@@ -1,0 +1,7 @@
+<package>
+  <description brief="ff: pddl planner">
+    ff: pddl planner. see http://www.loria.fr/~hoffmanj/ff.html
+  </description>
+  <author>J.Hoffmann()</author>
+  <license>GPL</license>
+</package>
