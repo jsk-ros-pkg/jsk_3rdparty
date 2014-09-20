@@ -1,6 +1,6 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package bayesian_belief_networks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package voice_text
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1.0.40 (2014-09-19)
 -------------------
@@ -9,6 +9,14 @@ Changelog for package bayesian_belief_networks
 -------------------
 
 1.0.38 (2014-09-13)
+-------------------
+* catkinize python_twoauth and voice_text, modify multi_map_server's catkin.cmake
+* Contributors: JSK applications, Ryohei Ueda
+
+* catkinize python_twoauth and voice_text, modify multi_map_server's catkin.cmake
+* Contributors: Yuto Inagaki
+
+1.0.37 (2014-09-08)
 -------------------
 
 1.0.36 (2014-09-01)
@@ -43,20 +51,15 @@ Changelog for package bayesian_belief_networks
 
 1.0.26 (2014-05-30)
 -------------------
-* (#445) fix setup.py
-* Contributors: Kei Okada
 
 1.0.25 (2014-05-26)
 -------------------
 
 1.0.24 (2014-05-24)
 -------------------
-* rostwitter/rbayesian_belief_networks : add disable_ssl
 
 1.0.23 (2014-05-23)
 -------------------
-* add eBay/bayesian-belief-networks
-* Contributors: Kei Okada
 
 1.0.22 (2014-05-22)
 -------------------
@@ -126,3 +129,8 @@ Changelog for package bayesian_belief_networks
 
 1.0.0 (2014-03-05)
 ------------------
+* add nkf to rosdep.yaml
+* do not compile if voicetext is not installed
+* add r58200(fixed include path), r58221(added nkf to rosdep) by mikita
+* add voice_text client program, copy from jsk-ros-pkg-unreleased
+* Contributors: k-okada
