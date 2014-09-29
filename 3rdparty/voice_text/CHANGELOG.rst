@@ -1,6 +1,6 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package ffha
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package voice_text
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1.0.44 (2014-09-26)
 -------------------
@@ -10,6 +10,8 @@ Changelog for package ffha
 
 1.0.42 (2014-09-25)
 -------------------
+* Support cakint for vice_text by using catkin_find command
+* Contributors: Ryohei Ueda
 
 1.0.41 (2014-09-23)
 -------------------
@@ -21,6 +23,14 @@ Changelog for package ffha
 -------------------
 
 1.0.38 (2014-09-13)
+-------------------
+* catkinize python_twoauth and voice_text, modify multi_map_server's catkin.cmake
+* Contributors: JSK applications, Ryohei Ueda
+
+* catkinize python_twoauth and voice_text, modify multi_map_server's catkin.cmake
+* Contributors: Yuto Inagaki
+
+1.0.37 (2014-09-08)
 -------------------
 
 1.0.36 (2014-09-01)
@@ -49,8 +59,6 @@ Changelog for package ffha
 
 1.0.28 (2014-06-24)
 -------------------
-* (ffha) use -n (--forward) to ignore patches that seem to be already applied
-* Contributors: Kei Okada
 
 1.0.27 (2014-06-10)
 -------------------
@@ -78,15 +86,9 @@ Changelog for package ffha
 
 1.0.19 (2014-05-06)
 -------------------
-* add find_package(catkin)
-* Add several missing build deps
-* ff, ffha: add CHANGELOG.rst
-* Contributors: Kei Okada, Scott K Logan
 
 1.0.18 (2014-05-04)
 -------------------
-* catkinize ffha
-* Contributors: Kei Okada
 
 1.0.17 (2014-04-20)
 -------------------
@@ -141,8 +143,8 @@ Changelog for package ffha
 
 1.0.0 (2014-03-05)
 ------------------
-* add dependencies of ffha
-* add patch for parse.c, segv if last condition of inititial state is 'not-condition' in problem
-* remove strange exit(-1) for use non DNF preconditions
-* put jsk tools in jsk_common stack
-* Contributors: furushchev, manabu, rosen
+* add nkf to rosdep.yaml
+* do not compile if voicetext is not installed
+* add r58200(fixed include path), r58221(added nkf to rosdep) by mikita
+* add voice_text client program, copy from jsk-ros-pkg-unreleased
+* Contributors: k-okada
