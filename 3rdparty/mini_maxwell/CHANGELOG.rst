@@ -1,14 +1,19 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package bayesian_belief_networks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package mini_maxwell
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1.0.51 (2014-10-20)
 -------------------
+* fix version number of mini_maxwell
+* download scripts in catkin_make
+* add sample program to control bandwidth
+* change band number
+* catkinize mini_maxwell
+* change mini maxwell parameter with dynamic reconfigure
+* Contributors: Kei Okada, Yusuke Furuta
 
 1.0.50 (2014-10-20)
 -------------------
-* Update bayesian_belief_networks to work on non-debian systems
-* Contributors: Scott K Logan
 
 1.0.49 (2014-10-13)
 -------------------
@@ -25,11 +30,11 @@ Changelog for package bayesian_belief_networks
 1.0.45 (2014-09-29)
 -------------------
 
-1.0.44 (2014-09-26)
--------------------
+1.0.44 (2014-09-26 09:17)
+-------------------------
 
-1.0.43 (2014-09-26)
--------------------
+1.0.43 (2014-09-26 01:08)
+-------------------------
 
 1.0.42 (2014-09-25)
 -------------------
@@ -44,6 +49,9 @@ Changelog for package bayesian_belief_networks
 -------------------
 
 1.0.38 (2014-09-13)
+-------------------
+
+1.0.37 (2014-09-08)
 -------------------
 
 1.0.36 (2014-09-01)
@@ -78,20 +86,15 @@ Changelog for package bayesian_belief_networks
 
 1.0.26 (2014-05-30)
 -------------------
-* (#445) fix setup.py
-* Contributors: Kei Okada
 
 1.0.25 (2014-05-26)
 -------------------
 
 1.0.24 (2014-05-24)
 -------------------
-* rostwitter/rbayesian_belief_networks : add disable_ssl
 
 1.0.23 (2014-05-23)
 -------------------
-* add eBay/bayesian-belief-networks
-* Contributors: Kei Okada
 
 1.0.22 (2014-05-22)
 -------------------
