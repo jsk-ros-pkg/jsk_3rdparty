@@ -1,12 +1,19 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package multi_map_server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package mini_maxwell
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1.0.52 (2014-10-23)
 -------------------
 
 1.0.51 (2014-10-20)
 -------------------
+* fix version number of mini_maxwell
+* download scripts in catkin_make
+* add sample program to control bandwidth
+* change band number
+* catkinize mini_maxwell
+* change mini maxwell parameter with dynamic reconfigure
+* Contributors: Kei Okada, Yusuke Furuta
 
 1.0.50 (2014-10-20)
 -------------------
@@ -26,16 +33,14 @@ Changelog for package multi_map_server
 1.0.45 (2014-09-29)
 -------------------
 
-1.0.44 (2014-09-26)
--------------------
+1.0.44 (2014-09-26 09:17)
+-------------------------
 
-1.0.43 (2014-09-26)
--------------------
+1.0.43 (2014-09-26 01:08)
+-------------------------
 
 1.0.42 (2014-09-25)
 -------------------
-* Rename executable of multi_map_server to avoid conflict against map_server
-* Contributors: Ryohei Ueda
 
 1.0.41 (2014-09-23)
 -------------------
@@ -48,13 +53,12 @@ Changelog for package multi_map_server
 
 1.0.38 (2014-09-13)
 -------------------
-* catkinize python_twoauth and voice_text, modify multi_map_server's catkin.cmake
-* Contributors: Yuto Inagaki
+
+1.0.37 (2014-09-08)
+-------------------
 
 1.0.36 (2014-09-01)
 -------------------
-* modify to install executable to right path
-* Contributors: Yuto Inagaki
 
 1.0.35 (2014-08-16)
 -------------------
@@ -85,8 +89,6 @@ Changelog for package multi_map_server
 
 1.0.26 (2014-05-30)
 -------------------
-* enable depend to map_server for default
-* Contributors: Kei Okada
 
 1.0.25 (2014-05-26)
 -------------------
@@ -115,23 +117,23 @@ Changelog for package multi_map_server
 1.0.17 (2014-04-20)
 -------------------
 
-1.0.16 (2014-04-19)
--------------------
+1.0.16 (2014-04-19 23:29)
+-------------------------
 
-1.0.15 (2014-04-19)
--------------------
+1.0.15 (2014-04-19 20:19)
+-------------------------
 
-1.0.14 (2014-04-19)
--------------------
+1.0.14 (2014-04-19 12:52)
+-------------------------
 
-1.0.13 (2014-04-19)
--------------------
+1.0.13 (2014-04-19 11:06)
+-------------------------
 
-1.0.12 (2014-04-18)
--------------------
+1.0.12 (2014-04-18 16:58)
+-------------------------
 
-1.0.11 (2014-04-18)
--------------------
+1.0.11 (2014-04-18 08:18)
+-------------------------
 
 1.0.10 (2014-04-17)
 -------------------
@@ -142,30 +144,20 @@ Changelog for package multi_map_server
 1.0.8 (2014-04-11)
 ------------------
 
+1.0.7 (2014-04-10)
+------------------
+
 1.0.6 (2014-04-07)
 ------------------
-* Added support for YAML-CPP 0.5+.
-  The new yaml-cpp API removes the "node >> outputvar;" operator, and
-  it has a new way of loading documents. There's no version hint in the
-  library's headers, so I'm getting the version number from pkg-config.
-  This is a port of @ktossell's patch for map_server.
-* Contributors: Scott K Logan
 
 1.0.5 (2014-03-31)
 ------------------
-* check if map_server exists under /opt/ros/{ROS_DISTRO}/stacks/navigation/map_server for groovy
-* Contributors: Kei Okada
 
-1.0.4 (2014-03-27)
+1.0.4 (2014-03-29)
 ------------------
-* multi_map_server: disable map_server for default in build_depend, run_depend
-* fix typo CATKIN-DEPENDS -> CATKIN_DEPENDS
-* multi_map_server: catkinize
-* Contributors: Kei Okada, Ryohei Ueda
 
 1.0.3 (2014-03-19)
 ------------------
-* update revision number to 1.0.3
 
 1.0.2 (2014-03-12)
 ------------------
@@ -175,6 +167,3 @@ Changelog for package multi_map_server
 
 1.0.0 (2014-03-05)
 ------------------
-* add explicit dependency to yaml-cpp as yaml-cpp i sinstalled as a rosdep system dependency
-* add multi_map_server, map_server with switch service, (this will publish TF between maps in the future)
-* Contributors: k-okada, manabu
