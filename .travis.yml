@@ -1,0 +1,16 @@
+language:
+  - cpp
+  - python
+python:
+  - "2.7"
+compiler:
+  - gcc
+sudo: required
+env:
+  - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=true  ROS_PARALLEL_JOBS="-j2 -l2"
+  - ROS_DISTRO=indigo ROSWS=wstool BUILDER=catkin   USE_DEB=true  ROS_PARALLEL_JOBS="-j8"
+script: source .travis/travis.sh
+notifications:
+  email:
+    on_success: always
+    on_failure: always
