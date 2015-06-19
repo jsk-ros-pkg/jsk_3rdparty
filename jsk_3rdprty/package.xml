@@ -31,8 +31,6 @@
   <run_depend>rostwitter</run_depend>
   <run_depend>bayesian_belief_networks</run_depend>
   <run_depend>julius</run_depend>
-  <run_depend>collada_urdf_jsk_patch</run_depend>
-  <run_depend>laser_filters_jsk_patch</run_depend>
   <export>
     <metapackage/>
   </export>
