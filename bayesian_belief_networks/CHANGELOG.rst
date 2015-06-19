@@ -2,6 +2,10 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* move from jsk_common to jsk_3rdparty
+
 1.0.72 (2015-06-07)
 -------------------
 * [bayesian_belief_networks] Ignore libs in git tracking

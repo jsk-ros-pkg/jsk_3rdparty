@@ -2,6 +2,10 @@
 Changelog for package mini_maxwell
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* move from jsk_common to jsk_3rdparty
+
 1.0.72 (2015-06-07)
 -------------------
 

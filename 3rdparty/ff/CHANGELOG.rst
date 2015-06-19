@@ -2,6 +2,13 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* move from jsk_common to jsk_3rdparty
+* [ff/package.xml] add mk to build_depend
+* 1.0.72
+* Contributors: Ryohei Ueda
+
 1.0.72 (2015-06-07)
 -------------------
 
