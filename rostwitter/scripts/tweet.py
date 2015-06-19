@@ -103,7 +103,7 @@ def tweet(dat):
         message = re.sub(filename,"",message)
         if os.path.exists(filename):
             ##rospy.logdebug(rospy.get_name() + " tweet %s with file %s", message, filename)                       
-            ret = Api.PostMedia(message, filename)
+            ret = Api.PostMedia(message[0:116], filename) # 140 - len("http://t.co/ssssssssss")
             #ret = Api.PostUpdate(message)
         else:
             rospy.logerr(rospy.get_name() + " %s could not find", filename)
