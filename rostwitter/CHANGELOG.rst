@@ -2,8 +2,8 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2015-06-19)
+------------------
 * move from jsk_common to jsk_3rdparty
 * [tweet.py] fix to post more than 116 character on PostMedia
 * Contributors: Kei Okada

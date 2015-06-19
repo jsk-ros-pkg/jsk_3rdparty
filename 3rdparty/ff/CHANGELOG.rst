@@ -2,8 +2,8 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2015-06-19)
+------------------
 * move from jsk_common to jsk_3rdparty
 * [ff/package.xml] add mk to build_depend
 * 1.0.72
