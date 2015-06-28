@@ -2,6 +2,9 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.1 (2015-06-19)
 ------------------
 * jsk_patch is not releasesd on indigo

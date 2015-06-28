@@ -2,6 +2,11 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [/jsk_ros_patch/collada_urdf_jsk_patch/CMakeLists.txt] if ROS_DISTRO is jade, the we'll use robot_model for indigo. jade-devel branch for robot_model is not released yet
+* Contributors: Kei Okada
+
 2.0.1 (2015-06-19)
 ------------------
 

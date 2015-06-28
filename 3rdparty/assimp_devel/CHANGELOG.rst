@@ -2,6 +2,11 @@
 Changelog for package assimp_devel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [Makefile] use http instead of https
+* Contributors: Kei Okada
+
 2.0.1 (2015-06-19)
 ------------------
 
