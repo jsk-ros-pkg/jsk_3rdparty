@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+  <name>libcmt</name>
+  <version>0.0.1</version>
+  <description>libCMT ROS Wrapper</description>
+  <maintainer email="inagaki@inagaki.jsk.imi.i.u-tokyo.ac.jp">Yuto Inagaki</maintainer>
+
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
