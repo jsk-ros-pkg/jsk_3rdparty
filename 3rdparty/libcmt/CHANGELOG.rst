@@ -2,8 +2,8 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.3 (2015-08-01)
+------------------
 * Update Changelog
 * [3rdparty] add libcmt
 * Contributors: Ryohei Ueda, Yuto Inagaki
