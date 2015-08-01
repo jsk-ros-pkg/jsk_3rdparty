@@ -2,6 +2,9 @@
 Changelog for package assimp_devel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.2 (2015-06-29)
 ------------------
 * [Makefile] use http instead of https

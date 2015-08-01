@@ -2,6 +2,9 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.2 (2015-06-29)
 ------------------
 * [Makefile] use http instead of https

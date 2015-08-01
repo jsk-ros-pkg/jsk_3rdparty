@@ -4,6 +4,10 @@ Changelog for package libcmt
 
 Forthcoming
 -----------
+* Update Changelog
+* [3rdparty] add libcmt
+* Contributors: Ryohei Ueda, Yuto Inagaki
+
 * [3rdparty] add libcmt
 * Contributors: Yuto Inagaki
 
