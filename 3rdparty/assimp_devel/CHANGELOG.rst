@@ -2,6 +2,11 @@
 Changelog for package assimp_devel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add ca-certificates for https download
+* Contributors: Kei Okada
+
 2.0.3 (2015-08-01)
 ------------------
 

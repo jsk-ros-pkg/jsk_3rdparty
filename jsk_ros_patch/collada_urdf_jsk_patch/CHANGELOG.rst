@@ -2,6 +2,11 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* collada_urdf_jsk_patch/Makefile: use catkin build to compile robot_model
+* Contributors: Kei Okada
+
 2.0.3 (2015-08-01)
 ------------------
 
