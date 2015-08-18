@@ -12,6 +12,8 @@
   <build_depend>boost</build_depend>
   <build_depend>zlib</build_depend>
   <build_depend>unzip</build_depend>
+  <build_depend>ca-certificates</build_depend>
+  <build_depend>openssl</build_depend>
 
   <run_depend>boost</run_depend>
   <run_depend>zlib</run_depend>

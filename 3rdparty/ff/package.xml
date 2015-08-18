@@ -23,6 +23,8 @@
   <build_depend>rosbash</build_depend>
   <build_depend>rospack</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>ca-certificates</build_depend>
+  <build_depend>openssl</build_depend>
  
   <export>
 
