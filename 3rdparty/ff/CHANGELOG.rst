@@ -2,6 +2,9 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.4 (2015-08-18)
 ------------------
 * add ca-certificates for https download
