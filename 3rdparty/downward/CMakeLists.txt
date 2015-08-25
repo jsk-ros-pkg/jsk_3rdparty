@@ -11,7 +11,7 @@ add_custom_command(
 )
 add_custom_command(
   OUTPUT ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
-  COMMAND cmake -E copy_directory build/downward/scripts/ ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
+  COMMAND cmake -E copy_directory build/downward/src/ ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
   DEPENDS installed
 )
 
