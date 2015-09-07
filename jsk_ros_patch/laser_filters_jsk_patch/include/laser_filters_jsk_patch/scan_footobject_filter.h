@@ -102,7 +102,7 @@ public:
     for (unsigned int i = 0; i < scan_in.ranges.size (); i++)
     {
       scan_out.ranges[i] = -1.0 * fabs(scan_in.ranges[i]); // set all ranges to invalid (*)
-      if ( scan_in.ranges[i] < 0 ) {
+      if ( scan_in.ranges[i] < 0 || std::isnan(scan_in.ranges[i])) {
           if ( range_blob.size() > min_points_ ) {
               range_blobs.push_back(range_blob);
           }
