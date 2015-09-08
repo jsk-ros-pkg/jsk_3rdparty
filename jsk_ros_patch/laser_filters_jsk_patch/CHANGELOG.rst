@@ -2,6 +2,11 @@
 Changelog for package laser_filters_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [laser_filters_jsk_patch] add nan check in scan_footobject_filter
+* Contributors: Yuto Inagaki
+
 2.0.5 (2015-08-23)
 ------------------
 

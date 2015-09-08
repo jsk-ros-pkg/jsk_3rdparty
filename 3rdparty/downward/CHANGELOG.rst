@@ -2,6 +2,12 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [downward/CMakeLists.txt] fix copy source directory path
+  source path changed maybe from when we use jsk-ros-pkg/archives
+* Contributors: Yuki Furuta
+
 2.0.5 (2015-08-23)
 ------------------
 

@@ -2,6 +2,12 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [libcmt] add git depend in package.xml
+* [libcmt] Fix email of maintainer
+* Contributors: Ryohei Ueda, Yuto Inagaki
+
 2.0.5 (2015-08-23)
 ------------------
 
