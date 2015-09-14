@@ -7,7 +7,7 @@ add_custom_target(libsiftfast ALL
   DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libsiftfast.so)
 add_custom_command(OUTPUT ${CATKIN_DEVEL_PREFIX}/lib/libsiftfast.so
   DEPENDS Makefile
-  COMMAND  make -f ${PROJECT_SOURCE_DIR}/Makefile INSTALL_DIR=${CATKIN_DEVEL_PREFIX})
+  COMMAND  make -f ${PROJECT_SOURCE_DIR}/Makefile SOURCE_DIR=${PROJECT_SOURCE_DIR} INSTALL_DIR=${CATKIN_DEVEL_PREFIX})
 
 # force install directory for catkin_package
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
@@ -29,6 +29,13 @@ endif()
 
 install(PROGRAMS ${CATKIN_DEVEL_PREFIX}/bin/siftfast
         DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+
+execute_process(
+  COMMAND ${PYTHON_EXECUTABLE} -c "from catkin_tools.verbs.catkin_build.common import get_python_install_dir; print get_python_install_dir()"
+  OUTPUT_VARIABLE _python_install_dir)
+install(CODE "
+  FILE(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${_python_install_dir}\" TYPE PROGRAM FILES \"${CATKIN_DEVEL_PREFIX}/lib/siftfastpy.so\")
+")
 
 install(CODE "
   file(GLOB _libs ${CATKIN_DEVEL_PREFIX}/lib/libsiftfast.*)
