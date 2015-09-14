@@ -1,6 +1,6 @@
 <package>
   <name>assimp_devel</name>
-  <version>2.0.6</version>
+  <version>2.0.7</version>
   <description>assimp library</description>
   <license>LGPL</license>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>

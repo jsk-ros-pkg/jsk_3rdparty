@@ -2,8 +2,8 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.7 (2015-09-14)
+------------------
 * [libsiftfast] Fix CMakeLists to generate python binding
 * Contributors: Kentaro Wada
 
