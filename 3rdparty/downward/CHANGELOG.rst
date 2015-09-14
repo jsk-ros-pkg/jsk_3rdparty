@@ -2,6 +2,9 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.6 (2015-09-08)
 ------------------
 * [downward/CMakeLists.txt] fix copy source directory path
