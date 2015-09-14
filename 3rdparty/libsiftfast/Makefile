@@ -12,6 +12,7 @@ build: SVN_UP libsiftfast
 
 BOOST_INCLUDE_DIRS=$(shell rosboost-cfg --include_dirs)
 BOOST_LIBRARY_DIRS=$(shell rosboost-cfg --lib_dirs)
+PYTHON_INSTALL_DIR=$(shell python -c "import sys; from catkin_tools.verbs.catkin_build.common import get_python_install_dir; sys.stdout.write(get_python_install_dir())")
 
 BUILDDIR=$(shell if [ $(DEBUG) ]; then echo builddebug; else echo build; fi)
 BUILDDIR=$(shell if [ $(DEBUG) ]; then echo builddebug; else echo build; fi)
@@ -25,6 +26,7 @@ patch: clone
 
 libsiftfast: patch
 	cd $(SVN_DIR)/$(BUILDDIR) && BOOST_INCLUDEDIR=$(BOOST_INCLUDE_DIRS) BOOST_LIBRARYDIR=$(BOOST_LIBRARY_DIRS) cmake -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) .. && make $(ROS_PARALLEL_JOBS) install
+	mkdir -p $(INSTALL_DIR)/$(PYTHON_INSTALL_DIR) && mv $(INSTALL_DIR)/lib/siftfastpy.so $(INSTALL_DIR)/$(PYTHON_INSTALL_DIR)/siftfastpy.so
 
 clean:
 	cd $(INSTALL_DIR) && make -C $(SVN_DIR) clean

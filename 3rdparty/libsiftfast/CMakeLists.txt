@@ -31,10 +31,10 @@ install(PROGRAMS ${CATKIN_DEVEL_PREFIX}/bin/siftfast
         DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 execute_process(
-  COMMAND ${PYTHON_EXECUTABLE} -c "from catkin_tools.verbs.catkin_build.common import get_python_install_dir; print get_python_install_dir()"
+  COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from catkin_tools.verbs.catkin_build.common import get_python_install_dir; sys.stdout.write(get_python_install_dir())"
   OUTPUT_VARIABLE _python_install_dir)
 install(CODE "
-  FILE(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${_python_install_dir}\" TYPE PROGRAM FILES \"${CATKIN_DEVEL_PREFIX}/lib/siftfastpy.so\")
+  FILE(INSTALL DESTINATION ${CMAKE_INSTALL_PREFIX}/${_python_install_dir} TYPE PROGRAM FILES ${CATKIN_DEVEL_PREFIX}/${_python_install_dir}/siftfastpy.so)
 ")
 
 install(CODE "
