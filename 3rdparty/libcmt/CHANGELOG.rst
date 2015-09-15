@@ -2,6 +2,11 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [libcmt] Depends on opencv2
+* Contributors: Ryohei Ueda
+
 2.0.7 (2015-09-14)
 ------------------
 
