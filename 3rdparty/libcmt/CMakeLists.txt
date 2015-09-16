@@ -6,7 +6,8 @@ include(ExternalProject)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
-
+execute_process(COMMAND
+  git config --global http.sslVerify false)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 ExternalProject_Add(
@@ -20,4 +21,3 @@ ExternalProject_Add(
 
 catkin_package(
   )
-
