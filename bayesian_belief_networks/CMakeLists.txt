@@ -3,6 +3,10 @@ project(bayesian_belief_networks)
 
 find_package(catkin REQUIRED COMPONENTS rospy std_msgs mk message_generation)
 
+set(CATKIN_VERSION ${catkin_VERSION}) #this is used in setup.py
+# Use configure_file because when installing package, this CATKIN_VERSION
+# environmental variable is not available
+configure_file(${PROJECT_SOURCE_DIR}/setup.py.in ${PROJECT_SOURCE_DIR}/setup.py)
 catkin_python_setup()
 
 add_message_files(DIRECTORY msg FILES Result.msg Observation.msg)
