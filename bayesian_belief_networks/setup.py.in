@@ -16,7 +16,7 @@ if os.path.isfile("/etc/debian_version"):
 else:
     target_dir = 'lib/python'+ sys_version +'/site-package'
 
-if StrictVersion("@CATKIN_VERSION@") >= StrictVersion("0.6.14"):
+if StrictVersion("@CATKIN_VERSION@") >= StrictVersion("0.6.15"):
     d = generate_distutils_setup(
         packages=['bayesian','bayesian_belief_networks'],
         package_dir={'bayesian': target_dir+'/bayesian','bayesian_belief_networks':'src/bayesian_belief_networks'}
