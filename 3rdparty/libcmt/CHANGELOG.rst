@@ -2,6 +2,12 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use libopencv-dev instad of opencv2, see `#23 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/23>`_
+* [libcmt] Disable ssl verify before chekingout git project
+* Contributors: Kei Okada, Ryohei Ueda
+
 2.0.8 (2015-09-15)
 ------------------
 * [libcmt] Depends on opencv2

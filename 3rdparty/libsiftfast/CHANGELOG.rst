@@ -2,6 +2,11 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [libsiftfast] Install python binding correctly when catkin config --no-install
+* Contributors: Kentaro Wada
+
 2.0.8 (2015-09-15)
 ------------------
 

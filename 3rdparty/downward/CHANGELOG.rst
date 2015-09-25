@@ -2,6 +2,11 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [downward] Use rawgit instead of github to download downward
+* Contributors: Ryohei Ueda
+
 2.0.8 (2015-09-15)
 ------------------
 

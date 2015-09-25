@@ -2,6 +2,14 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [bayesian_belief_network] Increase catkin version to fix basename
+  mismatch problem
+  see https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/27#issuecomment-143007535
+* [bayesian_belief_networks/] Fix basename mismatch problem
+* Contributors: Ryohei Ueda
+
 2.0.8 (2015-09-15)
 ------------------
 
