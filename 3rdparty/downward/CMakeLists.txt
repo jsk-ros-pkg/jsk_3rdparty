@@ -5,18 +5,21 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-add_custom_command(
-  OUTPUT installed
-  COMMAND \$\(MAKE\) -f ${PROJECT_SOURCE_DIR}/Makefile
+include(ExternalProject)
+externalproject_add(downward
+  URL https://cdn.rawgit.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND cd src && ./build_all DOWNWARD_BITWIDTH=native
+  INSTALL_COMMAND bash -c "cp -rf --parents src/{validate,plan,preprocess/preprocess,search/downward*,search/unitcost,search/portfolio.py,translate} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}"
+  BUILD_IN_SOURCE 1
 )
-add_custom_command(
-  OUTPUT ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
-  COMMAND cmake -E copy_directory build/downward/src/ ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
-  DEPENDS installed
-)
+externalproject_get_property(downward source_dir)
 
-add_custom_target(downward_install ALL DEPENDS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
-
-install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
+install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/
   USE_SOURCE_PERMISSIONS)
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS rostest)
+  add_rostest(test/test_downward.test)
+endif()

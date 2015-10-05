@@ -1,0 +1,4 @@
+<launch>
+  <test test-name="test_downward" pkg="downward" type="test_downward.py"
+        args="$(find downward)/test/hanoi_domain.pddl $(find downward)/test/hanoi_problem.pddl /tmp/plan-result $(find downward)/test/plan-result-ref" />
+</launch>
