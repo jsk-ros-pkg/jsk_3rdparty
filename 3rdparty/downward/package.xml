@@ -19,4 +19,5 @@
   <build_depend>gawk</build_depend>
   <build_depend>g++-static</build_depend>
   <build_depend>rostest</build_depend>
+  <build_depend>time</build_depend>
 </package>
