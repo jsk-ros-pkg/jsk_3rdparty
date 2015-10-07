@@ -2,6 +2,11 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [travis.yml&downward] install time from rosdep instead of travis.yml
+* Contributors: Yuki Furuta, Ryohei Ueda
+
 2.0.10 (2015-10-07)
 -------------------
 * - [downward] use ExternalProject instead of mk to reduce build failure
