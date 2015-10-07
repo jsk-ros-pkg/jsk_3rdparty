@@ -2,8 +2,8 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.11 (2015-10-07)
+-------------------
 * [travis.yml&downward] install time from rosdep instead of travis.yml
 * Contributors: Yuki Furuta, Ryohei Ueda
 
