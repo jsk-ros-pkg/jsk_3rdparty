@@ -2,8 +2,8 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.10 (2015-10-07)
+-------------------
 * - [downward] use ExternalProject instead of mk to reduce build failure
   - [downward] add test for planning
   - [travis.yml] fix: add EXTRA_DEB=time for test downward
