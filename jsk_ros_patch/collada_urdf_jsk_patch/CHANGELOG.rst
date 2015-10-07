@@ -2,6 +2,11 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [collada_urdf_jsk_patch] Add README.md
+* Contributors: Ryohei Ueda
+
 2.0.9 (2015-09-26)
 ------------------
 
