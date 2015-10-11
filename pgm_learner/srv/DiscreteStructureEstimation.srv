@@ -1,0 +1,5 @@
+pgm_learner/DiscreteGraphState[] states # trial data
+float64 pvalparam # optional
+uint16 indegree # optional
+---
+pgm_learner/GraphStructure graph # structure of network

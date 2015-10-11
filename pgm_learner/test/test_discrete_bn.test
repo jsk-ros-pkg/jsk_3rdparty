@@ -1,0 +1,5 @@
+<launch>
+  <node name="pgm_learner" pkg="pgm_learner" type="pgm_learner_server.py"
+        output="screen" />
+  <test test-name="discrete_bn_test" pkg="pgm_learner" type="test_discrete_bn.py" />
+</launch>

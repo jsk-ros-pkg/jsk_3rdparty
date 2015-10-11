@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>pgm_learner</name>
+  <version>0.0.0</version>
+  <description>Parameter/Structure Estimation and Inference for Bayesian Belief Network</description>
+
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
+  <license>MIT</license>
+  <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>python-libpgm-pip</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>message_runtime</run_depend>
+
+  <export>
+  </export>
+</package>

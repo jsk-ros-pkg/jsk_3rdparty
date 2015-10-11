@@ -1,0 +1,4 @@
+pgm_learner/GraphStructure graph # graph skeleton
+pgm_learner/DiscreteGraphState[] states # trial data
+---
+pgm_learner/DiscreteNode[] nodes # information of each nodes

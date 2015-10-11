@@ -1,0 +1,6 @@
+pgm_learner/LinearGaussianGraphState[] states # trial data
+float64 pvalparam # optional
+uint16 bins # optional
+uint16 indegree # optional
+---
+pgm_learner/GraphStructure graph # structure of network
