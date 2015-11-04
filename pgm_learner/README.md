@@ -19,8 +19,3 @@ roslaunch pgm_learner parameter_estimation.launch
 rosrun pgm_learner discrete_bayesian_parameter_estimation_sample.py
 rosrun pgm_learner linear_gaussian_bayesian_parameter_estimation_sample.py
 ```
-
-# TODO
-- add sample for structure estimation
-- add test for euslisp client
-- visualization
