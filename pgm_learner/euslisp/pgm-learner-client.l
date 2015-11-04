@@ -62,11 +62,12 @@
                                           :node_from (string-downcase (string (car gs)))
                                           :node_to   (string-downcase (string (caddr gs)))))
                             graph-list)))
-         (setq nodes (unique
+         (setq nodes (remove-duplicates
                       (flatten (mapcar #'(lambda (gs)
                                            (list (string-downcase (string (car gs)))
                                                  (string-downcase (string (caddr gs)))))
-                                       graph-list))))
+                                       graph-list))
+                      :test #'string=))
          (ros::ros-info "registered ~A nodes" (length nodes))
          (setq structure (instance pgm_learner::GraphStructure :init
                                    :nodes nodes :edges edges)))
