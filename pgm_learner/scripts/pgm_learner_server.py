@@ -79,10 +79,12 @@ class PGMLearnerServer(object):
         skel.toporder()
         data = U.graph_states_dict_from_ros(req.states)
         res = self.learner.lg_mle_estimateparams(skel, data)
+        rospy.logdebug("parameter estimation: %s" % res.Vdata)
         return LinearGaussianParameterEstimationResponse(U.linear_gaussian_nodes_to_ros(res.Vdata))
 
     def lg_structure_estimation_cb(self, req):
         states = [{ns.node: ns.state for ns in s.node_states} for s in req.states]
+        rospy.logdebug(states)
         pvalparam = 0.05 # default value
         bins = 10 # default value
         indegree = 1 # default value
@@ -92,10 +94,14 @@ class PGMLearnerServer(object):
             bins = req.bins
         if req.indegree != 0:
             indegree = req.indegree
+        rospy.logdebug("bins: %d, pvalparam: %f, indegree: %d" % (bins, pvalparam, indegree))
         res = self.learner.lg_constraint_estimatestruct(states,
                                                         pvalparam=pvalparam,
                                                         bins=bins,
                                                         indegree=indegree)
+        rospy.logdebug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        rospy.logdebug(res.V)
+        rospy.logdebug(res.E)
         return LinearGaussianStructureEstimationResponse(U.graph_skeleton_to_ros(res))
 
 
