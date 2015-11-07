@@ -1,0 +1,4 @@
+pgm_learner/GraphStructure graph # graph skeleton
+pgm_learner/LinearGaussianGraphState[] states # trial data
+---
+pgm_learner/LinearGaussianNode[] nodes # information of each nodes

@@ -1,0 +1,5 @@
+pgm_learner/DiscreteNode[] nodes # information of each nodes
+pgm_learner/DiscreteNodeState[] evidence # evidnce
+string[] query # query
+---
+pgm_learner/DiscreteNode[] nodes # information of each nodes

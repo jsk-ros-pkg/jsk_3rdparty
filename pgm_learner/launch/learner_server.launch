@@ -1,0 +1,4 @@
+<launch>
+  <node name="pgm_learner" pkg="pgm_learner" type="pgm_learner_server.py"
+        output="screen" />
+</launch>
