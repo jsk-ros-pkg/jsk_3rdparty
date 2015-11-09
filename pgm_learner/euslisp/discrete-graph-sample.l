@@ -17,11 +17,11 @@
                                    ((:a . :x1)
                                     (:b . 1)))))
 
-(warn ";;;;;;;;;;;;;; parameter estimation ;;;;;;;;;;;;;;;;;;~%")
+(ros::ros-info "parameter estimation")
 (dolist (n (send *graph* :parameter-estimation states))
   (print-ros-msg n))
 
-(warn ";;;;;;;;;;;;;; query ;;;;;;;;;;;;;;;;;;~%")
+(ros::ros-info "query")
 (dolist (n (send *graph* :query '(:a) :evidence '((:b . 1))))
   (print-ros-msg n))
 
