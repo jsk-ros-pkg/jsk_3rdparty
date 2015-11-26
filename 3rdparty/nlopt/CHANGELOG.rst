@@ -2,6 +2,14 @@
 Changelog for package nlopt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [nlopt] Stop compiling with octave
+  Fixes `#39 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/39>`_
+  This is because there is an error while compiling nlopt with octave on
+  Indigo Ubuntu 14.04.
+* Contributors: Kentaro Wada
+
 2.0.11 (2015-10-07)
 -------------------
 

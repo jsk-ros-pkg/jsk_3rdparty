@@ -2,6 +2,11 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* package.xml : downward uses time command on running (https://github.com/jsk-ros-pkg/jsk_planning/pull/30#issuecomment-146065373)
+* Contributors: Kei Okada
+
 2.0.11 (2015-10-07)
 -------------------
 * [travis.yml&downward] install time from rosdep instead of travis.yml

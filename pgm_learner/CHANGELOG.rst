@@ -1,28 +1,34 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package libsiftfast
+Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Forthcoming
 -----------
+* pgm_learner/package.xml : bad version number
+* [pgm_learner/euslisp/*-sample.l] refactor sample lisp codes
+  [pgm_learner/euslisp/pgm-learner-client.l] add graph visualization for lg bayesian graph
+* [pgm_learner/scripts/pgm_learner_server.py] add debug logging
+* [pgm_learner/README.md] remove achieved TODO
+* [pgm_learner/euslisp/pgm-learner-client.l] add graph visualization of lg-bayesian-graph
+* [pgm_learner/euslisp/pgm-learner-client.l] fix: use remove-duplicates to fetch unique node names instead of unique
+* [pgm_learner/euslisp/pgm-learner-client.l] disable validation
+* [pgm_learner] add pgm_learner package
+* Contributors: Furushchev, Kei Okada
 
-2.0.11 (2015-10-07)
--------------------
+2.0.11 (2015-10-07 14:16)
+-------------------------
 
-2.0.10 (2015-10-07)
--------------------
+2.0.10 (2015-10-07 12:47)
+-------------------------
 
 2.0.9 (2015-09-26)
 ------------------
-* [libsiftfast] Install python binding correctly when catkin config --no-install
-* Contributors: Kentaro Wada
 
 2.0.8 (2015-09-15)
 ------------------
 
 2.0.7 (2015-09-14)
 ------------------
-* [libsiftfast] Fix CMakeLists to generate python binding
-* Contributors: Kentaro Wada
 
 2.0.6 (2015-09-08)
 ------------------
@@ -39,12 +45,11 @@ Forthcoming
 2.0.2 (2015-06-29)
 ------------------
 
-2.0.1 (2015-06-19)
-------------------
+2.0.1 (2015-06-19 21:21)
+------------------------
 
-2.0.0 (2015-06-19)
-------------------
-* move from jsk_common to jsk_3rdparty
+2.0.0 (2015-06-19 10:41)
+------------------------
 
 1.0.72 (2015-06-07)
 -------------------
@@ -55,11 +60,11 @@ Forthcoming
 1.0.70 (2015-05-08)
 -------------------
 
-1.0.69 (2015-05-05)
--------------------
+1.0.69 (2015-05-05 12:28)
+-------------------------
 
-1.0.68 (2015-05-05)
--------------------
+1.0.68 (2015-05-05 09:49)
+-------------------------
 
 1.0.67 (2015-05-03)
 -------------------
@@ -82,13 +87,11 @@ Forthcoming
 1.0.61 (2015-02-11)
 -------------------
 
-1.0.60 (2015-02-03)
--------------------
+1.0.60 (2015-02-03 10:12)
+-------------------------
 
-1.0.59 (2015-02-03)
--------------------
-* Remove rosbuild files
-* Contributors: Ryohei Ueda
+1.0.59 (2015-02-03 04:05)
+-------------------------
 
 1.0.58 (2015-01-07)
 -------------------
@@ -111,11 +114,11 @@ Forthcoming
 1.0.52 (2014-10-23)
 -------------------
 
-1.0.51 (2014-10-20)
--------------------
+1.0.51 (2014-10-20 16:01)
+-------------------------
 
-1.0.50 (2014-10-20)
--------------------
+1.0.50 (2014-10-20 01:50)
+-------------------------
 
 1.0.49 (2014-10-13)
 -------------------
@@ -132,11 +135,11 @@ Forthcoming
 1.0.45 (2014-09-29)
 -------------------
 
-1.0.44 (2014-09-26)
--------------------
+1.0.44 (2014-09-26 09:17)
+-------------------------
 
-1.0.43 (2014-09-26)
--------------------
+1.0.43 (2014-09-26 01:08)
+-------------------------
 
 1.0.42 (2014-09-25)
 -------------------
@@ -151,6 +154,9 @@ Forthcoming
 -------------------
 
 1.0.38 (2014-09-13)
+-------------------
+
+1.0.37 (2014-09-08)
 -------------------
 
 1.0.36 (2014-09-01)
@@ -213,55 +219,53 @@ Forthcoming
 1.0.17 (2014-04-20)
 -------------------
 
-1.0.16 (2014-04-19)
--------------------
+1.0.16 (2014-04-19 23:29)
+-------------------------
 
-1.0.15 (2014-04-19)
--------------------
+1.0.15 (2014-04-19 20:19)
+-------------------------
 
-1.0.14 (2014-04-19)
--------------------
+1.0.14 (2014-04-19 12:52)
+-------------------------
 
-1.0.13 (2014-04-19)
--------------------
+1.0.13 (2014-04-19 11:06)
+-------------------------
 
-1.0.12 (2014-04-18)
--------------------
+1.0.12 (2014-04-18 16:58)
+-------------------------
 
-1.0.11 (2014-04-18)
--------------------
+1.0.11 (2014-04-18 08:18)
+-------------------------
 
 1.0.10 (2014-04-17)
 -------------------
 
 1.0.9 (2014-04-12)
 ------------------
-* change libsiftfast to non-catkin package by add SKIP_CMAKE_CONFIG_GENERATION
-* Contributors: Kei Okada
 
 1.0.8 (2014-04-11)
 ------------------
-* Merge pull request #376 from k-okada/catkinize_lib_siftfast
-* fix for buildpakcage: use install(CODE for libraries, since library file is generated during compile phase; remove devel directory when dhbuild; install share/siftfast -> share/libsiftfast
-* Contributors: Kei Okada
-* Only run Makefile during build phase (not install)
-  Currently, `Makefile` is re-run when catkin installs the package. This causes `Makefile` to re-install, this time leaving the files in `/` instead of an intermediate directory. This ensures that once built, `Makefile` is not re-run.
-* Contributors: Scott K Logan
 
 1.0.7 (2014-04-10)
 ------------------
-* Added missing build_depend on rospack and roslib
-* Handle case where ROS_DISTRO is not set
-* Contributors: Scott K Logan
 
 1.0.6 (2014-04-07)
 ------------------
-* catkinize libsiftfast, add fake add_library, set_target_properties for catkin, groovy does not suport EXPORTED_TARGETS
-* Contributors: Kei Okada
+
+1.0.5 (2014-03-31)
+------------------
+
+1.0.4 (2014-03-29)
+------------------
+
+1.0.3 (2014-03-19)
+------------------
+
+1.0.2 (2014-03-12)
+------------------
+
+1.0.1 (2014-03-07)
+------------------
 
 1.0.0 (2014-03-05)
 ------------------
-* add clean patched
-* change SVN repository to new sourceforge server. Fixed https://code.google.com/p/rtm-ros-robotics/issues/detail?id=84
-* moved posedetection_msgs, sift processing, and other packages to jsk_common and jsk_perception
-* Contributors: Yusuke Furuta, rosen, Kei Okada
