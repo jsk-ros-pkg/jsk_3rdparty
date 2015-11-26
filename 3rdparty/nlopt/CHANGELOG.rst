@@ -2,8 +2,8 @@
 Changelog for package nlopt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.12 (2015-11-26)
+-------------------
 * [nlopt] Stop compiling with octave
   Fixes `#39 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/39>`_
   This is because there is an error while compiling nlopt with octave on

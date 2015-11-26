@@ -2,8 +2,8 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.12 (2015-11-26)
+-------------------
 * pgm_learner/package.xml : bad version number
 * [pgm_learner/euslisp/*-sample.l] refactor sample lisp codes
   [pgm_learner/euslisp/pgm-learner-client.l] add graph visualization for lg bayesian graph
