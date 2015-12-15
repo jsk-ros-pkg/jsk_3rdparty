@@ -2,8 +2,8 @@
 Changelog for package ffha
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.13 (2015-12-15)
+-------------------
 * [ffha] Use http instead of https
   closes https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/45
   Modified:

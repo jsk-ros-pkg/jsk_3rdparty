@@ -2,8 +2,8 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.13 (2015-12-15)
+-------------------
 * [pgm_learner] Depends on rostest
   closes `#46 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/46>`_
   Modified:
