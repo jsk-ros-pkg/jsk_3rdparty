@@ -2,6 +2,14 @@
 Changelog for package ffha
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ffha] Use http instead of https
+  closes https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/45
+  Modified:
+  3rdparty/ffha/Makefile
+* Contributors: Ryohei Ueda
+
 2.0.12 (2015-11-26)
 -------------------
 

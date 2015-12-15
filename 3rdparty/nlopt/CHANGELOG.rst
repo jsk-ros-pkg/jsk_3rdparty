@@ -2,6 +2,9 @@
 Changelog for package nlopt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.12 (2015-11-26)
 -------------------
 * [nlopt] Stop compiling with octave

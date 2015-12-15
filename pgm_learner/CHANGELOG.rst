@@ -2,6 +2,14 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [pgm_learner] Depends on rostest
+  closes `#46 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/46>`_
+  Modified:
+  pgm_learner/package.xml
+* Contributors: Kei Okada, Ryohei Ueda
+
 2.0.12 (2015-11-26)
 -------------------
 * pgm_learner/package.xml : bad version number
@@ -13,7 +21,7 @@ Changelog for package pgm_learner
 * [pgm_learner/euslisp/pgm-learner-client.l] fix: use remove-duplicates to fetch unique node names instead of unique
 * [pgm_learner/euslisp/pgm-learner-client.l] disable validation
 * [pgm_learner] add pgm_learner package
-* Contributors: Furushchev, Kei Okada
+* Contributors: Yuki Furuta, Kei Okada
 
 2.0.11 (2015-10-07 14:16)
 -------------------------
