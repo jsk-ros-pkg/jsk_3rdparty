@@ -2,6 +2,9 @@
 Changelog for package ffha
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.13 (2015-12-15)
 -------------------
 * [ffha] Use http instead of https

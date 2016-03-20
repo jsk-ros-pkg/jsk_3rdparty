@@ -2,6 +2,11 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [.gitigonre] Ignore setup.py
+* Contributors: Kentaro Wada
+
 2.0.13 (2015-12-15)
 -------------------
 

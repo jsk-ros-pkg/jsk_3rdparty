@@ -2,6 +2,12 @@
 Changelog for package mini_maxwell
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove dynamic_reconfigure.parameter_generator, which only used for rosbuild
+* [mini_maxwell] Update maintainer
+* Contributors: Kei Okada, Ryohei Ueda
+
 2.0.13 (2015-12-15)
 -------------------
 

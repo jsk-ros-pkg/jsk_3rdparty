@@ -2,6 +2,13 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [CMakeLists.txt] downward: use http instead of https
+* [CMakeLists.txt] Set timeout for downloading downward
+* [package.xml] add ca-certificates to build_depends
+* Contributors: Kei Okada, Kentaro Wada
+
 2.0.13 (2015-12-15)
 -------------------
 

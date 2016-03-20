@@ -2,6 +2,11 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add depends to python-scipy
+* Contributors: Kei Okada
+
 2.0.13 (2015-12-15)
 -------------------
 * [pgm_learner] Depends on rostest

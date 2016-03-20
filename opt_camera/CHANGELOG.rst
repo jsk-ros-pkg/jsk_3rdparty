@@ -2,6 +2,11 @@
 Changelog for package opt_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove dynamic_reconfigure.parameter_generator, which only used for rosbuild
+* Contributors: Kei Okada
+
 2.0.13 (2015-12-15)
 -------------------
 
