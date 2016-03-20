@@ -2,8 +2,8 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.14 (2016-03-20)
+-------------------
 * add depends to python-scipy
 * Contributors: Kei Okada
 
