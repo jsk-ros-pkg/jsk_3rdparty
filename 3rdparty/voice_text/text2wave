@@ -20,8 +20,28 @@ do
 	esac
 done
 
+# Specify options
+# Because text2wave is called from soundplay_node.py and it is difficult to add arguments, we use environments.
+if [ -v VOICETEXT_TEXT2WAV_USE_LOCAL_MODE ]; # Use voice_text on local machine or remote machine.
+then
+    USE_LOCAL_MODE=1
+else
+    USE_LOCAL_MODE=0
+fi
+if [ -v VOICETEXT_TEXT2WAV_REMOTE_HOST ]; # Specify remote machine hostname, c2 by default.
+then
+    REMOTE_HOST=$VOICETEXT_TEXT2WAV_REMOTE_HOST
+else
+    REMOTE_HOST=c2
+fi
+
 nkf -s $INPUT_FILE > $JPTEXT_FILE
-scp $JPTEXT_FILE c2:$JPTEXT_FILE
-ssh c2 $COMMAND -o $OUTPUT_FILE $JPTEXT_FILE
-scp c2:$OUTPUT_FILE $OUTPUT_FILE
+if [ $USE_LOCAL_MODE -eq 0 ];
+then
+    scp $JPTEXT_FILE $REMOTE_HOST:$JPTEXT_FILE
+    ssh $REMOTE_HOST $COMMAND -o $OUTPUT_FILE $JPTEXT_FILE
+    scp $REMOTE_HOST:$OUTPUT_FILE $OUTPUT_FILE
+else
+    $COMMAND -o $OUTPUT_FILE $JPTEXT_FILE
+fi;
 #rm -f /tmp/_voice_text_*_$$.*
