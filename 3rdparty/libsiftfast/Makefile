@@ -12,7 +12,7 @@ build: SVN_UP libsiftfast
 
 BOOST_INCLUDE_DIRS=$(shell rosboost-cfg --include_dirs)
 BOOST_LIBRARY_DIRS=$(shell rosboost-cfg --lib_dirs)
-PYTHON_INSTALL_DIR=$(shell python -c "import sys; from catkin_tools.verbs.catkin_build.common import get_python_install_dir; sys.stdout.write(get_python_install_dir())")
+PYTHON_INSTALL_DIR=lib/python2.7/dist-packages
 
 BUILDDIR=$(shell if [ $(DEBUG) ]; then echo builddebug; else echo build; fi)
 BUILDDIR=$(shell if [ $(DEBUG) ]; then echo builddebug; else echo build; fi)
