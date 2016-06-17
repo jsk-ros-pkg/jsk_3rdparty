@@ -5,6 +5,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
 )
 
+catkin_add_env_hooks(99.bayesian_network SHELLS bash zsh
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
+
 catkin_python_setup()
 
 catkin_package(
