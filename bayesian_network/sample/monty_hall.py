@@ -26,9 +26,27 @@ nodes = [
                            .5,.5,0.])),
 ]
 
+print
+print "=== Inferring prob of monty_door given guest_door=A & prize_door=A ==="
 net = DiscreteBayesianNetwork(nodes)
-net.update_cpts()
 res = net.query([["guest_door", "A"],
                  ["prize_door", "A"]],
                 "monty_door")
-print res
+print "result:", res
+
+print
+print "=== Inferring prob of monty_door==C given guest_door=A & prize_door=A ==="
+res2 = net.query([["guest_door", "A"],
+                  ["prize_door", "B"]],
+                  [["monty_door", "C"]])
+print "result:", res2
+
+print
+print "=== Sampling instance datum from given network model ==="
+data = net.sample(1000)
+print "result:", data[:10], "...", len(data), "data"
+
+print
+print "=== Estimating network from data of monty hall ==="
+net2 = DiscreteBayesianNetwork(data=data)
+print "result:", net2.model_string()
