@@ -2,21 +2,7 @@
 # -*- coding: utf-8 -*-
 # Author: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
-
-from pyper import R
-import numpy as np
-
-class RObject(object):
-    def __init__(self, debug=False):
-        self.r = R(use_numpy=True)
-        self.debug = debug
-    def rcmd(self, cmd):
-        if self.debug:
-            print(cmd)
-        res = self.r(cmd)
-        if 'Error' in res:
-            raise Exception(res)
-        return res
+from . import helper
 
 class DiscreteNode(object):
     def __init__(self, name, values, parents, children, cpt):
@@ -26,7 +12,7 @@ class DiscreteNode(object):
         self.children = children
         self.cpt = cpt
 
-class DiscreteBayesianNetwork(RObject):
+class DiscreteBayesianNetwork(helper.RObject):
     def __init__(self, nodes=None, method="empty"):
         super(DiscreteBayesianNetwork, self).__init__(True)
         self.r('library(bnlearn)')
@@ -76,7 +62,6 @@ class DiscreteBayesianNetwork(RObject):
                     s += ', '
             s += ')'
         return s
-
     def model_string(self):
         s = ""
         for n in self.nodes:
@@ -85,6 +70,10 @@ class DiscreteBayesianNetwork(RObject):
                 s += "|" + ":".join(n.parents)
             s += "]"
         return s
+    def estimate_network(self, data, method='gs'):
+        self.r["data"] = data
+        self.r('graph <- %s(data)' % method)
+        return self.r["graph"]
     def fit(self, data):
         self.r["data"] = data
         self.r('fit = bn.fit(graph, data)')
@@ -101,31 +90,3 @@ class DiscreteBayesianNetwork(RObject):
         rcmd += "'))))"
         self.rcmd(rcmd)
         return self.r["query.result"]
-
-values = ["A","B","C"]
-nodes = [
-    DiscreteNode("prize_door", values,
-                 None, ["monty_door"],
-                 np.array([1./3]*3)),
-    DiscreteNode("guest_door", values,
-                 None, ["monty_door"],
-                 np.array([1./3]*3)),
-    DiscreteNode("monty_door", values,
-                 ["prize_door", "guest_door"], None,
-                 np.array([0.,.5,.5,
-                           0.,0.,1.,
-                           0.,1.,0.,
-                           0.,0.,1.,
-                           .5,0.,.5,
-                           1.,0.,0.,
-                           0.,1.,0.,
-                           1.,0.,0.,
-                           .5,.5,0.])),
-]
-
-net = DiscreteBayesianNetwork(nodes)
-net.update_cpts()
-res = net.query([["guest_door", "A"],
-                 ["prize_door", "A"]],
-                "monty_door"
-)
