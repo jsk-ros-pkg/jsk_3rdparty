@@ -42,6 +42,11 @@ class DiscreteBayesianNetwork(helper.RObject):
             except:
                 method="gs"
             self.estimate_network(data, method, **kwargs)
+    def ensure(self, var):
+        try:
+            self.r[var]
+        except:
+            raise ValueNotDefinedException(var)
     def estimate_network(self, data, method='gs', whitelist=None, blacklist=None, debug=False):
         self.r["data"] = data
         if whitelist is not None:
@@ -75,10 +80,7 @@ class DiscreteBayesianNetwork(helper.RObject):
             cpt = n_dict["prob"]
             self.nodes += [DiscreteNode(name, val, parents, children, cpt)]
     def sample(self, n):
-        try:
-            self.r["fit"]
-        except:
-            raise NoNetworkException()
+        self.ensure("fit")
         self.r("sample.result <- rbn(fit, %d)" % n)
         return self.r["sample.result"]
     def add_nodes(self, nodes):
@@ -87,10 +89,7 @@ class DiscreteBayesianNetwork(helper.RObject):
         rcmd = 'graph <- model2network("%s")' % self.model_string()
         self.rcmd(rcmd)
     def update_cpts(self):
-        try:
-            self.r["graph"]
-        except:
-            raise NoStructureException()
+        self.ensure("graph")
         rcmd = 'fit <- custom.fit(graph, dist = list('
         need_updated = False
         for n in self.nodes:
@@ -139,22 +138,16 @@ class DiscreteBayesianNetwork(helper.RObject):
                 s += "|" + ":".join(n.parents)
             s += "]"
         return s
-    def print_cpt(self, node_name):
+    def print_cprob(self, node_name):
         print self.rcmd('fit$%s' % node_name)
     def fit(self, data):
-        try:
-            self.r["graph"]
-        except:
-            raise NoStructureException()
+        self.ensure("graph")
         self.r.assign('data', data)
         self.rcmd('fit <- bn.fit(graph, data)')
         return self.r["fit"]
     def query(self, evidences, q):
-        try:
-            self.r["graph"]
-            self.r["fit"]
-        except:
-            raise NoNetworkException()
+        self.ensure("graph")
+        self.ensure("fit")
         if type(q) is list:
             rcmd = "query.result <- cpquery(fit, "
             qexp = ' & '.join(['(%s == "%s")' % tuple(e) for e in q])
@@ -173,16 +166,26 @@ class DiscreteBayesianNetwork(helper.RObject):
             n_sum = sum(res)
             res = map(lambda x: x * 1.0 / n_sum, res)
         return res
-    def plot(self, to_gui=True, to_pdf=None):
-        try:
-            self.r["graph"]
-        except:
-            raise NoStructureException()
-        if to_gui:
+    def plot_node(self, node_name, to_screen=True, to_pdf=None):
+        self.ensure("fit")
+        if to_screen:
+            self.rcmd("X11()")
+        self.rcmd("bn.fit.barchart(fit$%s)" % node_name)
+        if to_pdf is not None:
+            self.rcmd('dev.copy(pdf, file="%s")' % os.path.abspath(to_pdf))
+        if to_screen:
+            raw_input("press any key")
+        self.rcmd("dev.off()")
+    def plot(self, node_name=None, to_screen=True, to_pdf=None):
+        if node_name is not None:
+            self.plot_node(node_name, to_screen, to_pdf)
+            return
+        self.ensure("graph")
+        if to_screen:
             self.rcmd("X11()")
         self.rcmd("plot(graph)")
         if to_pdf is not None:
             self.rcmd('dev.copy(pdf, file="%s")' % os.path.abspath(to_pdf))
-        if to_gui:
+        if to_screen:
             raw_input("press any key")
         self.rcmd("dev.off()")

@@ -13,6 +13,7 @@
   <run_depend>rospy</run_depend>
   <run_depend>r-base</run_depend>
   <run_depend>pyper-pip</run_depend>
+  <run_depend>python-colorama</run_depend>
   <run_depend>python-pandas</run_depend>
   <export>
   </export>

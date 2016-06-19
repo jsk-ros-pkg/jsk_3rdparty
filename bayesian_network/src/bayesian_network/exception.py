@@ -3,10 +3,15 @@
 # Author: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 
-class NoStructureException(Exception):
+class ValueNotDefinedException(Exception):
+    hints = {
+        'graph': 'try add_nodes method',
+        'fit': 'try fit method'
+    }
+    def __init__(self, varname):
+        self.varname = varname
     def __str__(self):
-        return 'No structure found in graph. try add_nodes method'
-
-class NoNetworkException(Exception):
-    def __str__(self):
-        return "No network found in graph. try fit method"
+        hint = ''
+        if self.varname in hints:
+            hint = "(" + hints[self.varname] + ")"
+        return "Value %s is not defined in R. %s" % (self.varname, hint)

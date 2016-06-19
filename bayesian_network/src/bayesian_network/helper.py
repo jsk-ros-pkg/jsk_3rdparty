@@ -15,5 +15,3 @@ class RObject(object):
         if 'Error' in res:
             raise Exception(res)
         return res
-    def plot(self):
-        self.rcmd('plot(graph)')
