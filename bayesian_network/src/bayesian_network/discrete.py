@@ -4,7 +4,10 @@
 
 from . import helper
 from .exception import *
-from pyper import R
+import numpy as np
+import pandas as pd
+import os
+
 
 class DiscreteNode(object):
     def __init__(self, name, values, parents, children, cpt):
@@ -27,18 +30,38 @@ class DiscreteNode(object):
             return val
 
 class DiscreteBayesianNetwork(helper.RObject):
-    def __init__(self, nodes=None, data=None, method='gs'):
-        super(DiscreteBayesianNetwork, self).__init__(True)
+    def __init__(self, nodes=None, data=None, debug=True, **kwargs):
+        super(DiscreteBayesianNetwork, self).__init__(debug)
         self.r('library(bnlearn)')
         if nodes is not None:
             self.add_nodes(nodes)
             self.update_cpts()
         elif data is not None:
-            self.estimate_network(data, method)
-    def estimate_network(self, data, method='gs'):
+            try:
+                method=kwargs["method"]
+            except:
+                method="gs"
+            self.estimate_network(data, method, **kwargs)
+    def estimate_network(self, data, method='gs', whitelist=None, blacklist=None, debug=False):
         self.r["data"] = data
-        self.r("graph <- %s(data)" % method)
-        self.r("fit <- bn.fit(graph, data)")
+        if whitelist is not None:
+            self.r["whitelist"] = pd.DataFrame(np.array(whitelist), columns=["from", "to"])
+            self.rcmd('dimnames(whitelist)[2] <- list(c("from", "to"))')
+        else:
+            self.r["whitelist"] = None
+        if blacklist is not None:
+            self.r["blacklist"] = pd.DataFrame(np.array(blacklist), columns=["from", "to"])
+            self.rcmd('dimnames(blacklist)[2] <- list(c("from", "to"))')
+        else:
+            self.r["blacklist"] = None
+        self.r["debug"] = debug
+        self.rcmd("graph <- %s(data, blacklist=blacklist, whitelist=whitelist, debug=debug)" % method)
+        if debug:
+            self.rcmd("X11()")
+            self.rcmd("plot(graph)")
+            raw_input("hoge")
+            self.rcmd("dev.off()")
+        self.rcmd("fit <- bn.fit(graph, data)")
         self._parse_graph()
         return self.r["graph"]
     def _parse_graph(self):
@@ -71,7 +94,7 @@ class DiscreteBayesianNetwork(helper.RObject):
         rcmd = 'fit <- custom.fit(graph, dist = list('
         need_updated = False
         for n in self.nodes:
-            if n.cpt is None:
+            if len(n.cpt) == 0:
                 continue
             need_updated = True
             varname = "cpt." + n.name
@@ -116,13 +139,15 @@ class DiscreteBayesianNetwork(helper.RObject):
                 s += "|" + ":".join(n.parents)
             s += "]"
         return s
+    def print_cpt(self, node_name):
+        print self.rcmd('fit$%s' % node_name)
     def fit(self, data):
         try:
             self.r["graph"]
         except:
             raise NoStructureException()
-        self.r["data"] = data
-        self.r('fit <- bn.fit(graph, data)')
+        self.r.assign('data', data)
+        self.rcmd('fit <- bn.fit(graph, data)')
         return self.r["fit"]
     def query(self, evidences, q):
         try:
@@ -148,3 +173,16 @@ class DiscreteBayesianNetwork(helper.RObject):
             n_sum = sum(res)
             res = map(lambda x: x * 1.0 / n_sum, res)
         return res
+    def plot(self, to_gui=True, to_pdf=None):
+        try:
+            self.r["graph"]
+        except:
+            raise NoStructureException()
+        if to_gui:
+            self.rcmd("X11()")
+        self.rcmd("plot(graph)")
+        if to_pdf is not None:
+            self.rcmd('dev.copy(pdf, file="%s")' % os.path.abspath(to_pdf))
+        if to_gui:
+            raw_input("press any key")
+        self.rcmd("dev.off()")

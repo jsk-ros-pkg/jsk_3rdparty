@@ -6,7 +6,7 @@ from pyper import R
 
 class RObject(object):
     def __init__(self, debug=False):
-        self.r = R(use_numpy=True)
+        self.r = R(use_pandas=True, use_numpy=True)
         self.debug = debug
     def rcmd(self, cmd):
         if self.debug:

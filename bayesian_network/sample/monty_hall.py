@@ -50,3 +50,4 @@ print
 print "=== Estimating network from data of monty hall ==="
 net2 = DiscreteBayesianNetwork(data=data)
 print "result:", net2.model_string()
+net2.plot(to_pdf="monty_hall.pdf")
