@@ -1,0 +1,16 @@
+<package>
+  <name>lpg_planner</name>
+  <version>2.0.14</version>
+  <description>lpg_planner: LPGL Planner (http://eracle.ing.unibs.it/lpg/)</description>
+  <maintainer email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Yohei Kakiuchi</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://ros.org/wiki/downward</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author></author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
