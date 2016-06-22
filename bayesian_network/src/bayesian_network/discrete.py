@@ -4,6 +4,8 @@
 
 from . import helper
 from .exception import *
+import bayesian_network.msg as MSG
+import numpy as np
 
 
 class DiscreteNode(helper.DAGNode):
@@ -11,6 +13,22 @@ class DiscreteNode(helper.DAGNode):
         super(DiscreteNode, self).__init__(name, parents, children)
         self.values = self._check_val(values)
         self.cpt = self._check_val(cpt)
+    def to_ros(self):
+        msg = MSG.DiscreteNode()
+        msg.name = self.name
+        msg.parents = self.parents
+        msg.children = self.children
+        msg.values = self.values
+        msg.cpt = self.cpt
+        return msg
+
+def from_ros(msg):
+    return DiscreteNode(
+        msg.name,
+        np.array(msg.values),
+        np.array(msg.parents),
+        np.array(msg.children),
+        np.array(msg.cpt))
 
 class DiscreteBayesianNetwork(helper.BNLearnObject):
     def __init__(self, nodes=None, data=None, debug=False, **kwargs):

@@ -5,7 +5,10 @@
 
 from . import helper
 from .exception import *
+import numpy as np
 import pandas as pd
+import bayesian_network.msg as MSG
+
 
 class LinearGaussianNode(helper.DAGNode):
     def __init__(self, name, mu, sigma, parents, children, coefficients):
@@ -13,6 +16,24 @@ class LinearGaussianNode(helper.DAGNode):
         self.mu = mu
         self.sigma = sigma
         self.coefficients = self._check_val(coefficients)
+    def to_msg(self):
+        msg = MSG.LinearGaussianNode()
+        msg.name = self.name
+        msg.parents = self.parents
+        msg.children = self.children
+        msg.mu = self.mu
+        msg.sigma = self.sigma
+        msg.coefficients = self.coefficients
+        return msg
+
+def from_ros(msg):
+    return LinearGaussianNode(
+        msg.name,
+        msg.mu,
+        msg.sigma,
+        np.array(msg.parents),
+        np.array(msg.children),
+        np.array(msg.coefficients))
 
 class LinearGaussianBayesianNetwork(helper.BNLearnObject):
     def __init__(self, nodes=None, data=None, debug=False, **kwargs):
