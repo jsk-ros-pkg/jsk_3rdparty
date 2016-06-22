@@ -42,7 +42,7 @@ res2 = net.query([["guest_door", "A"],
 print "result:", res2
 
 print
-print "=== Sampling instance datum from given network model ==="
+print "=== Sampling instance data from given network model ==="
 data = net.sample(1000)
 print "result:", data[:10], "...", len(data), "data"
 
@@ -51,3 +51,5 @@ print "=== Estimating network from data of monty hall ==="
 net2 = DiscreteBayesianNetwork(data=data)
 print "result:", net2.model_string()
 net2.plot(to_pdf="monty_hall.pdf")
+print "saved figure to monty_hall.pdf"
+net2.plot_node("prize_door")

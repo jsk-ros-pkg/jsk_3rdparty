@@ -4,35 +4,17 @@
 
 from . import helper
 from .exception import *
-import numpy as np
-import pandas as pd
-import os
 
 
-class DiscreteNode(object):
+class DiscreteNode(helper.DAGNode):
     def __init__(self, name, values, parents, children, cpt):
-        self.name = name
-        self.parents = self._check_val(parents)
+        super(DiscreteNode, self).__init__(name, parents, children)
         self.values = self._check_val(values)
-        self.children = self._check_val(children)
         self.cpt = self._check_val(cpt)
-    def __repr__(self):
-        return "DiscreteNode: {name} | {parents}".format(name=self.name,
-                                                         parents=":".join(self.parents))
-    def __str__(self):
-        return self.__repr__()
-    def _check_val(self, val):
-        if val is None or (type(val) is str and len(val) == 0):
-            return list()
-        elif type(val) is str:
-            return [val]
-        else:
-            return val
 
-class DiscreteBayesianNetwork(helper.RObject):
-    def __init__(self, nodes=None, data=None, debug=True, **kwargs):
+class DiscreteBayesianNetwork(helper.BNLearnObject):
+    def __init__(self, nodes=None, data=None, debug=False, **kwargs):
         super(DiscreteBayesianNetwork, self).__init__(debug)
-        self.r('library(bnlearn)')
         if nodes is not None:
             self.add_nodes(nodes)
             self.update_cpts()
@@ -42,34 +24,8 @@ class DiscreteBayesianNetwork(helper.RObject):
             except:
                 method="gs"
             self.estimate_network(data, method, **kwargs)
-    def ensure(self, var):
-        try:
-            self.r[var]
-        except:
-            raise ValueNotDefinedException(var)
-    def estimate_network(self, data, method='gs', whitelist=None, blacklist=None, debug=False):
-        self.r["data"] = data
-        if whitelist is not None:
-            self.r["whitelist"] = pd.DataFrame(np.array(whitelist), columns=["from", "to"])
-            self.rcmd('dimnames(whitelist)[2] <- list(c("from", "to"))')
-        else:
-            self.r["whitelist"] = None
-        if blacklist is not None:
-            self.r["blacklist"] = pd.DataFrame(np.array(blacklist), columns=["from", "to"])
-            self.rcmd('dimnames(blacklist)[2] <- list(c("from", "to"))')
-        else:
-            self.r["blacklist"] = None
-        self.r["debug"] = debug
-        self.rcmd("graph <- %s(data, blacklist=blacklist, whitelist=whitelist, debug=debug)" % method)
-        if debug:
-            self.rcmd("X11()")
-            self.rcmd("plot(graph)")
-            raw_input("hoge")
-            self.rcmd("dev.off()")
-        self.rcmd("fit <- bn.fit(graph, data)")
-        self._parse_graph()
-        return self.r["graph"]
     def _parse_graph(self):
+        self.ensure("fit")
         nodenames = self.r["nodes(fit)"]
         self.nodes = []
         for name in nodenames:
@@ -83,11 +39,6 @@ class DiscreteBayesianNetwork(helper.RObject):
         self.ensure("fit")
         self.r("sample.result <- rbn(fit, %d)" % n)
         return self.r["sample.result"]
-    def add_nodes(self, nodes):
-        self.nodes = nodes
-        self.r["nodes"] = [n.name for n in nodes]
-        rcmd = 'graph <- model2network("%s")' % self.model_string()
-        self.rcmd(rcmd)
     def update_cpts(self):
         self.ensure("graph")
         rcmd = 'fit <- custom.fit(graph, dist = list('
@@ -130,21 +81,8 @@ class DiscreteBayesianNetwork(helper.RObject):
                     s += ', '
             s += ')'
         return s
-    def model_string(self):
-        s = ""
-        for n in self.nodes:
-            s += "[" + n.name
-            if len(n.parents) > 0:
-                s += "|" + ":".join(n.parents)
-            s += "]"
-        return s
     def print_cprob(self, node_name):
         print self.rcmd('fit$%s' % node_name)
-    def fit(self, data):
-        self.ensure("graph")
-        self.r.assign('data', data)
-        self.rcmd('fit <- bn.fit(graph, data)')
-        return self.r["fit"]
     def query(self, evidences, q):
         self.ensure("graph")
         self.ensure("fit")
@@ -166,26 +104,3 @@ class DiscreteBayesianNetwork(helper.RObject):
             n_sum = sum(res)
             res = map(lambda x: x * 1.0 / n_sum, res)
         return res
-    def plot_node(self, node_name, to_screen=True, to_pdf=None):
-        self.ensure("fit")
-        if to_screen:
-            self.rcmd("X11()")
-        self.rcmd("bn.fit.barchart(fit$%s)" % node_name)
-        if to_pdf is not None:
-            self.rcmd('dev.copy(pdf, file="%s")' % os.path.abspath(to_pdf))
-        if to_screen:
-            raw_input("press any key")
-        self.rcmd("dev.off()")
-    def plot(self, node_name=None, to_screen=True, to_pdf=None):
-        if node_name is not None:
-            self.plot_node(node_name, to_screen, to_pdf)
-            return
-        self.ensure("graph")
-        if to_screen:
-            self.rcmd("X11()")
-        self.rcmd("plot(graph)")
-        if to_pdf is not None:
-            self.rcmd('dev.copy(pdf, file="%s")' % os.path.abspath(to_pdf))
-        if to_screen:
-            raw_input("press any key")
-        self.rcmd("dev.off()")
