@@ -20,4 +20,5 @@ ExternalProject_Add(
   )
 
 catkin_package(
+  LIBRARIES cmt
   )
