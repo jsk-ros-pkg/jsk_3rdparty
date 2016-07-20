@@ -12,7 +12,7 @@ env:
     - CATKIN_PARALLEL_TEST_JOBS="-p1"
     - GIT_SSL_NO_VERIFY=1 # http://stackoverflow.com/questions/21181231/server-certificate-verification-failed-cafile-etc-ssl-certs-ca-certificates-c
   matrix:
-    - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin   USE_DEB=true  ROS_PARALLEL_JOBS="-j2 -l2"
+    - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin   USE_DEB=true  ROS_PARALLEL_JOBS="-j2 -l2" CATKIN_TOOLS_BUILD_OPTIONS="-iv --summarize --no-status"
     - ROS_DISTRO=indigo ROSWS=wstool BUILDER=catkin   USE_DEB=true  ROS_PARALLEL_JOBS="-j8"
     # - ROS_DISTRO=jade ROSWS=wstool BUILDER=catkin   USE_DEB=true  ROS_PARALLEL_JOBS="-j8"
 script: source .travis/travis.sh
