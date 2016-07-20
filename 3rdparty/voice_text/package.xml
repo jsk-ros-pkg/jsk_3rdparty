@@ -13,6 +13,8 @@
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>nkf</run_depend>
+
 
   <!-- Dependencies needed to compile this package. -->
 

@@ -13,12 +13,7 @@ find_package(catkin REQUIRED COMPONENTS)
 
 # catkin_package parameters: http://ros.org/doc/groovy/api/catkin/html/dev_guide/generated_cmake_api.html#catkin-package
 # TODO: fill in what other packages will need to use this package
-catkin_package(
-    DEPENDS nkf
-    CATKIN_DEPENDS # TODO
-    INCLUDE_DIRS # TODO include
-    LIBRARIES # TODO
-)
+catkin_package()
 
 if(EXISTS /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.a)
   add_executable(voicetext src/voicetext.c)
