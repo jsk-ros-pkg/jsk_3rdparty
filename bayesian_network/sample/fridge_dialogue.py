@@ -111,7 +111,7 @@ def conversation():
             qkey = min(var.items(), key=itemgetter(1))[0]
             qval = ask("Tell me how about", qkey)
 
-net.plot()
+net.plot(to_pdf="hoge.pdf")
 
 query_object([["color", "red"]])
 query_object([["type", "can"]])

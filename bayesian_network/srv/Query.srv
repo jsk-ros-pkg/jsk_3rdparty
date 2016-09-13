@@ -1,7 +1,7 @@
 bayesian_network/DiscreteNode[] nodes
 bayesian_network/Evidence[] evidences
 string query_node
-bayesian_network/Evidence[] query_state
+bayesian_network/Evidence query_state
 ---
 float64[] cdist
 float64 cprob

@@ -1,8 +1,8 @@
 # constraint-based learning algorithms
 int16 gs = 1
 int16 iamb = 2
-int16 fast.iamb = 3
-int16 inter.iamb = 4
+int16 fast_iamb = 3
+int16 inter_iamb = 4
 # score-based learning algorithms
 int16 hc = 5
 int16 tabu = 6
@@ -11,11 +11,12 @@ int16 mmhc = 7
 int16 rsmax2 = 8
 # other (constraint-based) local discovery algorithms
 int16 mmpc = 9
-int16 si.hiton.pc = 10
-int16 chow.liu = 11
+int16 si_hiton_pc = 10
+int16 chow_liu = 11
 int16 aracne = 12
 
 bayesian_network/Evidence[] evidences
+bool discrete
 int16 method
 ---
 bayesian_network/DiscreteNode[] discrete_nodes
