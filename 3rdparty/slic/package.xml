@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>slic</name>
+  <version>2.0.14</version>
+  <description>SLIC-Superpizel ROS Wrapper
+  This file contains the class elements of the class Slic. This class is an
+  implementation of the SLIC Superpixel algorithm by Achanta et al. [PAMI'12,
+  vol. 34, num. 11, pp. 2274-2282].
+
+  This implementation is created for the specific purpose of creating
+  over-segmentations in an OpenCV-based environment.
+  </description>
+  <maintainer email="k-okada@jsk.imi.i.u-tokyo.ac.jp">Kei Okada</maintainer>
+
+  <license>N/A</license>
+
+  <build_depend>git</build_depend>
+  <build_depend>libopencv-dev</build_depend>
+  <build_depend>ca-certificates</build_depend>
+  <build_depend>openssl</build_depend>
+
+  <run_depend>libopencv-dev</run_depend>
+
+ <export>
+    <build_type>cmake</build_type>
+ </export>
+
+</package>
