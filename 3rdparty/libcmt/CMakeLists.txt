@@ -5,19 +5,16 @@ include(ExternalProject)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
 execute_process(COMMAND
   git config --global http.sslVerify false)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 ExternalProject_Add(
   libcmt
-  PREFIX ""
-  GIT_REPOSITORY https://github.com/aginika/libCMT.git
-  GIT_TAG add-make-install
-  INSTALL_DIR ${CATKIN_DEVEL_PREFIX}
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
+  GIT_REPOSITORY https://github.com/delmottea/libCMT.git
+  GIT_TAG e4d7ea42edafe13b1070ef4d595b2d6062d79d1a
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+  INSTALL_COMMAND echo "install"
   )
 
-catkin_package(
-  )
+install(CODE "execute_process(COMMAND make install WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcmt-prefix/src/libcmt-build)")
