@@ -2,6 +2,13 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use PYTHON_INSTALL_DIR to install python module with catkin
+  Modified:
+  - 3rdparty/libsiftfast/CMakeLists.txt
+* Contributors: Kentaro Wada
+
 2.0.14 (2016-03-20)
 -------------------
 

@@ -2,6 +2,11 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix libcmt install process
+* Contributors: Kei Okada
+
 2.0.14 (2016-03-20)
 -------------------
 
