@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.15 (2016-10-16)
+-------------------
 * voice_text : clean up CMakeList.txt
 * [3rdparty/voice_text/text2wave] Enable text2wave using VoiceText other than pr2 robots.
 * Contributors: Kei Okada, Shunichi Nozawa
