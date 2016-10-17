@@ -21,7 +21,6 @@
   <run_depend>rospatlite</run_depend>
   <run_depend>nlopt</run_depend>
   <run_depend>voice_text</run_depend>
-  <run_depend>sklearn</run_depend>
   <run_depend>assimp_devel</run_depend>
   <run_depend>ff</run_depend>
   <run_depend>mini_maxwell</run_depend>
