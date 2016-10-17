@@ -2,6 +2,9 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.15 (2016-10-16)
 -------------------
 * fix libcmt install process

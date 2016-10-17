@@ -2,6 +2,9 @@
 Changelog for package slic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.15 (2016-10-16)
 -------------------
 * add slic

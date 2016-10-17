@@ -2,6 +2,9 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.15 (2016-10-16)
 -------------------
 * Use PYTHON_INSTALL_DIR to install python module with catkin
