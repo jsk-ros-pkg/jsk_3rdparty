@@ -2,8 +2,8 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.16 (2016-10-17)
+-------------------
 * jsk_3rdparty/package.xml: sklearn is no longer exists `#53 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/53>`_
 * Contributors: Kei Okada
 
