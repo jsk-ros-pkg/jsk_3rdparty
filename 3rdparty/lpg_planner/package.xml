@@ -1,0 +1,17 @@
+<package>
+  <name>lpg_planner</name>
+  <version>2.0.14</version>
+  <description>lpg_planner: LPGL Planner (http://zeus.ing.unibs.it/lpg/)</description>
+  <maintainer email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Hitoshi Kamada</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://ros.org/wiki/downward</url>
+
+  <author email="k-okada@jsk.imi.i.u-tokyo.ac.jp">Kei Okada</author>
+  <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+  <author email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Hitoshi Kamada</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
