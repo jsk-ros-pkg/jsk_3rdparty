@@ -2,6 +2,11 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* addbuildtool_depend
+* Contributors: Kei Okada
+
 2.0.16 (2016-10-17)
 -------------------
 

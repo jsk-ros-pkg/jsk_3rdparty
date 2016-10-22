@@ -2,6 +2,11 @@
 Changelog for package slic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add cmake/cmake_modules to depends
+* Contributors: Kei Okada
+
 2.0.16 (2016-10-17)
 -------------------
 
