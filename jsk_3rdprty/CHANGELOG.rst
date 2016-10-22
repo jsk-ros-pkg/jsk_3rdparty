@@ -2,8 +2,8 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.17 (2016-10-22)
+-------------------
 * add missing run_depends
 * Contributors: Kei Okada
 
