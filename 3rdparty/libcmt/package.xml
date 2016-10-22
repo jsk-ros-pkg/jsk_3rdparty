@@ -7,6 +7,8 @@
 
   <license>BSD</license>
 
+  <buildtool_depend>cmake</buildtool_depend>
+
   <build_depend>git</build_depend>
   <build_depend>libopencv-dev</build_depend>
   <build_depend>ca-certificates</build_depend>
