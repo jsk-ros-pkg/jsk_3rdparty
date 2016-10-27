@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(opt_camera)
 
 set(${PROJECT_NAME}_CATKIN_DEPS
-  rospack sensor_msgs driver_base image_proc dynamic_reconfigure camera_calibration_parsers compressed_image_transport image_proc compressed_image_transport cv_bridge
+  rospack sensor_msgs image_proc dynamic_reconfigure camera_calibration_parsers compressed_image_transport image_proc compressed_image_transport cv_bridge
 )
 find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 
