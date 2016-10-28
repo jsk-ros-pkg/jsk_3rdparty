@@ -4,7 +4,7 @@ project(collada_urdf_jsk_patch)
 
 if(("$ENV{ROS_DISTRO}" STREQUAL "groovy") OR ("$ENV{ROS_DISTRO}" STREQUAL "hydro"))
   set(SOURCE_DISTRO hydro)
-elseif ("$ENV{ROS_DISTRO}" STREQUAL "indigo" OR "$ENV{ROS_DISTRO}" STREQUAL "jade")
+elseif ("$ENV{ROS_DISTRO}" STREQUAL "indigo" OR "$ENV{ROS_DISTRO}" STRGREATER "indigo")
   set(SOURCE_DISTRO indigo)
 endif()
 
