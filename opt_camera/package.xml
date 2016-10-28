@@ -16,7 +16,6 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>sensor_msgs</build_depend>
-  <build_depend>driver_base</build_depend>
   <build_depend>image_proc</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>camera_calibration_parsers</build_depend>
@@ -26,7 +25,6 @@
   <build_depend>roslang</build_depend>
 
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>driver_base</run_depend>
   <run_depend>image_proc</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>camera_calibration_parsers</run_depend>
