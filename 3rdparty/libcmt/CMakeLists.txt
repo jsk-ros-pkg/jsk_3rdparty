@@ -13,6 +13,7 @@ ExternalProject_Add(
   libcmt
   GIT_REPOSITORY https://github.com/delmottea/libCMT.git
   GIT_TAG e4d7ea42edafe13b1070ef4d595b2d6062d79d1a
+  PATCH_COMMAND patch -p1 < ${PROJECT_SOURCE_DIR}/fix_opencv3.patch
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
   INSTALL_COMMAND echo "install"
   )
