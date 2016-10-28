@@ -5,8 +5,10 @@
 
 #include "opt_nm33_camera.h"
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+// #include <opencv/cv.h>
+// #include <opencv/highgui.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
 
 //
 #include <fcntl.h>

@@ -12,7 +12,13 @@ execute_process(COMMAND
 ExternalProject_Add(
   libcmt
   GIT_REPOSITORY https://github.com/delmottea/libCMT.git
-  GIT_TAG e4d7ea42edafe13b1070ef4d595b2d6062d79d1a
+
+  ## OLD TAG
+  # GIT_TAG e4d7ea42edafe13b1070ef4d595b2d6062d79d1a
+
+  ## RECENT TAG
+  GIT_TAG 196c3ce4b4d9a85f71744ce1bd4f44631110e51d
+
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
   INSTALL_COMMAND echo "install"
   )
