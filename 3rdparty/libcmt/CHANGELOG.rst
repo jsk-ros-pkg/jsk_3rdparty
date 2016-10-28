@@ -2,6 +2,11 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add patch to fix opencv3 https://github.com/delmottea/libCMT/pull/18 (`#78 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/78>`_)
+* Contributors: Kei Okada
+
 2.0.17 (2016-10-22)
 -------------------
 * addbuildtool_depend

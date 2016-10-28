@@ -2,6 +2,13 @@
 Changelog for package opt_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fir for kinetic (`#78 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/78>`_)
+  * fix header file for opencv2/3
+  * remove driver_base from OptNM33Camera.cfg
+* Contributors: Kei Okada
+
 2.0.17 (2016-10-22)
 -------------------
 

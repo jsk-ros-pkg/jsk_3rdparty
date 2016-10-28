@@ -1,22 +1,21 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package slic
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package lpg_planner
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Forthcoming
 -----------
 
 2.0.17 (2016-10-22)
 -------------------
-* add cmake/cmake_modules to depends
-* Contributors: Kei Okada
+* update version to 2.0.16 for lpg_planner
+* [lpg_planner] add lpg_planner
+* Contributors: Kamada Hitoshi, Kei Okada
 
 2.0.16 (2016-10-17)
 -------------------
 
 2.0.15 (2016-10-16)
 -------------------
-* add slic
-* Contributors: Kei Okada
 
 2.0.14 (2016-03-20)
 -------------------
