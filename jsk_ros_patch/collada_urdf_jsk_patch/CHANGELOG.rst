@@ -2,8 +2,8 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.18 (2016-10-28)
+-------------------
 * fix for kinetic (`#78 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/78>`_)
   * collada_urdf_jsk_patch/CMakeLists.txt: from kinetc we need to use c++11
   * collada_urdf_jsk_patch, fix condition >= indigo
