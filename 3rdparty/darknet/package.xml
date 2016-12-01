@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>darknet</name>
+  <version>2.0.18</version>
+  <description>Darknet is an open source neural network framework written in C and CUDA. It is fast, easy to install, and supports CPU and GPU computation</description>
+  <author>Joseph Redmon</author>
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
+  <license>YOLO</license>
+  <url type="website">http://pjreddie.com/darknet/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rospy</test_depend>
+  <export>
+  </export>
+</package>

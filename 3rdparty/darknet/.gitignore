@@ -1,0 +1,12 @@
+*~
+.*~
+.\#*
+\#*
+!.gitkeep
+
+cfg
+data
+weights
+include
+lib
+bin
