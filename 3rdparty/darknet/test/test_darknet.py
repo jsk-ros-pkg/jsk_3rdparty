@@ -38,7 +38,3 @@ class TestDarknet(unittest.TestCase):
         RESULT_PATH = os.path.join(PKGPATH, "predictions.jpg")
         if os.path.exists(RESULT_PATH):
             os.remove(RESULT_PATH)
-
-if __name__ == '__main__':
-    import rostest
-    rostest.rosrun(PKGNAME, "test_darknet", TestDarknet)
