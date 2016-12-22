@@ -33,7 +33,12 @@ add_custom_command(TARGET ${PROJECT_NAME}_ext
   COMMAND ${CMAKE_COMMAND} -E copy ${DARKNET_LIB_PATH} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 function(download_weights network_name)
-  file(DOWNLOAD http://pjreddie.com/media/files/${network_name}.weights
+  if("${network_name}" STREQUAL "yolo")
+    set(url "http://www.jsk.t.u-tokyo.ac.jp/~wada/data/yolo.weights")
+  else()
+    set(url "http://pjreddie.com/media/files/${network_name}.weights")
+  endif()
+  file(DOWNLOAD ${url}
     ${PROJECT_SOURCE_DIR}/weights/${network_name}.weights
     TIMEOUT 120)
 endfunction()
