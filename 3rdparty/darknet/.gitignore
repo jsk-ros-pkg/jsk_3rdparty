@@ -4,6 +4,9 @@
 \#*
 !.gitkeep
 
+*.py[cdo]
+predictions.jpg
+
 cfg
 data
 weights
