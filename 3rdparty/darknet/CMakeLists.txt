@@ -30,8 +30,7 @@ add_dependencies(${PROJECT_NAME} darknet_ext)
 # see http://answers.ros.org/question/223866/cmakecatkin-how-to-export-imported-target/
 add_custom_command(TARGET ${PROJECT_NAME}_ext
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${DARKNET_LIB_PATH} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  COMMAND ${CMAKE_COMMAND} -E copy ${DARKNET_BIN_PATH} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/darknet)
+  COMMAND ${CMAKE_COMMAND} -E copy ${DARKNET_LIB_PATH} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 function(download_weights network_name)
   file(DOWNLOAD http://pjreddie.com/media/files/${network_name}.weights
