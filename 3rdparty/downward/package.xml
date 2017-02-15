@@ -23,5 +23,6 @@
   <build_depend>time</build_depend>
 
   <run_depend>time</run_depend>
+  <run_depend>gawk</run_depend>
 
 </package>
