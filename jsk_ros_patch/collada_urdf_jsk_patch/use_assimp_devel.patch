@@ -1,13 +1,12 @@
 diff --git a/collada_urdf/CMakeLists.txt b/collada_urdf/CMakeLists.txt
-index fc93e4c..9b44a6e 100644
+index 524f2e9..6bd3707 100644
 --- a/collada_urdf/CMakeLists.txt
 +++ b/collada_urdf/CMakeLists.txt
-@@ -15,12 +15,13 @@ include_directories(include)
- find_package(Boost REQUIRED COMPONENTS system filesystem program_options)
- include_directories(${Boost_INCLUDE_DIR})
+@@ -12,12 +12,12 @@ catkin_package(
+ 
+ include_directories(include)
  
 -find_package(assimp QUIET)
-+set(ASSIMP_FOUND "")
 +find_package(assimp_devel QUIET)
  if ( NOT ASSIMP_FOUND )
 -  find_package(Assimp QUIET)
@@ -19,8 +18,31 @@ index fc93e4c..9b44a6e 100644
    endif()
  endif()
  if( ASSIMP_FOUND )
+diff --git a/collada_urdf/src/collada_to_urdf.cpp b/collada_urdf/src/collada_to_urdf.cpp
+index 616f58a..d4bbf2a 100644
+--- a/collada_urdf/src/collada_to_urdf.cpp
++++ b/collada_urdf/src/collada_to_urdf.cpp
+@@ -6,12 +6,12 @@
+ #include <urdf_parser/urdf_parser.h>
+ 
+ #if defined(ASSIMP_UNIFIED_HEADER_NAMES)
+-#include <assimp/IOSystem.hpp>
+-#include <assimp/IOStream.hpp>
+-#include <assimp/Importer.hpp>
+-#include <assimp/Exporter.hpp>
+-#include <assimp/postprocess.h>
+-#include <assimp/scene.h>
++#include <IOSystem.hpp>
++#include <IOStream.hpp>
++#include <Importer.hpp>
++#include <Exporter.hpp>
++#include <postprocess.h>
++#include <scene.h>
+ #else
+ #include <assimp.hpp>
+ #if defined(ASSIMP_EXPORT_API)
 diff --git a/collada_urdf/src/collada_urdf.cpp b/collada_urdf/src/collada_urdf.cpp
-index aae003d..c739252 100644
+index 23be87c..1aeac58 100644
 --- a/collada_urdf/src/collada_urdf.cpp
 +++ b/collada_urdf/src/collada_urdf.cpp
 @@ -63,13 +63,13 @@
@@ -44,26 +66,3 @@ index aae003d..c739252 100644
  #else
  #include <assimp.hpp>
  #include <aiScene.h>
-diff --git a/collada_urdf/src/collada_to_urdf.cpp b/collada_urdf/src/collada_to_urdf.cpp
-index 3a4d6e6..c9040d5 100644
---- a/collada_urdf/src/collada_to_urdf.cpp
-+++ b/collada_urdf/src/collada_to_urdf.cpp
-@@ -6,12 +6,12 @@
- #include <urdf_parser/urdf_parser.h>
- 
- #if defined(ASSIMP_UNIFIED_HEADER_NAMES)
--#include <assimp/IOSystem.hpp>
--#include <assimp/IOStream.hpp>
--#include <assimp/Importer.hpp>
--#include <assimp/Exporter.hpp>
--#include <assimp/postprocess.h>
--#include <assimp/scene.h>
-+#include <IOSystem.hpp>
-+#include <IOStream.hpp>
-+#include <Importer.hpp>
-+#include <Exporter.hpp>
-+#include <postprocess.h>
-+#include <scene.h>
- #else
- #include <assimp.hpp>
- #if defined(ASSIMP_EXPORT_API)
