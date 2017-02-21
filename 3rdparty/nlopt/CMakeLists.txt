@@ -15,7 +15,7 @@ add_custom_command(OUTPUT
   # copy nlopt.h and nlopt.hpp
   COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/tmp/include ${CATKIN_DEVEL_PREFIX}/include/nlopt
   # copy libnlopt
-  COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/tmp/lib/*.so ${CATKIN_DEVEL_PREFIX}/lib/
+  COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/tmp/lib/*.so* ${CATKIN_DEVEL_PREFIX}/lib/
   COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/tmp/share ${CATKIN_DEVEL_PREFIX}/share/
   DEPENDS Makefile ${CATKIN_DEVEL_PREFIX}/include
   ${CATKIN_DEVEL_PREFIX}/lib ${CATKIN_DEVEL_PREFIX}/share)
