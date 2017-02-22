@@ -2,6 +2,14 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update patch for https://github.com/ros/robot_model/commit/3e5a220 (`#86 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/86>`_)
+  * [collada_urdf_jsk_patch][README.md] update readme
+  * [collada_urdf_jsk_patch][use_assimp_devel.patch] update patch according to latest commit at collada_urdf
+  * [collada_urdf_jsk_patch][Makefile] don't apply collada_urdf_latest_gazebo.patch (see https://github.com/ros/robot_model/commit/3e5a220a67cf063d1e389cfbce3f05147c46f547)
+* Contributors: Yuki Furuta
+
 2.0.18 (2016-10-28)
 -------------------
 * fix for kinetic (`#78 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/78>`_)
