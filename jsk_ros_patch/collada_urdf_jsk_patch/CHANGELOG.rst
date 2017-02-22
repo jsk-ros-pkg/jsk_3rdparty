@@ -2,8 +2,8 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.19 (2017-02-22)
+-------------------
 * update patch for https://github.com/ros/robot_model/commit/3e5a220 (`#86 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/86>`_)
   * [collada_urdf_jsk_patch][README.md] update readme
   * [collada_urdf_jsk_patch][use_assimp_devel.patch] update patch according to latest commit at collada_urdf
