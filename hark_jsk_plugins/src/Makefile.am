@@ -31,4 +31,4 @@ INCLUDES = `flowdesigner-config --cflags config libflow audio_blocks` \
 	-I ../include \
 	`pkg-config --cflags FlowDesigner`
 
-libhark_jsk_la_LIBADD = -lboost_thread-mt
+libhark_jsk_la_LIBADD = @BOOST_THREAD@

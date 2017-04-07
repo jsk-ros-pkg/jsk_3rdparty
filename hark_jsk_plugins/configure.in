@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 CFLAGS="-O2"
 CXXFLAGS="-O2"
 
-AC_INIT([hark-jsk], [0.0.1], [demo@lists.sourceforge.net])
+AC_INIT([hark-jsk], [0.0.1], [s-fujii@jsk.imi.i.u-tokyo.ac.jp])
 AM_INIT_AUTOMAKE([foreign])
 AM_CONFIG_HEADER([config.h])
 LT_INIT
@@ -72,6 +72,10 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_MMAP
 AC_CHECK_FUNCS(getcwd getwd putenv strdup)
+
+dnl boost_thread judgement
+AC_CONFIG_MACRO_DIR(m4)
+BOOST_THREAD_JUDGE([1.46.0])
 
 dnl overflow-config test (Yannick Brosseau & Dominic Letourneau)
 
@@ -234,7 +238,7 @@ if test "$enable_ros" = "yes"; then
 
    if echo "`rosstack find ros`" | grep "cturtle"; then
       echo "ros cturtle cflags found"
-      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"   
+      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find xmlrpcpp`/src"
       CPPFLAGS="${CPPFLAGS} -I`rospack find rosconsole`/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find roslib`/msg/cpp -I`rospack find roslib`/include -I`rospack find roslib`/msg_gen/cpp/include"
@@ -244,7 +248,7 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosstack find ros`" | grep "diamondback"; then
       echo "ros diamondback cflags found"
-      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"   
+      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find rostime`/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find cpp_common`/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp_serialization`/include"
@@ -259,7 +263,7 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosstack find ros`" | grep "electric"; then
       echo "ros electric cflags found"
-      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"   
+      CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp`/include -I`rospack find roscpp`/srv/cpp -I`rospack find roscpp`/msg/cpp -I`rospack find roscpp`/msg_gen/cpp/include -I`rospack find roscpp`/srv_gen/cpp/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find rostime`/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find cpp_common`/include"
       CPPFLAGS="${CPPFLAGS} -I`rospack find roscpp_serialization`/include"
@@ -274,13 +278,13 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosstack find ros`" | grep "fuerte"; then
       echo "ros fuerte cflags found"
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"      
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config rosconsole --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config roslib --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config rospack --cflags`"
@@ -289,13 +293,43 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosversion -d`" | grep "groovy"; then
       echo "ros groovy cflags found"
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"      
-      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"      
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosconsole --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roslib --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rospack --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config std_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config dynamic_reconfigure --cflags`"
+   fi
+   if echo "`rosversion -d`" | grep "hydro"; then
+      echo "ros hydro cflags found"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosconsole --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roslib --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rospack --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config std_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config dynamic_reconfigure --cflags`"
+   fi
+   if echo "`rosversion -d`" | grep "indigo"; then
+      echo "ros indigo cflags found"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rostime --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config cpp_common --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_serialization --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config roscpp_traits --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config rosgraph_msgs --cflags`"
+      CPPFLAGS="${CPPFLAGS} `pkg-config xmlrpcpp --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config rosconsole --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config roslib --cflags`"
       CPPFLAGS="${CPPFLAGS} `pkg-config rospack --cflags`"
@@ -340,9 +374,9 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosstack find ros`" | grep "fuerte"; then
       echo "ros fuerte libs found"
-      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs`"      
-      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs`"      
-      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs`"      
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs`"
+      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs`"
+      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs`"
       LDFLAGS="${LDFLAGS} `pkg-config roscpp_serialization --libs`"
       LDFLAGS="${LDFLAGS} `pkg-config xmlrpcpp --libs`"
       LDFLAGS="${LDFLAGS} `pkg-config rosconsole --libs`"
@@ -353,9 +387,9 @@ if test "$enable_ros" = "yes"; then
    fi
    if echo "`rosversion -d`" | grep "groovy"; then
       echo "ros groovy libs found"
-      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs-only-L` -lroscpp"      
-      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs-only-L` -lrostime"      
-      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs-only-L` -lcpp_common"      
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs-only-L` -lroscpp"
+      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs-only-L` -lrostime"
+      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs-only-L` -lcpp_common"
       LDFLAGS="${LDFLAGS} `pkg-config roscpp_serialization --libs-only-L` -lroscpp_serialization"
       LDFLAGS="${LDFLAGS} `pkg-config xmlrpcpp --libs-only-L` -lxmlrpcpp"
       LDFLAGS="${LDFLAGS} `pkg-config rosconsole --libs-only-L` -lrosconsole"
@@ -366,8 +400,33 @@ if test "$enable_ros" = "yes"; then
       LDFLAGS="${LDFLAGS} -lboost_date_time-mt -lboost_system-mt -lboost_thread-mt -lpthread"
       LDFLAGS="${LDFLAGS} -Wl,-rpath,/opt/ros/groovy/lib"
    fi
-   LDFLAGS="${LDFLAGS} -lboost_thread-mt -lboost_signals-mt -lboost_thread-mt -llog4cxx"
-
+   if echo "`rosversion -d`" | grep "hydro"; then
+      echo "ros hydro libs found"
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs-only-L` -lroscpp"
+      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs-only-L` -lrostime"
+      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs-only-L` -lcpp_common"
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp_serialization --libs-only-L` -lroscpp_serialization"
+      LDFLAGS="${LDFLAGS} `pkg-config xmlrpcpp --libs-only-L` -lxmlrpcpp"
+      LDFLAGS="${LDFLAGS} `pkg-config rosconsole --libs-only-L` -lrosconsole"
+      LDFLAGS="${LDFLAGS} `pkg-config roslib --libs-only-L` -lroslib"
+      LDFLAGS="${LDFLAGS} `pkg-config rospack --libs-only-L` -lrospack -ltinyxml"
+      LDFLAGS="${LDFLAGS} -lpython2.7 -lboost_filesystem-mt -lboost_program_options-mt -lboost_system-mt"
+      LDFLAGS="${LDFLAGS} `pkg-config dynamic_reconfigure --libs-only-L` -ldynamic_reconfigure_config_init_mutex -lroscpp_serialization -lrostime"
+      LDFLAGS="${LDFLAGS} -lboost_date_time-mt -lboost_system-mt $BOOST_THREAD -lpthread"
+  fi
+  if echo "`rosversion -d`" | grep "indigo"; then
+      echo "ros indigo libs found"
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp --libs-only-L` -lroscpp"
+      LDFLAGS="${LDFLAGS} `pkg-config rostime --libs-only-L` -lrostime"
+      LDFLAGS="${LDFLAGS} `pkg-config cpp_common --libs-only-L` -lcpp_common"
+      LDFLAGS="${LDFLAGS} `pkg-config roscpp_serialization --libs-only-L` -lroscpp_serialization"
+      LDFLAGS="${LDFLAGS} `pkg-config xmlrpcpp --libs-only-L` -lxmlrpcpp"
+      LDFLAGS="${LDFLAGS} `pkg-config rosconsole --libs-only-L` -lrosconsole"
+      LDFLAGS="${LDFLAGS} `pkg-config roslib --libs-only-L` -lroslib"
+      LDFLAGS="${LDFLAGS} `pkg-config rospack --libs-only-L` -lrospack -ltinyxml"
+      LDFLAGS="${LDFLAGS} `pkg-config dynamic_reconfigure --libs-only-L` -ldynamic_reconfigure_config_init_mutex -lroscpp_serialization -lrostime"
+  fi
+  LDFLAGS="${LDFLAGS} $BOOST_THREAD -llog4cxx"
 fi
 
 dnl Output Files (makefiles)
