@@ -2,7 +2,7 @@
 all: urdf_to_collada
 
 GIT_DIR = build/robot_model/src
-GIT_URL = git://github.com/ros/robot_model.git
+GIT_URL = git://github.com/ros/collada_urdf.git
 GIT_REVISION = ${SOURCE_DISTRO}-devel
 PATCH_DIR = $(CURDIR)
 GIT_PATCH = ${PATCH_DIR}/use_assimp_devel.patch ${PATCH_DIR}/collada_urdf_latest_gazebo.patch
