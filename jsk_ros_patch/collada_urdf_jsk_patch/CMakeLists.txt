@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8.3)
 project(collada_urdf_jsk_patch)
 
 if(("$ENV{ROS_DISTRO}" STREQUAL "groovy") OR ("$ENV{ROS_DISTRO}" STREQUAL "hydro"))
-  set(SOURCE_DISTRO hydro)
+  set(SOURCE_DISTRO hydro-devel)
 elseif ("$ENV{ROS_DISTRO}" STREQUAL "indigo" OR "$ENV{ROS_DISTRO}" STRGREATER "indigo")
-  set(SOURCE_DISTRO indigo)
+  set(SOURCE_DISTRO bd4fc369d56eaa0c31d8cb17677e00b9d9685de6) # 1.11.13, before strip indigo
 endif()
 if ("$ENV{ROS_DISTRO}" STREQUAL "kinetic")
     set(CXXFLAGS CXXFLAGS=-std=gnu++11)
