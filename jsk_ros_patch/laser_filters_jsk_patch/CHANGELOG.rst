@@ -2,6 +2,9 @@
 Changelog for package laser_filters_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.19 (2017-02-22)
 -------------------
 

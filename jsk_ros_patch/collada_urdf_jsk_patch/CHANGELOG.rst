@@ -2,6 +2,11 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use indigo-devel before changing hydro-devel package structure
+* Contributors: Kei Okada
+
 2.0.19 (2017-02-22)
 -------------------
 * update patch for https://github.com/ros/robot_model/commit/3e5a220 (`#86 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/86>`_)

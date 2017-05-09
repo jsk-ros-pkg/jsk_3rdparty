@@ -2,6 +2,12 @@
 Changelog for package opt_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Revert "[opt_camera][OptNM33Camera.cfg] param "4view" does not follow ROS convention"
+* [opt_camera][OptNM33Camera.cfg] param "4view" does not follow ROS convention
+* Contributors: Kei Okada, Yuki Furuta
+
 2.0.19 (2017-02-22)
 -------------------
 
