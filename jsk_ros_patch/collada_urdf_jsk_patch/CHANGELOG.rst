@@ -2,8 +2,8 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.20 (2017-05-09)
+-------------------
 * use indigo-devel before changing hydro-devel package structure
 * Contributors: Kei Okada
 
