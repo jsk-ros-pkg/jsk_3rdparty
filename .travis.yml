@@ -1,0 +1,29 @@
+sudo: false
+
+language: python
+
+python:
+  - '2.7'
+  - '3.3'
+  - pypy
+
+before_install:
+  - pip install flake8 hacking
+  - flake8 .
+
+install:
+  - python setup.py install
+
+script:
+  # other than google drive
+  - output=/tmp/gdown_r
+  - gdown 'https://raw.githubusercontent.com/wkentaro/gdown/3.1.0/gdown/__init__.py' -O $output --quiet
+  - test $(md5sum $output | awk '{print $1}') = 2a51927dde6b146ce56b4d89ebbb5268
+  # small file
+  - output=/tmp/spam.txt
+  - gdown 'https://drive.google.com/uc?id=0B9P1L--7Wd2vU3VUVlFnbTgtS2c' -O $output --quiet
+  - test $(cat $output) = spam
+  # large file
+  - output=/tmp/apc2015_object_images.tgz
+  - gdown 'https://drive.google.com/uc?id=0B9P1L--7Wd2vNm9zMTJWOGxobkU' -O $output --quiet
+  - test $(md5sum $output | awk '{print $1}') = fa837a88f0c40c513d975104edf3da17
