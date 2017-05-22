@@ -126,7 +126,7 @@ def load_oauth_settings():
         ASECRET = key['ASECRET']
     except IOError as e:
         rospy.logerr('"%s" not found'%account_info)
-        rospy.logerr("$ rosrun rostwitter get_access_token.py")
+        rospy.logerr("$ get access token from https://apps.twitter.com/")
         rospy.logerr("cat /var/lib/robot/%s <<EOF"%account_info)
         rospy.logerr("CKEY: xxx")
         rospy.logerr("CSECRET: xxx")
