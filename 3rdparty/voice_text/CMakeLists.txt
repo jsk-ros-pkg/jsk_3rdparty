@@ -9,3 +9,7 @@ if(EXISTS /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.a)
   set_target_properties(voicetext PROPERTIES COMPILE_FLAGS -D_REENTRANT)
   target_link_libraries(voicetext /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.a -lm -lpthread)
 endif()
+
+install(FILES voice_text.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

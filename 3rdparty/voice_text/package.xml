@@ -2,22 +2,15 @@
   <name>voice_text</name>
   <version>2.0.20</version>
   <description>voice_text (www.voicetext.jp)</description>
-  <maintainer email="t@t.com">k-okada</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
 
   <license>HOYA License</license>
 
   <url type="website">http://ros.org/wiki/voice_text</url>
-  <!-- <url type="bugtracker"></url> -->
 
-  <author>k-okada</author>
+  <author>Kei Okada</author>
 
-  <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
-
-  <!-- Dependencies needed to compile this package. -->
-
-  <!-- Dependencies needed after this package is compiled. -->
-
-  <!-- Dependencies needed only for running tests. -->
-
+  <run_depend>nkf</run_depend>
+  <run_depend>sound_play</run_depend>
 </package>
