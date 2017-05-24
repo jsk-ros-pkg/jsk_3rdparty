@@ -1,5 +1,0 @@
-<launch>
-  <node pkg="sound_play" type="soundplay_node.py" name="soundplay_node">
-    <env name="PATH" value="$(find voice_text):$(env PATH)" />
-  </node>
-</launch>

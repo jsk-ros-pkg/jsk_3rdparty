@@ -11,6 +11,9 @@
   <author>Kei Okada</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>message_generation</build_depend>
   <run_depend>nkf</run_depend>
   <run_depend>sound_play</run_depend>
+  <run_depend>message_runtime</run_depend>
 </package>
