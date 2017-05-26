@@ -16,6 +16,8 @@
   <run_depend>sound_play</run_depend>
   <run_depend>speech_recognition_msgs</run_depend>
 
+  <test_depend>rostest</test_depend>
+
   <export>
   </export>
 </package>
