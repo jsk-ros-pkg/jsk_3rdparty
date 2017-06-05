@@ -1,0 +1,42 @@
+<launch>
+  <arg name="conf_file" default="$(find julius_ros)/conf/main.jconf" />
+  <arg name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs" />
+  <arg name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" />
+  <arg name="word_file" default="$(find julius_ros)/data/udon.dic" />
+  <arg name="module_port" default="10500" />
+  <arg name="audio_port"  default="10501" />
+  <arg name="max_connection_retry" default="0" />
+
+  <arg name="launch_audio_capture" default="true" />
+  <arg name="launch_sound_play" default="true" />
+  <arg name="sound_play_topic" default="sound_play" />
+
+  <!-- run julius (module mode) -->
+  <node name="julius" pkg="julius_ros" type="run_julius.sh"
+        args="-C $(arg conf_file)
+              -adport $(arg audio_port)
+              -module $(arg module_port)
+              -h $(arg hmm_def_file)
+              -hlist $(arg hmm_list_file)
+              -w $(arg word_file)" />
+
+  <!-- audio capture from microphone -->
+  <include file="$(find audio_capture)/launch/capture_wave.launch"
+           if="$(arg launch_audio_capture)"/>
+
+  <!-- sound play -->
+  <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
+        if="$(arg launch_sound_play)" />
+
+  <!-- ros / julius interface -->
+  <node name="julius_client"
+        pkg="julius_ros" type="julius_client.py"
+        output="screen">
+    <remap from="sound_play" to="$(arg sound_play_topic)" />
+    <rosparam subst_value="true">
+      audio_port: $(arg audio_port)
+      module_port: $(arg module_port)
+      max_connection_retry: $(arg max_connection_retry)
+    </rosparam>
+  </node>
+</launch>
