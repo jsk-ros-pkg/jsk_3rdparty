@@ -7,18 +7,21 @@
 -gprune safe
 
 # parameters
--b 1500
+-b 2000
 -b2 240
 -s 3000
-# -sb 80.0
 -sb 200.0
 -m 4000
--n 5
+-n 20
 -output 5
 
-# -spmodel "sp"
-# -iwsp
+-iwcd1 max
+
+-spmodel "sp"
+-iwspword
+-iwsp
 -iwsppenalty -70.0
+
 -nostrip
 -rejectshort 200
 -pausesegment

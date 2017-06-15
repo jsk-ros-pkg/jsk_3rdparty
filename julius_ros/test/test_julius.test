@@ -8,4 +8,5 @@
         args="--delay 5 $(find julius_ros)/test/wave.bag" />
 
   <test test-name="test_julius" pkg="julius_ros" type="test_julius.py" />
+  <test test-name="test_grammar" pkg="julius_ros" type="test_grammar.py" />
 </launch>
