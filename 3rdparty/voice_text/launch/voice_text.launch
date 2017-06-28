@@ -1,0 +1,29 @@
+<launch>
+  <arg name="voice_text_machine" default="localhost" />
+  <arg name="sound_play_machine" default="localhost" />
+
+  <arg name="launch_sound_play" default="true" />
+
+  <arg name="use_machine" default="true" />
+  <machine if="$(arg use_machine)" name="localhost" address="localhost" />
+
+  <node name="voice_text" pkg="voice_text" type="voice_text"
+        machine="$(arg voice_text_machine)">
+    <remap from="text_to_speech" to="voice_text/text_to_speech" />
+    <rosparam>
+      db_path: /usr/vt/sayaka/M16
+      pitch: 100
+      speed: 100
+      volume: 100
+      pause: 800
+    </rosparam>
+  </node>
+
+  <node pkg="sound_play" type="soundplay_node.py" name="sound_play_jp"
+        if="$(arg launch_sound_play)"
+        machine="$(arg sound_play_machine)">
+    <remap from="robotsound" to="robotsound_jp"/>
+    <remap from="sound_play" to="robotsound_jp"/>
+    <env name="PATH" value="$(find voice_text)/bin:$(env PATH)" />
+  </node>
+</launch>

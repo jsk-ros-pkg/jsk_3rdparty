@@ -7,10 +7,10 @@ index 524f2e9..6bd3707 100644
  include_directories(include)
  
 -find_package(assimp QUIET)
-+find_package(assimp_devel QUIET)
++find_package(assimp_devel QUIET NAMES ASSIMP)
  if ( NOT ASSIMP_FOUND )
 -  find_package(Assimp QUIET)
-+  find_package(Assimp_Devel QUIET)
++  find_package(Assimp_Devel QUIET NAMES ASSIMP)
    if ( NOT ASSIMP_FOUND )
      find_package(PkgConfig REQUIRED)
 -    pkg_check_modules(ASSIMP assimp)
