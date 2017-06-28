@@ -1,31 +1,32 @@
 # -*- makefile -*-
 
-all: installed.grammar
+all: installed.grammar-kit
 
-FILENAME = grammar-kit-v4.1.tar.gz
+VERSION = 4.3.1
+FILENAME = grammar-kit-v$(VERSION).tar.gz
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "http://sourceforge.jp/frs/redir.php?m=iij&f=%2Fjulius%2F51159%2Fgrammar-kit-v4.1.tar.gz"
+TARBALL_URL = "https://github.com/julius-speech/grammar-kit/archive/v$(VERSION).tar.gz"
 TARBALL_PATCH =
-SOURCE_DIR = build/grammar-kit-v4.1
+SOURCE_DIR = build/grammar-kit-$(VERSION)
 UNPACK_CMD = tar xf
-MD5SUM_DIR = $(CURDIR)
+MD5SUM_DIR = $(CURDIR)/md5sum
 MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
 include $(shell rospack find mk)/download_unpack_build.mk
 
 INSTALL_DIR = `rospack find julius`
 
-installed.grammar: $(SOURCE_DIR)/unpacked
-#	mv $(SOURCE_DIR)/model $(INSTALL_DIR)
-	mv $(SOURCE_DIR)/SampleGrammars $(INSTALL_DIR)
-	mv $(SOURCE_DIR)/doc $(INSTALL_DIR)/doc-grammar
-	mv $(SOURCE_DIR)/*jconf $(INSTALL_DIR)
-	rm -rf $(SOURCE_DIR)/src
-	rm -rf $(SOURCE_DIR)/bin
-	touch installed.grammar
+installed.grammar-kit: $(SOURCE_DIR)/unpacked
+	rsync -a $(SOURCE_DIR)/model $(INSTALL_DIR)
+	rsync -a $(SOURCE_DIR)/SampleGrammars $(INSTALL_DIR)
+	rsync -a $(SOURCE_DIR)/SampleGrammars_en $(INSTALL_DIR)
+	rsync -a $(SOURCE_DIR)/*conf $(INSTALL_DIR)/conf
+	touch installed.grammar-kit
 
 clean:
 	rm -rf $(TARBALL)
 	rm -rf $(SOURCE_DIR)
-	rm -rf $(INSTALL_DIR)/doc-grammar
 	rm -rf $(INSTALL_DIR)/SampleGrammars
-	rm -rf installed.grammar
+	rm -rf $(INSTALL_DIR)/SampleGrammars_en
+	rm -rf $(INSTALL_DIR)/model
+	rm -rf $(INSTALL_DIR)/conf
+	rm -rf installed.grammar-kit

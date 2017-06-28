@@ -1,0 +1,26 @@
+# mainly copied from julius/conf/main.jconf
+
+# continue on error
+-forcedict
+
+# gauss pruning parameter
+-gprune safe
+
+# parameters
+-b 1500
+-b2 240
+-s 3000
+-sb 80.0
+-m 4000
+-n 5
+-output 5
+
+# -spmodel "sp"
+# -iwsp
+-iwsppenalty -70.0
+-nostrip
+-rejectshort 200
+-pausesegment
+-multipath
+
+-input adinnet
