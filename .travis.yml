@@ -1,8 +1,4 @@
 language: generic
-python:
-  - "2.7"
-compiler:
-  - gcc
 sudo: required
 dist: trusty
 services:
