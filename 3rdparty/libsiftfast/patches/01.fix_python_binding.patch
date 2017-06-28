@@ -11,6 +11,20 @@ Index: CMakeLists.txt
  
  if( Boost_FOUND )
    message(STATUS "found boost version: ${Boost_VERSION}")
+@@ -195,11 +195,11 @@
+ #
+ set(BUILD_SIFTFASTPY)
+ if( Boost_PYTHON_FOUND )
+-  find_package(PythonLibs)
++  find_package(PythonLibs 2)
+ 
+   if( PYTHONLIBS_FOUND OR PYTHON_LIBRARIES )
+ 
+-    find_package(PythonInterp)
++    find_package(PythonInterp 2)
+     if( NOT PYTHON_EXECUTABLE )
+       # look specifically for 2.6
+       FIND_PROGRAM(PYTHON_EXECUTABLE
 @@ -223,7 +223,7 @@
  
      add_definitions(${Boost_CFLAGS})
