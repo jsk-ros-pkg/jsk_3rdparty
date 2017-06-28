@@ -1,0 +1,4 @@
+string text_path
+string wave_path
+---
+bool ok

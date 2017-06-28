@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# for festival compaibility
+ARGS=`echo $@ | sed 's/\-eval\ ()//' | sed 's/\-eval\ (\(.\+\))\ \(.\+\)$/\2\ \-p\ \1/'`
+eval set -- "$ARGS"
+
+INPUT_FILE=$1;shift;
+JPTEXT_FILE=/tmp/_voice_text_$$.txt
+OUTPUT_FILE=/tmp/_voice_text_$$.wav
+while getopts p:o: OPT
+do
+  case ${OPT} in
+    "o")
+      OUTPUT_FILE=$(readlink -f "$OPTARG")
+      ;;
+  esac
+done
+
+if [ ! -e $INPUT_FILE ]; then
+  echo "$INPUT_FILE not found" 1>&2
+  exit 1
+fi
+
+nkf -s $INPUT_FILE > $JPTEXT_FILE
+
+rosservice call voice_text/text_to_speech \
+"
+text_path: '$JPTEXT_FILE'
+wave_path: '$OUTPUT_FILE'
+"
+
+rm -f $JPTEXT_FILE
+
