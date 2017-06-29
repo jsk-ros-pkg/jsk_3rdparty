@@ -73,12 +73,12 @@ class JuliusClient(object):
         if self.use_isolated_word:
             self.sub_vocabulary = rospy.Subscriber("vocabulary", Vocabulary,
                                                    self.vocabulary_cb)
-            self.srv_speech_recognition = rospy.Service("speech_recognition",
-                                                        SpeechRecognition,
-                                                        self.speech_recognition_cb)
         else:
             self.sub_grammar = rospy.Subscriber("grammar", Grammar,
                                                 self.grammar_cb)
+        self.srv_speech_recognition = rospy.Service("speech_recognition",
+                                                    SpeechRecognition,
+                                                    self.speech_recognition_cb)
 
     def start(self):
         self.grammar_changed = None
