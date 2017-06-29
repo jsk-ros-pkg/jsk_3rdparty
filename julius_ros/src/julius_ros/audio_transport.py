@@ -4,7 +4,7 @@
 
 import rospy
 import struct
-from .transport import SocketTransport
+from julius_ros.transport import SocketTransport
 from audio_common_msgs.msg import AudioData
 
 

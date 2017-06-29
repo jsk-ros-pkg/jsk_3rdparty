@@ -13,9 +13,11 @@
   <run_depend>julius</run_depend>
   <run_depend>nkf</run_depend>
   <run_depend>python-lxml</run_depend>
+  <run_depend>python-rospkg</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>sound_play</run_depend>
   <run_depend>speech_recognition_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
 
   <test_depend>rostest</test_depend>
 

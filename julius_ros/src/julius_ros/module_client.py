@@ -4,7 +4,7 @@
 
 import os
 import rospy
-from .transport import SocketTransport
+from julius_ros.transport import SocketTransport
 from Queue import Queue
 import lxml.etree
 import traceback
