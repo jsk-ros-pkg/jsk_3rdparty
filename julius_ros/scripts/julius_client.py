@@ -202,7 +202,8 @@ class JuliusClient(object):
             if not ok:
                 rospy.logerr("failed to activate grammar %s" % req.grammar_name)
                 return res
-            candidate_words = self.vocabularies[req.grammar_name]
+            if req.grammar_name in self.vocabularies:
+                candidate_words = self.vocabularies[req.grammar_name]
         elif req.grammar.rules:
             g = req.grammar
             if not g.name:
@@ -254,8 +255,14 @@ class JuliusClient(object):
             speech = self.last_speech
             if not self.last_speech.transcript:
                 continue
-            if speech.transcript[0] in candidate_words and speech.confidence[0] >= threshold:
-                rospy.loginfo("Recognized %s (%f)..." % (speech.transcript[0], speech.confidence[0]))
+            if candidate_words:
+                ok = speech.transcript[0] in candidate_words and speech.confidence[0] >= threshold
+            else:
+                ok = speech.confidence[0] >= threshold
+            if ok:
+                t0 = speech.transcript[0]
+                c0 = speech.confidence[0]
+                rospy.loginfo("Recognized %s (%f)..." % (t0, c0))
                 if not req.quiet:
                     self.play_sound(self.success_signal, 0.1)
                 res.result = speech
