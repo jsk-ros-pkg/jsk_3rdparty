@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="test_grammar" pkg="julius_ros" type="test_grammar.py" />
+</launch>

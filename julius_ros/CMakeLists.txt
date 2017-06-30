@@ -16,6 +16,7 @@ install(
 if(CATKIN_ENABLE_TESTING)
   if("$ENV{ROS_DISTRO}" STRGREATER "hydro") # >= indigo
     find_package(rostest REQUIRED)
-    add_rostest(test/test_julius.test)
+    add_rostest(test/julius.test)
+    add_rostest(test/grammar.test)
   endif()
 endif()

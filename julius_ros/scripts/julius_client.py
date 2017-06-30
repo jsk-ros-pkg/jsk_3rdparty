@@ -3,13 +3,22 @@
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 import actionlib
+from threading import Lock
+import os
 import rospy
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from julius_ros.utils import make_phonemes_from_words
+from julius_ros.utils import make_grammar_from_rules
+from julius_ros.utils import make_voca_from_categories
+from julius_ros.utils import make_dfa
 from julius_ros.audio_transport import AudioTransport
 from julius_ros.module_client import ModuleClient
-from speech_recognition_msgs.msg import SpeechRecognitionCandidates, Vocabulary
-from speech_recognition_msgs.srv import SpeechRecognition, SpeechRecognitionResponse
+from speech_recognition_msgs.msg import Grammar
+from speech_recognition_msgs.msg import SpeechRecognitionCandidates
+from speech_recognition_msgs.msg import Vocabulary
+from speech_recognition_msgs.srv import SpeechRecognition
+from speech_recognition_msgs.srv import SpeechRecognitionResponse
+from std_srvs.srv import Empty, EmptyResponse
 import lxml.etree
 
 
@@ -19,22 +28,27 @@ class JuliusClient(object):
     timeout_signal = "/usr/share/sounds/ubuntu/stereo/window-slide.ogg"
 
     def __init__(self):
-        host = rospy.get_param("~host", "localhost")
-        module_port = rospy.get_param("~module_port", 10500)
-        audio_port = rospy.get_param("~audio_port", 10501)
-        max_retry = rospy.get_param("~max_connection_retry", 0)
-
+        # load parameters
         self.encoding = rospy.get_param("~encoding", "utf-8")
         self.default_duration = rospy.get_param("~duration", 3.0)
         self.default_threshold = rospy.get_param("~threshold", 0.8)
+        self.use_isolated_word = rospy.get_param("~use_isolated_word", True)
 
         self.pub_speech_recognition = rospy.Publisher("speech_to_text",
                                                       SpeechRecognitionCandidates,
                                                       queue_size=1)
+
+        # initialize sound play
         self.act_sound = actionlib.SimpleActionClient("sound_play", SoundRequestAction)
         if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
             rospy.logwarn("Failed to find sound_play action. Disabled audio alert")
             self.act_sound = None
+
+        # setup julius
+        host = rospy.get_param("~host", "localhost")
+        module_port = rospy.get_param("~module_port", 10500)
+        audio_port = rospy.get_param("~audio_port", 10501)
+        max_retry = rospy.get_param("~max_connection_retry", 0)
 
         self.module = ModuleClient(host, module_port, max_retry, self.encoding)
         self.audio = AudioTransport(host, audio_port, max_retry, "audio")
@@ -48,22 +62,33 @@ class JuliusClient(object):
         self.status()
         self.start()
 
+        # start subscribe
+        self.lock = Lock()
         self.last_speech = SpeechRecognitionCandidates()
-        self.sub_vocabulary = rospy.Subscriber("vocabulary",
-                                               Vocabulary,
-                                               self.vocabulary_cb)
+        self.vocabularies = {}
+
+        self.srv_show_status = rospy.Service("show_julius_status",
+                                             Empty, self.status)
+
+        if self.use_isolated_word:
+            self.sub_vocabulary = rospy.Subscriber("vocabulary", Vocabulary,
+                                                   self.vocabulary_cb)
+        else:
+            self.sub_grammar = rospy.Subscriber("grammar", Grammar,
+                                                self.grammar_cb)
         self.srv_speech_recognition = rospy.Service("speech_recognition",
                                                     SpeechRecognition,
                                                     self.speech_recognition_cb)
 
     def start(self):
         self.grammar_changed = None
-        self.module.send_command(["INPUTONCHANGE PAUSE"])
+        self.module.send_command(["INPUTONCHANGE", "PAUSE"])
 
-    def status(self):
+    def status(self, args=None):
         self.module.send_command(["VERSION"])
         self.module.send_command(["STATUS"])
         self.module.send_command(["GRAMINFO"])
+        return EmptyResponse()
 
     def play_sound(self, path, timeout=5.0):
         if self.act_sound is None:
@@ -75,36 +100,142 @@ class JuliusClient(object):
         goal = SoundRequestGoal(sound_request=req)
         self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
 
-    def change_gram(self, words, phonemes=[]):
-        if len(phonemes) == 0 or not phonemes[0]:
-            phonemes = make_phonemes_from_words(words)
-        else:
-            phonemes = phonemes
-
-        # change grammar
-        dic = [" %s %s" % (w, p) for w, p in zip(words, phonemes)]
-        cmd = ["CHANGEGRAM julius_ros"] + dic + ["DICEND"]
+    def send_grammar_cmd(self, cmd):
         self.grammar_changed = None
         self.module.send_command(cmd)
         while self.grammar_changed is None:
             rospy.sleep(0.01)
         return self.grammar_changed
 
+    def activate_gram(self, name):
+        with self.lock:
+            cmd = ["ACTIVATEGRAM", name]
+            self.module.send_command(cmd)
+            ok = True
+            if ok:
+                rospy.loginfo("Successfully activated grammar")
+            else:
+                rospy.logerr("Failed to activate grammar")
+            return ok
+
+    def deactivate_gram(self, name):
+        with self.lock:
+            cmd = ["DEACTIVATEGRAM", name]
+            rospy.loginfo("Deactivating %s" % name)
+            self.module.send_command(cmd)
+            ok = True
+            if ok:
+                rospy.loginfo("Successfully deactivated grammar")
+            else:
+                rospy.logerr("Failed to deactivate grammar")
+            return ok
+
+    def do_gram(self, cmd_name, name, dfa, dic):
+        with self.lock:
+            assert cmd_name
+            assert name
+            assert dic
+            cmd = ["%s %s" % (cmd_name, name)]
+            if dfa is not None:
+                cmd += [' ' + l.strip() for l in dfa if l.strip()]
+                cmd += ["DFAEND"]
+            cmd += [' ' + l.strip() for l in dic if l.strip()]
+            cmd += ["DICEND"]
+            ok = self.send_grammar_cmd(cmd)
+            if ok:
+                rospy.loginfo("%s Success" % cmd_name)
+            else:
+                rospy.logerr("%s Failed" % cmd_name)
+            return ok
+
+    def add_gram(self, name, dfa, dic):
+        ok = self.do_gram("ADDGRAM", name, dfa, dic)
+        ok &= self.deactivate_gram(name)
+        return ok
+
+    def change_gram(self, name, dfa, dic):
+        return self.do_gram("CHANGEGRAM", name, dfa, dic)
+
+    def grammar_cb(self, msg):
+        if msg.name:
+            name = msg.name
+        else:
+            rospy.logwarn("Name of grammar is empty. Use 'unknown'")
+            name = 'unknown'
+        grammar = make_grammar_from_rules(msg.rules)
+        voca = make_voca_from_categories(msg.categories, msg.vocabularies)
+        result = make_dfa(grammar, voca)
+        if result is None:
+            rospy.logerr("Failed to make dfa from grammar message")
+            return
+        dfa, dic = result
+        ok = self.add_gram(name, dfa.split(os.linesep), dic.split(os.linesep))
+        if ok:
+            self.vocabularies[name] = list(set(e for v in msg.vocabularies for e in v.words))
+        else:
+            rospy.logerr("Failed to change vocabulary")
+
     def vocabulary_cb(self, msg):
-        ok = self.change_gram(msg.words, msg.phonemes)
-        if not ok:
+        if msg.name:
+            name = msg.name
+        else:
+            rospy.logwarn("Name of grammar is empty. Use 'unknown'")
+            name = 'unknown'
+        if len(msg.phonemes) == 0 or not msg.phonemes[0]:
+            phonemes = make_phonemes_from_words(msg.words)
+        else:
+            phonemes = msg.phonemes
+        dic = [" %s\t%s" % (w, p) for w, p in zip(msg.words, phonemes)]
+        ok = self.add_gram(name, None, dic)
+        if ok:
+            self.vocabularies[name] = list(set(msg.words))
+        else:
             rospy.logerr("Failed to change vocabulary")
 
     def speech_recognition_cb(self, req):
         res = SpeechRecognitionResponse()
-        voca = req.vocabulary
-        if not voca.words:
-            rospy.logerr("No words specified")
-            return res
 
-        ok = self.change_gram(voca.words, voca.phonemes)
-        if not ok:
-            rospy.logerr("Failed to change vocabulary")
+        # change grammar
+        candidate_words = []
+        if req.grammar_name:
+            ok = self.activate_gram(req.grammar_name)
+            if not ok:
+                rospy.logerr("failed to activate grammar %s" % req.grammar_name)
+                return res
+            if req.grammar_name in self.vocabularies:
+                candidate_words = self.vocabularies[req.grammar_name]
+        elif req.grammar.rules:
+            g = req.grammar
+            if not g.name:
+                g.name = 'unknown'
+            grammar = make_grammar_from_rules(g.rules)
+            voca = make_voca_from_categories(g.categories, g.vocabularies)
+            result = make_dfa(grammar, voca)
+            if result is None:
+                rospy.logerr("Failed to make dfa from grammar message")
+                return res
+            dfa, dic = result
+            ok = self.change_gram(g.name, dfa.split(os.linesep), dic.split(os.linesep))
+            if not ok:
+                rospy.logerr("Failed to change grammar")
+                return res
+            self.vocabularies[g.name] = list(set(e for v in msg.vocabularies for e in v.words))
+            candidate_words = self.vocabularies[g.name]
+        elif req.vocabulary.words:
+            v = req.vocabulary
+            if not v.name:
+                v.name = 'unknown'
+            if len(v.phonemes) == 0 or not v.phonemes[0]:
+                v.phonemes = make_phonemes_from_words(v.words)
+            dic = [" %s\t%s" % (w, p) for w, p in zip(v.words, v.phonemes)]
+            ok = self.change_gram(v.name, None, dic)
+            if not ok:
+                rospy.logerr("Failed to change vocabulary")
+                return res
+            self.vocabularies[v.name] = list(set(v.words))
+            candidate_words = self.vocabularies[v.name]
+        else:
+            rospy.logerr("Invalid request: 'grammar_name', 'grammar' or 'vocabulary' must be filled")
             return res
 
         duration = req.duration
@@ -124,11 +255,17 @@ class JuliusClient(object):
             speech = self.last_speech
             if not self.last_speech.transcript:
                 continue
-            if speech.transcript[0] in voca.words and speech.confidence[0] >= threshold:
-                rospy.loginfo("Recognized %s (%f)..." % (speech.transcript[0], speech.confidence[0]))
+            if candidate_words:
+                ok = speech.transcript[0] in candidate_words and speech.confidence[0] >= threshold
+            else:
+                ok = speech.confidence[0] >= threshold
+            if ok:
+                t0 = speech.transcript[0]
+                c0 = speech.confidence[0]
+                rospy.loginfo("Recognized %s (%f)..." % (t0, c0))
                 if not req.quiet:
                     self.play_sound(self.success_signal, 0.1)
-                res.results = speech
+                res.result = speech
                 return res
 
         # timeout
@@ -137,12 +274,40 @@ class JuliusClient(object):
             self.play_sound(self.timeout_signal, 0.1)
         return res
 
+    def process_result(self, data):
+        results = {}
+        for shypo in data.xpath("//SHYPO"):
+            transcript = []
+            confidence = 0.0
+            for whypo in shypo.xpath("./WHYPO"):
+                word = whypo.attrib["WORD"].encode(self.encoding)
+                if word.startswith("<"):
+                    continue
+                transcript.append(word)
+                confidence += float(whypo.attrib["CM"])
+            confidence /= len(transcript)
+            transcript = " ".join(transcript)
+            results[confidence] = transcript
+
+        msg = SpeechRecognitionCandidates()
+        debug_str = ["Recognized:"]
+        for i, result in enumerate(sorted(results.items(), reverse=True)):
+            c, t = result
+            debug_str += ["%d: %s (%.2f)" % (i+1, t, c)]
+            msg.transcript.append(t)
+            msg.confidence.append(c)
+        self.pub_speech_recognition.publish(msg)
+        self.last_speech = msg
+        rospy.logdebug(os.linesep.join(debug_str))
+
     def shutdown_cb(self):
         self.module.join()
         self.audio.join()
 
     def julius_cb(self, data):
         status, detail = data
+        rospy.logdebug("status: %s" % status)
+        rospy.logdebug("detail: %s" % lxml.etree.tostring(detail))
         if status == 'ENGINEINFO':
             version = detail.attrib["VERSION"]
             conf = detail.attrib["CONF"]
@@ -150,7 +315,7 @@ class JuliusClient(object):
         elif status == 'SYSINFO':
             rospy.loginfo("Status: %s" % detail.attrib["PROCESS"])
         elif status == 'GRAMINFO':
-            rospy.logdebug("Grammar Information:\n%s" % detail.text.strip())
+            rospy.loginfo("Grammar Information:\n%s" % detail.text.strip())
         elif status == 'STARTPROC':
             rospy.loginfo("Julius Engine initialized")
         elif status == 'ENDPROC':
@@ -160,14 +325,9 @@ class JuliusClient(object):
         elif status == 'ENDRECOG':
             rospy.logdebug("End Recognize")
         elif status == 'RECOGFAIL':
-            rospy.logerr("Bad Recognize")
+            rospy.logerr("Recognition Failed")
         elif status == 'RECOGOUT':
-            whypo = detail.xpath('//*[local-name() = "WHYPO"]')
-            msg = SpeechRecognitionCandidates()
-            msg.transcript = [e.attrib["WORD"].encode(self.encoding) for e in whypo]
-            msg.confidence = [float(e.attrib["CM"]) for e in whypo]
-            self.last_speech = msg
-            self.pub_speech_recognition.publish(msg)
+            self.process_result(detail)
         elif status == 'INPUT':
             substat = detail.attrib["STATUS"]
             if substat == 'STARTREC':
@@ -182,11 +342,13 @@ class JuliusClient(object):
             substat = detail.attrib["STATUS"]
             if substat == 'RECEIVED':
                 self.grammar_changed = True
-            else:
+            elif substat == "ERROR":
+                reason = detail.attrib["REASON"]
+                rospy.logerr("Failed to change grammar: %s" % reason)
                 self.grammar_changed = False
         else:
-            rospy.logdebug("Received %s" % status)
-            rospy.logdebug("%s", lxml.etree.tostring(detail))
+            rospy.logwarn("Received %s" % status)
+            rospy.logwarn("%s", lxml.etree.tostring(detail))
 
 if __name__ == '__main__':
     rospy.init_node("julius_client")

@@ -4,10 +4,11 @@
 
 import os
 import rospy
-from .transport import SocketTransport
+from julius_ros.transport import SocketTransport
 from Queue import Queue
 import lxml.etree
 import traceback
+from xml.sax.saxutils import escape
 
 
 class ModuleClient(SocketTransport):
@@ -23,15 +24,25 @@ class ModuleClient(SocketTransport):
     def parse(self, data):
         parsed = data.split("." + os.linesep)
         if len(parsed) < 2:
-            # received data is too short
-            raise ValueError
+            raise ValueError("Received data too short")
         parsed_data = [self.parse_xml(d) for d in parsed[:-1]]
         parsed_length = len(data) - len(parsed[-1])
         return parsed_data, parsed_length
 
     def parse_xml(self, data):
-        xml = lxml.etree.fromstring(data.decode(self.encoding))
-        return xml.tag, xml
+        try:
+            data = data.decode(self.encoding)
+            data = self.validate_xml(data)
+            xml = lxml.etree.fromstring(data)
+            return xml.tag, xml
+        except Exception as e:
+            raise RuntimeError(e)
+
+    def validate_xml(self, data):
+        parsed = data.split('"')
+        for i in range(len(parsed))[1::2]:
+            parsed[i] = escape(parsed[i])
+        return '"'.join(parsed)
 
 if __name__ == '__main__':
     pass

@@ -58,8 +58,10 @@ class SocketTransport(Thread):
                     recvbuf = recvbuf[parsed_length:]
                 else:
                     recvbuf = ""
-            except:
+            except ValueError:
                 pass
+            except RuntimeError as e:
+                rospy.logerr("Failed to parse data: %s" % str(e))
 
     def is_connected(self):
         if self.socket is None:
@@ -77,10 +79,10 @@ class SocketTransport(Thread):
     def connect(self):
         retry = 0
         err = None
+        info = (self.host, self.port)
         while not rospy.is_shutdown() and (self.max_retry == 0 or retry < self.max_retry):
             s = None
             try:
-                info = (self.host, self.port)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.send_buffer_size)
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

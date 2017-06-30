@@ -2,10 +2,11 @@
   <include file="$(find julius_ros)/launch/julius.launch">
     <arg name="launch_audio_capture" value="false" />
     <arg name="launch_sound_play" value="false" />
+    <arg name="max_connection_retry" default="3" />
   </include>
 
   <node name="rosbag_play" pkg="rosbag" type="play"
-        args="--delay 5 $(find julius_ros)/test/wave.bag" />
+        args="--delay 10 $(find julius_ros)/test/wave.bag" />
 
   <test test-name="test_julius" pkg="julius_ros" type="test_julius.py" />
 </launch>
