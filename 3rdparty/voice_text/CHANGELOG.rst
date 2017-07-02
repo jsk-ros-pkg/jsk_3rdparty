@@ -2,6 +2,19 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [voice_text] Refactor API (`#101 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/101>`_)
+  * Cleanup directory (remove rosbuild related files.)
+  * Rewrote VoiceText server node as ROS friendly.
+  * text2wave calls rosservice internally (This enables running VoiceText
+  * engine on remote machine easily)
+  * Create sample launch file
+  * Create README
+  * WARNING : This breaks API (we need to run voice_text node in addition to sound_play), so existing users will have to change launch file for using voice text.
+
+* Contributors: Yuki Furuta
+
 2.0.20 (2017-05-09)
 -------------------
 

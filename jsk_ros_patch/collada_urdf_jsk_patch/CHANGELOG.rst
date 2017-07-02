@@ -2,6 +2,13 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [collada_urdf_jsk_patch] fix: occasional build failure (`#105 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/105>`_)
+  * [collada_urdf_jsk_patch] fix: no notify catkin build in catkin build
+  * [collada_urdf_jsk_patch] fix occasional build failure
+* Contributors: Yuki Furuta
+
 2.0.20 (2017-05-09)
 -------------------
 * use indigo-devel before changing hydro-devel package structure

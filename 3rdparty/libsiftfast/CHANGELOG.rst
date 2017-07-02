@@ -2,6 +2,14 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [libsiftfast] find python 2 (`#106 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/106>`_)
+  * libsiftfast is written for python2 and can be successfully installed with python2.
+  * However this package finds and uses python3 (not 2) first on environment where both python2 and 3 are installed. (In new travis environment both python2 and 3 seems to be installed)
+  * This issue is fixed in this PR by setting version 2 on find_package python.
+* Contributors: Yuki Furuta
+
 2.0.20 (2017-05-09)
 -------------------
 
