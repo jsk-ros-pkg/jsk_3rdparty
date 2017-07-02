@@ -2,8 +2,8 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2017-07-02)
+------------------
 * [julius_ros] support grammatical recognition (`#102 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/102>`_)
   * [julius_ros] fix: initial vocabulary
   * [julius_ros][julius_client.py] advertise service on grammar mode

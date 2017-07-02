@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2017-07-02)
+------------------
 * [voice_text] Refactor API (`#101 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/101>`_)
   * Cleanup directory (remove rosbuild related files.)
   * Rewrote VoiceText server node as ROS friendly.
