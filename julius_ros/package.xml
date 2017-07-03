@@ -11,6 +11,7 @@
   <run_depend>audio_capture</run_depend>
   <run_depend>audio_common_msgs</run_depend>
   <run_depend>julius</run_depend>
+  <run_depend>julius-voxforge</run_depend>
   <run_depend>nkf</run_depend>
   <run_depend>python-lxml</run_depend>
   <run_depend>python-rospkg</run_depend>
