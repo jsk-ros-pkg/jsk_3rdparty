@@ -2,6 +2,11 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [julius_ros] fix: missing deps julius-voxforge (`#109 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/109>`_)
+* Contributors: Furushchev
+
 2.1.0 (2017-07-02)
 ------------------
 * [julius_ros] support grammatical recognition (`#102 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/102>`_)

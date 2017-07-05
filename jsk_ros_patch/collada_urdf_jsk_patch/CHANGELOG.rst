@@ -2,6 +2,9 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.0 (2017-07-02)
 ------------------
 * [collada_urdf_jsk_patch] fix: occasional build failure (`#105 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/105>`_)

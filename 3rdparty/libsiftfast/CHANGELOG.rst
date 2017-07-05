@@ -2,6 +2,9 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.0 (2017-07-02)
 ------------------
 * [libsiftfast] find python 2 (`#106 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/106>`_)

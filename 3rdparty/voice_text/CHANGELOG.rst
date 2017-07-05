@@ -2,6 +2,11 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add dynamic_reconfigure to run/build depends  (`#110 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/110>`_)
+* Contributors: Kei Okada
+
 2.1.0 (2017-07-02)
 ------------------
 * [voice_text] Refactor API (`#101 <https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/101>`_)
