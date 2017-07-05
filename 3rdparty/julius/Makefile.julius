@@ -20,7 +20,7 @@ LIBSENT_OPTION =
 LIBJULIUS_OPTION = "--enable-decoder-vad"
 
 installed.julius: $(SOURCE_DIR)/unpacked
-	(cd $(SOURCE_DIR); ./configure --prefix=$(INSTALL_DIR) $(LIBSENT_OPTION) $(LIBJULIUS_OPTION); make; make install)
+	(cd $(SOURCE_DIR); unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && ./configure --prefix=$(INSTALL_DIR) $(LIBSENT_OPTION) $(LIBJULIUS_OPTION); make; make install)
 	touch installed.julius
 
 clean:
