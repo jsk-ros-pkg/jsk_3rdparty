@@ -2,6 +2,9 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.1 (2017-07-05)
 ------------------
 * [julius_ros] fix: missing deps julius-voxforge (`#109 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/109>`_)

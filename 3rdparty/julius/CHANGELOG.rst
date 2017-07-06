@@ -2,6 +2,11 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [julius][package.xml] add rsync to run_depend (`#112 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/112>`_)
+* Contributors: Yui Furuta
+
 2.1.1 (2017-07-05)
 ------------------
 * [julius] fix: failure on buildfirm (`#109 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/109>`_)
