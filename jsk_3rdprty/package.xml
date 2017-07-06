@@ -33,6 +33,7 @@
   <run_depend>rostwitter</run_depend>
   <run_depend>bayesian_belief_networks</run_depend>
   <run_depend>julius</run_depend>
+  <run_depend>julius_ros</run_depend>
   <export>
     <metapackage/>
   </export>
