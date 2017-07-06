@@ -2,8 +2,8 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.2 (2017-07-06)
+------------------
 * [julius][package.xml] add rsync to run_depend (`#112 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/112>`_)
 * Contributors: Yui Furuta
 

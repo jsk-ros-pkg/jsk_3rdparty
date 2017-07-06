@@ -1,6 +1,6 @@
 <package>
   <name>lpg_planner</name>
-  <version>2.1.1</version>
+  <version>2.1.2</version>
   <description>lpg_planner: LPGL Planner (http://zeus.ing.unibs.it/lpg/)</description>
   <maintainer email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Hitoshi Kamada</maintainer>
 
