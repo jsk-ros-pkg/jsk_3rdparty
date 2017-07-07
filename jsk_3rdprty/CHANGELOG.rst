@@ -2,6 +2,9 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.2 (2017-07-06)
 ------------------
 * add julius_ros to meta package (`#111 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/111>`_)
