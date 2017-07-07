@@ -2,8 +2,8 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.3 (2017-07-07)
+------------------
 * add unzip to build_depend ( `#114 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/114>`_ )
 * Contributors: Kei Okada
 
