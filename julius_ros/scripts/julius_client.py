@@ -33,6 +33,7 @@ class JuliusClient(object):
         self.default_duration = rospy.get_param("~duration", 3.0)
         self.default_threshold = rospy.get_param("~threshold", 0.8)
         self.use_isolated_word = rospy.get_param("~use_isolated_word", True)
+        self.start_signal_action_timeout = rospy.get_param("~start_signal_action_timeout", 0.3)
 
         self.pub_speech_recognition = rospy.Publisher("speech_to_text",
                                                       SpeechRecognitionCandidates,
@@ -247,7 +248,7 @@ class JuliusClient(object):
             threshold = self.default_threshold
 
         if not req.quiet:
-            self.play_sound(self.start_signal)
+            self.play_sound(self.start_signal, self.start_signal_action_timeout)
         start_time = rospy.Time.now()
         self.last_speech = SpeechRecognitionCandidates()
         while (rospy.Time.now() - start_time).to_sec() < duration:
