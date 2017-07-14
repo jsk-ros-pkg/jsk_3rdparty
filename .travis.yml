@@ -1,4 +1,4 @@
-language: generic
+language: c++
 sudo: required
 dist: trusty
 services:
