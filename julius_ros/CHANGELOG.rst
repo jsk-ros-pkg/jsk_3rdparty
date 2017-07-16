@@ -2,8 +2,8 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.4 (2017-07-16)
+------------------
 * [julius_ros] set timeout to self.play_sound(self.start_signal) (`#116 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/116>`_)
 * Contributors: Kanae Kochigami
 
