@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>and_scale_ros</name>
+  <version>0.0.0</version>
+  <description>The and_scale_ros package</description>
+
+  <maintainer email="pazeshun3682@gmail.com">Shun Hasegawa</maintainer>
+  <author email="pazeshun3682@gmail.com">Shun Hasegawa</author>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>jsk_recognition_msgs</run_depend>
+  <run_depend>rospy</run_depend>
+
+  <export>
+  </export>
+</package>
