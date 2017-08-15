@@ -79,26 +79,32 @@ class EkEwIDriver(object):
         # get scale value
         msg = WeightStamped()
         msg.header.stamp = stamp
-        msg.weight.stable = True
         header = data[:2]
         msg.weight.value = float(data[3:12])
         unit = data[12:15]
-        if header == 'QT':
-            # number mode
-            rospy.logerr('Unsupported mode: %s', header)
-            return
-        elif header == 'OL':
-            # scale over
-            rospy.logerr('Scale over')
-            return
-        elif unit != '  g':
+        if unit == '  g':
+            if header == 'ST':
+                # stable
+                msg.weight.stable = True
+            elif header == 'US':
+                # unstable
+                msg.weight.stable = False
+            elif header == 'OL':
+                # scale over
+                rospy.logerr('Scale data is over its range')
+                return
+            elif header == 'QT':
+                # number mode
+                rospy.logerr('Scale is in number mode')
+                return
+            else:
+                # Unknown header
+                rospy.logerr('Unknown header: %s', header)
+                return
+        else:
             # unit is not g
             rospy.logerr('Unsupported unit: %s', unit)
             return
-        elif header == 'US':
-            # unstable
-            rospy.logdebug('Scale value is unstable')
-            msg.weight.stable = False
 
         self.pub.publish(msg)
 
