@@ -12,6 +12,10 @@ Then run the driver:
 ``` bash
 rosrun and_scale_ros ekew_i_driver.py _port:=/dev/ttyUSB0
 ```
+or
+``` bash
+roslaunch and_scale_ros ekew_i_driver.launch
+```
 You can get scale value:
 ``` bash
 rostopic echo /ekew_i_driver/output
