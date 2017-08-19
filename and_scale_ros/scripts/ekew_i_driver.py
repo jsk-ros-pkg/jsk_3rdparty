@@ -34,7 +34,7 @@
 
 import serial
 
-from jsk_recognition_msgs.msg import WeightStamped
+from and_scale_ros.msg import WeightStamped
 import rospy
 
 
