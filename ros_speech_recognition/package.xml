@@ -2,7 +2,8 @@
 <package>
   <name>ros_speech_recognition</name>
   <version>0.0.0</version>
-  <description>Speech Recognition</description>
+  <description>ROS wrapper for Python SpeechRecognition library</description>
+  <url type="website">https://pypi.python.org/pypi/SpeechRecognition/</url>
 
   <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
   <license>BSD</license>
