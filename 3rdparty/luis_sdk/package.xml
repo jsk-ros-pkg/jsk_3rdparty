@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>luis_sdk</name>
+  <version>0.0.0</version>
+  <description>
+    LUIS SDK for python
+  </description>
+
+  <url type="website">https://github.com/Microsoft/Cognitive-LUIS-Python</url>
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
+  <license>MIT</license>
+  <author email="t-ahelhi@microsoft.com">Ahmed El-Hinidy</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>rospy</run_depend>
+</package>
