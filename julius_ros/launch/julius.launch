@@ -7,6 +7,7 @@
   <arg name="audio_port"  default="10501" />
   <arg name="max_connection_retry" default="0" />
   <arg name="default_threshold" default="0.9" />
+  <arg name="start_signal_action_timeout" default="0.3" />
   <arg name="respawn" default="false" />
 
   <arg name="launch_audio_capture" default="true" />
@@ -61,6 +62,7 @@
       module_port: $(arg module_port)
       max_connection_retry: $(arg max_connection_retry)
       threshold: $(arg default_threshold)
+      start_signal_action_timeout: $(arg start_signal_action_timeout)
     </rosparam>
   </node>
 </launch>

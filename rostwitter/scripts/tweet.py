@@ -1,18 +1,5 @@
 #!/usr/bin/env python                                                                                              
 import imp  ## for rosbuild                                                                                       
-try:
-    imp.find_module('rostwitter')
-    # # append oauth package path
-    # import rospkg
-    # rp = rospkg.RosPack()
-    # rostwitter_path = rp.get_path('rostwitter')
-    # rostwitter_path
-    # import sys, os
-    # sys.path.append(os.path.join(rostwitter_path, "lib", "python2.7", 
-    #                              "dist-packages"))
-except:
-    import roslib; roslib.load_manifest('rostwitter')
-
 import rospy
 import yaml,sys
 import re, os
@@ -24,7 +11,7 @@ from std_msgs.msg import String
 global Api, CKEY, CSECRET, AKEY, ASECRET
 
 import requests
-import oauth2 as oauth
+from requests_oauthlib import OAuth1
 import base64
 import json as simplejson
 
@@ -41,32 +28,33 @@ class twitter(object):
         self._access_token_key    = access_token_key
         self._access_token_secret = access_token_secret
 
-        self._signature_method_plaintext = oauth.SignatureMethod_PLAINTEXT()
-        self._signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
-
-        self._oauth_token    = oauth.Token(key=access_token_key, secret=access_token_secret)
-        self._oauth_consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+        self.__auth = OAuth1(self._consumer_key, self._consumer_secret,
+                             self._access_token_key, self._access_token_secret)
+        self._requests_timeout = 60
 
     def _RequestUrl(self, url, verb, data=None):
-        req = oauth.Request.from_consumer_and_token(self._oauth_consumer,
-                                                    token=self._oauth_token,
-                                                    http_method=verb,
-                                                    http_url=url)
-        req.sign_request(self._signature_method_hmac_sha1, self._oauth_consumer, self._oauth_token)
-
-        headers = req.to_header()
-
         if verb == 'POST':
-            return requests.post(
-                url,
-                headers=headers,
-                files=data
+            print(data)
+            if data.has_key('media'):
+                return requests.post(
+                    url,
+                    files=data,
+                    auth=self.__auth,
+                    timeout=self._requests_timeout
+                )
+            else:
+                return requests.post(
+                    url,
+                    data=data,
+                    auth=self.__auth,
+                    timeout=self._requests_timeout
                 )
         if verb == 'GET':
             url = self._BuildUrl(url, extra_params=data)
             return requests.get(
                 url,
-                headers=headers
+                auth=self.__auth,
+                timeout=self._requests_timeout
                 )
         return 0  # if not a POST or GET request
 
@@ -84,7 +72,7 @@ class twitter(object):
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
 
         data = {'status': StringIO(status)}
-        data['media[]'] = open(str(media), 'rb')
+        data['media'] = open(str(media), 'rb').read()
         json = self._RequestUrl(url, 'POST', data=data)
         data = simplejson.loads(json.content)
         if 'errors' in data:
@@ -95,14 +83,15 @@ def tweet(dat):
     global Api
     message = dat.data
     rospy.loginfo(rospy.get_name() + " sending %s", message)
-    # search word start from / and end with {.jpeg,.jpg,.png,.gif}                                                 
+
+    # search word start from / and end with {.jpeg,.jpg,.png,.gif}
     m = re.search('/\S+\.(jpeg|jpg|png|gif)', message)
     ret = None
     if m:
         filename = m.group(0)
         message = re.sub(filename,"",message)
         if os.path.exists(filename):
-            ##rospy.logdebug(rospy.get_name() + " tweet %s with file %s", message, filename)                       
+            rospy.loginfo(rospy.get_name() + " tweet %s with file %s", message, filename)
             ret = Api.PostMedia(message[0:116], filename) # 140 - len("http://t.co/ssssssssss")
             #ret = Api.PostUpdate(message)
         else:

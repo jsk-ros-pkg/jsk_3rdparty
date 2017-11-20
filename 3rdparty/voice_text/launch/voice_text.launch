@@ -7,6 +7,8 @@
   <arg name="use_machine" default="true" />
   <machine if="$(arg use_machine)" name="localhost" address="localhost" />
 
+  <arg name="sound_play_respawn" default="true" />
+
   <node name="voice_text" pkg="voice_text" type="voice_text"
         machine="$(arg voice_text_machine)">
     <remap from="text_to_speech" to="voice_text/text_to_speech" />
@@ -20,7 +22,7 @@
   </node>
 
   <node pkg="sound_play" type="soundplay_node.py" name="sound_play_jp"
-        if="$(arg launch_sound_play)"
+        if="$(arg launch_sound_play)" respawn="$(arg sound_play_respawn)"
         machine="$(arg sound_play_machine)">
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
