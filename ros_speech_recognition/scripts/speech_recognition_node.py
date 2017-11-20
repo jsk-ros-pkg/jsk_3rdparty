@@ -39,15 +39,22 @@ class ROSAudio(SR.AudioSource):
 
         self.stream = None
 
-    def __enter__(self):
+    def open(self):
         if self.stream is not None:
-            self.close()
+            self.stream.close()
+            self.stream = None
         self.stream = ROSAudio.AudioStream(self.topic_name, self.buffer_size)
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def close(self):
         self.stream.close()
         self.stream = None
+
+    def __enter__(self):
+        return self.open()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
     class AudioStream(object):
         def __init__(self, topic_name, buffer_size=10240):
@@ -69,7 +76,10 @@ class ROSAudio(SR.AudioSource):
             return self.read_once(size)
 
         def close(self):
-            self.sub_audio.unregister()
+            try:
+                self.sub_audio.unregister()
+            except:
+                pass
             self.buffer = bytes()
 
         def audio_cb(self, msg):
@@ -105,13 +115,19 @@ class ROSSpeechRecognition(object):
                                        "/usr/share/sounds/ubuntu/stereo/window-slide.ogg"),
         }
 
-        self.srv = Server(Config, self.config_callback)
+        self.dyn_srv = Server(Config, self.config_callback)
 
-        self.initialized = False
-
-        self.srv_speech_recognition = rospy.Service("speech_recognition",
-                                                    SpeechRecognition,
-                                                    self.speech_recognition_cb)
+        self.stop_fn = None
+        self.continuous = rospy.get_param("~continuous", False)
+        if self.continuous:
+            rospy.loginfo("Enabled continuous mode")
+            self.pub = rospy.Publisher("/Tablet/voice",
+                                       SpeechRecognitionCandidates,
+                                       queue_size=1)
+        else:
+            self.srv = rospy.Service("speech_recognition",
+                                     SpeechRecognition,
+                                     self.speech_recognition_srv_cb)
 
     def config_callback(self, config, level):
         # config for engine
@@ -130,6 +146,14 @@ class ROSSpeechRecognition(object):
         self.recognizer.dynamic_energy_ratio = config.dynamic_energy_ratio
 
         # config for timeout
+        if config.listen_timeout > 0.0:
+            self.listen_timeout = config.listen_timeout
+        else:
+            self.listen_timeout = None
+        if config.phrase_time_limit > 0.0:
+            self.phrase_time_limit = config.phrase_time_limit
+        else:
+            self.phrase_time_limit = None
         if config.operation_timeout > 0.0:
             self.recognizer.operation_timeout = config.operation_timeout
         else:
@@ -180,7 +204,35 @@ class ROSSpeechRecognition(object):
 
         return recog_func(audio_data=audio, language=self.language, **self.args)
 
-    def speech_recognition_cb(self, req):
+    def audio_cb(self, _, audio):
+        try:
+            rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
+            result = self.recognize(audio)
+            rospy.loginfo("Result: %s" % result.encode('utf-8'))
+            msg = SpeechRecognitionCandidates(transcript=[result])
+            self.pub.publish(msg)
+        except SR.UnknownValueError as e:
+            if self.dynamic_energy_threshold:
+                self.recognizer.adjust_for_ambient_noise(self.audio)
+                rospy.loginfo("Updated energy threshold to %f" % self.recognizer.energy_threshold)
+        except SR.RequestError as e:
+            rospy.logerr("Failed to recognize: %s" % str(e))
+
+    def start_speech_recognition(self):
+        if self.dynamic_energy_threshold:
+            with self.audio as src:
+                self.recognizer.adjust_for_ambient_noise(src)
+                rospy.loginfo("Set minimum energy threshold to {}".format(
+                    self.recognizer.energy_threshold))
+        self.stop_fn = self.recognizer.listen_in_background(
+            self.audio, self.audio_cb, phrase_time_limit=self.phrase_time_limit)
+        rospy.on_shutdown(self.on_shutdown)
+
+    def on_shutdown(self):
+        if self.stop_fn is not None:
+            self.stop_fn()
+
+    def speech_recognition_srv_cb(self, req):
         res = SpeechRecognitionResponse()
 
         duration = req.duration
@@ -198,7 +250,12 @@ class ROSSpeechRecognition(object):
             start_time = rospy.Time.now()
             while (rospy.Time.now() - start_time).to_sec() < duration:
                 rospy.loginfo("Waiting for speech...")
-                audio = self.recognizer.listen(src)
+                try:
+                    audio = self.recognizer.listen(
+                        src, timeout=self.listen_timeout, phrase_time_limit=self.phrase_time_limit)
+                except SR.WaitTimeoutError as e:
+                    rospy.logwarn(e)
+                    break
                 if not req.quiet:
                     self.play_sound("recognized", 0.05)
                 rospy.loginfo("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
@@ -225,8 +282,13 @@ class ROSSpeechRecognition(object):
                 self.play_sound("timeout", 0.1)
             return res
 
+    def spin(self):
+        if self.continuous:
+            self.start_speech_recognition()
+        rospy.spin()
+
 
 if __name__ == '__main__':
     rospy.init_node("speech_recognition")
     rec = ROSSpeechRecognition()
-    rospy.spin()
+    rec.spin()
