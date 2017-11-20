@@ -9,10 +9,14 @@ env:
     - ROS_PARALLEL_TEST_JOBS="-j8"
     - GIT_SSL_NO_VERIFY=1 # http://stackoverflow.com/questions/21181231/server-certificate-verification-failed-cafile-etc-ssl-certs-ca-certificates-c
   matrix:
-    - ROS_DISTRO=hydro   USE_DEB=true USE_DOCKER=true
     - ROS_DISTRO=indigo  USE_DEB=true
     - ROS_DISTRO=jade    USE_DEB=true
     - ROS_DISTRO=kinetic USE_DEB=true USE_DOCKER=true
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: ROS_DISTRO=hydro   USE_DEB=true USE_DOCKER=true
+
 script: source .travis/travis.sh
 notifications:
   email:
