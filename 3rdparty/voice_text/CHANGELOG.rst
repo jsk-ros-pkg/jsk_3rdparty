@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.5 (2017-11-20)
+------------------
 * [voice_text] Add respawn argument for sound_play (`#125 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/125>`_)
 * Contributors: Shunichi Nozawa
 

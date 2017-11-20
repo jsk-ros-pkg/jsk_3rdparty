@@ -2,8 +2,8 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.5 (2017-11-20)
+------------------
 * ros_speech_recognition: add continuous mode (`#127 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/127>`_)
 * ros_speech_recognition: add README (`#123 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/123>`_)
 * add ros_speech_recognition package (`#121 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/121>`_)
