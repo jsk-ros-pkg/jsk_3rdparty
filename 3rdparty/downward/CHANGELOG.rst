@@ -2,6 +2,11 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* change from g++-static to g++ (`#115 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/115>`_)
+* Contributors: Kei Okada
+
 2.1.4 (2017-07-16)
 ------------------
 

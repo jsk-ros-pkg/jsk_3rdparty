@@ -2,6 +2,11 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update to use python-requests-oauthlib, maybe we can now just to copy python-twitter (`#128 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/128>`_ )
+* Contributors: Kei Okada
+
 2.1.4 (2017-07-16)
 ------------------
 

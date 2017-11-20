@@ -1,9 +1,13 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package slic
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package ros_speech_recognition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Forthcoming
 -----------
+* ros_speech_recognition: add continuous mode (`#127 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/127>`_)
+* ros_speech_recognition: add README (`#123 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/123>`_)
+* add ros_speech_recognition package (`#121 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/121>`_)
+* Contributors: Yuki Furuta
 
 2.1.4 (2017-07-16)
 ------------------
@@ -31,16 +35,12 @@ Forthcoming
 
 2.0.17 (2016-10-22)
 -------------------
-* add cmake/cmake_modules to depends
-* Contributors: Kei Okada
 
 2.0.16 (2016-10-17)
 -------------------
 
 2.0.15 (2016-10-16)
 -------------------
-* add slic
-* Contributors: Kei Okada
 
 2.0.14 (2016-03-20)
 -------------------
@@ -86,9 +86,6 @@ Forthcoming
 
 2.0.0 (2015-06-19 10:41)
 ------------------------
-
-1.0.72 (2015-06-07)
--------------------
 
 1.0.71 (2015-05-17)
 -------------------

@@ -2,6 +2,11 @@
 Changelog for package laser_filters_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update to use non deprecated pluginlib macro (`#126 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/126>`_)
+* Contributors: Mikael Arguedas
+
 2.1.4 (2017-07-16)
 ------------------
 
