@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find voice_text)/launch/voice_text.launch"/>
+  <test test-name="test_voice_text" pkg="voice_text" type="test_voice_text.py"/>
+</launch>

@@ -1,8 +1,9 @@
 <package>
   <name>voice_text</name>
   <version>2.1.6</version>
-  <description>voice_text (www.voicetext.jp)</description>
+  <description>A sound_play interface to use VoiceText by HOYA (www.voicetext.jp)</description>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
 
   <license>HOYA License</license>
 
@@ -11,11 +12,19 @@
   <author>Kei Okada</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>message_generation</build_depend>
+
+  <build_depend>cmake_modules</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>libpoco-dev</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>message_runtime</run_depend>
   <run_depend>nkf</run_depend>
   <run_depend>sound_play</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
+
+  <test_depend>rostest</test_depend>
+
 </package>
