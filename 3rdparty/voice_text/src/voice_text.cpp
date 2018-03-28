@@ -85,10 +85,6 @@ public:
 
   ~VoiceText() {}
 
-  std::string search_library()
-  {
-  }
-
   void init_library(const std::string& lib_path,
                     const std::string& db_path,
                     const std::string& license_path)
@@ -192,7 +188,6 @@ public:
   Config config_;
   ros::ServiceServer srv_;
   std::string pkg_path_;
-  std::string db_path_, license_path_;
   VTWrapper vt_;
 };
 
