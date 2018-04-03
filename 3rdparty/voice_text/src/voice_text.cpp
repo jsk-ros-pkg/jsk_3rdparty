@@ -18,7 +18,11 @@
 #include <voice_text/TextToSpeech.h>
 
 // VoiceText
+#ifdef USE_DUMMY_INCLUDE
+#include "dummy/vt_dummy.h"
+#else
 #include "/usr/vt/sayaka/M16/inc/vt_jpn.h"
+#endif
 
 namespace fs = boost::filesystem;
 
