@@ -66,6 +66,9 @@ public:
     if (!license_path_.empty()) free(license_path_char);
     if (ret != VT_LOADTTS_SUCCESS) {
       ROS_FATAL("Failed to load TTS engine (code %d)", ret);
+      if (ret == -1) {
+        ROS_FATAL("You must install voice_text library before building this library");
+      }
       return false;
     }
 
