@@ -30,7 +30,7 @@ set(VT_LIB_PATH /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.so)
   add_dependencies(voice_text ${PROJECT_NAME}_generate_messages_cpp)
   set_target_properties(voice_text PROPERTIES COMPILE_FLAGS -D_REENTRANT)
 
-if(NOT EXISTS ${VT_LIB_PATH}a)
+if(NOT EXISTS ${VT_LIB_PATH})
   message(WARNING "VoiceText Library not found. building dummy library.")
   add_library(vt_dummy src/dummy/vt_dummy.cpp)
   set_target_properties(vt_dummy PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
