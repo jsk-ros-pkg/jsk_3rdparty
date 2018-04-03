@@ -44,6 +44,12 @@ endif()
     ${VT_LIB_PATH} -lm -lpthread
   )
 
+install(TARGETS voice_text # do not install vt_dummy target, that should be installed from voice_text library
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 install(PROGRAMS bin/text2wave
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
