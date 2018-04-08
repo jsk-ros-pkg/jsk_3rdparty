@@ -2,6 +2,18 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* voice_text: support dynamic linking (`#135 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/135>`_)
+  * install voice_text TARGETS - voice_text: CMakeLists.txt: remove debug code to force non-exists VT_LIB_PATH
+  * voice_text: guide to install libs
+  * install voice_text TARGETS
+  * voice_text: CMakeLists.txt: remove debug code to force non-exists VT_LIB_PATH
+  * add dependencies from generate_message_cpp to voice_text
+  * use vt_dummy when we do not have voice_text library
+* Contributors: Kei Okada, Yuki Furuta
+
 2.1.6 (2017-11-21)
 ------------------
 

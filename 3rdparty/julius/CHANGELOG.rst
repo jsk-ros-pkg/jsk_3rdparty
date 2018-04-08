@@ -2,6 +2,11 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* julius: add rsync & unzip to run_depend (`#134 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/134>`_)
+* Contributors: Yuki Furuta
+
 2.1.6 (2017-11-21)
 ------------------
 
