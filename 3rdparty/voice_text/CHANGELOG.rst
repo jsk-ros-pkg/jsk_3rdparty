@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.7 (2018-04-09)
+------------------
 
 * voice_text: support dynamic linking (`#135 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/135>`_)
   * install voice_text TARGETS - voice_text: CMakeLists.txt: remove debug code to force non-exists VT_LIB_PATH
