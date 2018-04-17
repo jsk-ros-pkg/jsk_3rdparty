@@ -2,6 +2,11 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* julius: add wget to dependencies (`#138 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/138>`_)
+* Contributors: Yuki Furuta
+
 2.1.7 (2018-04-09)
 ------------------
 * julius: add rsync & unzip to run_depend (`#134 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/134>`_)
