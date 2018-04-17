@@ -2,8 +2,8 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.8 (2018-04-17)
+------------------
 * julius: add wget to dependencies (`#138 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/138>`_)
 * Contributors: Yuki Furuta
 
