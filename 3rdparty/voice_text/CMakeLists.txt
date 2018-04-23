@@ -32,7 +32,7 @@ set(VT_LIB_PATH /usr/vt/sayaka/M16/bin/${VT_LIB_ARCH}RAMIO/libvt_jpn.so)
     ${catkin_INCLUDE_DIRS}
   )
   add_executable(voice_text src/voice_text.cpp)
-  add_dependencies(voice_text ${PROJECT_NAME}_generate_messages_cpp)
+  add_dependencies(voice_text ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
   set_target_properties(voice_text PROPERTIES COMPILE_FLAGS -D_REENTRANT)
 
 if(NOT EXISTS ${VT_LIB_PATH})
