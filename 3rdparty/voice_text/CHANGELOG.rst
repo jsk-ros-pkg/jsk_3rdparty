@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.9 (2018-04-24)
+------------------
 * voice_text: add gencfg target to deps (`#141 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/141>`_)
 * Contributors: Yuki Furta
 
