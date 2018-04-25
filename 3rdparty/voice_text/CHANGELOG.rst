@@ -2,6 +2,11 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add dependencies from voice_text to vt_dummy, solves `#139 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/139>`_ (`#143 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/143>`_)
+* Contributors: Kei Okada
+
 2.1.9 (2018-04-24)
 ------------------
 * voice_text: add gencfg target to deps (`#141 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/141>`_)
