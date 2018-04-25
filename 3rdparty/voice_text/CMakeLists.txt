@@ -48,6 +48,9 @@ endif()
     ${catkin_LIBRARIES}
     ${VT_LIB_PATH} -lm -lpthread
   )
+if(NOT EXISTS ${VT_LIB_PATH})
+  add_dependencies(voice_text vt_dummy)
+endif()
 
 install(TARGETS voice_text # do not install vt_dummy target, that should be installed from voice_text library
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
