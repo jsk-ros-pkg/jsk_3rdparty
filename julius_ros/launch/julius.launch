@@ -18,6 +18,12 @@
   <arg name="machine" default="localhost" />
   <arg name="use_machine" default="true" />
 
+  <arg name="device" default="" doc="device path, for example plughw:2,0" />
+  <arg name="format" default="wave"/>
+  <arg name="channels" default="1"/>
+  <arg name="depth" default="16"/>
+  <arg name="sample_rate" default="16000"/>
+
   <machine name="localhost" address="localhost" if="$(arg use_machine)" />
 
   <!-- run julius (isolated word) -->
@@ -35,11 +41,13 @@
         if="$(arg launch_audio_capture)"
         machine="$(arg machine)"
         respawn="$(arg respawn)"
-        output="screen">
-    <param name="format" value="wave" />
-    <param name="channels" value="1" />
-    <param name="depth" value="16" />
-    <param name="sample_rate" value="16000" />
+        output="screen"
+        clear_params="true">
+    <param name="device" value="$(arg device)"/>
+    <param name="format" value="$(arg format)" />
+    <param name="channels" value="$(arg channels)" />
+    <param name="depth" value="$(arg depth)" />
+    <param name="sample_rate" value="$(arg sample_rate)" />
   </node>
 
   <!-- sound play -->
