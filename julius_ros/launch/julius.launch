@@ -24,6 +24,8 @@
   <arg name="depth" default="16"/>
   <arg name="sample_rate" default="16000"/>
 
+  <arg name="julius_args" default="" doc="set -debug to turn on julius debug"/>
+
   <machine name="localhost" address="localhost" if="$(arg use_machine)" />
 
   <!-- run julius (isolated word) -->
@@ -34,7 +36,8 @@
               -module $(arg module_port)
               -h $(arg hmm_def_file)
               -hlist $(arg hmm_list_file)
-              -w $(arg word_file)" />
+              -w $(arg word_file)
+              $(arg julius_args)" />
 
   <!-- audio capture from microphone -->
   <node name="audio_capture" pkg="audio_capture" type="audio_capture"
