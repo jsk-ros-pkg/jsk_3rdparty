@@ -8,20 +8,16 @@ add_custom_target(libnlopt_cxx ALL
   DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libnlopt_cxx.so)
 add_custom_command(OUTPUT
   ${CATKIN_DEVEL_PREFIX}/lib/libnlopt_cxx.so
-  ${CATKIN_DEVEL_PREFIX}/include/nlopt
   COMMAND cp ${PROJECT_SOURCE_DIR}/nlopt-2.3.tar.gz.md5sum ${CMAKE_CURRENT_BINARY_DIR}
   COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/tmp
   COMMAND cmake -E chdir ${CMAKE_CURRENT_BINARY_DIR} make -f ${PROJECT_SOURCE_DIR}/Makefile DSTDIR=${CMAKE_CURRENT_BINARY_DIR}/tmp MK_DIR=${mk_PREFIX}/share/mk
   # copy nlopt.h and nlopt.hpp
-  COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/tmp/include ${CATKIN_DEVEL_PREFIX}/include/nlopt
+  COMMAND mkdir -p  ${CATKIN_DEVEL_PREFIX}/include/nlopt
+  COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/tmp/include/* ${CATKIN_DEVEL_PREFIX}/include/nlopt
   # copy libnlopt
   COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/tmp/lib/*.so* ${CATKIN_DEVEL_PREFIX}/lib/
   COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/tmp/share ${CATKIN_DEVEL_PREFIX}/share/
-  DEPENDS Makefile ${CATKIN_DEVEL_PREFIX}/include
-  ${CATKIN_DEVEL_PREFIX}/lib ${CATKIN_DEVEL_PREFIX}/share)
-
-add_custom_command(OUTPUT ${CATKIN_DEVEL_PREFIX}/include
-  COMMAND mkdir -p ${CATKIN_DEVEL_PREFIX}/include)
+  DEPENDS Makefile)
 
 catkin_package(
     DEPENDS
@@ -29,6 +25,7 @@ catkin_package(
     INCLUDE_DIRS
     LIBRARIES nlopt_cxx
     EXPORTED_TARGETS libnlopt_cxx
+    CFG_EXTRAS nlopt-extras.cmake
 )
 
 # set(NLOPTDIR ${CATKIN_PACKAGE_SHARE_DESTINATION}/jskeus/eus)
