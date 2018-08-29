@@ -2,8 +2,8 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.11 (2018-08-29)
+-------------------
 * collada_urdf_jsk_patch: std=gnu++11 need for kinetic and later (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
 * Contributors: Kei Okada
 

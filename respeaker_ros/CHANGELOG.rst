@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.11 (2018-08-29)
+-------------------
 * Add respeaker_ros package (`#152 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/152>`_)
 * Contributors: Yuki Furuta
 
