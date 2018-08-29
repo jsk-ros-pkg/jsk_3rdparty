@@ -1,0 +1,230 @@
+Index: siftfastpy.cpp
+===================================================================
+--- siftfastpy.cpp	(revision 54)
++++ siftfastpy.cpp	(working copy)
+@@ -21,11 +21,27 @@
+ #define PY_ARRAY_UNIQUE_SYMBOL PyArrayHandle
+ #include <boost/python.hpp>
+ #include <boost/python/exception_translator.hpp>
++// Copied from Code/RDBoost/boost_numpy.h (https://github.com/rdkit/rdkit/pull/1664)
++// Boost python numpy available in Boost 1.63+
++// Boost python numeric removed in Boost 1.65+
++#if BOOST_VERSION < 106500
++#include <boost/python/numeric.hpp>
++typedef typename boost::python::numeric::array NumpyArrayType;
++#else
++#include <boost/python/numpy.hpp>
++typedef typename boost::python::numpy::ndarray NumpyArrayType;
++#endif
++//
+ #include <pyconfig.h>
+ #include <numpy/arrayobject.h>
+ 
+ #include <boost/format.hpp>
+ 
++#if BOOST_VERSION >= 106500
++#define PyArray_FLOAT NPY_FLOAT
++#define PyArray_DATA(obj) ((void *)((PyArrayObject_fields *)(obj))->data)
++#endif
++
+ #include "siftfast.h"
+ 
+ #define CHECK_POINTER(p) { \
+@@ -33,7 +49,7 @@
+ }
+ 
+ using namespace boost::python;
+-using namespace std;
++//using namespace std;
+ 
+ // aligned malloc and free
+ inline void* py_aligned_malloc(size_t size, size_t align)
+@@ -63,10 +79,10 @@
+ struct siftfast_exception : std::exception
+ {
+     siftfast_exception() : std::exception(), _s("unknown exception") {}
+-    siftfast_exception(const string& s) : std::exception() { _s = "siftfast: " + s; }
++    siftfast_exception(const std::string& s) : std::exception() { _s = "siftfast: " + s; }
+     virtual ~siftfast_exception() throw() {}
+     char const* what() const throw() { return _s.c_str(); }
+-    string _s;
++    std::string _s;
+ };
+ 
+ #if defined(BOOST_ENABLE_ASSERT_HANDLER)
+@@ -91,19 +107,26 @@
+     PyObject *pyvalues = PyArray_SimpleNew(1,dims, PyArray_FLOAT);
+     if( pvalues != NULL )
+         memcpy(PyArray_DATA(pyvalues),pvalues,N*sizeof(float));
+-    return static_cast<numeric::array>(handle<>(pyvalues));
++#if BOOST_VERSION < 106500
++    return static_cast<NumpyArrayType>(handle<>(pyvalues));
++#else
++    // c.f. https://github.com/ndarray/Boost.NumPy/blob/master/libs/numpy/example/gaussian.cpp
++    boost::python::object obj(boost::python::handle<>(boost::python::borrowed(pyvalues)));
++    boost::python::numpy::ndarray arr(boost::python::numpy::from_object(obj, boost::python::numpy::dtype::get_builtin<float>(), 1, N, boost::python::numpy::ndarray::V_CONTIGUOUS));
++    return arr.copy();
++#endif
+ }
+ 
+ template <typename T>
+-inline vector<T> ExtractArray(object o)
++inline std::vector<T> ExtractArray(object o)
+ {
+-    vector<T> v(len(o));
++    std::vector<T> v(len(o));
+     for(size_t i = 0; i < v.size(); ++i)
+         v[i] = extract<T>(o[i]);
+     return v;
+ }
+ 
+-inline vector<float> ExtractFloatArray(object oraw)
++inline std::vector<float> ExtractFloatArray(object oraw)
+ {
+     object o = oraw.attr("flat");
+ 
+@@ -112,8 +135,12 @@
+     if( xr.check() )
+         return ExtractArray<float>(o);
+ 
+-    vector<float> v(len(o));
+-    object onew = ((numeric::array)oraw).astype("f8").attr("flat");
++    std::vector<float> v(len(o));
++#if BOOST_VERSION < 106500
++    object onew = ((NumpyArrayType)oraw).astype("f8").attr("flat");
++#else
++    object onew = ((NumpyArrayType)boost::python::numpy::from_object(oraw, boost::python::numpy::dtype::get_builtin<double>(), 1, v.size(), boost::python::numpy::ndarray::V_CONTIGUOUS)).astype(boost::python::numpy::dtype::get_builtin<double>()).attr("flat");
++#endif
+     for(size_t i = 0; i < v.size(); ++i)
+         v[i] = (float)(extract<double>(onew[i]));
+     return v;
+@@ -149,7 +176,7 @@
+         if( width != extract<int>(shape[1]) )
+             throw siftfast_exception("array columns do not match width");
+ 
+-        string dtype = extract<string>(arr.attr("dtype").attr("name"));
++        std::string dtype = extract<std::string>(arr.attr("dtype").attr("name"));
+         if( (dtype.size() >= 3 && dtype[0] == 'i' && dtype[1] == 'n' && dtype[2] == 't') ||
+             (dtype.size() >= 4 && dtype[1] == 'i' && dtype[2] == 'n' && dtype[3] == 't') ) {
+             extract<int> xi(arr[0][0]);
+@@ -180,7 +207,7 @@
+     }
+ 
+     int width,height,stride;
+-    vector<float> vimage;
++    std::vector<float> vimage;
+ };
+ 
+ class Image_pickle_suite : public pickle_suite
+@@ -195,7 +222,11 @@
+ object ReturnKeypoints(Keypoint keypts)
+ {
+     if( keypts == NULL )
+-        return make_tuple(numeric::array(boost::python::list()).astype("f4"),numeric::array(boost::python::list()).astype("f4"));
++#if BOOST_VERSION < 106500
++        return make_tuple(NumpyArrayType(boost::python::list()).astype("f4"),NumpyArrayType(boost::python::list()).astype("f4"));
++#else
++        return make_tuple(NumpyArrayType(boost::python::numpy::array(boost::python::list())).astype(boost::python::numpy::dtype::get_builtin<float>()), NumpyArrayType(boost::python::numpy::array(boost::python::list())).astype(boost::python::numpy::dtype::get_builtin<float>()));
++#endif
+     int numkeys = 0;
+     Keypoint key = keypts;
+     while(key) {
+@@ -226,8 +257,15 @@
+         key = key->next;
+         ++index;
+     }
+-
+-    return make_tuple(static_cast<numeric::array>(handle<>(pyframes)),static_cast<numeric::array>(handle<>(pydesc)));
++#if BOOST_VERSION < 106500
++    return make_tuple(static_cast<NumpyArrayType>(handle<>(pyframes)),static_cast<NumpyArrayType>(handle<>(pydesc)));
++#else
++    boost::python::object pyframes_obj(boost::python::handle<>(boost::python::borrowed(pyframes)));
++    boost::python::numpy::ndarray pyframes_arr(boost::python::numpy::from_object(pyframes_obj, boost::python::numpy::dtype::get_builtin<float>(), 1, index*4, boost::python::numpy::ndarray::V_CONTIGUOUS));
++    boost::python::object pydesc_obj(boost::python::handle<>(boost::python::borrowed(pydesc)));
++    boost::python::numpy::ndarray pydesc_arr(boost::python::numpy::from_object(pydesc_obj, boost::python::numpy::dtype::get_builtin<float>(), 1, index*128, boost::python::numpy::ndarray::V_CONTIGUOUS));
++    return make_tuple(pyframes_arr, pydesc_arr);
++#endif
+ }
+ 
+ object PyGetKeypoints(PyImage& im)
+@@ -281,8 +319,13 @@
+ 
+     FreeKeypoints(keypts);
+     DestroyAllImages();
+-
+-    return static_cast<numeric::array>(handle<>(pyframes));
++#if BOOST_VERSION < 106500
++    return static_cast<NumpyArrayType>(handle<>(pyframes));
++#else
++    boost::python::object pyframes_obj(boost::python::handle<>(boost::python::borrowed(pyframes)));
++    boost::python::numpy::ndarray pyframes_arr(boost::python::numpy::from_object(pyframes_obj, boost::python::numpy::dtype::get_builtin<float>(), 1, index*6, boost::python::numpy::ndarray::V_CONTIGUOUS));
++    return pyframes_arr.copy();
++#endif
+ }
+ 
+ object PyGetKeypointDescriptors(PyImage& im,object oframes)
+@@ -293,7 +336,7 @@
+     siftimage.pixels = &im.vimage[0];
+     siftimage.stride = im.stride;
+ 
+-    vector<Keypoint> vkeypoints(len(oframes));
++    std::vector<Keypoint> vkeypoints(len(oframes));
+     for(size_t i = 0; i < vkeypoints.size(); ++i) {
+         object oframe = oframes[i];
+         Keypoint keypt = (Keypoint)py_aligned_malloc(sizeof(KeypointSt),16);
+@@ -323,19 +366,19 @@
+     return o;
+ }
+ 
+-object PyGetKeypoints(numeric::array oarray)
++object PyGetKeypoints(NumpyArrayType oarray)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypoints(pimage);
+ }
+ 
+-object PyGetKeypointFrames(numeric::array oarray)
++object PyGetKeypointFrames(NumpyArrayType oarray)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypointFrames(pimage);
+ }
+ 
+-object PyGetKeypointDescriptors(numeric::array oarray, object oframes)
++object PyGetKeypointDescriptors(NumpyArrayType oarray, object oframes)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypointDescriptors(pimage, oframes);
+@@ -413,7 +456,12 @@
+ BOOST_PYTHON_MODULE(siftfastpy)
+ {
+     import_array();
+-    numeric::array::set_module_and_type("numpy", "ndarray");
++
++#if BOOST_VERSION < 106500
++    // Specify that py::numeric::array should refer to the Python type numpy.ndarray
++    // (rather than the older Numeric.array).    
++    NumpyArrayType::set_module_and_type("numpy", "ndarray");
++#endif
+     register_exception_translator<siftfast_exception>(&translate_siftfast_exception);
+     int_from_int();
+     T_from_number<float>();
+@@ -421,15 +469,15 @@
+ 
+     def("DestroyAllResources",DestroyAllResources);
+     object (*pkeypoints1)(PyImage&) = PyGetKeypoints;
+-    object (*pkeypoints2)(numeric::array) = PyGetKeypoints;
++    object (*pkeypoints2)(NumpyArrayType) = PyGetKeypoints;
+     def("GetKeypoints",pkeypoints1,args("image"));
+     def("GetKeypoints",pkeypoints2,args("array"));
+     object (*pkeypointsf1)(PyImage&) = PyGetKeypointFrames;
+-    object (*pkeypointsf2)(numeric::array) = PyGetKeypointFrames;
++    object (*pkeypointsf2)(NumpyArrayType) = PyGetKeypointFrames;
+     def("GetKeypointFrames",pkeypointsf1,args("image"));
+     def("GetKeypointFrames",pkeypointsf2,args("array"));
+     object (*pkeypointsd1)(PyImage&,object) = PyGetKeypointDescriptors;
+-    object (*pkeypointsd2)(numeric::array,object) = PyGetKeypointDescriptors;
++    object (*pkeypointsd2)(NumpyArrayType,object) = PyGetKeypointDescriptors;
+     def("GetKeypointDescriptors",pkeypointsd1,args("image","frames"));
+     def("GetKeypointDescriptors",pkeypointsd2,args("array","frames"));
+ 
