@@ -1,5 +1,6 @@
 <launch>
-  <node pkg="rosping" name="rosping" type="rosping" args="8.8.8.8" >
+  <node pkg="rosping" name="rosping" type="rosping" args="8.8.8.8"
+        launch-prefix="sudo -n -E LD_LIBRARY_PATH=$(env LD_LIBRARY_PATH)" >
     <param name="rate" value="0.5" /> <!-- 2hz -->
   </node>
   <param name="ping_delay/topic" value="ping/delay" />
