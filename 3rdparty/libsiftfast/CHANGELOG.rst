@@ -2,6 +2,13 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix for melodic (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+  * libsiftfast : add 02.cmake_warn_narrowing.patch 03.skip_python_bindings.patch.bak 04.boost_65_numpy_1_10.patch for 18.04
+  * libsiftfast: patch all fiels within pathes directory
+* Contributors: Kei Okada
+
 2.1.10 (2018-04-25)
 -------------------
 
