@@ -5,6 +5,7 @@
 import actionlib
 import rospy
 import speech_recognition as SR
+import json
 from threading import Lock
 
 from audio_common_msgs.msg import AudioData
@@ -185,8 +186,16 @@ class ROSSpeechRecognition(object):
                 self.args = {'key': rospy.get_param("~google_key", None)}
             recog_func = self.recognizer.recognize_google
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
+            print("GETPARAM:"+rospy.get_param("~google_cloud_credentials_json"))
             if not self.args:
-                self.args = {'credential_json': rospy.get_param("~google_cloud_credentials_json", None),
+                credentials_path = rospy.get_param("~google_cloud_credentials_json", None)
+		if credentials_path is not None:
+                    with open(credentials_path) as j:
+                        credentials_json = j.read()
+                else:
+                    credentials_json = None
+#                self.args = {'credentials_json': rospy.get_param("~google_cloud_credentials_json", None),
+                self.args = {'credentials_json': credentials_json,
                              'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None)}
             recog_func = self.recognizer.recognize_google_cloud
         elif self.engine == Config.SpeechRecognition_Sphinx:
