@@ -188,7 +188,7 @@ class ROSSpeechRecognition(object):
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
                 credentials_path = rospy.get_param("~google_cloud_credentials_json", None)
-		        if credentials_path is not None:
+                if credentials_path is not None:
                     with open(credentials_path) as j:
                         credentials_json = j.read()
                 else:
