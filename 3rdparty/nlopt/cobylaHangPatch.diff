@@ -1,0 +1,9 @@
+1241a1242
+>   int loopCounter=0;
+1772a1774,1779
+>   loopCounter++;
+>   if (loopCounter > 10000) 
+>     {
+>       //      printf("***loopCounter overrun...\n");
+>       return(NLOPT_FAILURE);
+>     }
