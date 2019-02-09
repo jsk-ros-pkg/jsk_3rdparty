@@ -59,7 +59,7 @@ install(TARGETS voice_text # do not install vt_dummy target, that should be inst
 )
 
 install(PROGRAMS bin/text2wave
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin
 )
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
