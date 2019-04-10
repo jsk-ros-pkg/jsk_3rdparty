@@ -23,11 +23,8 @@ fi
 
 nkf -s $INPUT_FILE > $JPTEXT_FILE
 
-rosservice call voice_text/text_to_speech \
-"
-text_path: '$JPTEXT_FILE'
-wave_path: '$OUTPUT_FILE'
-"
+python `rospack find voice_text`/scripts/text_to_speech_client.py \
+    $JPTEXT_FILE $OUTPUT_FILE
 
 rm -f $JPTEXT_FILE
 
