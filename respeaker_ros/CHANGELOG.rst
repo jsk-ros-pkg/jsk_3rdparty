@@ -2,6 +2,16 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Make sample_respeaker.launch re-usable (`#161 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/161>`_)
+
+  * [respeaker_ros] add docs for each args in sample_respeaker.launch
+  * make sample_respeaker.launch re-usable
+
+* respeaker_ros: cleanup error messages (`#155 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/155>`_)
+* Contributors: Yuki Furuta, Kei Okada, Naoya Yamaguchi
+
 2.1.11 (2018-08-29)
 -------------------
 * Add respeaker_ros package (`#152 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/152>`_)

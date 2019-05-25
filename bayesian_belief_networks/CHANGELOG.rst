@@ -2,6 +2,9 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.11 (2018-08-29)
 -------------------
 

@@ -2,6 +2,9 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.11 (2018-08-29)
 -------------------
 * downward: compile with -Wno-maybe-uninitialized to avoid error for 18.04 (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)

@@ -2,6 +2,9 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.11 (2018-08-29)
 -------------------
 * libcmt: opencv2/xfeatures2d.hpp only required between 3.1.0 <= OPENCV_VERSION_CODE < 3.2.0 (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
