@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.12 (2019-05-25)
+-------------------
 * Make sample_respeaker.launch re-usable (`#161 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/161>`_)
 
   * [respeaker_ros] add docs for each args in sample_respeaker.launch

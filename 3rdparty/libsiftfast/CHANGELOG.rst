@@ -2,8 +2,8 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.12 (2019-05-25)
+-------------------
 * enable to compile libsiftfast with current numpy.get_include() (`#162 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/162>`_ )
 * Contributors: Kei Okada
 

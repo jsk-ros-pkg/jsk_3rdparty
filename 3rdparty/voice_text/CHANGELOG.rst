@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.12 (2019-05-25)
+-------------------
 * Fix install directory of text2wave to ./lib -> ./bin (`#160 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/160>`_)
   `text2wave` Was wrongly  installed to `CATKIN_PACKAGE_LIB_DESTINATION`
   The launch file is assumed that it is installed under `rospack find voice_text`/bin
