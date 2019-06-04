@@ -17,6 +17,6 @@
         name="test_speech_to_text"
         pkg="jsk_tools"  type="test_topic_published.py" >
     <param name="~topic_0" value="/speech_to_text" />
-    <param name="~timeout_0" value="3" />
+    <param name="~timeout_0" value="10" />
   </test>
 </launch>
