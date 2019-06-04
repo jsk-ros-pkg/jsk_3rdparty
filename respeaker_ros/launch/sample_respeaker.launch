@@ -1,6 +1,8 @@
 <launch>
   <!-- publish tf of respeaker -->
   <arg name="publish_tf" default="true"/>
+  <!-- launch respeaker -->
+  <arg name="launch_respeaker" default="true"/>
   <!-- launch sound_play node -->
   <arg name="launch_soundplay" default="true"/>
   <!-- input speech topic of speech_to_text.py -->
@@ -14,8 +16,8 @@
         name="static_transformer" pkg="tf" type="static_transform_publisher"
         args="0 0 0 0 0 0 1 map respeaker_base 100"/>
 
-  <node name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
-        respawn="true"/>
+  <node if="$(arg launch_respeaker)"
+        name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py" respawn="true"/>
 
   <node if="$(arg launch_soundplay)"
         name="sound_play" pkg="sound_play" type="soundplay_node.py"/>
