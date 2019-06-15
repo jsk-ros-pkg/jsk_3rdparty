@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="1">
+  <name>dialogflow_ros</name>
+  <version>0.0.0</version>
+  <description>The dialogflow_ros package</description>
+
+  <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+
+  <license>BSD</license>
+  <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>app_manager</run_depend>
+  <run_depend>message_runtime</run_depend>
+
+  <export>
+  </export>
+
+</package>
