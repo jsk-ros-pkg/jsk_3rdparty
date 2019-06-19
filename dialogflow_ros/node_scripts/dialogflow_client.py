@@ -79,7 +79,7 @@ class DialogflowClient(object):
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
         self.hotword = rospy.get_param(
-            "~hotword", ["ねえねえ", "こんにちは", "やあ", "PR2", "PR 2"])
+            "~hotword", ["ねえねえ", "こんにちは", "やあ"])
 
         self.state = State()
         self.session_id = None
