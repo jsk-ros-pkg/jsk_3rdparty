@@ -3,6 +3,9 @@
   <arg name="credential" default="$(env GOOGLE_APPLICATION_CREDENTIALS)"/>
   <arg name="project_id" default="$(env DIALOGFLOW_PROJECT_ID)"/>
 
+  <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
+        args="/speech_to_text /speech_to_text_google /speech_to_text_julius" />
+
   <node name="dialogflow_client"
         pkg="dialogflow_ros" type="dialogflow_client.py"
         output="screen">
