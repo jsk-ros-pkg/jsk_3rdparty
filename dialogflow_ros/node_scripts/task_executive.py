@@ -164,61 +164,6 @@ class PriorityQueue(object):
             raise StopIteration()
 
 
-class TaskExecutive_old(object):
-    def __init__(self):
-        self.queue = PriorityQueue()
-        self.current_task = set()
-        self.idle_tasks = []
-        self.attentions = defaultdict(list)
-        #
-        self.app_manager = AppManager(
-            on_started=self.app_start_cb,
-            on_stopped=self.app_stop_cb,
-        )
-        self.sub_attention = rospy.Subscriber(
-            "~attention", Attention, self.attention_cb)
-        self.srv_enqueue_task = rospy.Service(
-            "~enqueue", EnqueueTask, self.enqueue_cb)
-
-    def is_idle(self):
-        running = self.active_tasks - set(self.idle_tasks)
-        return not running
-
-    def spawn_next_task(self):
-        next_task = None
-        # TODO(knorth55): implment spawn next task
-        # 1. check attention
-        # 2. check queue
-        # 3. check idle
-        # 4. cancel current task if needed
-        # 5. spawn next task
-        if next_task is not None:
-            if self.current_task:
-                for t in self.current_task:
-                    self.app_manager.stop_app(t)
-            self.app_manager.start_app(next_task)
-
-    def attention_cb(self, msg):
-        rospy.loginfo("Attention")
-        self.attentions[msg.level].append(msg)
-        # filter duplicated attentions?
-        self.spawn_next_task()
-
-    def enqueue_cb(self, req):
-        rospy.loginfo("Enqueue")
-        res = EnqueueTaskResponse()
-        self.queue.push(res.task)  # FIXME
-        self.spawn_next_task()
-        return res
-
-    def app_start_cb(self, name):
-        rospy.loginfo("{} started".format(name))
-
-    def app_stop_cb(self, name):
-        rospy.loginfo("{} stopped".format(name))
-        self.spawn_next_task()
-
-
 class TaskExecutive(object):
     def __init__(self):
         self.app_manager = AppManager(
