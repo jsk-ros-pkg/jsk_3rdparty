@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-from collections import defaultdict
 import heapq
 import json
 import re
@@ -12,10 +11,7 @@ from app_manager.srv import StartApp
 from app_manager.srv import StopApp
 from std_srvs.srv import Empty
 
-from dialogflow_ros.msg import Attention
-from dialogflow_ros.msg import DialogResponse
-from dialogflow_ros.srv import EnqueueTask
-from dialogflow_ros.srv import EnqueueTaskResponse
+from dialogflow_task_executive.msg import DialogResponse
 
 
 def camel_to_snake(name):

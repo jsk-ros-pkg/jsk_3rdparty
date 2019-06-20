@@ -7,7 +7,7 @@
         args="/speech_to_text /speech_to_text_google /speech_to_text_julius" />
 
   <node name="dialogflow_client"
-        pkg="dialogflow_ros" type="dialogflow_client.py"
+        pkg="dialogflow_task_executive" type="dialogflow_client.py"
         output="screen">
     <rosparam subst_value="true">
       use_audio: false
@@ -18,7 +18,7 @@
   </node>
 
   <node name="task_executive"
-        pkg="dialogflow_ros" type="task_executive.py"
+        pkg="dialogflow_task_executive" type="task_executive.py"
         output="screen">
     <rosparam subst_value="true">
     </rosparam>

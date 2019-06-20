@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="1">
-  <name>dialogflow_ros</name>
+  <name>dialogflow_task_executive</name>
   <version>0.0.0</version>
-  <description>The dialogflow_ros package</description>
+  <description>Task execution with dialogflow package</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
 
