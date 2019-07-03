@@ -2,7 +2,7 @@
 <package format="1">
   <name>dialogflow_task_executive</name>
   <version>0.0.0</version>
-  <description>Task execution with dialogflow package</description>
+  <description>A ROS package for Task execution with dialogflow</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
 
