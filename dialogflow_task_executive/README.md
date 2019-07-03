@@ -87,7 +87,7 @@ Your robot will execute the task from dialogflow.
 
 ## Author
 
-Yuki Furuta <furushcheve@jsk.imi.i.u-tokyo.ac.jp>
+Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 Shingo Kitagawa <s-kitagawa@jsk.imi.i.u-tokyo.ac.jp>
 
