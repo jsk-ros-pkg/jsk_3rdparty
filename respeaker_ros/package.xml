@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>respeaker_ros</name>
+  <version>2.1.12</version>
+  <description>The respeaker_ros package</description>
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
+  <license>Apache</license>
+  <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <run_depend>angles</run_depend>
+  <run_depend>audio_common_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>python-numpy</run_depend>
+  <run_depend>python-pyaudio</run_depend>
+  <run_depend>python-pyusb-pip</run_depend>
+</package>

@@ -2,6 +2,14 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+* run sudo -E and set LD_LIBRARY_PATH, because LD_LIBRARY_PATH is not passwed after sudo -E or suid, see set ld_library_path within (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+* Contributors: Kei Okada
+
 2.1.10 (2018-04-25)
 -------------------
 

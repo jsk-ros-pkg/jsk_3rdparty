@@ -2,6 +2,14 @@
 Changelog for package nlopt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+* add nlopt-extras.cmake to set nlopt_INCLUDE_DIR for https://github.com/jsk-ros-pkg/jsk_control/issues/696 (`#153 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/153>`_)
+* Contributors: Kei Okada
+
 2.1.10 (2018-04-25)
 -------------------
 

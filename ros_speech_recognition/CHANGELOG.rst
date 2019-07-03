@@ -2,6 +2,14 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.12 (2019-05-25)
+-------------------
+* fixes GoogleCloud auth (`#158 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/158>`_)
+* Contributors: jonasius
+
+2.1.11 (2018-08-29)
+-------------------
+
 2.1.10 (2018-04-25)
 -------------------
 

@@ -10,7 +10,7 @@ externalproject_add(downward
   URL http://cdn.rawgit.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz
   TIMEOUT 120
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND cd src && ./build_all DOWNWARD_BITWIDTH=native
+  BUILD_COMMAND cd src && sed -i "s@^CXXFLAGS =$@CXXFLAGS = -Wno-maybe-uninitialized@" search/Makefile && ./build_all DOWNWARD_BITWIDTH=native
   INSTALL_COMMAND bash -c "cp -rf --parents src/{validate,plan,preprocess/preprocess,search/downward*,search/unitcost,search/portfolio.py,translate} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}"
   BUILD_IN_SOURCE 1
 )

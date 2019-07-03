@@ -2,6 +2,17 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.12 (2019-05-25)
+-------------------
+* Fix install directory of text2wave to ./lib -> ./bin (`#160 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/160>`_)
+  `text2wave` Was wrongly  installed to `CATKIN_PACKAGE_LIB_DESTINATION`
+  The launch file is assumed that it is installed under `rospack find voice_text`/bin
+  https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/2.1.10/3rdparty/voice_text/launch/voice_text.launch#L29
+* Contributors: Kei Okada
+
+2.1.11 (2018-08-29)
+-------------------
+
 2.1.10 (2018-04-25)
 -------------------
 * add dependencies from voice_text to vt_dummy, solves `#139 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/139>`_ (`#143 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/143>`_)
