@@ -28,7 +28,7 @@ class SpeechToText(object):
         self.tts_tolerance = rospy.Duration.from_sec(
             rospy.get_param("~tts_tolerance", 1.0))
         tts_action_names = rospy.get_param(
-            '~tts_action_names', ['robotsound', 'robotsound_jp'])
+            '~tts_action_names', ['soundplay'])
 
         self.recognizer = SR.Recognizer()
 
