@@ -4,7 +4,10 @@
 
 import actionlib
 import rospy
-import speech_recognition as SR
+try:
+    import speech_recognition as SR
+except ImportError as e:
+    raise ImportError(str(e) + '\nplease try "pip install speechrecognition"')
 
 from actionlib_msgs.msg import GoalStatus, GoalStatusArray
 from audio_common_msgs.msg import AudioData
