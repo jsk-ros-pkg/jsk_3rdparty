@@ -18,4 +18,5 @@
   <run_depend>python-numpy</run_depend>
   <run_depend>python-pyaudio</run_depend>
   <run_depend>python-pyusb-pip</run_depend>
+  <test_depend>jsk_tools</test_depend>
 </package>
