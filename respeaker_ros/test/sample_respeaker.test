@@ -5,6 +5,11 @@
     <arg name="audio" value="speech_audio" />
     <arg name="language" value="ja-JP" />
   </include>
+  <group ns="speech_to_text">
+    <rosparam>
+      tts_action_names: []
+    </rosparam>
+  </group>
 
   <!-- launch bag file -->
   <param name="/use_sim_time" value="true" />
