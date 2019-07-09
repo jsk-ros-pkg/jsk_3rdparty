@@ -4,7 +4,10 @@
 
 import actionlib
 import rospy
-import speech_recognition as SR
+try:
+    import speech_recognition as SR
+except ImportError as e:
+    raise ImportError(str(e) + '\nplease try "pip install speechrecognition"')
 
 from actionlib_msgs.msg import GoalStatus, GoalStatusArray
 from audio_common_msgs.msg import AudioData
@@ -25,7 +28,7 @@ class SpeechToText(object):
         self.tts_tolerance = rospy.Duration.from_sec(
             rospy.get_param("~tts_tolerance", 1.0))
         tts_action_names = rospy.get_param(
-            '~tts_action_names', ['robotsound', 'robotsound_jp'])
+            '~tts_action_names', ['soundplay'])
 
         self.recognizer = SR.Recognizer()
 
