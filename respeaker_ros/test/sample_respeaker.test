@@ -2,6 +2,7 @@
   <!-- launch speech_to_text -->
   <include file="$(find respeaker_ros)/launch/sample_respeaker.launch">
     <arg name="launch_respeaker" value="false" />
+    <arg name="launch_soundplay" value="false" />
     <arg name="audio" value="speech_audio" />
     <arg name="language" value="ja-JP" />
   </include>
