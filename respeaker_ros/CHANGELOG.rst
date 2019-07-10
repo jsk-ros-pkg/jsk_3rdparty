@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.13 (2019-07-10)
+-------------------
 * [respeaker_ros] increase timeout to pass the test (`#170 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/170>`_)
 
   * default tts_action_names should be soundplay
