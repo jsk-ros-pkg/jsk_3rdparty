@@ -1,33 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-# for festival compaibility
-ARGS=`echo $@ | sed 's/\-eval\ ()//' | sed 's/\-eval\ (\(.\+\))\ \(.\+\)$/\2\ \-p\ \1/'`
-eval set -- "$ARGS"
+import argparse
+import sys
+import os
+import rospy
+from voice_text.srv import *
 
-INPUT_FILE=$1;shift;
-JPTEXT_FILE=/tmp/_voice_text_$$.txt
-OUTPUT_FILE=/tmp/_voice_text_$$.wav
-while getopts p:o: OPT
-do
-  case ${OPT} in
-    "o")
-      OUTPUT_FILE=$(readlink -f "$OPTARG")
-      ;;
-  esac
-done
 
-if [ ! -e $INPUT_FILE ]; then
-  echo "$INPUT_FILE not found" 1>&2
-  exit 1
-fi
+def text_to_speech_client(text_path, wave_path):
+    rospy.wait_for_service('/voice_text/text_to_speech')
+    try:
+        text_to_speech = rospy.ServiceProxy('/voice_text/text_to_speech', TextToSpeech)
+        # print("Requesting %s -> %s"%(text_path, wave_path))
+        res = text_to_speech(text_path, wave_path)
+        return res.ok
+    except rospy.ServiceException, e:
+        print("Service call failed: %s"%e)
 
-nkf -s $INPUT_FILE > $JPTEXT_FILE
 
-rosservice call voice_text/text_to_speech \
-"
-text_path: '$JPTEXT_FILE'
-wave_path: '$OUTPUT_FILE'
-"
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
 
-rm -f $JPTEXT_FILE
+    input_file = args.text
+    jptext_file = "/tmp/_voice_text_%s.txt"%os.getpid()
+    output_file = "/tmp/_voice_text_%s.wav"%os.getpid()
+    if args.output is not None:
+        output_file = args.output
 
+    if not os.path.exists(input_file):
+        rospy.logerr("%s not found"%input_file)
+        sys.exit(1)
+
+    # convert character code to shift JIS
+    os.system("nkf -s %s > %s"%(input_file, jptext_file))
+
+    text_to_speech_client(jptext_file, output_file)
+
+    os.remove(jptext_file)
