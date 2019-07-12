@@ -91,6 +91,8 @@ Edit a config file below and save it as `/etc/init/jsk-dialog.conf`
 
 You can control `dialogflow_task_executive` service by `sudo initctl start jsk-dialog`.
 
+See [config/jsk-dialog.conf](./config/jsk-dialog.conf)
+
 ```bash
 # make sure that robot is running
 start on robot-is-up
