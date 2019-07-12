@@ -15,7 +15,7 @@ If you are a JSK lab member, ask s-kitagawa or k-okada about JSK dialogflow acco
 
 Go to console on Dialogflow [Dialogflow](https://dialogflow.com/) and create new agent.
 
-![](./.readme/dialogflow_agent.png)
+![](./img/dialogflow_agent.png)
 
 
 ### Create new Service account key
@@ -26,7 +26,7 @@ The page is as shown below and press blue button to create the key.
 
 You can download the key as JSON file in the age and save the JSON file in your robot.
 
-![](./.readme/service_account_key.png)
+![](./img/service_account_key.png)
 
 ### Set environmental variables in your robot
 
@@ -56,7 +56,7 @@ If your app is registered as `your_package/your_demo`, you need to set `YourDemo
 
 (i.e. App name: `detect_cans_in_fridge201202/pick_object` -> Dialogflow Action: `PickObject`)
 
-![](./.readme/dialogflow_intent.png)
+![](./img/dialogflow_intent.png)
 
 In order to fulfill other forms, please read [dialogflow doc](https://dialogflow.com/docs/intents) for more detailed information abount Intent.
 
@@ -83,7 +83,7 @@ roslaunch dialogflow_task_executive dialogflow_task_executive.launch
 
 Your robot will execute the task from dialogflow.
 
-![](./.readme/pr2_demo.gif)
+![](./img/pr2_demo.gif)
 
 ## Author
 
