@@ -2,6 +2,11 @@
 
 A ROS package for Task execution with Dialogflow
 
+
+## System structure
+
+![](./img/system.png)
+
 ## Installation to your new robot
 
 ### Create a Dialogflow account
