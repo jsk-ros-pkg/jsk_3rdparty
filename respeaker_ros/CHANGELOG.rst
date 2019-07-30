@@ -2,6 +2,24 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.13 (2019-07-10)
+-------------------
+* [respeaker_ros] increase timeout to pass the test (`#170 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/170>`_)
+
+  * default tts_action_names should be soundplay
+  * [respeaker_ros] increase timeout to pass the test https://api.travis-ci.org/v3/job/554008643/log.txt
+  * [respeaker_ros] add python-speechrocognition-pip to package.depends, because scripts/speech_to_text.py depends on it
+
+* [respeaker_ros] Add test file for speech_to_text (`#164 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/164>`_)
+
+  * add test file for speech_to_text
+
+* [respeaker_ros] add tts_action_names param: do not listen when the robot is speaking either japanese or english (`#168 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/168>`_)
+
+  * add tts_actions param: do not listen when the robot is speaking either japanese or english
+
+* Contributors: Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.12 (2019-05-25)
 -------------------
 * Make sample_respeaker.launch re-usable (`#161 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/161>`_)

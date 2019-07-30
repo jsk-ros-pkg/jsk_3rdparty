@@ -2,6 +2,15 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.13 (2019-07-10)
+-------------------
+* [voice_text] Call rosservice from python instead of bash (`#166 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/166>`_ )
+
+  * rewrite text2wave with python
+  * call rosservice from python instead of bash
+
+* Contributors: Hideaki Ito
+
 2.1.12 (2019-05-25)
 -------------------
 * Fix install directory of text2wave to ./lib -> ./bin (`#160 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/160>`_)
