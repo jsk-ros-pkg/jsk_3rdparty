@@ -12,7 +12,7 @@
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
   <license>BSD</license>
 
-  <url></url>
+  <url type="website">http://ros.org/wiki/mini_maxwell</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
