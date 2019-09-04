@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name> nlopt </name>
+  <name>nlopt</name>
   <description>
     nlopt
   </description>
