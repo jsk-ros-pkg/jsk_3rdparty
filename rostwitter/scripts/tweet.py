@@ -34,7 +34,6 @@ class twitter(object):
 
     def _RequestUrl(self, url, verb, data=None):
         if verb == 'POST':
-            print(data)
             if data.has_key('media'):
                 return requests.post(
                     url,
