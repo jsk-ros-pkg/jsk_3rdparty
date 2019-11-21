@@ -6,7 +6,7 @@
 
   <license>GPL</license>
 
-  <url type="website">http://ros.org/wiki/downward</url>
+  <url type="website">http://ros.org/wiki/lpg_planner</url>
 
   <author email="k-okada@jsk.imi.i.u-tokyo.ac.jp">Kei Okada</author>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
