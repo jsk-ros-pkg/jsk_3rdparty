@@ -2,8 +2,8 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.14 (2019-11-21)
+-------------------
 * [libcmt] Support using OpenCV3 in kinetic (`#179 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/179>`_)
   * Change dependency: libopencv-dev -> cv_bridge to support using OpenCV3 in kinetic
 * Contributors: Yuto Uchimi
