@@ -2,6 +2,11 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove debug print line in rostwitter to suppress log (`#178 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/178>`_)
+* Contributors: Shingo Kitagawa
+
 2.1.13 (2019-07-10)
 -------------------
 
