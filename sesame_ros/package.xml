@@ -10,6 +10,8 @@
 
   <license>BSD</license>
 
+  <url type="website">http://ros.org/wiki/sesame_ros</url>
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>catkin_virtualenv</build_depend>
