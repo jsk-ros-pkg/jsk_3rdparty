@@ -8,7 +8,9 @@
 
   <license>BSD</license>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
-
+  <url type="website">http://ros.org/wiki/dialogflow_task_executive</url>
+  <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
+  <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>message_generation</build_depend>
