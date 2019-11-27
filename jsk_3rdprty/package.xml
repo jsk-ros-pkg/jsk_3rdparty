@@ -35,6 +35,7 @@
   <run_depend>julius</run_depend>
   <run_depend>julius_ros</run_depend>
   <run_depend>sesame_ros</run_depend>
+  <run_depend>dialogflow_task_executive</run_depend>
 
   <export>
     <metapackage/>
