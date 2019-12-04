@@ -10,15 +10,16 @@ Google Drive file uploader for ROS
 cd ~
 mkdir gdrive_ws/src -p
 cd gdrive_ws/src
-git clone https://github.com/knorth55/gdrive_ros.git
-rosdep install --ignore-src -from-paths . -y -r -i
+git clone https://github.com/jsk-ros-pkg/jsk_3rdparty.git
+rosdep install --ignore-src -from-paths . -y -r
 cd ~/gdrive_ws
+catkin init
 catkin build
 ```
 
-### Authentication for Google Drive API 
+### Do authentication of Google Drive API
 
-Please follow [here](https://gsuitedevs.github.io/PyDrive/docs/build/html/quickstart.html#authentication).
+Please follow step 1-5 in [here](https://gsuitedevs.github.io/PyDrive/docs/build/html/quickstart.html#authentication).
 
 ### Create your settings yaml
 
@@ -35,6 +36,18 @@ get_refresh_token: True
 oauth_scope:
   - https://www.googleapis.com/auth/drive.file
 ```
+
+If you set `save_credentials: True`, you need to login to your Google account only for the first time.
+
+### Run server for the first time and login to Google account
+
+Run google drive server and login to Google account for the first time.
+
+```bash
+export GOOGLE_DRIVE_SETTINGS_YAML=/your/settings/yaml/path
+roslaunch gdrive_ros gdrive_server.launch
+```
+
 
 ## Usage
 
@@ -55,18 +68,20 @@ rosservice call /gdrive_ros/upload_multi ...
 
 ## Parameters
 
-- `~settings_yaml` (`string, default: `None`)
+- `~settings_yaml` (`string`, default: `None`)
 
   - PyDrive settings yaml path
 
-- `~share_type` (`string`, default: `anyone`)
+- `~share_type` (`string`, default: `anyone`, candidates: `user`, `group`, `domain` and `anyone`)
 
   - Uploaded file share type
+
+  - For more information, please read [here](https://developers.google.com/drive/api/v3/reference/permissions#type).
 
 - `~share_value` (`string`, default: `anyone`)
 
   - Uploaded file share value
-
+  
 - `~share_role` (`string`, default: `reader`)
 
   - Uploaded file share role
