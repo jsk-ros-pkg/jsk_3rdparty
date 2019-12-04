@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(gdrive_ros)
 
 find_package(catkin REQUIRED COMPONENTS
-    std_msgs
-    message_generation
+  std_msgs
+  message_generation
 )
 
 add_service_files(
@@ -20,5 +20,14 @@ generate_messages(
 catkin_package(
   CATKIN_DEPENDS
   message_runtime
-  std_msgs
+)
+
+install(DIRECTORY node_scripts
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+)
+
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS
 )
