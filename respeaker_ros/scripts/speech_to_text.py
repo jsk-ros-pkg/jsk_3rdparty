@@ -4,7 +4,10 @@
 
 import actionlib
 import rospy
-import speech_recognition as SR
+try:
+    import speech_recognition as SR
+except ImportError as e:
+    raise ImportError(str(e) + '\nplease try "pip install speechrecognition"')
 
 from actionlib_msgs.msg import GoalStatus, GoalStatusArray
 from audio_common_msgs.msg import AudioData
@@ -24,20 +27,26 @@ class SpeechToText(object):
         # time to assume as SPEAKING after tts service is finished
         self.tts_tolerance = rospy.Duration.from_sec(
             rospy.get_param("~tts_tolerance", 1.0))
+        tts_action_names = rospy.get_param(
+            '~tts_action_names', ['soundplay'])
 
         self.recognizer = SR.Recognizer()
 
         self.tts_action = None
         self.last_tts = None
         self.is_canceling = False
+        self.tts_actions = []
         if self.self_cancellation:
-            self.tts_action = actionlib.SimpleActionClient(
-                "sound_play", SoundRequestAction)
-            if self.tts_action.wait_for_server(rospy.Duration(5.0)):
+            for tts_action_name in tts_action_names:
+                tts_action = actionlib.SimpleActionClient(
+                    tts_action_name, SoundRequestAction)
+                if tts_action.wait_for_server(rospy.Duration(5.0)):
+                    self.tts_actions.append(tts_action)
+                else:
+                    rospy.logerr(
+                        "action '{}' is not initialized."
+                        .format(tts_action_name))
                 self.tts_timer = rospy.Timer(rospy.Duration(0.1), self.tts_timer_cb)
-            else:
-                rospy.logerr("action '%s' is not initialized." % rospy.remap_name("sound_play"))
-                self.tts_action = None
 
         self.pub_speech = rospy.Publisher(
             "speech_to_text", SpeechRecognitionCandidates, queue_size=1)
@@ -46,9 +55,12 @@ class SpeechToText(object):
     def tts_timer_cb(self, event):
         stamp = event.current_real
         active = False
-        for st in self.tts_action.action_client.last_status_msg.status_list:
-            if st.status == GoalStatus.ACTIVE:
-                active = True
+        for tts_action in self.tts_actions:
+            for st in tts_action.action_client.last_status_msg.status_list:
+                if st.status == GoalStatus.ACTIVE:
+                    active = True
+                    break
+            if active:
                 break
         if active:
             if not self.is_canceling:

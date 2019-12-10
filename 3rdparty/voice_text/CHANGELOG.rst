@@ -2,6 +2,26 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+* [voice_text] Call rosservice from python instead of bash (`#166 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/166>`_ )
+
+  * rewrite text2wave with python
+  * call rosservice from python instead of bash
+
+* Contributors: Hideaki Ito
+
+2.1.12 (2019-05-25)
+-------------------
+* Fix install directory of text2wave to ./lib -> ./bin (`#160 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/160>`_)
+  `text2wave` Was wrongly  installed to `CATKIN_PACKAGE_LIB_DESTINATION`
+  The launch file is assumed that it is installed under `rospack find voice_text`/bin
+  https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/2.1.10/3rdparty/voice_text/launch/voice_text.launch#L29
+* Contributors: Kei Okada
+
 2.1.11 (2018-08-29)
 -------------------
 
