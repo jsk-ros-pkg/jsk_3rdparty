@@ -16,6 +16,7 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>python-numpy</run_depend>
+  <run_depend>python-pixel-ring-pip</run_depend>
   <run_depend>python-pyaudio</run_depend>
   <run_depend>python-pyusb-pip</run_depend>
   <run_depend>python-speechrecognition-pip</run_depend>
