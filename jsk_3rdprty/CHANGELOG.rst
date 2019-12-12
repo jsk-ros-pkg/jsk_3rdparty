@@ -2,8 +2,8 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.15 (2019-12-12)
+-------------------
 * add gdrive_ros package (`#182 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/182>`_)
 * [dialogflow_task_executive] add dialogflow_task_executive run_depend in jsk_3rdparty (`#183 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/183>`_)
 * Contributors: Shingo Kitagawa

@@ -2,8 +2,8 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.15 (2019-12-12)
+-------------------
 * [sesame_ros] Add dependency for building cryptograpy (`#180 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/180>`_)
 
   * Add url of ROS wiki for sesame_ros
