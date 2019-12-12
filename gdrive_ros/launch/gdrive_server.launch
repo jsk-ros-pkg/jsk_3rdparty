@@ -1,0 +1,8 @@
+<launch>
+  <arg name="settings_yaml" default="$(env GOOGLE_DRIVE_SETTINGS_YAML)" />
+  <node name="gdrive_server" pkg="gdrive_ros" type="gdrive_server_node.py" output="screen">
+    <rosparam subst_value="true">
+      settings_yaml: $(arg settings_yaml)
+    </rosparam>
+  </node>
+</launch>
