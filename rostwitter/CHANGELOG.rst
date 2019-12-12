@@ -2,6 +2,9 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.14 (2019-11-21)
 -------------------
 * remove debug print line in rostwitter to suppress log (`#178 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/178>`_)

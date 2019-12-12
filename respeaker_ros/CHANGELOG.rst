@@ -2,6 +2,12 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [respeaker_ros] add pixel-ring in run_depend of respeaker_ros (`#184 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/184>`_)
+* [respeaker_ros] install config dir in respeaker_ros (`#185 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/185>`_)
+* Contributors: Shingo Kitagawa
+
 2.1.14 (2019-11-21)
 -------------------
 

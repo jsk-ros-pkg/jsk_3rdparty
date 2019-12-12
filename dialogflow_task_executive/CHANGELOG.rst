@@ -2,6 +2,11 @@
 Changelog for package dialogflow_task_executive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add url in dialogflow_task_executive (`#181 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/181>`_)
+* Contributors: Shingo Kitagawa
+
 2.1.14 (2019-11-21)
 -------------------
 * [dialogflow_task_executive] add dialogflow_task_executive (`#165 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/165>`_)
