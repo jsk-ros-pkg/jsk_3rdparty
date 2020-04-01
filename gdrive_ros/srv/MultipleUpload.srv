@@ -1,0 +1,12 @@
+string[] file_paths
+string[] file_titles
+string parents_path
+string parents_id
+bool use_timestamp_folder
+bool use_timestamp_file_title
+---
+bool[] successes
+string[] file_ids
+string[] file_urls
+string parents_id
+string parents_url

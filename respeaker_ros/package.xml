@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>respeaker_ros</name>
-  <version>2.1.12</version>
+  <version>2.1.15</version>
   <description>The respeaker_ros package</description>
   <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
   <license>Apache</license>
@@ -16,6 +16,7 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>python-numpy</run_depend>
+  <run_depend>python-pixel-ring-pip</run_depend>
   <run_depend>python-pyaudio</run_depend>
   <run_depend>python-pyusb-pip</run_depend>
   <run_depend>python-speechrecognition-pip</run_depend>

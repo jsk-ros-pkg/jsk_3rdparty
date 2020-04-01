@@ -1,0 +1,7 @@
+---
+string nickname
+string serial
+string device_id
+int32 battery
+bool locked
+bool responsive
