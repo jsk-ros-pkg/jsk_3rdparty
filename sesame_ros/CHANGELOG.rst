@@ -2,8 +2,8 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.17 (2020-04-16)
+-------------------
 * update pip modules for security reason (`#196 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/196>`_)
 * add idna==2.7
   to cloes ERROR: requests 2.20.0 has requirement idna<2.8,>=2.5, but you'll have idna 2.9 which is incompatible.

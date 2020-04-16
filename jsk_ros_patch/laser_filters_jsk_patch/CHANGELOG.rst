@@ -2,8 +2,8 @@
 Changelog for package laser_filters_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.17 (2020-04-16)
+-------------------
 * install laser_filters_plugins.xml (`#195 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/195>`_)
 * Contributors: Kei Okada
 
