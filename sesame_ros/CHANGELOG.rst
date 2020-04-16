@@ -2,6 +2,12 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add i386 tests (`#191 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/191>`_)
+* specify python module number, closes `#190 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/190>`_
+* Contributors: Kei Okada
+
 2.1.15 (2019-12-12)
 -------------------
 * [sesame_ros] Add dependency for building cryptograpy (`#180 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/180>`_)
