@@ -15,3 +15,6 @@ install(TARGETS laser_scan_filters_jsk_patch
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+install(FILES laser_filters_plugins.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
