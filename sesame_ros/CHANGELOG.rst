@@ -2,8 +2,8 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.16 (2020-04-16)
+-------------------
 * add i386 tests (`#191 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/191>`_)
 * specify python module number, closes `#190 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/190>`_
 * Contributors: Kei Okada
