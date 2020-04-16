@@ -12,6 +12,7 @@ env:
   matrix:
     - ROS_DISTRO=indigo  USE_DEB=true
     - ROS_DISTRO=kinetic USE_DEB=true
+    - ROS_DISTRO=kinetic USE_DEB=true DOCKER_IMAGE=i386/ubuntu:16.04
     - ROS_DISTRO=melodic USE_DEB=true
 matrix:
   fast_finish: true
