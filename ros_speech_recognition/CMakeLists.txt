@@ -17,3 +17,8 @@ install(DIRECTORY scripts launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  add_rostest(test/sample_ros_speech_recognition.test)
+  roslaunch_add_file_check(launch/speech_recognition.launch)
+endif()
