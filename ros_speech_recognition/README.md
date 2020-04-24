@@ -92,6 +92,10 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Seconds of non-speaking audio to keep on both sides of the recording
 
+* `~duration` (`Double`, default: `10.0`)
+
+  Seconds of waiting for speech
+
 * `~depth` (`Int`, default: `16`)
 
   Depth of audio signal
@@ -116,6 +120,10 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Path to sound file for bell on timeout for recognition
   
+* `~continuous` (`Bool`, default: False)
+
+  Selecting to use topic or service. By default, service is used.
+
 * `~google_key` (`String`, default: `None`)
 
   Auth Key for Google API. If `None`, use public key. (No guarantee to be blocked.)  
