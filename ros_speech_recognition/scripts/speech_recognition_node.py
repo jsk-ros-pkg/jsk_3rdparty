@@ -96,9 +96,10 @@ class ROSSpeechRecognition(object):
         self.default_duration = rospy.get_param("~duration", 10.0)
         self.engine = None
         self.recognizer = SR.Recognizer()
-        self.audio = ROSAudio(topic_name="audio",
+        self.audio = ROSAudio(topic_name=rospy.get_param("~audio_topic", "audio"),
                               depth=rospy.get_param("~depth", 16),
-                              sample_rate=rospy.get_param("~sample_rate", 16000))
+                              sample_rate=rospy.get_param("~sample_rate", 16000),
+                              buffer_size=rospy.get_param("~buffer_size", 10240))
 
         # initialize sound play client
         self.act_sound = actionlib.SimpleActionClient("sound_play", SoundRequestAction)
