@@ -10,7 +10,6 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   ```bash
   sudo apt install ros-${ROS_DISTRO}-ros-speech-recognition
-  sudo pip install SpeechRecognition
   ```
   
 2. Launch speech recognition node
