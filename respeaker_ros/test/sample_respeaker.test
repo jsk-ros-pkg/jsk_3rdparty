@@ -7,10 +7,9 @@
   </include>
 
   <!-- launch bag file -->
-  <param name="/use_sim_time" value="true" />
   <node name="rosbag_play"
         pkg="rosbag" type="play"
-        args="$(find respeaker_ros)/test/data/konnichiwa.bag --clock --loop">
+        args="$(find respeaker_ros)/test/data/konnichiwa.bag --loop">
   </node>
 
   <test test-name="test_speech_to_text"
