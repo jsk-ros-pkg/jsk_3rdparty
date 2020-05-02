@@ -21,7 +21,7 @@ from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
 
 
 class ROSAudio(SR.AudioSource):
-    def __init__(self, topic_name="audio", depth=16, channels=1,
+    def __init__(self, topic_name="audio", depth=16, n_channel=1,
                  sample_rate=16000, chunk_size=1024, buffer_size=10240):
         assert buffer_size > chunk_size
 
@@ -39,7 +39,7 @@ class ROSAudio(SR.AudioSource):
 
         self.SAMPLE_RATE = sample_rate
         self.CHUNK = chunk_size
-        self.channels = channels
+        self.n_channel = n_channel
 
         self.stream = None
 
@@ -49,7 +49,7 @@ class ROSAudio(SR.AudioSource):
             self.stream = None
         self.stream = ROSAudio.AudioStream(
             self.topic_name, self.buffer_size, depth=self.SAMPLE_WIDTH*8,
-            channels=self.channels)
+            n_channel=self.n_channel)
         return self
 
     def close(self):
@@ -64,13 +64,13 @@ class ROSAudio(SR.AudioSource):
 
     class AudioStream(object):
         def __init__(self, topic_name, buffer_size=10240, depth=16,
-                     channels=1, target_channel=0):
+                     n_channel=1, target_channel=0):
             self.buffer_size = buffer_size
             self.lock = Lock()
             self.buffer = bytes()
             self.depth = depth
-            self.channels = channels
-            self.target_channel = min(self.channels - 1, max(0, target_channel))
+            self.n_channel = n_channel
+            self.target_channel = min(self.n_channel - 1, max(0, target_channel))
             self.sub_audio = rospy.Subscriber(
                 topic_name, AudioData, self.audio_cb)
 
@@ -102,7 +102,7 @@ class ROSAudio(SR.AudioSource):
                     dtype = 'l'  # int32
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
-                chan_data = data[self.target_channel::self.channels]
+                chan_data = data[self.target_channel::self.n_channel]
                 self.buffer += array.array(dtype, chan_data).tostring()
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
@@ -116,7 +116,7 @@ class ROSSpeechRecognition(object):
         self.recognizer = SR.Recognizer()
         self.audio = ROSAudio(topic_name=rospy.get_param("~audio_topic", "audio"),
                               depth=rospy.get_param("~depth", 16),
-                              channels=rospy.get_param("~channels", 1),
+                              n_channel=rospy.get_param("~n_channel", 1),
                               sample_rate=rospy.get_param("~sample_rate", 16000),
                               buffer_size=rospy.get_param("~buffer_size", 10240))
 

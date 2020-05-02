@@ -112,9 +112,9 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Depth of audio signal
   
-* `~channels` (`Int`, default: `1`)
+* `~n_channel` (`Int`, default: `1`)
 
-  Channels of audio data (e.g. 1: mono, 2: stereo)
+  Total number of channels in audio data (e.g. 1: mono, 2: stereo)
   
 * `~sample_rate` (`Int`, default: `16000`)
 
