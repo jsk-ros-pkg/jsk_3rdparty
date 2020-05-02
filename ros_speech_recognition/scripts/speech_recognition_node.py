@@ -73,6 +73,9 @@ class ROSAudio(SR.AudioSource):
             self.target_channel = min(self.n_channel - 1, max(0, target_channel))
             self.sub_audio = rospy.Subscriber(
                 topic_name, AudioData, self.audio_cb)
+            self.type_code = {}
+            for code in ['b', 'h', 'i', 'l']:
+                self.type_code[array.array(code).itemsize] = code
 
         def read_once(self, size):
             with self.lock:
@@ -94,12 +97,7 @@ class ROSAudio(SR.AudioSource):
 
         def audio_cb(self, msg):
             with self.lock:
-                if self.depth == 8:
-                    dtype = 'b'  # int8
-                if self.depth == 16:
-                    dtype = 'h'  # int16
-                if self.depth == 32:
-                    dtype = 'l'  # int32
+                dtype = self.type_code[self.depth/8]
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
