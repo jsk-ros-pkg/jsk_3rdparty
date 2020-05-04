@@ -84,6 +84,14 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Seconds after an internal operation (e.g., an API request) starts before it times out
   
+* `~listen_timeout` (`Double`, default: `0.0`)
+
+  The maximum number of seconds that this will wait for a phrase to start before giving up
+  
+* `~phrase_time_limit` (`Double`, default: `10.0`)
+
+  The maximum number of seconds that this will allow a phrase to continue before stopping and returning the part of the phrase processed before the time limit was reached
+  
 * `~phrase_threshold` (`Double`, default: `0.3`)
 
   Minimum seconds of speaking audio before we consider the speaking audio a phrase
@@ -96,13 +104,25 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Seconds of waiting for speech
 
+* `~audio_topic` (`String`, default: `audio`)
+
+  Topic name of input audio data
+  
 * `~depth` (`Int`, default: `16`)
 
   Depth of audio signal
   
+* `~n_channel` (`Int`, default: `1`)
+
+  Total number of channels in audio data (e.g. 1: mono, 2: stereo)
+  
 * `~sample_rate` (`Int`, default: `16000`)
 
   Sample rate of audio signal
+  
+* `~buffer_size` (`Int`, default: `10240`)
+
+  Maximum buffer size to store audio data for speech recognition
   
 * `~start_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/bell.ogg`)
 
