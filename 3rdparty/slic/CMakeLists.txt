@@ -18,11 +18,11 @@ ExternalProject_Add(
   INSTALL_COMMAND echo "install"
   )
 
-
+find_package( OpenCV REQUIRED )
 install(CODE "execute_process(COMMAND cmake -E make_directory ${CMAKE_INSTALL_PREFIX}/incldue/)")
 install(CODE "execute_process(COMMAND cmake -E copy slic.h ${CMAKE_INSTALL_PREFIX}/incldue/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/slic-prefix/src/slic/)")
 
 install(CODE "execute_process(COMMAND cmake -E make_directory ${CMAKE_INSTALL_PREFIX}/lib/)")
-install(CODE "execute_process(COMMAND gcc -fPIC --shared -o ${CMAKE_INSTALL_PREFIX}/lib/libslic.so ${CMAKE_CURRENT_BINARY_DIR}/slic-prefix/src/slic/slic.cpp)")
+install(CODE "execute_process(COMMAND gcc -I${OpenCV_INCLUDE_DIRS} -fPIC --shared -o ${CMAKE_INSTALL_PREFIX}/lib/libslic.so ${CMAKE_CURRENT_BINARY_DIR}/slic-prefix/src/slic/slic.cpp)")
 
 
