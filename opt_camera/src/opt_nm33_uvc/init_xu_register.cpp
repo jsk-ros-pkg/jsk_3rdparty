@@ -8,8 +8,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <opencv2/opencv.hpp>
+#if ( CV_MAJOR_VERSION >= 4)
+#include <opencv2/highgui.hpp>
+#else
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+#endif
 
 #include "opt_nm33_uvc.h"
 
