@@ -162,9 +162,16 @@ class GDriveServerNode(object):
             rospy.logerr(
                 'Failed to upload: {} -> {}', file_path,
                 self.folder_url_format.format(parents_id))
+        except OSError as e:
+            rospy.logerr(e)
+            rospy.logerr(
+                'Failed to upload: {} -> {}', file_path,
+                self.folder_url_format.format(parents_id))
         return success, file_id, file_url
 
     def _upload_file(self, file_path, file_title, parents_id=None):
+        if not os.path.exists(file_path):
+            raise OSError('File not found: {}'.format(file_path))
         rospy.loginfo('Start uploading a file: {}'.format(file_title))
         if parents_id:
             gfile = self.gdrive.CreateFile(
