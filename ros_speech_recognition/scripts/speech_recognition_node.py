@@ -29,11 +29,11 @@ class ROSAudio(SR.AudioSource):
         self.buffer_size = buffer_size
 
         if depth == 8:
-            self.SAMPLE_WIDTH = 1L
+            self.SAMPLE_WIDTH = 1
         elif depth == 16:
-            self.SAMPLE_WIDTH = 2L
+            self.SAMPLE_WIDTH = 2
         elif depth == 32:
-            self.SAMPLE_WIDTH = 4L
+            self.SAMPLE_WIDTH = 4
         else:
             raise ValueError("depth must be 8, 16 or 32")
 

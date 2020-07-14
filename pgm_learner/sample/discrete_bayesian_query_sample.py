@@ -65,10 +65,10 @@ def q_without_ros():
     }
 
     res = fn.condprobve(query, evidence)
-    print res.vals
-    print res.scope
-    print res.card
-    print res.stride
+    print(res.vals)
+    print(res.scope)
+    print(res.card)
+    print(res.stride)
 
 def monty_door_prob(prize, guest):
     if prize == guest:
@@ -104,8 +104,8 @@ def q():
     monty_door.parents = ["prize_door", "guest_door"]
     monty_door.outcomes = ["A", "B", "C"]
     for prize, guest in it.product(["A","B","C"], repeat=2):
-        print str([prize, guest])
-        print monty_door_prob(prize, guest)
+        print(str([prize, guest]))
+        print(monty_door_prob(prize, guest))
         monty_door.CPT += [ConditionalProbability(values=[prize, guest],
                                                   probabilities=monty_door_prob(prize=prize, guest=guest))]
 
@@ -114,7 +114,7 @@ def q():
     req.evidence = [DiscreteNodeState(node="guest_door", state="A"),
                     DiscreteNodeState(node="monty_door", state="B"),]
     req.query = ["prize_door"]
-    print query_func(req)
+    print(query_func(req))
 
 if __name__ == '__main__':
     q()
