@@ -1,0 +1,6 @@
+- git:
+    local-name: catkin_virtualenv
+    uri: https://github.com/locusrobotics/catkin_virtualenv
+- git:
+    local-name: collada_urdf
+    uri: https://github.com/ros/collada_urdf
