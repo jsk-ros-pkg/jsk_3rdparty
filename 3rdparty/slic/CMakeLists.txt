@@ -5,13 +5,13 @@ include(ExternalProject)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-execute_process(COMMAND
-  git config --global http.sslVerify false)
+# execute_process(COMMAND
+#   git config --global http.sslVerify false)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 ExternalProject_Add(
   slic
-  GIT_REPOSITORY https://github.com/garaemon/SLIC-Superpixels
+  URL https://github.com/garaemon/SLIC-Superpixels/archive/78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c.zip
   GIT_TAG 78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c
   CMAKE_COMMAND echo "configure"
   BUILD_COMMAND echo "build"
