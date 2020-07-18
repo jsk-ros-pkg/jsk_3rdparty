@@ -1,0 +1,28 @@
+--- src/downward/src/translate/invariant_finder.py.bak	2020-07-18 04:52:40.124485948 +0000
++++ src/downward/src/translate/invariant_finder.py	2020-07-18 04:53:16.950807966 +0000
+@@ -10,6 +10,12 @@
+ import pddl
+ import timers
+ 
++def time_clock():
++    try:
++        return time.clock()
++    except:
++        return time.process_time()
++
+ class BalanceChecker(object):
+     def __init__(self, task, reachable_action_params):
+         self.predicates_to_add_actions = defaultdict(set)
+@@ -99,10 +105,10 @@
+             candidates.append(invariant)
+             seen_candidates.add(invariant)
+ 
+-    start_time = time.clock()
++    start_time = time_clock()
+     while candidates:
+         candidate = candidates.popleft()
+-        if time.clock() - start_time > MAX_TIME:
++        if time_clock() - start_time > MAX_TIME:
+             print("Time limit reached, aborting invariant generation")
+             return
+         if candidate.check_balance(balance_checker, enqueue_func):
