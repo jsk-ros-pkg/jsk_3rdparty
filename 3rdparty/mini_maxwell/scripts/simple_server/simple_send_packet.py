@@ -14,7 +14,7 @@ parser.add_argument("--udp", action="store_true")
 parser.add_argument("--ip", default="127.0.0.1")
 args = parser.parse_args()
 
-print "connecting to ", (args.ip, args.port)
+print("connecting to ", (args.ip, args.port))
 if args.udp:
     server = socket(AF_INET, SOCK_DGRAM)
 else:
@@ -27,14 +27,14 @@ while True:
     data = packer.pack(("%d" % (counter % 10)) * args.size)
     if not data:
         break
-    print "sending", packer.size * 8, "bits"
+    print("sending", packer.size * 8, "bits")
     if args.udp:
         server.sendto(data, (args.ip, args.port))
     else:
         server.send(data)
     if not data:
         break
-    print data
+    print(data)
     counter = counter + 1
     time.sleep(1 / args.rate)
 

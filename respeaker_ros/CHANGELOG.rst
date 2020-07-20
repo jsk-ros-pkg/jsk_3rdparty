@@ -2,6 +2,21 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * respeaker_ros: use catkin_install_python to install scripts
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* [respeaker_ros] use rospy.logerr instead of print (`#206 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/206>`_)
+* Add args to ros_speech_recognition (`#197 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/197>`_)
+
+  * [respeaker_ros] update run_depend and test file to pass travis test properly
+
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.17 (2020-04-16)
 -------------------
 

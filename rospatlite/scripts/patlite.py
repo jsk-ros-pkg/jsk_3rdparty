@@ -151,7 +151,7 @@ class Patlite(object):
             self.sock.sendall(self.WRITE_HEADER + state.state)
             ret = self.sock.recv(self.bufsize)
         except socket.timeout:
-            print "timeout"
+            print("timeout")
         if (ret != self.ACK):
             return False
         return True
@@ -161,7 +161,7 @@ class Patlite(object):
             self.sock.sendall(self.READ)
             tmp_state = PatliteState(self.sock.recv(self.bufsize))
         except socket.timeout:
-            print "timeout"
+            print("timeout")
             return None
         return tmp_state
 
@@ -171,7 +171,7 @@ class Patlite(object):
             self.sock.sendall(self.CLEAR)
             ret = self.sock.recv(self.bufsize)
         except socket.timeout:
-            print "timeout"
+            print("timeout")
             return False
         if (ret != self.ACK):
             return False

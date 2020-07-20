@@ -13,8 +13,8 @@ def runTCP(host, port, buffer_size):
     server.serve_forever()
 
 def printData(data):
-    print data, 
-    print "(%d bytes)" % sys.getsizeof(data)
+    print(data, end=' ') 
+    print("(%d bytes)" % sys.getsizeof(data))
     
 class Handler(SocketServer.StreamRequestHandler):
     def handle(self):
@@ -43,10 +43,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.udp:
-        print 'listening UDP', (HOSTNAME, args.port), "buffer size is", args.buffer_size
+        print('listening UDP', (HOSTNAME, args.port), "buffer size is", args.buffer_size)
         runUDP(HOSTNAME, args.port, args.buffer_size)
     else:
-        print 'listening TCP', (HOSTNAME, args.port), "buffer size is", args.buffer_size
+        print('listening TCP', (HOSTNAME, args.port), "buffer size is", args.buffer_size)
         runTCP(HOSTNAME, args.port, args.buffer_size)
     
     

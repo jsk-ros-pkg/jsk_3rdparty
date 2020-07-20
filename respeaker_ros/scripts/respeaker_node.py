@@ -22,13 +22,13 @@ from dynamic_reconfigure.server import Server
 try:
     from pixel_ring import usb_pixel_ring_v2
 except IOError as e:
-    print e
+    rospy.logerr(e)
     raise RuntimeError("Check the device is connected and recognized")
 
 try:
     from respeaker_ros.cfg import RespeakerConfig
 except Exception as e:
-    print e
+    rospy.logerr(e)
     raise RuntimeError("Need to run respeaker_gencfg.py first")
 
 

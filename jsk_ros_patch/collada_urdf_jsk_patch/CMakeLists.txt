@@ -11,7 +11,11 @@ if ("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STRGREATER "kine
     set(CXXFLAGS CXXFLAGS=-std=gnu++11)
 endif()
 
-find_package(catkin REQUIRED COMPONENTS collada_urdf)
+# find_package(catkin REQUIRED COMPONENTS collada_urdf)
+# v5.0.0 have invalid inclduedir
+# /usr/lib/x86_64-linux-gnu/pkgconfig/assimp.pc
+#   includedir=/usr/../include/include
+find_package(catkin REQUIRED)
 
 catkin_package(CATKIN_DEPENDS collada_urdf)
 

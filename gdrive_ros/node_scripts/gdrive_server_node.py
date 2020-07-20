@@ -53,7 +53,7 @@ class GDriveServerNode(object):
 
         if parents_id and parents_path:
             rospy.logerr('parents_path and parents_id is both set.')
-            rospy.logerr('parents_id: {} is selected to upload.')
+            rospy.logerr('parents_id: {} is selected to upload.'.format(parents_id))
             parents_path = ''
 
         if parents_path:
@@ -103,7 +103,7 @@ class GDriveServerNode(object):
 
         if parents_id and parents_path:
             rospy.logerr('parents_path and parents_id is both set.')
-            rospy.logerr('parents_id: {} is selected to upload.')
+            rospy.logerr('parents_id: {} is selected to upload.'.format(parents_id))
             parents_path = ''
 
         if parents_path:
@@ -152,19 +152,23 @@ class GDriveServerNode(object):
         success = False
         file_id = ''
         file_url = ''
+        folder_url = self.folder_url_format.format(parents_id)
         try:
             file_id = self._upload_file(
                 file_path, file_title, parents_id=parents_id)
             file_url = self.file_url_format.format(file_id)
             success = True
-        except ApiRequestError as e:
+            rospy.loginfo(
+                'Success to upload: {} -> {}'.format(file_path, file_url))
+        except (OSError, ApiRequestError) as e:
             rospy.logerr(e)
             rospy.logerr(
-                'Failed to upload: {} -> {}', file_path,
-                self.folder_url_format.format(parents_id))
+                'Failed to upload: {} -> {}'.format(file_path, folder_url))
         return success, file_id, file_url
 
     def _upload_file(self, file_path, file_title, parents_id=None):
+        if not os.path.exists(file_path):
+            raise OSError('File not found: {}'.format(file_path))
         rospy.loginfo('Start uploading a file: {}'.format(file_title))
         if parents_id:
             gfile = self.gdrive.CreateFile(
