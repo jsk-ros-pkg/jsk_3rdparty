@@ -2,8 +2,8 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.18 (2020-07-20)
+-------------------
 * [gdrive_ros] Fix gdrive_ros to catch error properly (`#205 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/205>`_)
 
   * fix ros log format in gdrive_ros

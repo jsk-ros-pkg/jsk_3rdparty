@@ -2,8 +2,8 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.18 (2020-07-20)
+-------------------
 * Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
 
   * downward: fix for python3, remove time.clock() and import commands
