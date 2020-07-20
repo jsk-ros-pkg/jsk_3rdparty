@@ -2,6 +2,16 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * python-libpgm-pip did not work with python3
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

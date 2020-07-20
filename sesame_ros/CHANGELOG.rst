@@ -2,6 +2,14 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * update sesame_ros/requirements.txt to pass https://github.com/locusrobotics/catkin_virtualenv/blob/master/README.md#locking-dependencies
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 * update pip modules for security reason (`#196 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/196>`_)

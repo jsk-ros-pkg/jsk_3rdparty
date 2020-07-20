@@ -2,6 +2,16 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * fix for python2/3 with ROS_PYTHON_VERSION
+  * fix libsiftfast for python3 / boost 1.71
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

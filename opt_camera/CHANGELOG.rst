@@ -2,6 +2,11 @@
 Changelog for package opt_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic / fix for opencv > 2 (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

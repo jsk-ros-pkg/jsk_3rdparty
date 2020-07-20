@@ -2,6 +2,16 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * julius_ros: fix for python3, specially str <-> bytes
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

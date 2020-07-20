@@ -2,6 +2,16 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * collada_urdf_jsk_patch : use download_unpack_build instead of git_checkout
+  * remove collada_urdf from find_packaeg(catkin) unitl assimp_devel v5.0.1 released
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

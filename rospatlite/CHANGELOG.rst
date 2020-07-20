@@ -2,6 +2,14 @@
 Changelog for package rospatlite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * fix 2to3, with print, raise, exception
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

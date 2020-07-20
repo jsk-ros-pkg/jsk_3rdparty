@@ -2,6 +2,15 @@
 Changelog for package slic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * use .zip instead of git clone
+  * use -I to compile slic.cpp
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 

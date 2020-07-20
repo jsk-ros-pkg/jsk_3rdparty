@@ -2,6 +2,15 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * clean up CMakeList.txt find_package
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
 2.1.17 (2020-04-16)
 -------------------
 
