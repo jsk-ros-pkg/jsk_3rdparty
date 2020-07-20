@@ -2,6 +2,56 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * fix 2to3, with print, raise, exception
+
+* [ros_speech_recognition] Enable multi channel audio recognition (`#198 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/198>`_)
+
+  * adjust type code to the CPU platform
+  * replace rosparam name: channels -> n_channel
+  * add rosparam description to README
+  * enable multi channel audio recognition
+
+* Add args to ros_speech_recognition (`#197 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/197>`_)
+
+  * Add flac as run_depend for SpeechRecognition pip package
+  * Use catkin_virtualenv to use SpeechRecognition pip package
+  * Add arguments and params to pass rostest
+  * Add test for ros_speech_recognition
+  * add args to launch
+  * add pip install to tutorials
+  * add param description to README
+
+* Contributors: Kei Okada, Naoya Yamaguchi
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* set SoundRequest.volume for kinetic (`#173 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/173>`_)
+* Contributors: Kei Okada
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+* fixes GoogleCloud auth (`#158 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/158>`_)
+* Contributors: jonasius
+
+2.1.11 (2018-08-29)
+-------------------
+
 2.1.10 (2018-04-25)
 -------------------
 

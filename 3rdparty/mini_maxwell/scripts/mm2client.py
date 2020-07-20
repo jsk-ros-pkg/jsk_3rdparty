@@ -27,7 +27,7 @@ import sys
 import platform
 pvt = platform.python_version_tuple()
 if (int(pvt[0]) == 2) and (int(pvt[1]) < 6):
-    print "This program requires Python 2.6 or later."
+    print("This program requires Python 2.6 or later.")
     sys.exit(1)
 del pvt
 
@@ -68,7 +68,7 @@ def GetMM2ConfigInJson(mm2name):
     resp = conn.getresponse()
 
     if (resp.status/100) != 2:
-        raise Exception,resp.reason
+        raise Exception(resp.reason)
     jdata = resp.read()
     conn.close()
     return jdata
@@ -118,10 +118,10 @@ class BandSettings(object):
         """
         if (not isinstance(bandnumber, (types.IntType, types.LongType))) or \
            (bandnumber < 1) or (bandnumber > 5):
-            raise MiniMaxClientException, "Band number not integer in range 1..5"
+            raise MiniMaxClientException("Band number not integer in range 1..5")
 
         if not isinstance(leftflag, types.BooleanType):
-            raise MiniMaxClientException, "Left/right flag not a boolean"
+            raise MiniMaxClientException("Left/right flag not a boolean")
 
         self.__BandNumber = bandnumber
         self.__LeftFlag = leftflag
@@ -204,7 +204,7 @@ class BandSettings(object):
     #**************************************************
     def Validate(self):
         if (self.__DelayVariation < 0) or (self.__DelayVariation > self.__DelayAmount):
-            raise MiniMaxClientException, "Delay Variation not in range 0 .. Delay Amount"
+            raise MiniMaxClientException("Delay Variation not in range 0 .. Delay Amount")
         return True
 
     #**************************************************
@@ -230,24 +230,24 @@ class BandSettings(object):
 
     def SetDelayAmount(self, val):
         if (val < 0) or (val > 60000):
-            raise MiniMaxClientException, "Delay Amount not in range 0 .. 60000"
-    	self.__DelayAmount = val
+            raise MiniMaxClientException("Delay Amount not in range 0 .. 60000")
+        self.__DelayAmount = val
 
     def SetDelayVariation(self, val):
         if (val < 0) or (val > 60000):
-            raise MiniMaxClientException, "Delay Amount not in range 0 .. 60000"
+            raise MiniMaxClientException("Delay Amount not in range 0 .. 60000")
         self.__DelayVariation = val
 
     def SetDelayCorrelation(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Delay Correlation not in range 0 .. 100"
+            raise MiniMaxClientException("Delay Correlation not in range 0 .. 100")
         self.__DelayCorrelation = val
 
     def SetDelayDistribution(self, val):
         lcval = val.lower()
         if val not in self.__class__.MM_DELAY_DISTRIBUTIONS:
-            raise MiniMaxClientException, "Delay distribution must be one of %s" % \
-                str(self.__class__.MM_DELAY_DISTRIBUTIONS)
+            raise MiniMaxClientException("Delay distribution must be one of %s" % \
+                str(self.__class__.MM_DELAY_DISTRIBUTIONS))
         self.__DelayDistribution = val
 
     def SetDelayReorder(self, val):
@@ -255,53 +255,53 @@ class BandSettings(object):
 
     def SetDropAmount(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Drop Amount not in range 0 .. 100"
+            raise MiniMaxClientException("Drop Amount not in range 0 .. 100")
         self.__DropAmount = val
 
     def SetDropCorrelation(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Drop Correlation not in range 0 .. 100"
+            raise MiniMaxClientException("Drop Correlation not in range 0 .. 100")
         self.__DropCorrelation = val
 
     def SetDupAmount(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Duplication Amount not in range 0 .. 100"
+            raise MiniMaxClientException("Duplication Amount not in range 0 .. 100")
         self.__DupAmount = val
 
     def SetDupCorrelation(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Duplication Correlation not in range 0 .. 100"
+            raise MiniMaxClientException("Duplication Correlation not in range 0 .. 100")
         self.__DupCorrelation = val
 
     def SetReorderGap(self, val):
         if (val < 0) or (val > 1024):
-            raise MiniMaxClientException, "Reorder Gap not in range 0 .. 1024"
+            raise MiniMaxClientException("Reorder Gap not in range 0 .. 1024")
         self.__ReorderGap = val
 
     def SetReorderAmount(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Reorder Amount not in range 0 .. 100"
+            raise MiniMaxClientException("Reorder Amount not in range 0 .. 100")
         self.__ReorderAmount = val
 
     def SetReorderCorrelation(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Reorder Correlation not in range 0 .. 100"
+            raise MiniMaxClientException("Reorder Correlation not in range 0 .. 100")
         self.__ReorderCorrelation = val
 
     def SetCorruptionAmount(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Corruption Amount not in range 0 .. 100"
+            raise MiniMaxClientException("Corruption Amount not in range 0 .. 100")
         self.__CorruptionAmount = val
 
     def SetCorruptionCorrelation(self, val):
         if (val < 0.0) or (val > 100.0):
-            raise MiniMaxClientException, "Corruption Correlation not in range 0 .. 100"
+            raise MiniMaxClientException("Corruption Correlation not in range 0 .. 100")
         self.__CorruptionCorrelation = val
 
     def SetRateLimit(self, val):
         if (val < 128) or (val > self.__class__.MM_MAXRATE):
-            raise MiniMaxClientException, "Rate Limit not in range 128 .. %u" % \
-                self.__class__.MM_MAXRATE
+            raise MiniMaxClientException("Rate Limit not in range 128 .. %u" % \
+                self.__class__.MM_MAXRATE)
         self.__RateLimit = val
 
     def SetByCnfigName(self, name, val):
@@ -355,17 +355,17 @@ class Bands(object):
 
     def GetLeftBand(self, bnum):
         if (bnum < 1) or (bnum > 5):
-            raise MiniMaxClientException, "Band number must be in in range 1..5"
+            raise MiniMaxClientException("Band number must be in in range 1..5")
         return self.__LeftBands[bnum-1]
 
     def GetRightBand(self, bnum):
         if (bnum < 1) or (bnum > 5):
-            raise MiniMaxClientException, "Band number must be in in range 1..5"
+            raise MiniMaxClientException("Band number must be in in range 1..5")
         return self.__RightBands[bnum-1]
 
     def GetBand(self, bnum, leftflag):
         if (bnum < 1) or (bnum > 5):
-            raise MiniMaxClientException, "Band number must be in in range 1..5"
+            raise MiniMaxClientException("Band number must be in in range 1..5")
         if leftflag:
             return self.__LeftBands[bnum-1]
         return self.__RightBands[bnum-1]
@@ -496,7 +496,7 @@ def ChangeBandsOnMM(bandsobj, mm2host):
     resp = conn.getresponse()
 
     if (resp.status/100) != 2:
-        raise Exception,resp.reason
+        raise Exception(resp.reason)
     data = resp.read()
     conn.close()
     return
@@ -507,8 +507,8 @@ def ChangeBandsOnMM(bandsobj, mm2host):
 if __name__ == "__main__":
 
     if len(sys.argv) != 2:
-        print "Usage: %s <minimaxwell-hostname-or-ip-address>" % sys.argv[0]
-        print "Aborting"
+        print("Usage: %s <minimaxwell-hostname-or-ip-address>" % sys.argv[0])
+        print("Aborting")
         sys.exit(1)
 
     mm2name = sys.argv[1]

@@ -31,10 +31,12 @@ include_directories(${catkin_INCLUDE_DIRS}  ${OpenCV_INCLUDE_DIRS})
 add_executable(nm33_node src/nm33_node.cpp src/opt_nm33_uvc/opt_nm33_camera.cpp src/opt_nm33_uvc/opt_nm33_uvc.cpp)
 add_executable(init_xu_register src/opt_nm33_uvc/init_xu_register.cpp src/opt_nm33_uvc/opt_nm33_uvc.cpp)
 target_link_libraries(nm33_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(init_xu_register ${OpenCV_LIBRARIES})
 
 add_executable(nm33_node_non_std_uvc src/nm33_node.cpp src/opt_nm33_uvc/opt_nm33_camera.cpp src/opt_nm33_uvc/opt_nm33_uvc.cpp)
 add_executable(init_xu_register_non_std_uvc src/opt_nm33_uvc/init_xu_register.cpp src/opt_nm33_uvc/opt_nm33_uvc.cpp)
 target_link_libraries(nm33_node_non_std_uvc ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(init_xu_register_non_std_uvc ${OpenCV_LIBRARIES})
 
 add_dependencies(nm33_node ${PROJECT_NAME}_gencfg)
 add_dependencies(nm33_node_non_std_uvc ${PROJECT_NAME}_gencfg)

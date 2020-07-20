@@ -2,6 +2,34 @@
 Changelog for package laser_filters_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+
+2.1.17 (2020-04-16)
+-------------------
+* install laser_filters_plugins.xml (`#195 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/195>`_)
+* Contributors: Kei Okada
+
+2.1.16 (2020-04-16)
+-------------------
+* [laser_filsters_jsk_patch] add installation of launch resources (`#188 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/188>`_)
+* Contributors: Koki Shinjo
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+
 2.1.10 (2018-04-25)
 -------------------
 

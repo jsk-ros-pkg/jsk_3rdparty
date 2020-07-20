@@ -1,0 +1,13 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 54)
++++ CMakeLists.txt	(working copy)
+@@ -194,7 +194,7 @@
+ # generate python bindings via boost-python
+ #
+ set(BUILD_SIFTFASTPY)
+-if( Boost_PYTHON_FOUND )
++if( 0 ) ## Boost_PYTHON_FOUND )
+   find_package(PythonLibs 2)
+ 
+   if( PYTHONLIBS_FOUND OR PYTHON_LIBRARIES )

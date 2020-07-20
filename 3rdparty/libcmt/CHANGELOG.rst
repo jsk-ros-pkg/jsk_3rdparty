@@ -2,6 +2,41 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * use .zip instead of git clone
+  * for OpenCV4 includce opencv2/imgproc/types_c.h
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* [libcmt] Support using OpenCV3 in kinetic (`#179 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/179>`_)
+  * Change dependency: libopencv-dev -> cv_bridge to support using OpenCV3 in kinetic
+* Contributors: Yuto Uchimi
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+* libcmt: opencv2/xfeatures2d.hpp only required between 3.1.0 <= OPENCV_VERSION_CODE < 3.2.0 (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+* Contributors: Kei Okada
+
 2.1.10 (2018-04-25)
 -------------------
 

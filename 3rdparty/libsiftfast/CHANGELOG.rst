@@ -2,6 +2,43 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * fix for python2/3 with ROS_PYTHON_VERSION
+  * fix libsiftfast for python3 / boost 1.71
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+* enable to compile libsiftfast with current numpy.get_include() (`#162 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/162>`_ )
+* Contributors: Kei Okada
+
+2.1.11 (2018-08-29)
+-------------------
+* fix for melodic (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+  * libsiftfast : add 02.cmake_warn_narrowing.patch 03.skip_python_bindings.patch.bak 04.boost_65_numpy_1_10.patch for 18.04
+  * libsiftfast: patch all fiels within pathes directory
+* Contributors: Kei Okada
+
 2.1.10 (2018-04-25)
 -------------------
 

@@ -7,11 +7,15 @@ if(("$ENV{ROS_DISTRO}" STREQUAL "groovy") OR ("$ENV{ROS_DISTRO}" STREQUAL "hydro
 elseif ("$ENV{ROS_DISTRO}" STREQUAL "indigo" OR "$ENV{ROS_DISTRO}" STRGREATER "indigo")
   set(SOURCE_DISTRO bd4fc369d56eaa0c31d8cb17677e00b9d9685de6) # 1.11.13, before strip indigo
 endif()
-if ("$ENV{ROS_DISTRO}" STREQUAL "kinetic")
+if ("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STRGREATER "kinetic")
     set(CXXFLAGS CXXFLAGS=-std=gnu++11)
 endif()
 
-find_package(catkin REQUIRED COMPONENTS collada_urdf)
+# find_package(catkin REQUIRED COMPONENTS collada_urdf)
+# v5.0.0 have invalid inclduedir
+# /usr/lib/x86_64-linux-gnu/pkgconfig/assimp.pc
+#   includedir=/usr/../include/include
+find_package(catkin REQUIRED)
 
 catkin_package(CATKIN_DEPENDS collada_urdf)
 

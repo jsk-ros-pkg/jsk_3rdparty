@@ -2,6 +2,39 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * julius_ros: fix for python3, specially str <-> bytes
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* set SoundRequest.volume for kinetic (`#173 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/173>`_)
+* Contributors: Kei OKada
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+
 2.1.10 (2018-04-25)
 -------------------
 

@@ -1,0 +1,37 @@
+<launch>
+  <arg name="run_app_manager" default="false" />
+  <arg name="credential" default="$(env GOOGLE_APPLICATION_CREDENTIALS)"/>
+  <arg name="project_id" default="$(env DIALOGFLOW_PROJECT_ID)"/>
+
+  <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
+        args="/speech_to_text /speech_to_text_google /speech_to_text_julius" />
+
+  <node name="dialogflow_client"
+        pkg="dialogflow_task_executive" type="dialogflow_client.py"
+        output="screen">
+    <rosparam subst_value="true">
+      use_audio: false
+      language: ja-JP
+      use_tts: true
+      project_id: $(arg project_id)
+    </rosparam>
+  </node>
+
+  <node name="task_executive"
+        pkg="dialogflow_task_executive" type="task_executive.py"
+        output="screen">
+    <rosparam subst_value="true">
+    </rosparam>
+  </node>
+  
+  <group if="$(arg run_app_manager)">
+    <node pkg="app_manager" type="appmaster" name="appmaster"
+          args="-p 11313"/>
+    <node pkg="app_manager" type="app_manager" name="app_manager"
+          args="--applist $(arg applist)"
+          output="screen">
+      <param name="interface_master" value="http://localhost:11313"/>
+    </node>
+  </group>
+
+</launch>

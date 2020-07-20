@@ -1,0 +1,13 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 54)
++++ CMakeLists.txt	(working copy)
+@@ -48,7 +48,7 @@
+ 
+ if( CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX )
+   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g")
+-  add_definitions(" -Wall -fPIC ")
++  add_definitions(" -Wall -fPIC -Wno-narrowing")
+ 
+   # check for x86-64 system
+   check_cxx_source_runs("

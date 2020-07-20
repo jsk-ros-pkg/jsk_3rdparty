@@ -5,6 +5,7 @@
 import actionlib
 from threading import Lock
 import os
+import sys
 import rospy
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from julius_ros.utils import make_phonemes_from_words
@@ -97,6 +98,8 @@ class JuliusClient(object):
         req = SoundRequest()
         req.sound = SoundRequest.PLAY_FILE
         req.command = SoundRequest.PLAY_ONCE
+        if hasattr(SoundRequest, 'volume'): # volume is added from 0.3.0 https://github.com/ros-drivers/audio_common/commit/da9623414f381642e52f59701c09928c72a54be7#diff-fe2d85580f1ccfed4e23a608df44a7f7
+            sound.volume = 1.0
         req.arg = path
         goal = SoundRequestGoal(sound_request=req)
         self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
@@ -281,7 +284,10 @@ class JuliusClient(object):
             transcript = []
             confidence = 0.0
             for whypo in shypo.xpath("./WHYPO"):
-                word = whypo.attrib["WORD"].encode(self.encoding)
+                if sys.version_info.major < 3:
+                    word = whypo.attrib["WORD"].encode(self.encoding)
+                else:
+                    word = whypo.attrib["WORD"]
                 if word.startswith("<"):
                     continue
                 transcript.append(word)

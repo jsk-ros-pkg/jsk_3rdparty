@@ -1,0 +1,197 @@
+Index: siftfastpy.cpp
+===================================================================
+--- siftfastpy.cpp	(revision 54)
++++ siftfastpy.cpp	(working copy)
+@@ -22,7 +22,7 @@
+ #include <boost/python.hpp>
+ #include <boost/python/exception_translator.hpp>
+ #include <pyconfig.h>
+-#include <numpy/arrayobject.h>
++#include <boost/python/numpy.hpp>
+ 
+ #include <boost/format.hpp>
+ 
+@@ -87,11 +87,11 @@
+ 
+ inline object toPyArrayN(const float* pvalues, int N)
+ {
+-    npy_intp dims[] = {N};
+-    PyObject *pyvalues = PyArray_SimpleNew(1,dims, PyArray_FLOAT);
+-    if( pvalues != NULL )
+-        memcpy(PyArray_DATA(pyvalues),pvalues,N*sizeof(float));
+-    return static_cast<numeric::array>(handle<>(pyvalues));
++    numpy::dtype dt = numpy::dtype::get_builtin<float>();
++    boost::python::tuple shape = boost::python::make_tuple(N);
++    numpy::ndarray pyarray = numpy::empty(shape, dt);
++    std::memcpy(pyarray.get_data(), &pvalues[0], N * sizeof(float));
++    return pyarray;
+ }
+ 
+ template <typename T>
+@@ -113,9 +113,8 @@
+         return ExtractArray<float>(o);
+ 
+     vector<float> v(len(o));
+-    object onew = ((numeric::array)oraw).astype("f8").attr("flat");
+     for(size_t i = 0; i < v.size(); ++i)
+-        v[i] = (float)(extract<double>(onew[i]));
++        v[i] = (float)(extract<double>(oraw[i]));
+     return v;
+ }
+ 
+@@ -186,9 +185,9 @@
+ class Image_pickle_suite : public pickle_suite
+ {
+ public:
+-    static tuple getinitargs(const PyImage& im)
++  static boost::python::tuple getinitargs(const PyImage& im)
+     {
+-        return make_tuple(im.width,im.height,im.stride,toPyArrayN(&im.vimage[0],im.vimage.size()));
++      return boost::python::make_tuple(im.width,im.height,im.stride,toPyArrayN(&im.vimage[0],im.vimage.size()));
+     }
+ };
+ 
+@@ -195,7 +194,7 @@
+ object ReturnKeypoints(Keypoint keypts)
+ {
+     if( keypts == NULL )
+-        return make_tuple(numeric::array(boost::python::list()).astype("f4"),numeric::array(boost::python::list()).astype("f4"));
++        return boost::python::make_tuple(numpy::array(boost::python::list()),numpy::array(boost::python::list()));
+     int numkeys = 0;
+     Keypoint key = keypts;
+     while(key) {
+@@ -203,13 +202,14 @@
+         key = key->next;
+     }
+ 
+-    npy_intp dims[2] = {numkeys,4};
+-    PyObject *pyframes = PyArray_SimpleNew(2,dims, PyArray_FLOAT);
+-    float* pframes = (float*)PyArray_DATA(pyframes);
+-    
++    boost::python::tuple dims = boost::python::make_tuple(numkeys, 3);
++    numpy::ndarray pyframes = numpy::empty(dims, numpy::dtype::get_builtin<float>());
++    float* pframes = reinterpret_cast<float*>(pyframes.get_data());
++
++    numpy::dtype dt = numpy::dtype::get_builtin<float>();
+     dims[1] = 128;
+-    PyObject *pydesc = PyArray_SimpleNew(2,dims, PyArray_FLOAT);
+-    float* pdesc = (float*)PyArray_DATA(pydesc);
++    numpy::ndarray pydesc = numpy::empty(dims, dt);
++    float* pdesc = (float*)pydesc.get_data();
+ 
+     int index = 0;
+     key = keypts;
+@@ -227,7 +227,7 @@
+         ++index;
+     }
+ 
+-    return make_tuple(static_cast<numeric::array>(handle<>(pyframes)),static_cast<numeric::array>(handle<>(pydesc)));
++    return boost::python::make_tuple(pyframes,pydesc);
+ }
+ 
+ object PyGetKeypoints(PyImage& im)
+@@ -262,9 +262,10 @@
+         key = key->next;
+     }
+ 
+-    npy_intp dims[2] = {numkeys,6};
+-    PyObject *pyframes = PyArray_SimpleNew(2,dims, PyArray_FLOAT);
+-    float* pframes = (float*)PyArray_DATA(pyframes);
++    numpy::dtype dt = numpy::dtype::get_builtin<float>();
++    boost::python::tuple shape = boost::python::make_tuple(numkeys,6);
++    numpy::ndarray pyframes = numpy::empty(shape, dt);
++    float* pframes = (float *)(pyframes.get_data());
+         int index = 0;
+     key = keypts;
+     while(key) {
+@@ -282,7 +283,7 @@
+     FreeKeypoints(keypts);
+     DestroyAllImages();
+ 
+-    return static_cast<numeric::array>(handle<>(pyframes));
++    return static_cast<numpy::ndarray>(pyframes);
+ }
+ 
+ object PyGetKeypointDescriptors(PyImage& im,object oframes)
+@@ -323,19 +324,19 @@
+     return o;
+ }
+ 
+-object PyGetKeypoints(numeric::array oarray)
++object PyGetKeypoints(numpy::ndarray oarray)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypoints(pimage);
+ }
+ 
+-object PyGetKeypointFrames(numeric::array oarray)
++object PyGetKeypointFrames(numpy::ndarray oarray)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypointFrames(pimage);
+ }
+ 
+-object PyGetKeypointDescriptors(numeric::array oarray, object oframes)
++object PyGetKeypointDescriptors(numpy::ndarray oarray, object oframes)
+ {
+     PyImage pimage(oarray);
+     return PyGetKeypointDescriptors(pimage, oframes);
+@@ -352,8 +353,8 @@
+ 
+     static void* convertible( PyObject* obj)
+     {
+-        PyObject* newobj = PyNumber_Int(obj);
+-        if (!PyString_Check(obj) && newobj) {
++        PyObject* newobj = PyNumber_Long(obj);
++        if (!PyUnicode_Check(obj) && newobj) {
+             Py_DECREF(newobj);
+             return obj;
+         }
+@@ -368,7 +369,7 @@
+ 
+     static void construct(PyObject* _obj, converter::rvalue_from_python_stage1_data* data)
+     {
+-        PyObject* newobj = PyNumber_Int(_obj);
++        PyObject* newobj = PyNumber_Long(_obj);
+         int* storage = (int*)((converter::rvalue_from_python_storage<int>*)data)->storage.bytes;
+         *storage = extract<int>(newobj);
+         Py_DECREF(newobj);
+@@ -387,7 +388,7 @@
+     static void* convertible( PyObject* obj)
+     {
+         PyObject* newobj = PyNumber_Float(obj);
+-        if (!PyString_Check(obj) && newobj) {
++        if (!PyUnicode_Check(obj) && newobj) {
+             Py_DECREF(newobj);
+             return obj;
+         }
+@@ -412,8 +413,8 @@
+ 
+ BOOST_PYTHON_MODULE(siftfastpy)
+ {
+-    import_array();
+-    numeric::array::set_module_and_type("numpy", "ndarray");
++    Py_Initialize();
++    numpy::initialize();
+     register_exception_translator<siftfast_exception>(&translate_siftfast_exception);
+     int_from_int();
+     T_from_number<float>();
+@@ -421,15 +422,15 @@
+ 
+     def("DestroyAllResources",DestroyAllResources);
+     object (*pkeypoints1)(PyImage&) = PyGetKeypoints;
+-    object (*pkeypoints2)(numeric::array) = PyGetKeypoints;
++    object (*pkeypoints2)(numpy::ndarray) = PyGetKeypoints;
+     def("GetKeypoints",pkeypoints1,args("image"));
+     def("GetKeypoints",pkeypoints2,args("array"));
+     object (*pkeypointsf1)(PyImage&) = PyGetKeypointFrames;
+-    object (*pkeypointsf2)(numeric::array) = PyGetKeypointFrames;
++    object (*pkeypointsf2)(numpy::ndarray) = PyGetKeypointFrames;
+     def("GetKeypointFrames",pkeypointsf1,args("image"));
+     def("GetKeypointFrames",pkeypointsf2,args("array"));
+     object (*pkeypointsd1)(PyImage&,object) = PyGetKeypointDescriptors;
+-    object (*pkeypointsd2)(numeric::array,object) = PyGetKeypointDescriptors;
++    object (*pkeypointsd2)(numpy::ndarray,object) = PyGetKeypointDescriptors;
+     def("GetKeypointDescriptors",pkeypointsd1,args("image","frames"));
+     def("GetKeypointDescriptors",pkeypointsd2,args("array","frames"));
+ 

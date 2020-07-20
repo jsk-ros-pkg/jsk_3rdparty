@@ -1,0 +1,21 @@
+<launch>
+  <!-- launch speech_to_text -->
+  <include file="$(find respeaker_ros)/launch/sample_respeaker.launch">
+    <arg name="launch_respeaker" value="false" />
+    <arg name="audio" value="speech_audio" />
+    <arg name="language" value="ja-JP" />
+  </include>
+
+  <!-- launch bag file -->
+  <node name="rosbag_play"
+        pkg="rosbag" type="play"
+        args="$(find respeaker_ros)/test/data/konnichiwa.bag --loop">
+  </node>
+
+  <test test-name="test_speech_to_text"
+        name="test_speech_to_text"
+        pkg="jsk_tools"  type="test_topic_published.py" >
+    <param name="~topic_0" value="/speech_to_text" />
+    <param name="~timeout_0" value="30" />
+  </test>
+</launch>

@@ -4,15 +4,26 @@ all: urdf_to_collada
 GIT_DIR = build/robot_model/src
 GIT_URL = git://github.com/ros/robot_model.git
 GIT_REVISION = ${SOURCE_DISTRO}
-PATCH_DIR = $(CURDIR)
+
+TARBALL     = build/robot_model.zip
+TARBALL_URL = https://github.com/ros/robot_model/archive/${SOURCE_DISTRO}.zip
+SOURCE_DIR  = build/robot_model/src
+INITIAL_DIR  = build/robot_model-${SOURCE_DISTRO}
+MD5SUM_FILE = ${PATCH_DIR}/robot_model.zip.md5sum
+UNPACK_CMD  = unzip
+
 GIT_PATCH = ${PATCH_DIR}/use_assimp_devel.patch
 BUILD_BIN_DIR  = build/robot_model/devel/lib/collada_urdf
-include $(shell rospack find mk)/git_checkout.mk
+#include $(shell rospack find mk)/git_checkout.mk
+include $(shell rospack find mk)/download_unpack_build.mk
 
-disable_ssl:
-	git config --global http.sslVerify false
+# disable_ssl:
+# 	git config --global http.sslVerify false
 
-urdf_to_collada: disable_ssl $(GIT_DIR) patched
+catkin_ws:
+	mkdir -p build/robot_model/src
+
+urdf_to_collada: catkin_ws $(SOURCE_DIR)/unpacked
 	(cd build/robot_model; catkin init -w .; PKG_CONFIG_PATH=`rospack find assimp_devel`/lib/pkgconfig:${PKG_CONFIG_PATH} catkin build -v -i collada_urdf --force-cmake --no-status --no-notify)
 	cp $(BUILD_BIN_DIR)/urdf_to_collada .
 	cp $(BUILD_BIN_DIR)/collada_to_urdf .
