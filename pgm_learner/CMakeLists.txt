@@ -45,7 +45,10 @@ install(
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(test/test_discrete_bn.test)
-  add_rostest(test/test_lg_bn.test)
+  # python-libpgm-pip did not work with python3
+  if ("$ENV{ROS_PYTHON_VERSION}" STREQUAL "2")
+    find_package(catkin REQUIRED COMPONENTS rostest)
+    add_rostest(test/test_discrete_bn.test)
+    add_rostest(test/test_lg_bn.test)
+  endif()
 endif()

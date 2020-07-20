@@ -154,7 +154,7 @@ def ShowMessage(*args):
     msg = datetime.datetime.now().isoformat() \
           + ' "' + TeamName + '" ' \
           + " ".join(args)
-    print msg
+    print(msg)
     if UseSyslog:
         syslog.syslog(syslog.LOG_INFO, msg)
 
@@ -324,7 +324,7 @@ class RunList(object):
                 ShowMessage("Starting task \"%s\"" % req.Name)
                 try:
                     req.Run(nowtime)
-                except Exception, err:
+                except Exception as err:
                     ShowMessage("Exception in Task \"%s\" - %s" % (req.Name, str(err)))
                 del self.__WorkList[ndx]
                 return True
@@ -556,7 +556,7 @@ if __name__ == "__main__":
 
     try:
         main()
-    except Exception, err:
+    except Exception as err:
         ShowMessage("Unhandled exception:", str(err))
         traceback.print_exc()
 

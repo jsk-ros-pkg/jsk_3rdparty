@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="3">
   <name>respeaker_ros</name>
   <version>2.1.17</version>
   <description>The respeaker_ros package</description>
@@ -9,17 +9,19 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>dynamic_reconfigure</build_depend>
-  <run_depend>angles</run_depend>
-  <run_depend>audio_common_msgs</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>flac</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>python-numpy</run_depend>
-  <run_depend>python-pixel-ring-pip</run_depend>
-  <run_depend>python-pyaudio</run_depend>
-  <run_depend>python-pyusb-pip</run_depend>
-  <run_depend>python-speechrecognition-pip</run_depend>
+  <exec_depend>angles</exec_depend>
+  <exec_depend>audio_common_msgs</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>flac</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-numpy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python3-numpy</exec_depend>
+  <exec_depend>python-pixel-ring-pip</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-pyaudio</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python3-pyaudio</exec_depend>
+  <exec_depend>python-pyusb-pip</exec_depend>
+  <exec_depend>python-speechrecognition-pip</exec_depend>
   <test_depend>jsk_tools</test_depend>
 </package>

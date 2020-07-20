@@ -5,6 +5,7 @@
 import actionlib
 from threading import Lock
 import os
+import sys
 import rospy
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from julius_ros.utils import make_phonemes_from_words
@@ -283,7 +284,10 @@ class JuliusClient(object):
             transcript = []
             confidence = 0.0
             for whypo in shypo.xpath("./WHYPO"):
-                word = whypo.attrib["WORD"].encode(self.encoding)
+                if sys.version_info.major < 3:
+                    word = whypo.attrib["WORD"].encode(self.encoding)
+                else:
+                    word = whypo.attrib["WORD"]
                 if word.startswith("<"):
                     continue
                 transcript.append(word)
