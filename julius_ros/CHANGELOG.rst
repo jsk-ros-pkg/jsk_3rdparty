@@ -2,8 +2,8 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.19 (2020-07-21)
+-------------------
 * fix typo in julius_client.py (`#203 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/203>`_)
 * add more arg options for julius.launch (`#144 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/144>`_)
 
