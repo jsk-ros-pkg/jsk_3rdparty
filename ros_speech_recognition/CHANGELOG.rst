@@ -2,6 +2,11 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed issue `#201 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/201>`_ as requested, see https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/202
+* Contributors: MrMarshy
+
 2.1.18 (2020-07-20)
 -------------------
 * Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)

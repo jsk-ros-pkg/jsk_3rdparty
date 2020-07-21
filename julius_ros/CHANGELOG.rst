@@ -2,6 +2,17 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix typo in julius_client.py (`#203 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/203>`_)
+* add more arg options for julius.launch (`#144 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/144>`_)
+
+  * add julius_output args
+  * add julius_args
+  * add args for device,channels,depth,sample_rate,format
+
+* Contributors: Kei Okada, Shingo Kitagawa
+
 2.1.18 (2020-07-20)
 -------------------
 * Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)

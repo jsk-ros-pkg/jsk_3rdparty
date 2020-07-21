@@ -2,6 +2,9 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.18 (2020-07-20)
 -------------------
 * download zip, instead of git clone to avoid sslverify errors (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
