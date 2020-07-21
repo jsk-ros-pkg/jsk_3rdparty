@@ -55,11 +55,12 @@ Please read [app_manager](https://github.com/PR2/app_manager/) for more detailed
 
 For your new task, create new Intent as below.
 
-`Action` section, you must name camel-cased name of your `app_manager` app.
+`Action` section, you can set full name (`<package name>/<app name>`), app name or camel-cased name of your `app_manager` app.
+The Full name (`<package name>/<app name>`) is recommended to avoid name confliction.
 
-If your app is registered as `your_package/your_demo`, you need to set `YourDemo` in `Action` section.
+If your app is registered as `your_package/your_demo`, you need to set `your_package/your_demo`, `your_demo` or  `YourDemo` in `Action` section.
 
-(i.e. App name: `detect_cans_in_fridge201202/pick_object` -> Dialogflow Action: `PickObject`)
+(i.e. App name: `detect_cans_in_fridge201202/pick_object` -> Dialogflow Action: `detect_cans_in_fridge201202/pick_object`, `pick_object` or `PickObject`)
 
 ![](./img/dialogflow_intent.png)
 
