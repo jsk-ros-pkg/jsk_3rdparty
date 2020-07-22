@@ -212,7 +212,7 @@ class TaskExecutive(object):
         else:
             action = camel_to_snake(msg.action)
             for app_name in self.app_manager.available_apps:
-                if action == app_name.split('/')[1]:
+                if action == app_name or action == app_name.split('/')[1]:
                     action = app_name
                     break
         if action not in self.app_manager.available_apps:
