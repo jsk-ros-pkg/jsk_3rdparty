@@ -23,7 +23,11 @@ include $(shell rospack find mk)/download_unpack_build.mk
 catkin_ws:
 	mkdir -p build/robot_model/src
 
-urdf_to_collada: catkin_ws $(SOURCE_DIR)/unpacked
+$(SOURCE_DIR)/patched:  $(SOURCE_DIR)/unpacked # download_unpack_build use -p0, which did not work with our ${GIT_PATCH}
+	$(foreach PATCH, $(GIT_PATCH), patch -d $(SOURCE_DIR) -p1 < $(PATCH) && ) echo patched
+	touch patched
+
+urdf_to_collada: catkin_ws $(SOURCE_DIR)/patched
 	(cd build/robot_model; catkin init -w .; PKG_CONFIG_PATH=`rospack find assimp_devel`/lib/pkgconfig:${PKG_CONFIG_PATH} catkin build -v -i collada_urdf --force-cmake --no-status --no-notify)
 	cp $(BUILD_BIN_DIR)/urdf_to_collada .
 	cp $(BUILD_BIN_DIR)/collada_to_urdf .
