@@ -6,10 +6,10 @@ GIT_URL = git://github.com/ros/robot_model.git
 GIT_REVISION = ${SOURCE_DISTRO}
 
 TARBALL     = build/robot_model.zip
-TARBALL_URL = https://github.com/ros/robot_model/archive/${SOURCE_DISTRO}.zip
+TARBALL_URL = https://github.com/ros/${GIT_REPO}/archive/${SOURCE_DISTRO}.zip
 SOURCE_DIR  = build/robot_model/src
-INITIAL_DIR  = build/robot_model-${SOURCE_DISTRO}
-MD5SUM_FILE = ${PATCH_DIR}/robot_model.zip.md5sum
+INITIAL_DIR  = build/${GIT_REPO}-${SOURCE_DISTRO}
+MD5SUM_FILE = ${PATCH_DIR}/robot_model.$(shell echo ${SOURCE_DISTRO} | head -c 4).md5sum
 UNPACK_CMD  = unzip
 
 GIT_PATCH = ${PATCH_DIR}/use_assimp_devel.patch
