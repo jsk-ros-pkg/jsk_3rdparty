@@ -2,6 +2,16 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* apply fix_issue_18 only for collada_urdf 1.12.12 (`#209 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/209>`_)
+
+  * add https://github.com/Naoki-Hiraoka/collada_urdf/commit/c37592e86af2d949479e3db9e271e34ff8eff189
+  * use collada_urdf 1.12.12 for melodic and later
+  * fix bug introduced in 0c200c7ce26cdf3c16f36cf5dd68d05ee06775e2
+
+* Contributors: Kei Okada
+
 2.1.19 (2020-07-21)
 -------------------
 

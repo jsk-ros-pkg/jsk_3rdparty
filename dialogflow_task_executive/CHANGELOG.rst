@@ -2,6 +2,15 @@
 Changelog for package dialogflow_task_executive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [dialogflow_task_executive] accepct full name of app name for dialogflow action (`#208 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/208>`_)
+
+  * update readme to accept dialogflow action name
+  * use whole app_name for action
+
+* Contributors: Kei Okada, Shingo Kitagawa
+
 2.1.19 (2020-07-21)
 -------------------
 
