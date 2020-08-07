@@ -12,7 +12,10 @@ INITIAL_DIR  = build/${GIT_REPO}-${SOURCE_DISTRO}
 MD5SUM_FILE = ${PATCH_DIR}/robot_model.$(shell echo ${SOURCE_DISTRO} | head -c 4).md5sum
 UNPACK_CMD  = unzip
 
-GIT_PATCH = ${PATCH_DIR}/use_assimp_devel.patch ${PATCH_DIR}/fix_issue_18.patch
+GIT_PATCH = ${PATCH_DIR}/use_assimp_devel.patch
+ifeq ("${SOURCE_DISTRO}", "923c5d33bd245e82134e8ae02e4c9d379e80eb27") # 1.12.12
+GIT_PATCH += ${PATCH_DIR}/fix_issue_18.patch
+endif
 BUILD_BIN_DIR  = build/robot_model/devel/lib/collada_urdf
 #include $(shell rospack find mk)/git_checkout.mk
 include $(shell rospack find mk)/download_unpack_build.mk
