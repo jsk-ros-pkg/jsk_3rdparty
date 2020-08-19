@@ -2,6 +2,12 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add missing packages, closes https://github.com/ros/rosdistro/pull/26216 (`#211 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/211>`_)
+
+* Contributors: Kei Okada
+
 2.1.20 (2020-08-07)
 -------------------
 * apply fix_issue_18 only for collada_urdf 1.12.12 (`#209 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/209>`_)
