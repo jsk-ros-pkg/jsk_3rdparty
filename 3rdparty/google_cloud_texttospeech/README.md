@@ -2,10 +2,18 @@
 
 ROS Interface for Google Cloud Text-to-Speech
 
-## Installation
+## Preparation
 
 1. Register [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech)
 2. Put the credentail json for [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech) in your robot
+
+## Installation
+
+For python2.7, you need to use `google-cloud-texttospeech==1.0.1`.
+
+```bash
+sudo pip install google-cloud-texttospeech==1.0.1
+```
 
 ## Usage
 
