@@ -25,9 +25,14 @@ roslaunch google_cloud_texttospeech google_cloud_texttospeech.launch credentail:
 
 ### Say something
 
-```bash
-# english
-rosrun sound_play say.py 'Hello' dummy 1.0 robotsound:=robotsound
-# japanese
-rosrun sound_play say.py 'こんにちは' dummy 1.0 robotsound:=robotsound_jp
+```python
+import rospy
+from sound_play.libsoundplay import SoundClient
+
+rospy.init_node('say_node')
+
+client = SoundClient(sound_action='robotsound', sound_topic='robotsound')
+
+client.say('hello!')
+client.say('こんにちは', voice='ja')
 ```
