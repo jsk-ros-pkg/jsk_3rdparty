@@ -5,7 +5,7 @@ ROS Interface for Google Cloud Text-to-Speech
 ## Preparation
 
 1. Register [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech)
-2. Put the credentail json for [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech) in your robot
+2. Put the credential json for [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech) in your robot
 
 ## Installation
 
@@ -20,7 +20,7 @@ sudo pip install google-cloud-texttospeech==1.0.1
 ### Launch sound_play with Google Cloud Text-to-Speech
 
 ```bash
-roslaunch google_cloud_texttospeech google_cloud_texttospeech.launch credentail:=/your/credentail/json/path
+roslaunch google_cloud_texttospeech google_cloud_texttospeech.launch credential:=/your/credential/json/path
 ```
 
 ### Say something
