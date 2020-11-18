@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import argparse
+
+from google.cloud import texttospeech
+import rospy
+
+
+if __name__ == '__main__':
+    speaking_rate = rospy.get_param('~speaking_rate', 1.0)
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
+
+    # Instantiates a client
+    client = texttospeech.TextToSpeechClient()
+    with open(args.text, 'rb') as f:
+        synthesis_input = texttospeech.types.SynthesisInput(
+            text=f.readline())
+
+    # English as default
+    language_code = 'en-US'
+    name = 'en-US-Wavenet-A'
+    # You can see which language is available here
+    # https://cloud.google.com/text-to-speech/docs/voices
+    # Japanese
+    if args.evaluate in ['(ja)', '(ja-JP)']:
+        language_code = 'ja-JP'
+        name = 'ja-JP-Wavenet-A'
+    voice = texttospeech.types.VoiceSelectionParams(
+        language_code=language_code,
+        name=name,
+        ssml_gender=texttospeech.enums.SsmlVoiceGender.FEMALE)
+
+    # Select the type of audio file you want returned
+    audio_config = texttospeech.types.AudioConfig(
+        audio_encoding=texttospeech.enums.AudioEncoding.MP3,
+        speaking_rate=speaking_rate)
+    response = client.synthesize_speech(
+        synthesis_input, voice, audio_config)
+    with open(args.output, 'wb') as out:
+        # Write the response to the output file.
+        out.write(response.audio_content)
