@@ -16,7 +16,7 @@ catkin_package()
 
 if($ENV{ROS_DISTRO} STREQUAL "noetic")
   catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3.8
+    PYTHON_INTERPRETER python3
     )
 else()
   catkin_generate_virtualenv()
