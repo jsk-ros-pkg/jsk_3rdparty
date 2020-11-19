@@ -14,7 +14,13 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
-catkin_generate_virtualenv()
+if($ENV{ROS_DISTRO} STREQUAL "noetic")
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python3.8
+    )
+else()
+  catkin_generate_virtualenv()
+endif()
 
 catkin_install_python(
   PROGRAMS scripts/speech_recognition_node.py
