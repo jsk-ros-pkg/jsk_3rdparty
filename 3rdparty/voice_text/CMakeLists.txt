@@ -20,12 +20,32 @@ generate_messages()
 
 catkin_package(CATKIN_DEPENDS message_runtime)
 
-if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
-  set(VT_LIB_ARCH x86_32/)
-elseif("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
-  set(VT_LIB_ARCH x86_64/)
+file(GLOB VT_ROOT /usr/vt/*/*)
+if(NOT VT_ROOT)
+  message(WARNING "VoiceText directory should be /usr/vt/*/* (e.g., /usr/vt/sayaka/M16) but is not found")
+  set(VT_ROOT /usr/vt/sayaka/M16)  # default value for following configure_file
+else()
+  if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
+    set(VT_LIB_PATH_OLD ${VT_ROOT}/bin/x86_32/RAMIO/libvt_jpn.so)  # e.g., /usr/vt/sayaka/M16/bin/x86_32/RAMIO/libvt_jpn.so
+    set(VT_LIB_PATH_NEW ${VT_ROOT}/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so)  # e.g., /usr/vt/risa/H16/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so
+  elseif("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+    set(VT_LIB_PATH_OLD ${VT_ROOT}/bin/x86_64/RAMIO/libvt_jpn.so)  # e.g., /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.so
+    set(VT_LIB_PATH_NEW ${VT_ROOT}/bin/LINUX64_GLIBC3/RAMIO/libvt_jpn.so)  # e.g., /usr/vt/risa/H16/bin/LINUX64_GLIBC3/RAMIO/libvt_jpn.so
+  endif()
+  if(EXISTS ${VT_LIB_PATH_OLD})
+    set(VT_LIB_PATH ${VT_LIB_PATH_OLD})
+  else()
+    if(EXISTS ${VT_LIB_PATH_NEW})
+      set(VT_LIB_PATH ${VT_LIB_PATH_NEW})
+    endif()
+  endif()
+  if(VT_LIB_PATH)
+    message(WARNING "VoiceText library is found at ${VT_LIB_PATH}")
+  else()
+    message(WARNING "VoiceText library is not found at ${VT_LIB_PATH_OLD} or ${VT_LIB_PATH_NEW}")
+  endif()
 endif()
-set(VT_LIB_PATH /usr/vt/sayaka/M16/bin/${VT_LIB_ARCH}RAMIO/libvt_jpn.so)
+configure_file(src/voice_text.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
 
   include_directories(
     ${Boost_INCLUDE_DIRS}
@@ -35,8 +55,8 @@ set(VT_LIB_PATH /usr/vt/sayaka/M16/bin/${VT_LIB_ARCH}RAMIO/libvt_jpn.so)
   add_dependencies(voice_text ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
   set_target_properties(voice_text PROPERTIES COMPILE_FLAGS -D_REENTRANT)
 
-if(NOT EXISTS ${VT_LIB_PATH})
-  message(WARNING "VoiceText Library not found at ${VT_LIB_PATH}. building dummy library.")
+if(NOT VT_LIB_PATH)
+  message(WARNING "Building dummy library")
   add_library(vt_dummy src/dummy/vt_dummy.cpp)
   set_target_properties(vt_dummy PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
   set_target_properties(vt_dummy PROPERTIES LIBRARY_OUTPUT_NAME vt_jpn)
