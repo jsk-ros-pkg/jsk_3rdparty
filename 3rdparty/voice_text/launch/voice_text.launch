@@ -13,7 +13,7 @@
         machine="$(arg voice_text_machine)">
     <remap from="text_to_speech" to="voice_text/text_to_speech" />
     <rosparam>
-      db_path: /usr/vt/sayaka/M16
+      # db_path: /usr/vt/sayaka/M16  # Commented out to support other speakers than SAYAKA
       pitch: 100
       speed: 100
       volume: 100
