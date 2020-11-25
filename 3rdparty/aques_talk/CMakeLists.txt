@@ -5,6 +5,10 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
+# Considering the use of docker in addition to the usual use,
+# we use dpkg-architecture command instead of ${CMAKE_SYSTEM_PROCESSOR} to get the architecture.
+# https://stackoverflow.com/a/58222507
+# http://manpages.ubuntu.com/manpages/bionic/man1/dpkg-architecture.1.html
 execute_process(COMMAND dpkg-architecture -qDEB_HOST_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
 if("${ARCHITECTURE}" MATCHES x86_64* )
 set(AQTK2_LNX_LIB_DIR "lib64")
