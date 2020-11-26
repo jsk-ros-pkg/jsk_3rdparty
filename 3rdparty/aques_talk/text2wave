@@ -1,30 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-# for festival compaibility
-ARGS=`echo $@ | sed 's/\-eval\ ()//' | sed 's/\-eval\ (\(.\+\))\ \(.\+\)$/\2\ \-p\ \1/'`
-eval set -- "$ARGS"
+import argparse
+import os
+import rospkg
+import rospy
+import sys
 
-INPUT_FILE=$1;shift;
-OUTPUT_FILE=/tmp/_aques_talk_sound_$$.wav
-JPTEXT_FILE=/tmp/_aques_talk_text_$$.txt
-PHONT_FILE=aq_f1c.phont
-while getopts p:o: OPT
-do
-    case ${OPT} in
-	"o")
-	    OUTPUT_FILE=${OPTARG};;
-	"p")
-	    PHONT_FILE=${OPTARG};;
-	esac
-done
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
 
-PHONT_FILE=`rospack find aques_talk`/phont/$PHONT_FILE
-PATH=`rospack find aques_talk`/bin:$PATH
-nkf -j $INPUT_FILE | kakasi -JH | nkf -w | \
-    sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
-    sed -e 's/．/。/g' | sed -e 's/\./。/g' > \
-    $JPTEXT_FILE
-cat $JPTEXT_FILE 1>&2
-`rospack find aques_talk`/bin/SampleTalk -p $PHONT_FILE -o $OUTPUT_FILE $JPTEXT_FILE
-#rm -f /tmp/_jtalk_{log,input}_$$.*
+    input_file = args.text
+    jptext_file = "/tmp/_voice_text_%s.txt"%os.getpid()
+    output_file = "/tmp/_voice_text_%s.wav"%os.getpid()
+    phont_file  = "aq_f1c.phont"
+    phont_file  ="%s/phont/%s"%(rospkg.RosPack().get_path("aques_talk"), phont_file)
+    if args.output is not None:
+        output_file = args.output
 
+    if not os.path.exists(input_file):
+        rospy.logerr("%s not found"%input_file)
+        sys.exit(1)
+
+    if args.evaluate in ['(en)']:
+        os.system("/usr/bin/text2wave %s > %s"%(input_file, output_file))
+        sys.exit(0)
+
+    # escape invalid code
+    os.system("nkf -j %s | kakasi -JH | nkf -w | \
+               sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
+               sed -e 's/．/。/g' | sed -e 's/\./。/g' > \
+               %s"%(input_file, jptext_file))
+    os.system("cat %s 1>&2"%(jptext_file))
+    os.system("rosrun aques_talk SampleTalk -p %s -o %s %s"%(phont_file, output_file, jptext_file))
+
+    os.remove(jptext_file)
