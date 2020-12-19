@@ -34,6 +34,7 @@ if __name__ == '__main__':
     os.system("nkf -j %s | kakasi -JH | nkf -w | \
                sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
                sed -e 's/．/。/g' | sed -e 's/\./。/g' | \
+               sed -e 's/\([a-zA-Z]\+\)/<ALPHA VAL=\\1>/g' | \
                sed -e 's/\([0-9]\+\)/<NUMK VAL=\\1>/g' > \
                %s"%(input_file, jptext_file))
     os.system("cat %s 1>&2"%(jptext_file))
