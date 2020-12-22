@@ -34,3 +34,13 @@ client.say('Hello', voice='en')
 
 
 ```
+
+
+### Limitations on input strings
+```
+Wrong -> Correct
+20時です -> 20じです # Kanji is sometimes mispronounced.
+fetch15 -> フェッチ15 # fetch is pronounced as エフ、イー、ティー、シー、エイチ
+73B2 -> 7,3,B,2 # 73B2 is pronounced as ななじゅうさんビーに
+私の名前は -> 私の名前わ
+```
