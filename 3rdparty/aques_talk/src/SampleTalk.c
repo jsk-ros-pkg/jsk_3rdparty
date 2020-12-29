@@ -71,6 +71,26 @@ int main(int ac, char **av)
   unsigned char *wav = AquesTalk2_Synthe_Utf8(speak_str, 100, &size, pPhont);
   if(wav==0) {
     fprintf(stderr, "ERR %d\n", size); // エラー時は size にエラーコードが返る
+    switch (size) {
+      case 100: fprintf(stderr, "その他のエラー\n"); break;
+      case 101: fprintf(stderr, "メモリ不足\n"); break;
+      case 102: fprintf(stderr, "音声記号列に未定義の読み記号が指定された\n"); break;
+      case 103: fprintf(stderr, "韻律データの時間長がマイナスなっている\n"); break;
+      case 104: fprintf(stderr, "内部エラー(未定義の区切りコード検出）\n"); break;
+      case 105: fprintf(stderr, "音声記号列に未定義の読み記号が指定された\n"); break;
+      case 106: fprintf(stderr, "音声記号列のタグの指定が正しくない\n"); break;
+      case 107: fprintf(stderr, "タグの長さが制限を越えている（または[>]がみつからない）\n"); break;
+      case 108: fprintf(stderr, "タグ内の値の指定が正しくない\n"); break;
+      case 109: fprintf(stderr, "WAVE 再生ができない（サウンドドライバ関連の問題）\n"); break;
+      case 110: fprintf(stderr, "WAVE 再生ができない（サウンドドライバ関連の問題 非同期再生）\n"); break;
+      case 111: fprintf(stderr, "発声すべきデータがない\n"); break;
+      case 200: fprintf(stderr, "音声記号列が長すぎる\n"); break;
+      case 201: fprintf(stderr, "１つのフレーズ中の読み記号が多すぎる\n"); break;
+      case 202: fprintf(stderr, "音声記号列が長い（内部バッファオーバー1）\n"); break;
+      case 203: fprintf(stderr, "ヒープメモリ不足\n"); break;
+      case 204: fprintf(stderr, "音声記号列が長い（内部バッファオーバー1）\n"); break;
+    }
+    fprintf(stderr, "Please refer to https://www.a-quest.com/archive/manual/aqtk2_lnx_man.pdf for more info.\n");
     return -1;
   }
   // Phont データの開放(音声合成が終わったら開放できる)
