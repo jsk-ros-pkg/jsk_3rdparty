@@ -52,7 +52,7 @@ def GetMM2ConfigInJson(mm2name):
     resp = conn.getresponse()
 
     if (resp.status/100) != 2:
-        raise Exception,resp.reason
+        raise Exception(resp.reason)
     data = resp.read()
     conn.close()
     return data
@@ -65,7 +65,7 @@ class FiltSetting(object):
     def __init__(self, filtname, toband):
         bnum = int(toband)
         if (bnum <= 0) or (bnum > 5):
-            raise ValueError, "Band number for \"%s\" must be in range 1..5" % filtname
+            raise ValueError("Band number for \"%s\" must be in range 1..5" % filtname)
         self.FiltName = filtname
         self.ToBand = bnum
 
@@ -87,7 +87,7 @@ def SetFiltMap(mm2host, a2bfilt_vals, b2afilt_vals, all_filter_names=None):
     for fvals in (a2bfilt_vals, b2afilt_vals):
         for filt in fvals:
             if filt.FiltName not in all_filter_names:
-                raise ValueError, "Filter name \"%s\" is not present" % filt.FiltName
+                raise ValueError("Filter name \"%s\" is not present" % filt.FiltName)
 
     offa2b = all_filter_names.difference(set(map(lambda x: x.FiltName, a2bfilt_vals)))
     offb2a = all_filter_names.difference(set(map(lambda x: x.FiltName, b2afilt_vals)))
@@ -113,7 +113,7 @@ def SetFiltMap(mm2host, a2bfilt_vals, b2afilt_vals, all_filter_names=None):
     resp = conn.getresponse()
 
     if (resp.status/100) != 2:
-        raise Exception,resp.reason
+        raise Exception(resp.reason)
     data = resp.read()
     conn.close()
 
@@ -150,12 +150,12 @@ if __name__ == "__main__":
     if pargs.filters:
         try:
             all_filter_names = GetAllFilterNames(mm_hostname)
-        except Exception, err:
-            print "HTTP Exception occurred:", str(err)
+        except Exception as err:
+            print("HTTP Exception occurred:", str(err))
             sys.exit(1)
 
         for filt in all_filter_names:
-            print filt
+            print(filt)
         sys.exit(0)
 
     if pargs.defaults:
@@ -166,16 +166,16 @@ if __name__ == "__main__":
         for farg in a2bargs:
             try:
                 a2bfilts.append(FiltSetting(farg[0], farg[1]))
-            except Exception, err:
-                print "Parameter error: %s - Aborting." % str(err)
+            except Exception as err:
+                print("Parameter error: %s - Aborting." % str(err))
                 sys.exit(1)
 
     if b2aargs is not None:
         for farg in b2aargs:
             try:
                 b2afilts.append(FiltSetting(farg[0], farg[1]))
-            except Exception, err:
-                print "Parameter error: %s - Aborting." % str(err)
+            except Exception as err:
+                print("Parameter error: %s - Aborting." % str(err))
                 sys.exit(1)
 
     SetFiltMap(mm_hostname, a2bfilts, b2afilts)

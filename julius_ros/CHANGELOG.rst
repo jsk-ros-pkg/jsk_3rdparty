@@ -2,6 +2,50 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+* fix typo in julius_client.py (`#203 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/203>`_)
+* add more arg options for julius.launch (`#144 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/144>`_)
+
+  * add julius_output args
+  * add julius_args
+  * add args for device,channels,depth,sample_rate,format
+
+* Contributors: Kei Okada, Shingo Kitagawa
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * julius_ros: fix for python3, specially str <-> bytes
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* set SoundRequest.volume for kinetic (`#173 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/173>`_)
+* Contributors: Kei OKada
+
+2.1.13 (2019-07-10)
+-------------------
+
 2.1.12 (2019-05-25)
 -------------------
 

@@ -2,6 +2,38 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.21 (2020-08-19)
+-------------------
+* add missing packages, closes https://github.com/ros/rosdistro/pull/26216 (`#211 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/211>`_)
+
+* Contributors: Kei Okada
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* download zip, instead of git clone to avoid sslverify errors (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
 2.1.12 (2019-05-25)
 -------------------
 

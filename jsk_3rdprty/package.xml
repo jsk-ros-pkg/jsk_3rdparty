@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>jsk_3rdparty</name>
-  <version>2.1.12</version>
+  <version>2.1.21</version>
   <description>
    <p>Metapackage that contains commonly used 3rdparty toolset for jsk-ros-pkg</p>
   </description>
@@ -34,6 +34,11 @@
   <run_depend>bayesian_belief_networks</run_depend>
   <run_depend>julius</run_depend>
   <run_depend>julius_ros</run_depend>
+  <run_depend>sesame_ros</run_depend>
+  <run_depend>dialogflow_task_executive</run_depend>
+  <run_depend>gdrive_ros</run_depend>
+  <run_depend>google_cloud_texttospeech</run_depend>
+
   <export>
     <metapackage/>
   </export>

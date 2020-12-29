@@ -1,0 +1,12 @@
+string file_path
+string file_title
+string parents_path
+string parents_id
+bool use_timestamp_folder
+bool use_timestamp_file_title
+---
+bool success
+string file_id
+string file_url
+string parents_id
+string parents_url

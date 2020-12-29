@@ -3,9 +3,13 @@
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 import os
+import sys
 import rospy
 from julius_ros.transport import SocketTransport
-from Queue import Queue
+try:
+    from Queue import Queue ## for Python2
+except ImportError:
+    from queue import Queue ## for Python3
 import lxml.etree
 import traceback
 from xml.sax.saxutils import escape
@@ -31,7 +35,8 @@ class ModuleClient(SocketTransport):
 
     def parse_xml(self, data):
         try:
-            data = data.decode(self.encoding)
+            if sys.version_info.major < 3:
+                data = data.decode(self.encoding) ## Python2 needs to convert to utf-8
             data = self.validate_xml(data)
             xml = lxml.etree.fromstring(data)
             return xml.tag, xml

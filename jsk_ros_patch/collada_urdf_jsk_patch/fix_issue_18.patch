@@ -1,0 +1,385 @@
+diff --git a/collada_urdf/src/collada_urdf.cpp b/collada_urdf/src/collada_urdf.cpp
+index ecf8e1e..8dc8051 100644
+--- a/collada_urdf/src/collada_urdf.cpp
++++ b/collada_urdf/src/collada_urdf.cpp
+@@ -1176,22 +1176,32 @@ class ColladaWriter : public daeErrorHandler
+                         string geomid = _ComputeId(str(boost::format("g%s_%s_geom%d")%strModelUri%linksid%igeom));
+                         igeom++;
+                         domGeometryRef pdomgeom;
++                        const aiScene *sceneWithMaterial;
++                        std::vector<int> usedMaterialIndex;
+                         if ( it != plink->visual_array.begin() ) {
+                             urdf::Pose org_trans =  _poseMult(geometry_origin_inv, (*it)->origin);
+-                            pdomgeom = _WriteGeometry((*it)->geometry, geomid, &org_trans);
++                            pdomgeom = _WriteGeometry((*it)->geometry, geomid, sceneWithMaterial, usedMaterialIndex, &org_trans);
+                         }
+                         else {
+-                            pdomgeom = _WriteGeometry((*it)->geometry, geomid);
++                            pdomgeom = _WriteGeometry((*it)->geometry, geomid, sceneWithMaterial, usedMaterialIndex);
+                         }
+                         domInstance_geometryRef pinstgeom = daeSafeCast<domInstance_geometry>(pnode->add(COLLADA_ELEMENT_INSTANCE_GEOMETRY));
+                         pinstgeom->setUrl((string("#") + geomid).c_str());
+                         // material
+-                        _WriteMaterial(pdomgeom->getID(), (*it)->material);
++                        _WriteMaterial(pdomgeom->getID(), (*it)->material, sceneWithMaterial);
+                         domBind_materialRef pmat = daeSafeCast<domBind_material>(pinstgeom->add(COLLADA_ELEMENT_BIND_MATERIAL));
+                         domBind_material::domTechnique_commonRef pmattec = daeSafeCast<domBind_material::domTechnique_common>(pmat->add(COLLADA_ELEMENT_TECHNIQUE_COMMON));
+-                        domInstance_materialRef pinstmat = daeSafeCast<domInstance_material>(pmattec->add(COLLADA_ELEMENT_INSTANCE_MATERIAL));
+-                        pinstmat->setTarget(xsAnyURI(*pdomgeom, string("#")+geomid+string("_mat")));
+-                        pinstmat->setSymbol("mat0");
++                        for (uint32_t i = 0; i < sceneWithMaterial->mNumMaterials; i++) {
++                            if(std::find(usedMaterialIndex.begin(), usedMaterialIndex.end(), i)!=usedMaterialIndex.end()){
++                                domInstance_materialRef pinstmat = daeSafeCast<domInstance_material>(pmattec->add(COLLADA_ELEMENT_INSTANCE_MATERIAL));
++                                aiString name;
++                                sceneWithMaterial->mMaterials[i]->Get(AI_MATKEY_NAME,name);
++                                string matlocal = string(name.C_Str());
++                                string matid = geomid+string("_")+string(name.C_Str())+string("_mat");
++                                pinstmat->setTarget(xsAnyURI(*pdomgeom, string("#")+matid));
++                                pinstmat->setSymbol(matlocal.c_str());
++                            }
++                        }
+                         write_visual = true;
+                     }
+                 }
+@@ -1200,17 +1210,27 @@ class ColladaWriter : public daeErrorHandler
+                 // just 1 visual
+                 int igeom = 0;
+                 string geomid = _ComputeId(str(boost::format("g%s_%s_geom%d")%strModelUri%linksid%igeom));
+-                domGeometryRef pdomgeom = _WriteGeometry(geometry, geomid);
++                const aiScene *sceneWithMaterial;
++                std::vector<int> usedMaterialIndex;
++                domGeometryRef pdomgeom = _WriteGeometry(geometry, geomid, sceneWithMaterial, usedMaterialIndex);
+                 domInstance_geometryRef pinstgeom = daeSafeCast<domInstance_geometry>(pnode->add(COLLADA_ELEMENT_INSTANCE_GEOMETRY));
+                 pinstgeom->setUrl((string("#")+geomid).c_str());
+ 
+                 // material
+-                _WriteMaterial(pdomgeom->getID(), material);
++                _WriteMaterial(pdomgeom->getID(), material, sceneWithMaterial);
+                 domBind_materialRef pmat = daeSafeCast<domBind_material>(pinstgeom->add(COLLADA_ELEMENT_BIND_MATERIAL));
+                 domBind_material::domTechnique_commonRef pmattec = daeSafeCast<domBind_material::domTechnique_common>(pmat->add(COLLADA_ELEMENT_TECHNIQUE_COMMON));
+-                domInstance_materialRef pinstmat = daeSafeCast<domInstance_material>(pmattec->add(COLLADA_ELEMENT_INSTANCE_MATERIAL));
+-                pinstmat->setTarget(xsAnyURI(*pdomgeom, string("#")+geomid+string("_mat")));
+-                pinstmat->setSymbol("mat0");
++                for (uint32_t i = 0; i < sceneWithMaterial->mNumMaterials; i++) {
++                    if(std::find(usedMaterialIndex.begin(), usedMaterialIndex.end(), i)!=usedMaterialIndex.end()){
++                        domInstance_materialRef pinstmat = daeSafeCast<domInstance_material>(pmattec->add(COLLADA_ELEMENT_INSTANCE_MATERIAL));
++                        aiString name;
++                        sceneWithMaterial->mMaterials[i]->Get(AI_MATKEY_NAME,name);
++                        string matlocal = string(name.C_Str());
++                        string matid = geomid+string("_")+string(name.C_Str())+string("_mat");
++                        pinstmat->setTarget(xsAnyURI(*pdomgeom, string("#")+matid));
++                        pinstmat->setSymbol(matlocal.c_str());
++                    }
++                }
+             }
+         }
+ 
+@@ -1279,7 +1299,7 @@ class ColladaWriter : public daeErrorHandler
+         return out;
+     }
+ 
+-    domGeometryRef _WriteGeometry(urdf::GeometrySharedPtr geometry, const std::string& geometry_id, urdf::Pose *org_trans = NULL)
++    domGeometryRef _WriteGeometry(urdf::GeometrySharedPtr geometry, const std::string& geometry_id, const aiScene* &sceneWithMaterial, std::vector<int>& usedMaterialIndex, urdf::Pose *org_trans = NULL)
+     {
+         domGeometryRef cgeometry = daeSafeCast<domGeometry>(_geometriesLib->add(COLLADA_ELEMENT_GEOMETRY));
+         cgeometry->setId(geometry_id.c_str());
+@@ -1287,13 +1307,13 @@ class ColladaWriter : public daeErrorHandler
+         case urdf::Geometry::MESH: {
+             urdf::Mesh* urdf_mesh = (urdf::Mesh*) geometry.get();
+             cgeometry->setName(urdf_mesh->filename.c_str());
+-            _loadMesh(urdf_mesh->filename, cgeometry, urdf_mesh->scale, org_trans);
++            _loadMesh(urdf_mesh->filename, cgeometry, urdf_mesh->scale, org_trans, sceneWithMaterial, usedMaterialIndex);
+             break;
+         }
+         case urdf::Geometry::SPHERE: {
+             shapes::Sphere sphere(static_cast<urdf::Sphere*>(geometry.get())->radius);
+             boost::scoped_ptr<shapes::Mesh> mesh(shapes::createMeshFromShape(sphere));
+-            _loadVertices(mesh.get(), cgeometry);
++            _loadVertices(mesh.get(), cgeometry, sceneWithMaterial, usedMaterialIndex);
+             break;
+         }
+         case urdf::Geometry::BOX: {
+@@ -1301,14 +1321,14 @@ class ColladaWriter : public daeErrorHandler
+                             static_cast<urdf::Box*>(geometry.get())->dim.y,
+                             static_cast<urdf::Box*>(geometry.get())->dim.z);
+             boost::scoped_ptr<shapes::Mesh> mesh(shapes::createMeshFromShape(box));
+-            _loadVertices(mesh.get(), cgeometry);
++            _loadVertices(mesh.get(), cgeometry, sceneWithMaterial, usedMaterialIndex);
+             break;
+         }
+         case urdf::Geometry::CYLINDER: {
+             shapes::Cylinder cyl(static_cast<urdf::Cylinder*>(geometry.get())->radius,
+                                  static_cast<urdf::Cylinder*>(geometry.get())->length);
+             boost::scoped_ptr<shapes::Mesh> mesh(shapes::createMeshFromShape(cyl));
+-            _loadVertices(mesh.get(), cgeometry);
++            _loadVertices(mesh.get(), cgeometry, sceneWithMaterial, usedMaterialIndex);
+             break;
+         }
+         default: {
+@@ -1318,41 +1338,42 @@ class ColladaWriter : public daeErrorHandler
+         return cgeometry;
+     }
+ 
+-    void _WriteMaterial(const string& geometry_id, urdf::MaterialSharedPtr material)
++    void _WriteMaterial(const string& geometry_id, urdf::MaterialSharedPtr material, const aiScene* sceneWithMaterial)
+     {
+-        string effid = geometry_id+string("_eff");
+-        string matid = geometry_id+string("_mat");
+-        domMaterialRef pdommat = daeSafeCast<domMaterial>(_materialsLib->add(COLLADA_ELEMENT_MATERIAL));
+-        pdommat->setId(matid.c_str());
+-        domInstance_effectRef pdominsteff = daeSafeCast<domInstance_effect>(pdommat->add(COLLADA_ELEMENT_INSTANCE_EFFECT));
+-        pdominsteff->setUrl((string("#")+effid).c_str());
+-
+-        urdf::Color ambient, diffuse;
+-        ambient.init("0.1 0.1 0.1 0");
+-        diffuse.init("1 1 1 0");
+-
+-        if( !!material ) {
+-            ambient.r = diffuse.r = material->color.r;
+-            ambient.g = diffuse.g = material->color.g;
+-            ambient.b = diffuse.b = material->color.b;
+-            ambient.a = diffuse.a = material->color.a;
+-        }
+-
+-        domEffectRef effect = _WriteEffect(geometry_id, ambient, diffuse);
+-
+-        // <material id="g1.link0.geom0.eff">
+-        domMaterialRef dommaterial = daeSafeCast<domMaterial>(_materialsLib->add(COLLADA_ELEMENT_MATERIAL));
+-        string material_id = geometry_id + string("_mat");
+-        dommaterial->setId(material_id.c_str());
+-        {
+-            // <instance_effect url="#g1.link0.geom0.eff"/>
+-            domInstance_effectRef instance_effect = daeSafeCast<domInstance_effect>(dommaterial->add(COLLADA_ELEMENT_INSTANCE_EFFECT));
+-            string effect_id(effect->getId());
+-            instance_effect->setUrl((string("#") + effect_id).c_str());
++        for (uint32_t i = 0; i < sceneWithMaterial->mNumMaterials; i++) {
++            aiString name;
++            sceneWithMaterial->mMaterials[i]->Get(AI_MATKEY_NAME,name);
++            string effid = geometry_id+string("_")+string(name.C_Str())+string("_eff");
++            string matid = geometry_id+string("_")+string(name.C_Str())+string("_mat");
++            domMaterialRef pdommat = daeSafeCast<domMaterial>(_materialsLib->add(COLLADA_ELEMENT_MATERIAL));
++            pdommat->setId(matid.c_str());
++            domInstance_effectRef pdominsteff = daeSafeCast<domInstance_effect>(pdommat->add(COLLADA_ELEMENT_INSTANCE_EFFECT));
++            pdominsteff->setUrl((string("#")+effid).c_str());
++            urdf::Color ambient, diffuse;
++            ambient.init("0.1 0.1 0.1 0");
++            diffuse.init("1 1 1 0");
++
++            if( !!material ) {
++                ambient.r = diffuse.r = material->color.r;
++                ambient.g = diffuse.g = material->color.g;
++                ambient.b = diffuse.b = material->color.b;
++                ambient.a = diffuse.a = material->color.a;
++            }else{
++                aiColor3D _ambient(0.f,0.f,0.f);
++                sceneWithMaterial->mMaterials[i]->Get(AI_MATKEY_COLOR_AMBIENT,_ambient);
++                aiColor3D _diffuse(0.f,0.f,0.f);
++                sceneWithMaterial->mMaterials[i]->Get(AI_MATKEY_COLOR_DIFFUSE,_diffuse);
++                ambient.r = _ambient.r;
++                ambient.g = _ambient.g;
++                ambient.b = _ambient.b;
++                ambient.a = 0.0;
++                diffuse.r = _diffuse.r;
++                diffuse.g = _diffuse.g;
++                diffuse.b = _diffuse.b;
++                diffuse.a = 0.0;
++            }
++            domEffectRef effect = _WriteEffect(effid, ambient, diffuse);
+         }
+-        // </material>
+-
+-        domEffectRef pdomeff = _WriteEffect(effid, ambient, diffuse);
+     }
+ 
+     boost::shared_ptr<instance_physics_model_output> _WriteInstance_physics_model(int id, daeElementRef parent, const string& sidscope, const MAPLINKPOSES& maplinkposes)
+@@ -1437,17 +1458,13 @@ class ColladaWriter : public daeErrorHandler
+         return pmout;
+     }
+ 
+-    void _loadVertices(const shapes::Mesh *mesh, domGeometryRef pdomgeom) {
++    void _loadVertices(const shapes::Mesh *mesh, domGeometryRef pdomgeom, const aiScene* &sceneWithMaterial, std::vector<int>& usedMaterialIndex) {
+ 
+         // convert the mesh into an STL binary (in memory)
+         std::vector<char> buffer;
+         shapes::writeSTLBinary(mesh, buffer);
+-
+-        // Create an instance of the Importer class
+-        Assimp::Importer importer;
+-
+         // And have it read the given file with some postprocessing
+-        const aiScene* scene = importer.ReadFileFromMemory(reinterpret_cast<const void*>(&buffer[0]), buffer.size(),
++        const aiScene* scene = _rawimporter.ReadFileFromMemory(reinterpret_cast<const void*>(&buffer[0]), buffer.size(),
+                                                            aiProcess_Triangulate            |
+                                                            aiProcess_JoinIdenticalVertices  |
+                                                            aiProcess_SortByPType            |
+@@ -1486,11 +1503,13 @@ class ColladaWriter : public daeErrorHandler
+             pvertinput->setSemantic("POSITION");
+             pvertinput->setSource(domUrifragment(*pvertsource, std::string("#")+std::string(pvertsource->getID())));
+         }
+-        _buildAiMesh(scene,scene->mRootNode,pdommesh,parray, pdomgeom->getID(), urdf::Vector3(1,1,1));
++        _buildAiMesh(scene,scene->mRootNode,pdommesh,parray, pdomgeom->getID(), urdf::Vector3(1,1,1),usedMaterialIndex);
+         pacc->setCount(parray->getCount());
++
++        sceneWithMaterial = scene;
+     }
+ 
+-    void _loadMesh(std::string const& filename, domGeometryRef pdomgeom, const urdf::Vector3& scale, urdf::Pose *org_trans)
++    void _loadMesh(std::string const& filename, domGeometryRef pdomgeom, const urdf::Vector3& scale, urdf::Pose *org_trans, const aiScene* &sceneWithMaterial, std::vector<int>& usedMaterialIndex)
+     {
+         const aiScene* scene = _importer.ReadFile(filename, aiProcess_SortByPType|aiProcess_Triangulate); //|aiProcess_GenNormals|aiProcess_GenUVCoords|aiProcess_FlipUVs);
+         if( !scene ) {
+@@ -1535,11 +1554,12 @@ class ColladaWriter : public daeErrorHandler
+             pvertinput->setSemantic("POSITION");
+             pvertinput->setSource(domUrifragment(*pvertsource, string("#")+string(pvertsource->getID())));
+         }
+-        _buildAiMesh(scene,scene->mRootNode,pdommesh,parray, pdomgeom->getID(),scale,org_trans);
++        _buildAiMesh(scene,scene->mRootNode,pdommesh,parray, pdomgeom->getID(),scale,usedMaterialIndex, org_trans);
+         pacc->setCount(parray->getCount());
++        sceneWithMaterial = scene;
+     }
+ 
+-    void _buildAiMesh(const aiScene* scene, aiNode* node, domMeshRef pdommesh, domFloat_arrayRef parray, const string& geomid, const urdf::Vector3& scale, urdf::Pose *org_trans = NULL)
++    void _buildAiMesh(const aiScene* scene, aiNode* node, domMeshRef pdommesh, domFloat_arrayRef parray, const string& geomid, const urdf::Vector3& scale, std::vector<int>& usedMaterialIndex, urdf::Pose *org_trans = NULL)
+     {
+         if( !node ) {
+             return;
+@@ -1564,10 +1584,10 @@ class ColladaWriter : public daeErrorHandler
+             }
+ 
+             parray->getValue().grow(parray->getCount()+nTotalVertices*3);
+-            parray->setCount(parray->getCount()+nTotalVertices);
+ 
+             for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+                 aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
++                parray->setCount(parray->getCount()+input_mesh->mNumVertices);
+                 for (uint32_t j = 0; j < input_mesh->mNumVertices; j++) {
+                     aiVector3D p = input_mesh->mVertices[j];
+                     p *= transform;
+@@ -1587,14 +1607,9 @@ class ColladaWriter : public daeErrorHandler
+                         parray->getValue().append(p.z*scale.z);
+                     }
+                 }
+-            }
+ 
+-            // in order to save space, separate triangles from poly lists
+-
+-            vector<int> triangleindices, otherindices;
+-            int nNumOtherPrimitives = 0;
+-            for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+-                aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
++                int nNumOtherPrimitives = 0;
++                vector<int> triangleindices, otherindices;
+                 uint32_t indexCount = 0, otherIndexCount = 0;
+                 for (uint32_t j = 0; j < input_mesh->mNumFaces; j++) {
+                     aiFace& face = input_mesh->mFaces[j];
+@@ -1605,8 +1620,8 @@ class ColladaWriter : public daeErrorHandler
+                         otherIndexCount += face.mNumIndices;
+                     }
+                 }
+-                triangleindices.reserve(triangleindices.size()+indexCount);
+-                otherindices.reserve(otherindices.size()+otherIndexCount);
++                triangleindices.reserve(indexCount);
++                otherindices.reserve(otherIndexCount);
+                 for (uint32_t j = 0; j < input_mesh->mNumFaces; j++) {
+                     aiFace& face = input_mesh->mFaces[j];
+                     if( face.mNumIndices == 3 ) {
+@@ -1621,42 +1636,44 @@ class ColladaWriter : public daeErrorHandler
+                         nNumOtherPrimitives++;
+                     }
+                 }
+-                vertexOffset += input_mesh->mNumVertices;
+-            }
+ 
+-            if( triangleindices.size() > 0 ) {
+-                domTrianglesRef ptris = daeSafeCast<domTriangles>(pdommesh->add(COLLADA_ELEMENT_TRIANGLES));
+-                ptris->setCount(triangleindices.size()/3);
+-                ptris->setMaterial("mat0");
+-                domInput_local_offsetRef pvertoffset = daeSafeCast<domInput_local_offset>(ptris->add(COLLADA_ELEMENT_INPUT));
+-                pvertoffset->setSemantic("VERTEX");
+-                pvertoffset->setOffset(0);
+-                pvertoffset->setSource(domUrifragment(*pdommesh->getVertices(), str(boost::format("#%s/vertices")%geomid)));
+-                domPRef pindices = daeSafeCast<domP>(ptris->add(COLLADA_ELEMENT_P));
+-                pindices->getValue().setCount(triangleindices.size());
+-                for(size_t ind = 0; ind < triangleindices.size(); ++ind) {
+-                    pindices->getValue()[ind] = triangleindices[ind];
++                if( triangleindices.size() > 0 ) {
++                    domTrianglesRef ptris = daeSafeCast<domTriangles>(pdommesh->add(COLLADA_ELEMENT_TRIANGLES));
++                    ptris->setCount(triangleindices.size()/3);
++                    aiString name;
++                    scene->mMaterials[input_mesh->mMaterialIndex]->Get(AI_MATKEY_NAME,name);
++                    ptris->setMaterial(name.C_Str());
++                    usedMaterialIndex.push_back(input_mesh->mMaterialIndex);
++                    domInput_local_offsetRef pvertoffset = daeSafeCast<domInput_local_offset>(ptris->add(COLLADA_ELEMENT_INPUT));
++                    pvertoffset->setSemantic("VERTEX");
++                    pvertoffset->setOffset(0);
++                    pvertoffset->setSource(domUrifragment(*pdommesh->getVertices(), str(boost::format("#%s/vertices")%geomid)));
++                    domPRef pindices = daeSafeCast<domP>(ptris->add(COLLADA_ELEMENT_P));
++                    pindices->getValue().setCount(triangleindices.size());
++                    for(size_t ind = 0; ind < triangleindices.size(); ++ind) {
++                        pindices->getValue()[ind] = triangleindices[ind];
++                    }
+                 }
+-            }
+ 
+-            if( nNumOtherPrimitives > 0 ) {
+-                domPolylistRef ptris = daeSafeCast<domPolylist>(pdommesh->add(COLLADA_ELEMENT_POLYLIST));
+-                ptris->setCount(nNumOtherPrimitives);
+-                ptris->setMaterial("mat0");
+-                domInput_local_offsetRef pvertoffset = daeSafeCast<domInput_local_offset>(ptris->add(COLLADA_ELEMENT_INPUT));
+-                pvertoffset->setSemantic("VERTEX");
+-                pvertoffset->setSource(domUrifragment(*pdommesh->getVertices(), str(boost::format("#%s/vertices")%geomid)));
+-                domPRef pindices = daeSafeCast<domP>(ptris->add(COLLADA_ELEMENT_P));
+-                pindices->getValue().setCount(otherindices.size());
+-                for(size_t ind = 0; ind < otherindices.size(); ++ind) {
+-                    pindices->getValue()[ind] = otherindices[ind];
+-                }
++                if( nNumOtherPrimitives > 0 ) {
++                    domPolylistRef ptris = daeSafeCast<domPolylist>(pdommesh->add(COLLADA_ELEMENT_POLYLIST));
++                    ptris->setCount(nNumOtherPrimitives);
++                    aiString name;
++                    scene->mMaterials[input_mesh->mMaterialIndex]->Get(AI_MATKEY_NAME,name);
++                    ptris->setMaterial(name.C_Str());
++                    usedMaterialIndex.push_back(input_mesh->mMaterialIndex);
++                    domInput_local_offsetRef pvertoffset = daeSafeCast<domInput_local_offset>(ptris->add(COLLADA_ELEMENT_INPUT));
++                    pvertoffset->setSemantic("VERTEX");
++                    pvertoffset->setSource(domUrifragment(*pdommesh->getVertices(), str(boost::format("#%s/vertices")%geomid)));
++                    domPRef pindices = daeSafeCast<domP>(ptris->add(COLLADA_ELEMENT_P));
++                    pindices->getValue().setCount(otherindices.size());
++                    for(size_t ind = 0; ind < otherindices.size(); ++ind) {
++                        pindices->getValue()[ind] = otherindices[ind];
++                    }
+ 
+-                domPolylist::domVcountRef pcount = daeSafeCast<domPolylist::domVcount>(ptris->add(COLLADA_ELEMENT_VCOUNT));
+-                pcount->getValue().setCount(nNumOtherPrimitives);
+-                uint32_t offset = 0;
+-                for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+-                    aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
++                    domPolylist::domVcountRef pcount = daeSafeCast<domPolylist::domVcount>(ptris->add(COLLADA_ELEMENT_VCOUNT));
++                    pcount->getValue().setCount(nNumOtherPrimitives);
++                    uint32_t offset = 0;
+                     for (uint32_t j = 0; j < input_mesh->mNumFaces; j++) {
+                         aiFace& face = input_mesh->mFaces[j];
+                         if( face.mNumIndices > 3 ) {
+@@ -1664,11 +1681,12 @@ class ColladaWriter : public daeErrorHandler
+                         }
+                     }
+                 }
++                vertexOffset = parray->getCount();
+             }
+         }
+ 
+         for (uint32_t i=0; i < node->mNumChildren; ++i) {
+-            _buildAiMesh(scene, node->mChildren[i], pdommesh,parray,geomid,scale,org_trans);
++            _buildAiMesh(scene, node->mChildren[i], pdommesh,parray,geomid,scale,usedMaterialIndex,org_trans);
+         }
+     }
+ 
+@@ -1930,7 +1948,7 @@ class ColladaWriter : public daeErrorHandler
+     std::map< urdf::JointConstSharedPtr, int > _mapjointindices;
+     std::map< urdf::LinkConstSharedPtr, int > _maplinkindices;
+     std::map< urdf::MaterialConstSharedPtr, int > _mapmaterialindices;
+-    Assimp::Importer _importer;
++    Assimp::Importer _importer, _rawimporter;
+ };
+ 
+ 

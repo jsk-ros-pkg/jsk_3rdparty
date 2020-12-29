@@ -2,6 +2,41 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * clean up CMakeList.txt find_package
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* remove debug print line in rostwitter to suppress log (`#178 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/178>`_)
+* Contributors: Shingo Kitagawa
+
+2.1.13 (2019-07-10)
+-------------------
+
 2.1.12 (2019-05-25)
 -------------------
 

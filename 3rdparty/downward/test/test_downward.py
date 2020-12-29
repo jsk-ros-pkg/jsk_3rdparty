@@ -4,7 +4,7 @@
 
 from __future__ import print_function
 import os
-import commands
+import subprocess
 import time
 import sys
 import unittest
@@ -26,7 +26,11 @@ class TestDownward(unittest.TestCase):
                                                                 config,
                                                                 plan_path)
         print("EXECUTING: ", cmd, file=sys.stderr)
-        (status, output) = commands.getstatusoutput(cmd)
+        status = 0
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            status = e.returncode
         print("DOWNWARD STATUS: %d, OUTPUT: %s" % (status, output), file=sys.stderr)
         self.assertEqual(status, 0)
 

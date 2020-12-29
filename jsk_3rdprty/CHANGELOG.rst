@@ -2,6 +2,38 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+* add gdrive_ros package (`#182 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/182>`_)
+* [dialogflow_task_executive] add dialogflow_task_executive run_depend in jsk_3rdparty (`#183 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/183>`_)
+* Contributors: Shingo Kitagawa
+
+2.1.14 (2019-11-21)
+-------------------
+* Add sesame_ros package (`#176 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/176>`_)
+* Contributors: Yuto Uchimi
+
+2.1.13 (2019-07-10)
+-------------------
+
 2.1.12 (2019-05-25)
 -------------------
 

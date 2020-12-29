@@ -5,7 +5,7 @@
 #include <image_transport/image_transport.h>
 #include <camera_calibration_parsers/parse.h>
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
 #include <dynamic_reconfigure/server.h>

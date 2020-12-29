@@ -2,9 +2,14 @@
 # -*- coding: utf-8 -*-
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
-from cStringIO import StringIO
+# https://stackoverflow.com/questions/11914472/stringio-in-python3
+try:
+    from cStringIO import StringIO ## for Python 2
+except ImportError:
+    from io import StringIO ## for Python 3
 import os
 import re
+import sys
 import rospkg
 import rospy
 import subprocess
@@ -23,26 +28,37 @@ def is_hiragana(s):
 
 def readlines_with_utf8(path):
     assert os.path.exists(path)
-    return subprocess.check_output(["nkf", "-w", path]).split(os.linesep)
+    sep = os.linesep
+    if sys.version_info.major >=  3:
+        sep = sep.encode()
+    return subprocess.check_output(["nkf", "-w", path]).split(sep)
 
 
 def load_grammar(path, name):
     assert os.path.isdir(path)
     g = Grammar()
     grammar_path = os.path.join(path, "%s.grammar" % name)
+    sep = ':'
+    if sys.version_info.major >=  3:
+        sep = sep.encode()
     for l in readlines_with_utf8(grammar_path):
             l = l.strip()
             if l:
-                sym, defi = l.strip().split(':')
+                sym, defi = l.strip().split(sep)
                 r = PhraseRule()
                 r.symbol = sym.strip()
                 r.definition = [d.strip() for d in defi.split()]
                 g.rules.append(r)
     voca_path = os.path.join(path, "%s.voca" % name)
     voca = None
+    sep = '%'
+    spc = ' '
+    if sys.version_info.major >=  3:
+        sep = sep.encode()
+        spc = spc.encode()
     for l in readlines_with_utf8(voca_path):
         l = l.strip()
-        if l.startswith('%'):
+        if l.startswith(sep):
             g.categories.append(l[1:].strip())
             if voca:
                 g.vocabularies.append(voca)
@@ -50,7 +66,7 @@ def load_grammar(path, name):
         elif l:
             sp = l.strip().split()
             voca.words.append(sp[0])
-            voca.phonemes.append(' '.join(sp[1:]))
+            voca.phonemes.append(spc.join(sp[1:]))
     if voca:
         g.vocabularies.append(voca)
     return g
@@ -83,9 +99,18 @@ def make_phonemes_from_words(words):
 def make_grammar_from_rules(rules):
     ss = StringIO()
     for r in rules:
+        symbol = r.symbol
+        definition = r.definition
+        if type(symbol) == bytes:
+            symbol = symbol.decode()
+        if len(definition) > 0:
+            if type(definition[0]) == bytes:
+                definition = b' '.join(definition).decode()
+            else:
+                definition = ' '.join(definition)
         ss.write("{symbol}: {definition}{linesep}".format(
-            symbol=r.symbol,
-            definition=" ".join(r.definition),
+            symbol=symbol,
+            definition=definition,
             linesep=os.linesep))
     return ss.getvalue()
 
@@ -93,6 +118,8 @@ def make_grammar_from_rules(rules):
 def make_voca_from_categories(cats, vocas):
     ss = StringIO()
     for c, vs in zip(cats, vocas):
+        if type(c) == bytes:
+            c = c.decode()
         ss.write("% {category}{linesep}".format(
             category=c,
             linesep=os.linesep))
@@ -100,6 +127,10 @@ def make_voca_from_categories(cats, vocas):
         if len(phonemes) == 0:
             phonemes = make_phonemes_from_words(vs.words)
         for w, p in zip(vs.words, phonemes):
+            if type(w) == bytes:
+                w = w.decode()
+            if type(p) == bytes:
+                p = p.decode()
             ss.write("{word}\t{phoneme}{linesep}{linesep}".format(
                 word=w,
                 phoneme=p,
@@ -118,11 +149,19 @@ def make_dfa(grammar, voca):
 
     cmd = ["rosrun", "julius", "mkdfa.pl", name]
     rospy.logdebug("Executing %s" % cmd)
-    p = subprocess.Popen(cmd,
-                         stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE,
-                         cwd=temp_dir)
+    if sys.version_info.major >= 3:
+        p = subprocess.Popen(cmd,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             encoding='utf8',
+                             cwd=temp_dir)
+    else:
+        p = subprocess.Popen(cmd,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             cwd=temp_dir)
     result, error = p.communicate(temp_dir)
     rospy.logdebug("STDOUT: %s" % result)
     rospy.logdebug("STDERR: %s" % error)

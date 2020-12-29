@@ -2,6 +2,65 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * respeaker_ros: use catkin_install_python to install scripts
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* [respeaker_ros] use rospy.logerr instead of print (`#206 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/206>`_)
+* Add args to ros_speech_recognition (`#197 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/197>`_)
+
+  * [respeaker_ros] update run_depend and test file to pass travis test properly
+
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+* [respeaker_ros] increase timeout to pass the test https://api.travis-ci.org/v3/job/554008643/log.txt
+* Contributors: Kei Okada
+
+2.1.15 (2019-12-12)
+-------------------
+* [respeaker_ros] add pixel-ring in run_depend of respeaker_ros (`#184 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/184>`_)
+* [respeaker_ros] install config dir in respeaker_ros (`#185 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/185>`_)
+* Contributors: Shingo Kitagawa
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+* [respeaker_ros] increase timeout to pass the test (`#170 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/170>`_)
+
+  * default tts_action_names should be soundplay
+  * [respeaker_ros] increase timeout to pass the test https://api.travis-ci.org/v3/job/554008643/log.txt
+  * [respeaker_ros] add python-speechrocognition-pip to package.depends, because scripts/speech_to_text.py depends on it
+
+* [respeaker_ros] Add test file for speech_to_text (`#164 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/164>`_)
+
+  * add test file for speech_to_text
+
+* [respeaker_ros] add tts_action_names param: do not listen when the robot is speaking either japanese or english (`#168 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/168>`_)
+
+  * add tts_actions param: do not listen when the robot is speaking either japanese or english
+
+* Contributors: Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.12 (2019-05-25)
 -------------------
 * Make sample_respeaker.launch re-usable (`#161 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/161>`_)

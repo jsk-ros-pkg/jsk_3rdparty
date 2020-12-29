@@ -6,6 +6,7 @@ import actionlib
 import rospy
 import speech_recognition as SR
 import json
+import array
 from threading import Lock
 
 from audio_common_msgs.msg import AudioData
@@ -20,23 +21,25 @@ from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
 
 
 class ROSAudio(SR.AudioSource):
-    def __init__(self, topic_name="audio", depth=16, sample_rate=16000, chunk_size=1024, buffer_size=10240):
+    def __init__(self, topic_name="audio", depth=16, n_channel=1,
+                 sample_rate=16000, chunk_size=1024, buffer_size=10240):
         assert buffer_size > chunk_size
 
         self.topic_name = topic_name
         self.buffer_size = buffer_size
 
         if depth == 8:
-            self.SAMPLE_WIDTH = 1L
+            self.SAMPLE_WIDTH = 1
         elif depth == 16:
-            self.SAMPLE_WIDTH = 2L
+            self.SAMPLE_WIDTH = 2
         elif depth == 32:
-            self.SAMPLE_WIDTH = 4L
+            self.SAMPLE_WIDTH = 4
         else:
             raise ValueError("depth must be 8, 16 or 32")
 
         self.SAMPLE_RATE = sample_rate
         self.CHUNK = chunk_size
+        self.n_channel = n_channel
 
         self.stream = None
 
@@ -44,7 +47,9 @@ class ROSAudio(SR.AudioSource):
         if self.stream is not None:
             self.stream.close()
             self.stream = None
-        self.stream = ROSAudio.AudioStream(self.topic_name, self.buffer_size)
+        self.stream = ROSAudio.AudioStream(
+            self.topic_name, self.buffer_size, depth=self.SAMPLE_WIDTH*8,
+            n_channel=self.n_channel)
         return self
 
     def close(self):
@@ -58,12 +63,19 @@ class ROSAudio(SR.AudioSource):
         self.close()
 
     class AudioStream(object):
-        def __init__(self, topic_name, buffer_size=10240):
+        def __init__(self, topic_name, buffer_size=10240, depth=16,
+                     n_channel=1, target_channel=0):
             self.buffer_size = buffer_size
             self.lock = Lock()
             self.buffer = bytes()
+            self.depth = depth
+            self.n_channel = n_channel
+            self.target_channel = min(self.n_channel - 1, max(0, target_channel))
             self.sub_audio = rospy.Subscriber(
                 topic_name, AudioData, self.audio_cb)
+            self.type_code = {}
+            for code in ['b', 'h', 'i', 'l']:
+                self.type_code[array.array(code).itemsize] = code
 
         def read_once(self, size):
             with self.lock:
@@ -85,7 +97,11 @@ class ROSAudio(SR.AudioSource):
 
         def audio_cb(self, msg):
             with self.lock:
-                self.buffer += bytes(msg.data)
+                dtype = self.type_code[self.depth/8]
+                # take out target_channel channel data from multi channel data
+                data = array.array(dtype, bytes(msg.data)).tolist()
+                chan_data = data[self.target_channel::self.n_channel]
+                self.buffer += array.array(dtype, chan_data).tostring()
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
@@ -96,9 +112,11 @@ class ROSSpeechRecognition(object):
         self.default_duration = rospy.get_param("~duration", 10.0)
         self.engine = None
         self.recognizer = SR.Recognizer()
-        self.audio = ROSAudio(topic_name="audio",
+        self.audio = ROSAudio(topic_name=rospy.get_param("~audio_topic", "audio"),
                               depth=rospy.get_param("~depth", 16),
-                              sample_rate=rospy.get_param("~sample_rate", 16000))
+                              n_channel=rospy.get_param("~n_channel", 1),
+                              sample_rate=rospy.get_param("~sample_rate", 16000),
+                              buffer_size=rospy.get_param("~buffer_size", 10240))
 
         # initialize sound play client
         self.act_sound = actionlib.SimpleActionClient("sound_play", SoundRequestAction)
@@ -175,6 +193,8 @@ class ROSSpeechRecognition(object):
         req = SoundRequest()
         req.sound = SoundRequest.PLAY_FILE
         req.command = SoundRequest.PLAY_ONCE
+        if hasattr(SoundRequest, 'volume'): # volume is added from 0.3.0 https://github.com/ros-drivers/audio_common/commit/da9623414f381642e52f59701c09928c72a54be7#diff-fe2d85580f1ccfed4e23a608df44a7f7
+            req.volume = 1.0
         req.arg = self.signals[key]
         goal = SoundRequestGoal(sound_request=req)
         self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))

@@ -5,8 +5,12 @@
 
 #include "opt_nm33_uvc.h"
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include <opencv2/opencv.hpp>
+#if ( CV_MAJOR_VERSION >= 4)
+#include <opencv2/highgui.hpp>
+#include <opencv2/core/core_c.h>
+#include <opencv2/core/types_c.h>
+#endif
 
 class OptNM3xCamera
 {
