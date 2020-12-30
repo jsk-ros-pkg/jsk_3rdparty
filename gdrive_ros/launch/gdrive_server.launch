@@ -1,6 +1,6 @@
 <launch>
   <arg name="settings_yaml" default="$(env GOOGLE_DRIVE_SETTINGS_YAML)" />
-  <arg name="respawm" default="false" />
+  <arg name="respawn" default="false" />
 
   <node name="gdrive_server" pkg="gdrive_ros" type="gdrive_server_node.py"
         output="screen" respawn="$(arg respawn)">
