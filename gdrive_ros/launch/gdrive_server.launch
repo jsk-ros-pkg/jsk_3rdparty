@@ -1,5 +1,5 @@
 <launch>
-  <arg name="settings_yaml" default="$(env GOOGLE_DRIVE_SETTINGS_YAML)" />
+  <arg name="settings_yaml" default="$(optenv GOOGLE_DRIVE_SETTINGS_YAML /var/lib/robot/pydrive_settings.yaml)" />
   <arg name="respawn" default="false" />
 
   <node name="gdrive_server" pkg="gdrive_ros" type="gdrive_server_node.py"
