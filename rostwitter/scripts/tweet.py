@@ -42,11 +42,15 @@ class Tweet(object):
                     message, filename)
                 # 140 - len("http://t.co/ssssssssss")
                 ret = self.api.post_media(message[0:116], filename)
+                if 'errors' in ret:
+                    rospy.logerr('Failed to post: {}'.format(ret))
                 # ret = self.api.post_update(message)
             else:
                 rospy.logerr(rospy.get_name() + " %s could not find", filename)
         else:
             ret = self.api.post_update(message[0:140])
+            if 'errors' in ret:
+                rospy.logerr('Failed to post: {}'.format(ret))
         # seg faults if message is longer than 140 byte ???
         rospy.loginfo(rospy.get_name() + " receiving %s", ret)
 

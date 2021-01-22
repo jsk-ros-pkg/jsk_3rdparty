@@ -58,8 +58,6 @@ class Twitter(object):
         data = {'status': StringIO(status)}
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
-        if 'error' in data:
-            raise Exception(data)
         return data
 
     def post_media(self, status, media):
@@ -72,6 +70,4 @@ class Twitter(object):
         data['media'] = open(str(media), 'rb').read()
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
-        if 'errors' in data:
-            raise Exception(data)
         return data
