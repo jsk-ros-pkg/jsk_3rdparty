@@ -3,22 +3,27 @@
 import os
 import re
 import sys
-import yaml
 
 import rospy
 from std_msgs.msg import String
 
 from rostwitter.twitter import Twitter
+from rostwitter.util import load_oauth_settings
 
 
 class Tweet(object):
     def __init__(self):
-        self.load_oauth_settings()
+        account_info = rospy.get_param(
+            'account_info', '/var/lib/robot/account.yaml')
+        ckey, csecret, akey, asecret = load_oauth_settings(account_info)
+        if not ckey or not csecret or not akey or not asecret:
+            sys.exit(1)
+
         self.api = Twitter(
-            consumer_key=self.CKEY,
-            consumer_secret=self.CSECRET,
-            access_token_key=self.AKEY,
-            access_token_secret=self.ASECRET)
+            consumer_key=ckey,
+            consumer_secret=csecret,
+            access_token_key=akey,
+            access_token_secret=asecret)
         self.sub = rospy.Subscriber("tweet", String, self.tweet_cb)
 
     def tweet_cb(self, msg):
@@ -44,28 +49,6 @@ class Tweet(object):
             ret = self.api.post_update(message[0:140])
         # seg faults if message is longer than 140 byte ???
         rospy.loginfo(rospy.get_name() + " receiving %s", ret)
-
-    def load_oauth_settings(self):
-        account_info = rospy.get_param(
-            'account_info', '/var/lib/robot/account.yaml')
-
-        try:
-            key = yaml.load(open(account_info))
-            self.CKEY = key['CKEY']
-            self.CSECRET = key['CSECRET']
-            self.AKEY = key['AKEY']
-            self.ASECRET = key['ASECRET']
-        except IOError as e:
-            rospy.logerr(e)
-            rospy.logerr('"%s" not found' % account_info)
-            rospy.logerr("$ get access token from https://apps.twitter.com/")
-            rospy.logerr("cat /var/lib/robot/%s <<EOF" % account_info)
-            rospy.logerr("CKEY: xxx")
-            rospy.logerr("CSECRET: xxx")
-            rospy.logerr("AKEY: xxx")
-            rospy.logerr("ASECRET: xxx")
-            rospy.logerr("EOF")
-            sys.exit(-1)
 
 
 if __name__ == '__main__':
