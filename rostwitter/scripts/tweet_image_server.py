@@ -46,7 +46,8 @@ class TweetImageServer(object):
         ret = None
         success = True
         if req.image:
-            os.remove(self.image_path)
+            if os.path.exists(self.image_path):
+                os.remove(self.image_path)
             self.sub = rospy.Subscriber(
                 req.image_topic_name, Image, self._image_cb)
 
