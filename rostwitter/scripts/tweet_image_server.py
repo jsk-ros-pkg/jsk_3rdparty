@@ -80,6 +80,7 @@ class TweetImageServer(object):
                 warning_text = 'さん'
                 req.warning_time = 3
             warning_text = warning_text + 'びょうまえ'
+            self.client.say(warning_text)
             if req.warning_time > 0:
                 time.sleep(req.warning_time)
             wave_path = os.path.join(
