@@ -4,6 +4,7 @@ import datetime
 import os.path
 import sys
 
+from httplib2 import ServerNotFoundError
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from pydrive.files import ApiRequestError
@@ -60,7 +61,7 @@ class GDriveServerNode(object):
             try:
                 parents_id = self._get_parents_id(
                     parents_path, mkdir=True)
-            except (ValueError, ApiRequestError) as e:
+            except (ValueError, ApiRequestError, ServerNotFoundError) as e:
                 rospy.logerr(e)
                 rospy.logerr(
                     'Failed to get parents_id: {}'.format(parents_path))
@@ -73,7 +74,7 @@ class GDriveServerNode(object):
             try:
                 parents_id = self._get_parents_id(
                     [timestamp], parents_id=parents_id, mkdir=True)
-            except (ValueError, ApiRequestError) as e:
+            except (ValueError, ApiRequestError, ServerNotFoundError) as e:
                 rospy.logerr(e)
                 rospy.logerr(
                     'Failed to get parents_id: {} in {}'.format(
@@ -110,7 +111,7 @@ class GDriveServerNode(object):
             try:
                 parents_id = self._get_parents_id(
                     parents_path, mkdir=True)
-            except (ValueError, ApiRequestError) as e:
+            except (ValueError, ApiRequestError, ServerNotFoundError) as e:
                 rospy.logerr(e)
                 rospy.logerr(
                     'Failed to get parents_id: {}'.format(parents_path))
@@ -123,7 +124,7 @@ class GDriveServerNode(object):
             try:
                 parents_id = self._get_parents_id(
                     [timestamp], parents_id=parents_id, mkdir=True)
-            except (ValueError, ApiRequestError) as e:
+            except (ValueError, ApiRequestError, ServerNotFoundError) as e:
                 rospy.logerr(e)
                 rospy.logerr(
                     'Failed to get parents_id: {} in {}'.format(
@@ -160,7 +161,7 @@ class GDriveServerNode(object):
             success = True
             rospy.loginfo(
                 'Success to upload: {} -> {}'.format(file_path, file_url))
-        except (OSError, ApiRequestError) as e:
+        except (OSError, ApiRequestError, ServerNotFoundError) as e:
             rospy.logerr(e)
             rospy.logerr(
                 'Failed to upload: {} -> {}'.format(file_path, folder_url))
