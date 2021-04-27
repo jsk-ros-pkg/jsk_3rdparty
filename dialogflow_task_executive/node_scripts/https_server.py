@@ -10,18 +10,21 @@ import logging
 import json
 
 class Server():
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
+    def __init__(self):
         rospack = rospkg.RosPack()
+        httpsconffile = rospack.get_path('dialogflow_task_executive') + "/config/https.json"
         certfile = rospack.get_path('dialogflow_task_executive') + "/auth/certfile.json"
+        with open(httpsconffile) as f:
+            json_dict = json.load(f)
+            self.host = json_dict['ip']
+            self.port = int(json_dict['port'])
         with open(certfile) as f:
             json_dict = json.load(f)
             self._certfile_path = json_dict['certfile']
             self._keyfile_path = json_dict['keyfile']
         self._run_handler()
-        rospy.on_shutdown(self.killnode)
         rospy.init_node('dialogflow_https_server')
+        rospy.on_shutdown(self.killnode)
         
     def killnode(self):
         self.httpd.shutdown()
@@ -33,10 +36,10 @@ class Server():
         
 class DialogFlowHandler(s.BaseHTTPRequestHandler):
     """
-    The HTTPS response to react the POST from Google DialogFlow.
+    The HTTPS response to react the POST from Google DialogFlow and publish a ROS topic.
     """
     def __init__(self, *args):
-        self.pub = rospy.Publisher('dialog_response', DialogResponse, queue_size=10)
+        self.pub = rospy.Publisher('dialog_response', DialogResponse, queue_size=1)
         s.BaseHTTPRequestHandler.__init__(self, *args)
     
     def do_POST(self):
@@ -61,10 +64,10 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
         msg.response = self.json_content['queryResult']['fulfillmentText']
         if self.json_content['queryResult']['allRequiredParamsPresent'] == 'True':
             msg.fulfilled = True
-        msg.parameters = str(self.json_content['queryResult']['parameters'])
+        msg.parameters = json.dumps(self.json_content['queryResult']['parameters'])
         msg.speech_score = 1.0
         msg.intent_score = self.json_content['queryResult']['intentDetectionConfidence']
-        print(msg)
+        # print(msg)
         self.pub.publish(msg)
         
     def _response(self):
@@ -87,12 +90,15 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
 
         
 if __name__ == '__main__':
+    try:
+        # logging.basicConfig(level=logging.DEBUG)
+        server = Server()
+        rospy.loginfo('DialogFlow HTTPS Server starts - %s:%s' % (server.host, server.port))
 
-    logging.basicConfig(level=logging.DEBUG)
-    server = Server(host='0.0.0.0', port=8080)
-    rospy.loginfo('DialogFlow HTTPS Server starts - %s:%s' % (server.host, server.port))
-    server.httpd.serve_forever()
-    rospy.spin()
+    except:
+        pass
 
-    if rospy.is_shutdown():
-        server.killnode()
+    while not rospy.is_shutdown():
+        server.httpd.serve_forever()
+
+    server.killnode()
