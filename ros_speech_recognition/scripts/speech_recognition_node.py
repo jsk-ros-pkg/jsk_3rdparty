@@ -5,6 +5,7 @@
 import actionlib
 import rospy
 import speech_recognition as SR
+from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import json
 import array
 import sys
@@ -112,7 +113,7 @@ class ROSSpeechRecognition(object):
     def __init__(self):
         self.default_duration = rospy.get_param("~duration", 10.0)
         self.engine = None
-        self.recognizer = SR.Recognizer()
+        self.recognizer = RecognizerEx() # Use custom Recognizer to support exteded API
         self.audio = ROSAudio(topic_name=rospy.get_param("~audio_topic", "audio"),
                               depth=rospy.get_param("~depth", 16),
                               n_channel=rospy.get_param("~n_channel", 1),
@@ -216,6 +217,8 @@ class ROSSpeechRecognition(object):
                     credentials_json = None
                 self.args = {'credentials_json': credentials_json,
                              'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None)}
+                if rospy.has_param('~diarizationConfig') :
+                    self.args.update({'user_config': {'diarizationConfig': rospy.get_param('~diarizationConfig') }})
             recog_func = self.recognizer.recognize_google_cloud
         elif self.engine == Config.SpeechRecognition_Sphinx:
             recog_func = self.recognizer.recognize_sphinx
