@@ -7,6 +7,7 @@ import rospy
 import speech_recognition as SR
 import json
 import array
+import sys
 from threading import Lock
 
 from audio_common_msgs.msg import AudioData
@@ -244,6 +245,10 @@ class ROSSpeechRecognition(object):
                 rospy.loginfo("Updated energy threshold to %f" % self.recognizer.energy_threshold)
         except SR.RequestError as e:
             rospy.logerr("Failed to recognize: %s" % str(e))
+        except SR.UnknownValueError as e:
+            rospy.logerr("Failed to recognize: %s" % str(e))
+        except:
+            rospy.logerr("Unexpected error: %s" % str(sys.exc_info()))
 
     def start_speech_recognition(self):
         if self.dynamic_energy_threshold:
