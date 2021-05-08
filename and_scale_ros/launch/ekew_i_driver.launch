@@ -1,0 +1,8 @@
+<launch>
+  <node name="ekew_i_driver" pkg="and_scale_ros" type="ekew_i_driver.py" respawn="true">
+    <rosparam>
+      port: /dev/ttyUSB0
+      timeout: 1
+    </rosparam>
+  </node>
+</launch>
