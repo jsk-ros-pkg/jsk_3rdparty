@@ -1,15 +1,15 @@
 <launch>
-  <arg name="launch_sound_play" default="true" />
-  <arg name="launch_audio_capture" default="true" />
+  <arg name="launch_sound_play" default="true" doc="Launch sound_play node to speak" />
+  <arg name="launch_audio_capture" default="true" doc="Launch audio_capture node to publish audio topic from microphone" />
 
-  <arg name="audio_topic" default="/audio" />
-  <arg name="n_channel" default="1" />
-  <arg name="depth" default="16" />
-  <arg name="sample_rate" default="16000" />
-  <arg name="device" default="" />
-  <arg name="engine" default="Google" />
-  <arg name="language" default="en-US" />
-  <arg name="continuous" default="false" />
+  <arg name="audio_topic" default="/audio" doc="Name of audio topic captured from microphone" />
+  <arg name="n_channel" default="1" doc="Number of channels of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
+  <arg name="depth" default="16" doc="Bit depth of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
+  <arg name="sample_rate" default="16000" doc="Frame rate of audio topic and microphone. '$ pactl list short sinks' to check your hardware"/>
+  <arg name="device" default="" doc="Card and device number of microphone (e.g. hw:0,0). you can check card number and device number by '$ arecord -l', then uses hw:[card number],[device number]" />
+  <arg name="engine" default="Google" doc="Speech to text engine. TTS engine, Google, GoogleCloud, Sphinx, Wit, Bing Houndify, IBM" />
+  <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
+  <arg name="continuous" default="false" doc="If false, /speech_recognition service is published. If true, /Tablet/voice topic is published." />
 
   <!-- sound play -->
   <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
@@ -27,8 +27,8 @@
       channels: $(arg n_channel)
       depth: $(arg depth)
       sample_rate: $(arg sample_rate)
-      device: $(arg device)
     </rosparam>
+    <param name="device" value="$(arg device)" />
   </node>
 
   <node name="speech_recognition"
