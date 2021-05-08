@@ -165,9 +165,13 @@ class RespeakerInterface(object):
 
         length = 8
 
-        response = self.dev.ctrl_transfer(
-            usb.util.CTRL_IN | usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE,
-            0, cmd, id, length, self.TIMEOUT)
+        try:
+            response = self.dev.ctrl_transfer(
+                usb.util.CTRL_IN | usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE,
+                0, cmd, id, length, self.TIMEOUT)
+        except usb.core.USBError as e:
+            rospy.logerr(e)
+            rospy.signal_shutdown('Shutdown this node because of USBError')
 
         response = struct.unpack(b'ii', response.tostring())
 
