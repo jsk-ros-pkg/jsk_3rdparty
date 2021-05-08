@@ -1,4 +1,11 @@
 language: c++
+cache:
+  apt: true
+  pip: true
+  directories:
+    - $HOME/.ccache
+    - $HOME/.cache/pip
+    - $HOME/apt-cacher-ng
 sudo: required
 dist: bionic
 services:
