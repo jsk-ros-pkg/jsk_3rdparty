@@ -1,0 +1,19 @@
+#
+uint8 ADD=0
+uint8 DELETE=1
+uint8 DELETEALL=2
+
+# Req
+Header header
+int32 id
+
+int32 action
+
+geometry_msgs/Pose pose
+
+string stream_topic_audio
+string stream_topic_info
+
+---
+# Res
+bool is_success

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>spatial_audio</name>
+  <version>0.1.0</version>
+  <description>The spatial_audio package</description>
+
+  <author email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</author>
+  <maintainer email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>libopenal-dev</build_depend>
+
+  <build_depend>audio_stream_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>spatial_audio_msgs</build_depend>
+  <build_depend>tf2</build_depend>>
+  <build_depend>tf2_ros</build_depend>>
+  <build_depend>tf2_geometry_msgs</build_depend>>
+
+  <exec_depend>audio_stream_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>spatial_audio_msgs</exec_depend>
+  <exec_depend>tf2</exec_depend>>
+  <exec_depend>tf2_ros</exec_depend>>
+  <exec_depend>tf2_geometry_msgs</exec_depend>>
+
+  <export>
+
+  </export>
+</package>
