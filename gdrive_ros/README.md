@@ -19,11 +19,11 @@ catkin build
 
 ### Do authentication of Google Drive API
 
-Please follow step 1-5 in [here](https://gsuitedevs.github.io/PyDrive/docs/build/html/quickstart.html#authentication).
+Please follow step 1-5 in [here](https://pythonhosted.org/PyDrive/quickstart.html#quickstart).
 
 ### Create your settings yaml
 
-Please follow [here](https://gsuitedevs.github.io/PyDrive/docs/build/html/oauth.html#sample-settings-yaml).
+Please follow [here](https://pythonhosted.org/PyDrive/oauth.html#automatic-and-custom-authentication-with-settings-yaml).
 
 My settings yaml is as follows;
 
