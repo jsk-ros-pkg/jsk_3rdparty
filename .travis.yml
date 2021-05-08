@@ -1,4 +1,11 @@
 language: c++
+cache:
+  apt: true
+  pip: true
+  directories:
+    - $HOME/.ccache
+    - $HOME/.cache/pip
+    - $HOME/apt-cacher-ng
 sudo: required
 dist: bionic
 services:
@@ -24,6 +31,7 @@ matrix:
     - env: ROS_DISTRO=noetic  USE_DEB=true
 script:
   - if [ "${CHECK_PYTHON3_COMPILE}" == "true" ]; then python3 -m compileall .; exit $?; fi
+  - if [ "$ROS_DISTRO" == "indigo" ]; then export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0; $BEFORE_SCRIPT"; fi
   - source .travis/travis.sh
 notifications:
   email:
