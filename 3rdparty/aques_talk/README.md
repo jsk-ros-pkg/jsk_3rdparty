@@ -4,6 +4,20 @@ ROS Interface for AqeusTalk2
 
 ## Usage
 
+### Build aques_talk
+```bash
+mkdir -p catkin_ws/src
+cd  catkin_ws/src
+wstool init .
+wstool set --git jsk-ros-pkg/jsk_3rdparty https://github.com/jsk-ros-pkg/jsk_3rdparty.git -y
+wstool update -t .
+source /opt/ros/$ROS_DISTRO/setup.bash
+rosdep install -y -r --from-paths . --ignore-src
+cd ../
+catkin build aques_talk
+source devel/setup.bash
+```
+
 ### Launch sound_play with AquesTalk2 Text-to-Speech
 
 ```bash

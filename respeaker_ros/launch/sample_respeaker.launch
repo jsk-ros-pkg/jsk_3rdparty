@@ -17,7 +17,8 @@
         args="0 0 0 0 0 0 1 map respeaker_base 100"/>
 
   <node if="$(arg launch_respeaker)"
-        name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py" respawn="true"/>
+        name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
+        respawn="true" respawn_delay="10" />
 
   <node if="$(arg launch_soundplay)"
         name="sound_play" pkg="sound_play" type="soundplay_node.py"/>
