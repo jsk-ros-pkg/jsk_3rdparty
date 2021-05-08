@@ -11,11 +11,13 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>mk</build_depend>
   <build_depend>git</build_depend>
 
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-requests-oauthlib</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-requests-oauthlib</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-requests</exec_depend>
