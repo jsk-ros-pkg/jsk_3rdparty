@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-#! -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import os
 import sys
 import time
 
+import actionlib
 import cv2
 import cv_bridge
 import rospkg
@@ -14,8 +15,10 @@ from sound_play.libsoundplay import SoundClient
 from rostwitter.twitter import Twitter
 from rostwitter.util import load_oauth_settings
 
-from rostwitter.srv import Tweet
-from rostwitter.srv import TweetResponse
+from rostwitter.msg import TweetAction
+from rostwitter.msg import TweetFeedback
+from rostwitter.msg import TweetResult
+
 from sensor_msgs.msg import Image
 
 
@@ -39,78 +42,86 @@ class TweetImageServer(object):
             access_token_secret=asecret)
         self.client = SoundClient(
             blocking=True, sound_action='robotsound_jp')
-        self.server = rospy.Service(
-            '~tweet', Tweet, self._service_cb)
+        self.server = actionlib.SimpleActionServer(
+            '~tweet', TweetAction, self._execute_cb)
 
-    def _service_cb(self, req):
+    def _execute_cb(self, goal):
         ret = None
         success = True
-        if req.image:
+        if goal.image:
             if os.path.exists(self.image_path):
                 os.remove(self.image_path)
             self.sub = rospy.Subscriber(
-                req.image_topic_name, Image, self._image_cb)
+                goal.image_topic_name, Image, self._image_cb)
 
-        if req.warning and req.speak:
-            if req.warning_time <= 0:
+        if goal.warning and goal.speak:
+            if goal.warning_time <= 0:
                 warning_text = 'ぜろ'
-                req.warning_time = 0
-            elif req.warning_time == 1:
+                goal.warning_time = 0
+            elif goal.warning_time == 1:
                 warning_text = 'いち'
-            elif req.warning_time == 2:
+            elif goal.warning_time == 2:
                 warning_text = 'に'
-            elif req.warning_time == 3:
+            elif goal.warning_time == 3:
                 warning_text = 'さん'
-            elif req.warning_time == 4:
+            elif goal.warning_time == 4:
                 warning_text = 'よん'
-            elif req.warning_time == 5:
+            elif goal.warning_time == 5:
                 warning_text = 'ご'
-            elif req.warning_time == 6:
+            elif goal.warning_time == 6:
                 warning_text = 'ろく'
-            elif req.warning_time == 7:
+            elif goal.warning_time == 7:
                 warning_text = 'なな'
-            elif req.warning_time == 8:
+            elif goal.warning_time == 8:
                 warning_text = 'はち'
-            elif req.warning_time == 9:
+            elif goal.warning_time == 9:
                 warning_text = 'きゅう'
-            elif req.warning_time >= 10:
+            elif goal.warning_time >= 10:
                 warning_text = 'じゅう'
-                req.warning_time = 10
+                goal.warning_time = 10
             else:
                 warning_text = 'さん'
-                req.warning_time = 3
+                goal.warning_time = 3
             warning_text = warning_text + 'びょうまえ'
             self.client.say(warning_text)
-            if req.warning_time > 0:
-                time.sleep(req.warning_time)
+            if goal.warning_time > 0:
+                time.sleep(goal.warning_time)
             wave_path = os.path.join(
-                self.pack.get_path('jsk_pr2_startup'),
-                'jsk_pr2_lifelog/camera.wav')
+                self.pack.get_path('rostwitter'),
+                'resource/camera.wav')
             self.client.playWave(wave_path)
 
-        if req.image:
+        if goal.image:
             now = rospy.Time.now()
             while ((rospy.Time.now() - now).to_sec() < self.image_timeout
                     and not os.path.exists(self.image_path)):
                 time.sleep(0.1)
-            if os.path.exists(self.image_path):
-                ret = self.api.post_media(req.text, self.image_path)
+                if self.server.is_preempt_requested():
+                    rospy.logerr('tweet image server preempted')
+                    self.server.set_preempted()
+                    success = False
+                    break
+                feedback = TweetFeedback(stamp=rospy.Time.now())
+                self.server.publish_feedback(feedback)
+            if success and os.path.exists(self.image_path):
+                ret = self.api.post_media(goal.text, self.image_path)
             else:
                 rospy.logerr('cannot find image: {}'.format(self.image_path))
-                ret = self.api.post_update(req.text)
+                ret = self.api.post_update(goal.text)
             self.sub.unregister()
             del self.sub
         else:
-            ret = self.api.post_update(req.text)
+            ret = self.api.post_update(goal.text)
 
         if not ret or 'errors' in ret:
             success = False
             rospy.logerr('Failed to post: {}'.format(ret))
-        if success and req.speak:
-            self.client.say('ついーとしました')
 
-        res = TweetResponse(success=success)
-        return res
+        if success:
+            if goal.speak:
+                self.client.say('ついーとしました')
+            res = TweetResult(success=success)
+            self.server.set_succeeded(res)
 
     def _image_cb(self, msg):
         img = self.bridge.imgmsg_to_cv2(msg)
