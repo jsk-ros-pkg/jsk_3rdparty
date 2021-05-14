@@ -124,7 +124,7 @@ class TweetImageServer(object):
             self.server.set_succeeded(res)
 
     def _image_cb(self, msg):
-        img = self.bridge.imgmsg_to_cv2(msg)
+        img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         cv2.imwrite(self.image_path, img)
 
 
