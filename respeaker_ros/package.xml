@@ -18,10 +18,10 @@
   <exec_depend>speech_recognition_msgs</exec_depend>
   <exec_depend>tf</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-numpy</exec_depend>
-  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python3-numpy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-numpy</exec_depend>
   <exec_depend>python-pixel-ring-pip</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-pyaudio</exec_depend>
-  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python3-pyaudio</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-pyaudio</exec_depend>
   <exec_depend>python-pyusb-pip</exec_depend>
   <exec_depend>python-speechrecognition-pip</exec_depend>
   <test_depend>jsk_tools</test_depend>
