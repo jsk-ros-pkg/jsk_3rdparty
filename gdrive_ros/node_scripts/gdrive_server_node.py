@@ -29,6 +29,7 @@ class GDriveServerNode(object):
         self.share_role = rospy.get_param('~share_role', 'reader')
         self.share_with_link = rospy.get_param('~share_with_link', True)
         auth_max_trial = rospy.get_param('~auth_max_trial', 10)
+        auth_wait_seconds = rospy.get_param('~auth_wait_seconds', 10.0)
         if settings_yaml is not None:
             self.gauth = GoogleAuth(settings_yaml)
         else:
@@ -45,7 +46,7 @@ class GDriveServerNode(object):
             except ServerNotFoundError as e:
                 rospy.logerr('Authentication failed: {}'.format(e))
                 auth_count = auth_count + 1
-                time.sleep(10.0)
+                time.sleep(auth_wait_seconds)
         if not auth_success:
             rospy.logerr('Authentication failed {} times.'.format(auth_max_trial))
             sys.exit(1)
