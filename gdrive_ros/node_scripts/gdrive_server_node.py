@@ -28,7 +28,7 @@ class GDriveServerNode(object):
         self.share_value = rospy.get_param('~share_value', 'anyone')
         self.share_role = rospy.get_param('~share_role', 'reader')
         self.share_with_link = rospy.get_param('~share_with_link', True)
-        auth_max_trial = rospy.get_param('~auth_max_trial', 10)
+        auth_max_trial = rospy.get_param('~auth_max_trial', -1)
         auth_wait_seconds = rospy.get_param('~auth_wait_seconds', 10.0)
         if settings_yaml is not None:
             self.gauth = GoogleAuth(settings_yaml)
@@ -39,7 +39,8 @@ class GDriveServerNode(object):
         rospy.loginfo('Google drive authentication starts.')
         auth_success = False
         auth_count = 0
-        while (not auth_success and auth_count < auth_max_trial):
+        while (not auth_success and
+                (auth_max_trial < 0 or auth_count < auth_max_trial)):
             try:
                 self.gauth.LocalWebserverAuth()
                 auth_success = True
