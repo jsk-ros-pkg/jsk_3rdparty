@@ -48,7 +48,8 @@ class GDriveServerNode(object):
                 auth_count = auth_count + 1
                 time.sleep(auth_wait_seconds)
         if not auth_success:
-            rospy.logerr('Authentication failed {} times.'.format(auth_max_trial))
+            rospy.logerr(
+                'Authentication failed {} times.'.format(auth_max_trial))
             sys.exit(1)
         self.gdrive = GoogleDrive(self.gauth)
         rospy.loginfo('Google drive authentication finished.')
@@ -69,7 +70,8 @@ class GDriveServerNode(object):
 
         if parents_id and parents_path:
             rospy.logerr('parents_path and parents_id is both set.')
-            rospy.logerr('parents_id: {} is selected to upload.'.format(parents_id))
+            rospy.logerr(
+                'parents_id: {} is selected to upload.'.format(parents_id))
             parents_path = ''
 
         if parents_path:
@@ -119,7 +121,8 @@ class GDriveServerNode(object):
 
         if parents_id and parents_path:
             rospy.logerr('parents_path and parents_id is both set.')
-            rospy.logerr('parents_id: {} is selected to upload.'.format(parents_id))
+            rospy.logerr(
+                'parents_id: {} is selected to upload.'.format(parents_id))
             parents_path = ''
 
         if parents_path:
