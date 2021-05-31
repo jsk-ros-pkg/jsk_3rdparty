@@ -1,0 +1,58 @@
+<launch>
+
+  <arg name="use_chaplus" default="true" />
+  <arg name="use_a3rt" default="true" />
+
+  <arg name="launch_sound_play" default="false" />
+  <arg name="launch_audio_capture" default="true" />
+  <arg name="audio_topic" default="/audio" />
+  <arg name="n_channel" default="2" />
+  <arg name="depth" default="16" />
+  <arg name="sample_rate" default="44100" />
+  <arg name="device" default="hw:0,0" />
+  <arg name="engine" default="GoogleCloud" />
+  <arg name="language" default="ja-JP" />
+  <arg name="continuous" default="true" />
+
+  <param name="/speech_recognition/google_cloud_credentials_json"
+         value="$(find ros_speech_recognition)/eternal-byte-236613-4bc6962824d1.json" />
+  <param name="/speech_recognition/diarizationConfig"
+         type="yaml"
+         value="{'enableSpeakerDiarization': True, 'maxSpeakerCount': 3}"/>
+
+  <!-- ros_speech_recognition -->
+  <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch" >
+      <arg name="launch_sound_play" default="$(arg launch_sound_play)" />
+      <arg name="launch_audio_capture" default="$(arg launch_audio_capture)" />
+      <arg name="audio_topic" default="$(arg audio_topic)" />
+      <arg name="n_channel" default="$(arg n_channel)" />
+      <arg name="depth" default="$(arg depth)" />
+      <arg name="sample_rate" default="$(arg sample_rate)" />
+      <arg name="device" default="$(arg device)" />
+      <arg name="engine" value="$(arg engine)" />
+      <arg name="language" value="$(arg language)" />
+      <arg name="continuous" value="$(arg continuous)" />
+  </include>
+
+  <!-- use chaplus API -->
+  <node pkg="chatapi_ros"
+        name="talk_chaplus"
+        type="talk_chaplus.py"
+        output="screen"
+        if="$(arg use_chaplus)"
+        respawn="true">
+    <rosparam command="load"
+              file="$(find chatapi_ros)/settings.yaml" />
+  </node>
+
+  <!-- use a3rt API -->
+  <node pkg="chatapi_ros"
+        name="talk_a3rt"
+        type="talk_a3rt.py"
+        output="screen"
+        if="$(arg use_a3rt)"
+        respawn="true">
+    <rosparam command="load"
+              file="$(find chatapi_ros)/settings.yaml" />
+  </node>
+</launch>

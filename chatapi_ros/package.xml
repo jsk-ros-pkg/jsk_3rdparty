@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>chatapi_ros</name>
+  <version>0.0.0</version>
+  <description>The chatapi_ros package</description>
+
+  <maintainer email="a-fujii@jsk.imi.i.u-tokyo.ac.jp">a-fujii</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>ros_speech_recognition</run_depend>
+
+  <export>
+  </export>
+</package>
