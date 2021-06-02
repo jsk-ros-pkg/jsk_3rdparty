@@ -87,4 +87,4 @@ source devel/setup.bash
 ```
 roslaunch chatapi_ros chatapi.launch
 ```
-You can access the result in rostopics. (`/chatAPI/a3rt` and `/chatAPI/chaplus`)
+You can access the results in rostopics. (`/chatAPI/a3rt` and `/chatAPI/chaplus`)
