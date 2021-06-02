@@ -41,6 +41,7 @@ from std_msgs.msg import String
 import requests
 import json
 import sys
+import re
 
 if sys.version_info.major == 2:
     reload(sys)
@@ -51,7 +52,8 @@ class ChaplusROS(object):
 
     def __init__(self):
 
-        # APIKEYの部分は自分のAPI鍵を代入してください
+        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Chaplus")
+        # please write your apikey to chaplus_ros/apikey.json
         r = rospkg.RosPack()
         apikey_path = rospy.get_param(
             "~chaplus_apikey_file", r.get_path('chaplus_ros')+"/apikey.json")
@@ -65,43 +67,79 @@ class ChaplusROS(object):
                 "echo '{\"apikey\": \00000000\"}' > `rospack find chaplus_ros`/apikey.json")
             sys.exit(e)
 
-        self.headers = {'content-type': 'text/json'}
-        self.url = 'https://www.chaplus.jp/v1/chat?apikey={}'.format(
-            apikey_json['apikey'])
+        if self.chatbot_engine=="Chaplus":
+            self.headers = {'content-type': 'text/json'}
+            self.url = 'https://www.chaplus.jp/v1/chat?apikey={}'.format(
+                apikey_json['apikey'])
+
+        elif self.chatbot_engine=="A3RT":
+            self.apikey = apikey_json['apikey_a3rt']
+            self.endpoint = "https://api.a3rt.recruit-tech.co.jp/talk/v1/smalltalk"
+
+        else:
+            rospy.logerr("please use chatbot_engine Chaplus or A3RT")
+            sys.exit(1)
 
         # define pub/sub
         self.pub = rospy.Publisher('response', String, queue_size=1)
         rospy.Subscriber("request", String, self.topic_cb)
 
     def topic_cb(self, msg):
-        # chaplusを利用
-        try:
-            rospy.loginfo("received {}".format(msg.data))
-            self.data = json.dumps({'utterance': msg.data})
-            response = requests.post(
-                url=self.url, headers=self.headers, data=self.data)
-            response_json = response.json()
-            if not response_json.has_key('bestResponse'):
-                raise Exception(response_json)
-        except Exception as e:
-            rospy.logerr("Failed to reqeust url={}, headers={}, data={}".format(
-                self.url, self.headers, self.data))
-            rospy.logerr(e)
-            return None
+        # use chaplus
+        if self.chatbot_engine=="Chaplus":
+            try:
+                rospy.loginfo("received {}".format(msg.data))
+                self.data = json.dumps({'utterance': msg.data})
+                response = requests.post(
+                    url=self.url, headers=self.headers, data=self.data)
+                response_json = response.json()
+                if not response_json.has_key('bestResponse'):
+                    best_response = "ごめんなさい、よくわからないです"
+                else:
+                    best_response = response_json['bestResponse']['utterance']
+            except Exception as e:
+                rospy.logerr("Failed to reqeust url={}, headers={}, data={}".format(
+                    self.url, self.headers, self.data))
+                rospy.logerr(e)
+                best_response = "ごめんなさい、よくわからないです"
+            rospy.loginfo("chaplus: returns best response {}".format(best_response))
 
-        # convert to string for print out
-        if sys.version_info.major == 2:
-            rospy.logdebug(str(json.dumps(response_json, indent=2,
-                                          ensure_ascii=False, encoding='unicode-escape')))
-        else:  # pytyon3
-            rospy.logdebug(json.dumps(
-                response_json, indent=2, ensure_ascii=False))
+        #use A3RT
+        elif self.chatbot_engine=="A3RT":
+            try:
+                rospy.loginfo("received {}".format(msg.data))
+                params = {"apikey": self.apikey, "query": msg.data,}
+                response = requests.post(self.endpoint, params)
+                response_json = response.json()
+                if not response_json.has_key('results'):
+                    best_response = "ごめんなさい、よくわからないです"
+                else:
+                    best_response = response_json["results"][0]["reply"]
+            except Exception as e:
+                rospy.logerr("Failed to reqeust url={}, data={}".format(
+                    self.endpoint, msg.data))
+                rospy.logerr(e)
+                best_response = "ごめんなさい、よくわからないです"
+            rospy.loginfo("a3rt: returns best response {}".format(best_response))
 
-        # publish best response
-        best_response = response_json['bestResponse']['utterance']
-        rospy.loginfo("returns best response {}".format(best_response))
+        else:
+            rospy.logerr("please use chatbot_engine Chaplus or A3RT")
+
+        if response_json is not None:
+            # convert to string for print out
+            if sys.version_info.major == 2:
+                rospy.logdebug(str(json.dumps(response_json, indent=2,
+                                              ensure_ascii=False, encoding='unicode-escape')))
+            else:  # pytyon3
+                rospy.logdebug(json.dumps(
+                    response_json, indent=2, ensure_ascii=False))
+
+        #publish response
+        best_response=best_response.replace("『", "")
+        best_response=best_response.replace("』", "")
+        best_response=best_response.replace("！", "。")
+        best_response=best_response.replace("〜", "ー")
         self.pub.publish(String(best_response))
-
 
 if __name__ == '__main__':
     rospy.init_node('chaplus_ros')

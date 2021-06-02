@@ -5,7 +5,9 @@ ROS package for https://www.chaplus.jp/
 
 ## Tutorials
 
-1) Obtain API keys for chaplus service, goto https://chaplus.work and acreate accoutn, then reqeust [beta program](https://forms.gle/DQWXdXzUH4MnE5wv6)
+1) Obtain API keys for chaplus service, go to https://www.chaplus.jp/api
+
+You can also create account via https://chaplus.work and reqeust [beta program](https://forms.gle/DQWXdXzUH4MnE5wv6)
 
 2) Put API key as json file under `` `rospack find chaplus_ros`/apikey.json ``
    ```
@@ -50,4 +52,21 @@ Example with google speech recognition. This demo requires [google_cloud_credent
 ```
   <param name="/speech_recognition/google_cloud_credentials_json"
          value="/home/k-okada/Downloads/eternal-byte-236613-4bc6962824d1.json" />
+```
+
+## Use other chat API
+### A3RT
+If you want to use [A3RT](https://a3rt.recruit-tech.co.jp/product/talkAPI)
+1) Get A3RT APIKey
+Please access https://a3rt.recruit-tech.co.jp/product/talkAPI/registered/ and enter your information.
+
+2) Write A3RT API key in json file under `` `rospack find chaplus_ros`/apikey.json ``
+```
+{"apikey": "0123456789",
+ "apikey_a3rt": "abcdefgh"}
+```
+
+3) raunch with A3RT option
+```
+roslaunch chaplus_ros google_example.launch chatbot_engine:=A3RT
 ```
