@@ -3,6 +3,7 @@
   <arg name="launch_audio_capture" default="true" doc="Launch audio_capture node to publish audio topic from microphone" />
 
   <arg name="audio_topic" default="/audio" doc="Name of audio topic captured from microphone" />
+  <arg name="voice_topic" default="/Tablet/voice" doc="Name of text topic of recognized speech" />
   <arg name="n_channel" default="1" doc="Number of channels of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
   <arg name="depth" default="16" doc="Bit depth of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
   <arg name="sample_rate" default="16000" doc="Frame rate of audio topic and microphone. '$ pactl list short sinks' to check your hardware"/>
@@ -37,6 +38,7 @@
         output="screen">
     <rosparam subst_value="true">
       audio_topic: $(arg audio_topic)
+      voice_topic: $(arg voice_topic)
       n_channel: $(arg n_channel)
       depth: $(arg depth)
       sample_rate: $(arg sample_rate)
