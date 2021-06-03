@@ -9,7 +9,7 @@ import http.server as s
 from urllib.parse import urlparse, parse_qs
 import ssl
 
-import json
+import os, json
 
 
 class Server(object):
@@ -22,7 +22,8 @@ class Server(object):
         You need to set the path to certfile for ssl connection. You shouldn't use self-signed certificate.
         """
         rospack = rospkg.RosPack()
-        conffile = rospack.get_path('dialogflow_task_executive') + "/config/webhook.json"
+        conffile = rospy.get_param('~webhook_config', os.path.join(rospack.get_path('dialogflow_task_executive'), 'config/webhook.json'))
+
         with open(conffile) as f:
             json_dict = json.load(f)
             self.host = json_dict['host']
@@ -117,9 +118,6 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
 
         
 if __name__ == '__main__':
-    try:
-        server = Server()
-        rospy.loginfo('DialogFlow HTTPS Server starts - %s:%s' % (server.host, server.port))
-        server.httpd.serve_forever()
-    except Exception as e:
-        rospy.logerr(e)
+    server = Server()
+    rospy.loginfo('DialogFlow HTTPS Server starts - %s:%s' % (server.host, server.port))
+    server.httpd.serve_forever()
