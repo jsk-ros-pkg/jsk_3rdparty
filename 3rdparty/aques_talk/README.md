@@ -1,6 +1,9 @@
 # aques_talk
 
-ROS Interface for AqeusTalk2
+ROS Interface for AqeusTalk2.
+
+For detail, Please see [manual](https://www.a-quest.com/archive/manual/aqtk2_lnx_man.pdf) and [symbols table](https://www.a-quest.com/archive/manual/siyo_onseikigou.pdf)
+
 
 ## Usage
 
