@@ -38,7 +38,7 @@ if __name__ == '__main__':
                nkf -j %s | kakasi -JH | nkf -w | \
                sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
                sed -e 's/．/。/g' | sed -e 's/\./。/g' | \
-               sed -e 's/[^a-zA-Z0-9ぁ-んー、。?？]//g' | \
+               sed -e 's/[^a-zA-Z0-9ぁ-んァ-ンー、。?？]//g' | \
                sed -e 's/\([a-zA-Z]\+\)/<ALPHA VAL=\\1>/g' | \
                sed -e 's/\([0-9]\+\)/<NUMK VAL=\\1>/g' > \
                %s"%(input_file, jptext_file))

@@ -41,7 +41,7 @@ client.say('Hello', voice='en')
 
 ### Limitations on input strings
 
-All charactors except `[a-zA-Z0-9ぁ-んー、。?？]` and Kanji are removed so that AquesTalk2 can recognize them.
+All charactors except `[a-zA-Z0-9ぁ-んァ-ンー、。?？]` and Kanji are removed so that AquesTalk2 can recognize them.
 
 ```
 ’こ”^＾ん/に*|ち＊＊｜は；：;:『』！#＃$＄&＆~〜()（）＿_｀\_\\\_・・<\>＊｀＞＜+＋@＠ー=＝%[]-￥
@@ -50,8 +50,10 @@ All charactors except `[a-zA-Z0-9ぁ-んー、。?？]` and Kanji are removed so
 ```
 
 **Do not** input the charactors which are recognized as control charactors. For example,
-- `' "` in many programs (Because many programs recognize them as string control charactor)
-- ``! ` `` if you use shell (Because shell recognizes them as control charactor)
+- `ヰ` `ヱ`
+- `ぁ` (`ぁ` at the beginning of sentence cannot be pronounced, but `ふぁ` can be pronounced.)
+- `'` `"` in many programs (Because many programs recognize them as string control charactor)
+- `!` `` ` `` if you use shell (Because shell recognizes them as control charactor)
 
 You should be careful in input charactors about how they are pronounced.
 ```
