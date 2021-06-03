@@ -1,0 +1,34 @@
+<launch>
+    <include file="$(find audio_capture)/launch/capture.launch">
+        <arg name="format" value="wave" />
+    </include>
+
+    <node
+        name="webrtcvad_ros"
+        pkg="webrtcvad_ros"
+        type="webrtcvad_ros.py"
+        output="screen"
+        >
+        <rosparam>
+            aggressiveness: 3
+        </rosparam>
+        <remap from="audio_data" to="/audio/audio" />
+        <remap from="audio_info" to="/audio/audio_info" />
+    </node>
+
+    <node
+        name="speech_recognition"
+        pkg="ros_speech_recognition"
+        type="speech_recognition_node.py"
+        output="screen">
+      <rosparam subst_value="true">
+          audio_topic: /webrtcvad_ros/speech_audio
+          n_channel: 1
+          depth: 16
+          sample_rate: 16000
+          engine: Google
+          language: en-US
+          continuous: true
+      </rosparam>
+    </node>
+</launch>
