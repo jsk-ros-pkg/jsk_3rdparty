@@ -40,6 +40,21 @@ client.say('Hello', voice='en')
 
 
 ### Limitations on input strings
+
+Some charactors are replaced so that AquesTalk2 can recognize them.
+
+```
+’こ”^＾ん/に*|ち＊＊｜は；：;:『』!！#＃$＄&＆~〜()（）＿_｀\_\\\_・・<\>＊｀＞＜+＋@＠ー=＝
+->
+こんにちはー
+```
+
+
+**Do not** input the following charactors:
+- ``% [ ] ` - ￥`` (Because sed command recognize them as control charactor)
+- `' "` (Because ros publisher (e.g. python or shell) recognized as string control charactor)
+
+You should be careful in input charactors about how they are pronounced.
 ```
 Wrong -> Correct
 20時です -> 20じです # Kanji is sometimes mispronounced.
