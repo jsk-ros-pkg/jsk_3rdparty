@@ -20,18 +20,15 @@ class Server():
         You need to set the path to certfile for ssl connection. You shouldn't use self-signed certificate.
         """
         rospack = rospkg.RosPack()
-        httpsconffile = rospack.get_path('dialogflow_task_executive') + "/config/https.json"
-        certfile = rospack.get_path('dialogflow_task_executive') + "/auth/certfile.json"
-        with open(httpsconffile) as f:
+        conffile = rospack.get_path('dialogflow_task_executive') + "/config/webhook.json"
+        with open(conffile) as f:
             json_dict = json.load(f)
-            self.host = json_dict['ip']
-            self.port = int(json_dict['port'])
-        with open(certfile) as f:
-            json_dict = json.load(f)
+            self.host = json_dict['host']
+            self.port = json_dict['port']
             self._certfile_path = json_dict['certfile']
             self._keyfile_path = json_dict['keyfile']
         rospy.on_shutdown(self.killnode)
-        rospy.init_node('dialogflow_https_server', disable_signals=True)
+        rospy.init_node('dialogflow_webhook_server', disable_signals=True)
         self._run_handler()
         
     def killnode(self):
@@ -89,7 +86,7 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
     def _make_response(self):
         """
         This function is in development. If you want to develop the application like the robot sends its state to the Dialogflow and the Dialogflow handle it, you have to make new response_type. 
-        Plese see https://cloud.google.com/dialogflow/es/docs/fulfillment-webhook#webhook_response for details.
+        Please see https://cloud.google.com/dialogflow/es/docs/fulfillment-webhook#webhook_response for details.
         """
         res_body = {}
         
