@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+
 import rospy
 import rospkg
 from dialogflow_task_executive.msg import DialogResponse
@@ -10,7 +11,8 @@ import ssl
 
 import json
 
-class Server():
+
+class Server(object):
     """
     This server is expected to accept the POST https message from Google DialogFlow.
     If the server received the message, it publishes the topic 'dialogflow_task_executive.msg DialogResponse' and send response to Google DialogFlow.
