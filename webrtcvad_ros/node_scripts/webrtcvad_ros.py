@@ -13,6 +13,7 @@ class WebRTCVADROS(object):
         self._speech_audio_buffer = ''
 
         aggressiveness = rospy.get_param('~aggressiveness',1)
+        self._minimum_duration = rospy.get_param('~minimum_duration',0.4)
         self._vad = webrtcvad.Vad(int(aggressiveness))
 
         self._pub_is_speech = rospy.Publisher('~is_speech',Bool,queue_size=1)
@@ -40,7 +41,11 @@ class WebRTCVADROS(object):
             self._current_speaking = True
         elif self._current_speaking == True and is_speech == False:
             self._speech_audio_buffer = self._speech_audio_buffer + msg.data
-            self._pub_speech_audio.publish(AudioData(self._speech_audio_buffer))
+            speech_duration = (len(self._speech_audio_buffer) / 2.0) / self._audio_info.sample_rate
+            if speech_duration > self._minimum_duration: 
+                self._pub_speech_audio.publish(AudioData(self._speech_audio_buffer))
+            else:
+                rospy.logwarn('speech duration: {} dropped'.format(speech_duration))
             self._current_speaking = False
             self._speech_audio_buffer = ''
 
