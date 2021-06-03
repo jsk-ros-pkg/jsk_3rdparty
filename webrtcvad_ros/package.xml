@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>webrtcad_ros</name>
+  <name>webrtcvad_ros</name>
   <version>0.0.0</version>
   <description>This package provides a wrapper node for webrtcvad. It subscribes an audio topic and publish a flag if curretly speeched or not with VAD.</description>
 

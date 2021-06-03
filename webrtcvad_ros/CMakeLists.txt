@@ -3,4 +3,4 @@ project(webrtcvad_ros)
 
 find_package(catkin REQUIRED)
 
-catkin_package(
+catkin_package()
