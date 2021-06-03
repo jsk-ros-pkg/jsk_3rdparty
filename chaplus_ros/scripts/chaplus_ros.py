@@ -135,10 +135,6 @@ class ChaplusROS(object):
                     response_json, indent=2, ensure_ascii=False))
 
         #publish response
-        best_response=best_response.replace("『", "")
-        best_response=best_response.replace("』", "")
-        best_response=best_response.replace("！", "。")
-        best_response=best_response.replace("〜", "ー")
         self.pub.publish(String(best_response))
 
 if __name__ == '__main__':
