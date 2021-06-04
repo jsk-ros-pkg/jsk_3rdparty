@@ -40,17 +40,8 @@ if __name__ == '__main__':
                sed -e 's/．/。/g' | sed -e 's/\./。/g' | \
                sed -e 's/！/。/g' | sed -e 's/\!/。/g' | \
                sed -e 's/〜/ー/g' | \
-               sed -e 's/ぁ/ー/g' | \
-               sed -e 's/ぃ/ー/g' | \
-               sed -e 's/ぅ/ー/g' | \
-               sed -e 's/ぇ/ー/g' | \
-               sed -e 's/ぉ/ー/g' | \
-               sed -e 's/ァ/ー/g' | \
-               sed -e 's/ィ/ー/g' | \
-               sed -e 's/ゥ/ー/g' | \
-               sed -e 's/ェ/ー/g' | \
-               sed -e 's/ォ/ー/g' | \
                sed -e 's/[^a-zA-Z0-9ぁ-んァ-ンー、。?？]//g' | \
+               sed -e 's/^[ぁぃぅぇぉァィゥェォ、。ー]*//' | \
                sed -e 's/\([a-zA-Z]\+\)/<ALPHA VAL=\\1>/g' | \
                sed -e 's/\([0-9]\+\)/<NUMK VAL=\\1>/g' > \
                %s"%(input_file, jptext_file))
