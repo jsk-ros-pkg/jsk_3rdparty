@@ -51,7 +51,8 @@ All charactors except `[a-zA-Z0-9ぁ-んァ-ンー、。?？]` and Kanji are rem
 
 **Do not** input the unpronounceable or control characters. For example,
 - `ヰ` `ヱ`
-- `ぁ` at the beginning of sentence (`ぁ` at the beginning of sentence cannot be pronounced, but `ふぁ` can be pronounced.)
+- `ぁ` `〜` at the beginning of sentence (`ぁ` or `〜` at the beginning of sentence cannot be pronounced)
+- `たぁ` (On the other hand, `ふぁ` can be pronounced.)
 - `'` `"` in many programs (Because many programs recognize them as string control charactor)
 - `!` `` ` `` if you use shell (Because shell recognizes them as control charactor)
 
