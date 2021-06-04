@@ -16,7 +16,7 @@ class WebRTCVADROS(object):
         self._minimum_duration = rospy.get_param('~minimum_duration',0.4)
         self._vad = webrtcvad.Vad(int(aggressiveness))
 
-        self._pub_is_speech = rospy.Publisher('~is_speech',Bool,queue_size=1)
+        self._pub_is_speech = rospy.Publisher('~is_speeching',Bool,queue_size=1)
         self._pub_speech_audio = rospy.Publisher('~speech_audio',AudioData,queue_size=1)
         self._pub_speech_audio_info = rospy.Publisher('~speech_audio_info',AudioInfo,queue_size=1,latch=True)
 
