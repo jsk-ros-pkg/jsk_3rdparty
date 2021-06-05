@@ -11,8 +11,9 @@ jobs:
     container: jskrobotics/ros-ubuntu:14.04
 
     steps:
+      # We can remove git-lfs after https://github.com/ros/rosdistro/pull/29778 is merged and git-lfs dependency is added to julius/package.xml
       - name: Install latest git ( use sudo for ros-ubuntu )
-        run: sudo apt-get update && sudo apt-get install -y software-properties-common && sudo apt-get update && sudo add-apt-repository -y ppa:git-core/ppa && sudo apt-get update && sudo apt-get install -y git
+        run: sudo apt-get update && sudo apt-get install -y software-properties-common && sudo apt-get update && sudo add-apt-repository -y ppa:git-core/ppa && sudo apt-get update && sudo apt-get install -y git git-lfs
       - name: Before Checkout # need for actoins/checkout with ros-ubuntu container
         run: sudo chown -R user:jenkins $RUNNER_WORKSPACE $HOME
       - name: Chcekout

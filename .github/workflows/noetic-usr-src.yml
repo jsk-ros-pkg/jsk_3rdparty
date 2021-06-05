@@ -10,8 +10,9 @@ jobs:
     container: ubuntu:20.04
 
     steps:
+      # We can remove git-lfs after https://github.com/ros/rosdistro/pull/29778 is merged and git-lfs dependency is added to julius/package.xml
       - name: Install latest git ( use sudo for ros-ubuntu )
-        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git git-lfs
       - name: Chcekout
         uses: actions/checkout@v2
       - name: Run jsk_travis
