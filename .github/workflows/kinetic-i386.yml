@@ -12,10 +12,9 @@ jobs:
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
         run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
-      # We can remove git-lfs after https://github.com/ros/rosdistro/pull/29778 is merged and git-lfs dependency is added to julius/package.xml
-      # git-lfs installation: https://askubuntu.com/a/799451
+      # git-lfs for julius. installation: https://askubuntu.com/a/799451
       - name: Install git-lfs
-        run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && apt-get install -y git-lfs
+        run: apt-get install -y curl && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && apt-get install -y git-lfs
       - name: Chcekout
         run: |
           git clone --depth=1 $GITHUB_SERVER_URL/$GITHUB_REPOSITORY $GITHUB_WORKSPACE
