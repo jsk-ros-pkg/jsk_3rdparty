@@ -19,3 +19,5 @@ jobs:
         with:
           ROS_DISTRO : noetic
           ROS_PARALLEL_TEST_JOBS: "-j8"
+          # Install git-lfs for julius. We can remove git-lfs after https://github.com/ros/rosdistro/pull/29778 is merged and git-lfs dependency is added to julius/package.xml
+          BEFORE_SCRIPT : "sudo apt-get install -y git-lfs"

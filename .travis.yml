@@ -31,13 +31,7 @@ matrix:
     - env: ROS_DISTRO=noetic  USE_DEB=true
 script:
   - if [ "${CHECK_PYTHON3_COMPILE}" == "true" ]; then python3 -m compileall .; exit $?; fi
-  # Install git-lfs for julius.
-  # For indigo and kinetic, see https://askubuntu.com/a/799451
-  # For melodic and noetic, We can remove git-lfs after https://github.com/ros/rosdistro/pull/29778 is merged and git-lfs dependency is added to julius/package.xml
-  - if [ "$ROS_DISTRO" == "indigo" ]; then export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0; curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash; sudo apt-get install -y git-lfs; $BEFORE_SCRIPT"; fi
-  - if [ "$ROS_DISTRO" == "kinetic" ]; then export BEFORE_SCRIPT="sudo apt-get install -y curl; curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash; sudo apt-get install -y git-lfs; $BEFORE_SCRIPT"; fi
-  - if [ "$ROS_DISTRO" == "melodic" ]; then export BEFORE_SCRIPT="sudo apt-get install -y git-lfs; $BEFORE_SCRIPT"; fi
-  - if [ "$ROS_DISTRO" == "noetic" ]; then export BEFORE_SCRIPT="sudo apt-get install -y git-lfs; $BEFORE_SCRIPT"; fi
+  - if [ "$ROS_DISTRO" == "indigo" ]; then export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0; $BEFORE_SCRIPT"; fi
   - source .travis/travis.sh
 notifications:
   email:
