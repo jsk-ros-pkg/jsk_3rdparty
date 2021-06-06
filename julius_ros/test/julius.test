@@ -1,12 +1,23 @@
 <launch>
+  <arg name="dnn" default="false" />
+  <arg name="module_port" default="10500" />
+  <arg name="audio_port" default="10501" />
+
   <include file="$(find julius_ros)/launch/julius.launch">
     <arg name="launch_audio_capture" value="false" />
     <arg name="launch_sound_play" value="false" />
     <arg name="max_connection_retry" default="3" />
+    <arg name="dnn" value="$(arg dnn)" />
+    <arg name="module_port" value="$(arg module_port)" />
+    <arg name="audio_port" value="$(arg audio_port)" />
   </include>
 
   <node name="rosbag_play" pkg="rosbag" type="play"
         args="--delay 10 $(find julius_ros)/test/wave.bag" />
 
-  <test test-name="test_julius" pkg="julius_ros" type="test_julius.py" />
+  <test test-name="test_julius" pkg="julius_ros" type="test_julius.py" >
+    <rosparam subst_value="true">
+      dnn: $(arg dnn)
+    </rosparam>
+  </test>
 </launch>
