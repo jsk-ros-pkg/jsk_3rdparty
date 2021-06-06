@@ -3,6 +3,12 @@ julius_ros
 
 ROS Interface for Julius speech recognition engine
 
+Please see
+ - [Source](https://github.com/julius-speech/julius): Julius source code
+ - [Japanese dictatoin kit](https://github.com/julius-speech/dictation-kit):
+ - [Up-to-date doc](https://julius.osdn.jp/juliusbook/ja/): New but incomplete documentation
+ - [old doc](https://julius.osdn.jp/juliusbook/ja/): Old documentation
+
 ## Usage
 
 ``` bash
@@ -28,7 +34,7 @@ rosservice call /speech_recognition "vocabulary:
   words: ['みそ', 'しょうゆ', 'とんこつ']
 "
 # speak one word in the list above
-results: 
+results:
   transcript: ['\xe3\x81\xbf\xe3\x81\x9d', '\xe3\x81\x97\xe3\x82\x87\xe3\x81\x86\xe3\x82\x86', '\xe3\x81\xa8\xe3\x82\x93\xe3\x81\x93\xe3\x81\xa4']
     confidence: [1.0, 0.0, 0.0]
 ```

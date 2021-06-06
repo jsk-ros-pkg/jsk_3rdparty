@@ -1,19 +1,20 @@
 <launch>
-  <arg name="conf_file" default="$(find julius_ros)/conf/main.jconf" />
-  <arg name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs" />
-  <arg name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" />
-  <arg name="word_file" default="$(find julius_ros)/data/udon.dic" />
+  <arg name="conf_file" default="$(find julius_ros)/conf/main.jconf" doc="Common Julius config file for GMM version and DNN version. Other configs are specified in the args of run_julius.sh" />
 
-  <arg name="bingram_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.bingram" />
-  <arg name="htkdic_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.htkdic" />
-  <arg name="dnn_am_file" default="$(find julius)/dnn/am-dnn.jconf" />
-  <arg name="dnn_julius_file" default="$(find julius)/dnn/julius.dnnconf" />
+  <arg name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
+  <arg name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
+  <arg name="word_file" default="$(find julius_ros)/data/udon.dic" doc="Word dictionary file (pronunciation dictionary file)" />
 
-  <arg name="module_port" default="10500" />
-  <arg name="audio_port"  default="10501" />
-  <arg name="max_connection_retry" default="0" />
-  <arg name="default_threshold" default="0.9" />
-  <arg name="start_signal_action_timeout" default="0.3" />
+  <arg name="bingram_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.bingram" doc="Binary N-gram file (Language model file)" />
+  <arg name="htkdic_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.htkdic" doc="Pronunciation dictionary for language models" />
+  <arg name="dnn_am_file" default="$(find julius)/dnn/am-dnn.jconf" doc="DNN version of Julius acoustic model and input configuration file" />
+  <arg name="dnn_julius_file" default="$(find julius)/dnn/julius.dnnconf" doc="Feature conversion configuration file for DNN (Julius alone) version" />
+
+  <arg name="module_port" default="10500" doc="Port number when julius is started in module mode." />
+  <arg name="audio_port"  default="10501" doc="Port number for outputting audio to julius module." />
+  <arg name="max_connection_retry" default="0" doc="Maximum number of times to try to connect to the server; if 0, it will try forever." />
+  <arg name="default_threshold" default="0.9" doc="Threshold for judging the recognition result as correct" />
+  <arg name="start_signal_action_timeout" default="0.3" doc="Timeout[s] for sounding start signal" />
   <arg name="respawn" default="false" />
 
   <arg name="launch_audio_capture" default="true" />
