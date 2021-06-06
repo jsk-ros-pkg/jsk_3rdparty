@@ -3,9 +3,12 @@
   <arg name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs" />
   <arg name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" />
   <arg name="word_file" default="$(find julius_ros)/data/udon.dic" />
-  <arg name="dnn_conf_file" default="$(find julius)/dnn/main.jconf" />
+
+  <arg name="bingram_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.bingram" />
+  <arg name="htkdic_file" default="$(find julius)/dnn/model/lang_m/bccwj.60k.htkdic" />
   <arg name="dnn_am_file" default="$(find julius)/dnn/am-dnn.jconf" />
   <arg name="dnn_julius_file" default="$(find julius)/dnn/julius.dnnconf" />
+
   <arg name="module_port" default="10500" />
   <arg name="audio_port"  default="10501" />
   <arg name="max_connection_retry" default="0" />
@@ -49,10 +52,12 @@
   <node name="julius_isolated" pkg="julius_ros" type="run_julius.sh"
         machine="$(arg machine)" respawn="$(arg respawn)"
         output="$(arg julius_output)" if="$(arg dnn)"
-        args="-C $(arg dnn_conf_file)
+        args="-C $(arg conf_file)
+              -d $(arg bingram_file)
+              -v $(arg htkdic_file)
               -C $(arg dnn_am_file)
               -demo -dnnconf $(arg dnn_julius_file)
-              -input adinnet -adport $(arg audio_port)
+              -adport $(arg audio_port)
               -module $(arg module_port)" />
 
   <!-- audio capture from microphone -->
