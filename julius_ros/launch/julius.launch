@@ -52,7 +52,7 @@
         args="-C $(arg dnn_conf_file)
               -C $(arg dnn_am_file)
               -demo -dnnconf $(arg dnn_julius_file)
-              -adport $(arg audio_port)
+              -input adinnet -adport $(arg audio_port)
               -module $(arg module_port)" />
 
   <!-- audio capture from microphone -->
