@@ -1,0 +1,5 @@
+string nickname # input
+---
+bool successful # output
+int32 status
+string msg
