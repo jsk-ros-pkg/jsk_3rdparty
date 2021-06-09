@@ -1,6 +1,9 @@
 # aques_talk
 
-ROS Interface for AqeusTalk2
+ROS Interface for AqeusTalk2.
+
+For detail, Please see [manual](https://www.a-quest.com/archive/manual/aqtk2_lnx_man.pdf) and [symbols table](https://www.a-quest.com/archive/manual/siyo_onseikigou.pdf)
+
 
 ## Usage
 
@@ -51,6 +54,23 @@ client.say('Hello', voice='en')
 
 
 ### Limitations on input strings
+
+All charactors except `[a-zA-Z0-9ぁ-んァ-ンー、。?？]` and Kanji are removed so that AquesTalk2 can recognize them.
+
+```
+’こ”^＾ん/に*|ち＊＊｜は；：;:『』！#＃$＄&＆~〜()（）＿_｀\_\\\_・・<\>＊｀＞＜+＋@＠ー=＝%[]-￥
+->
+こんにちはー
+```
+
+**Do not** input the unpronounceable or control characters. For example,
+- `ヰ` `ヱ`
+- `ぁ` `〜` at the beginning of sentence (`ぁ` or `〜` at the beginning of sentence cannot be pronounced)
+- `たぁ` (On the other hand, `ふぁ` can be pronounced.)
+- `'` `"` in many programs (Because many programs recognize them as string control charactor)
+- `!` `` ` `` if you use shell (Because shell recognizes them as control charactor)
+
+You should be careful in input charactors about how they are pronounced.
 ```
 Wrong -> Correct
 20時です -> 20じです # Kanji is sometimes mispronounced.
