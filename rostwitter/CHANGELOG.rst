@@ -2,6 +2,23 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Refactor rostwitter (`#235 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/235>`_)
+
+  * fix desired_encoding=bgr8
+  * use action
+  * speak warning
+  * remove only if exists
+  * add utf-8 encoding
+  * add tweet_image_server
+  * do not raise error
+  * add util.py
+  * add Tweet srv
+  * add twitter.py for reuse
+
+* Contributors: Shingo Kitagawa
+
 2.1.21 (2020-08-19)
 -------------------
 

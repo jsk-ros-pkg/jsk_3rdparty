@@ -2,6 +2,17 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* set max authentication trial times as infinite (`#249 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/249>`_)
+* catch ServerNotFoundError in gdrive_server_node.py ((`#240 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/240>`_)
+* update doc links in gdrive_ros (`#233 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/233>`_)
+* [gdrive_ros] add node_name arg in gdrive_server.launch (`#234 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/234>`_)
+* add roslaunch test (`#232 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/232>`_)
+* [gdrive_ros] add argument respawn (`#230 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/230>`_)
+
+* Contributors: Shingo Kitagawa
+
 2.1.21 (2020-08-19)
 -------------------
 
