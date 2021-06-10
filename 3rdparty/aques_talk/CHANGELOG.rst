@@ -2,8 +2,8 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * Ignore charactors which AquesTalk2 cannot recognize (`#257 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/257>`_)
 
   * Update README on limitation

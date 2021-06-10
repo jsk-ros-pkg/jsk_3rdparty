@@ -2,8 +2,8 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * enable to change topic name from speech_recognition.launch (`#254 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/254>`_)
 * support SpeakerDiarization, see https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#SpeechRecognitionAlternative (`#244 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/244>`_)
 

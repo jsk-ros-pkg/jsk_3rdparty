@@ -2,8 +2,8 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * Refactor rostwitter (`#235 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/235>`_)
 
   * fix desired_encoding=bgr8

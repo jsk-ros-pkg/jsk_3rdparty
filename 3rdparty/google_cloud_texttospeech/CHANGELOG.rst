@@ -2,8 +2,8 @@
 Changelog for package google_cloud_texttospeech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * add google_cloud_texttospeech packagef( `#218 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/218>`_)
 
 * Contributors: Shingo Kitagawa, Shun Hasegawa

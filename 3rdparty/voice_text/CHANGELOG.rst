@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * [voice_text] Fix README to follow supporting other speakers than SAYAKA (`#220 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/220>`_)
 
 * Contributors: Shun Hasegawa

@@ -2,8 +2,8 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.22 (2021-06-10)
+-------------------
 * add chat agent interface for ros (`#252 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/252>`_)
 
   * add A3RT chat engine
