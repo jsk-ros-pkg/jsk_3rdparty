@@ -15,7 +15,7 @@
 
   <exec_depend>audio_common_msgs</exec_depend>
   <exec_depend>rospy</exec_depend>
-  <exec_depend>webrtcvad</exec_depend>
+  <exec_depend>python-webrtcvad-pip</exec_depend>
 
   <export>
   </export>
