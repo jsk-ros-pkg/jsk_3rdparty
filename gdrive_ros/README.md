@@ -90,6 +90,14 @@ rosservice call /gdrive_ros/upload_multi ...
 
   - Uploaded file share with link or not 
 
+- `~auth_max_trial` (`int`, default: `-1`)
+
+  - Max authentication trial times. `-1` means trying for infinite times.
+
+- `~auth_wait_seconds` (`float`, default: `10.0`)
+
+  - Authentication wait seconds
+
 ## Services
 
 ### `gdrive_ros/Upload`
