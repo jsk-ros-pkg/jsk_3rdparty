@@ -1,0 +1,11 @@
+# Define the goal
+string name
+string command
+string parameter
+string commandType
+---
+# Define the result
+bool done
+---
+# Define a feedback message
+string status

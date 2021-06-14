@@ -72,7 +72,7 @@ class SwitchBotAPIClient:
             elif response_json['statusCode'] == 190:
                 raise DeviceInternalError()
             else:
-                raise RuntimeError("Got unknown status code")
+                raise RuntimeError("Got unknown status code : " + str(response_json['statusCode']))
 
 
     def update_device_list(self):
@@ -159,11 +159,11 @@ class DeviceTypeError(DeviceError):
 
 class DeviceNotFoundError(DeviceError):
     def __str__(self):
-        return("Device is not found")
+        return("The device is not found")
 
 class CommandNotSupportedError(DeviceError):
     def __str__(self):
-        return("Command is not supported")
+        return("Your command is not supported")
 
 class DeviceOfflineError(DeviceError):
     def __str__(self):

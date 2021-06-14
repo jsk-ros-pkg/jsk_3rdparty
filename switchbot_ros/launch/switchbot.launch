@@ -1,0 +1,8 @@
+<launch>
+  <arg name="token" default="DUMMYTOKEN" />
+  <node name="switchbot_ros" pkg="switchbot_ros" type="switchbot_ros_server.py">
+    <rosparam subst_value="true">
+      token: $(arg token)
+    </rosparam>
+  </node>
+</launch>
