@@ -24,8 +24,8 @@ class SwitchBotAction:
 
         
     def execute_cb(self, goal):
-        self._feedback = SwitchBotCommandFeedback()
-        self._result = SwitchBotCommandResult()
+        feedback = SwitchBotCommandFeedback()
+        result = SwitchBotCommandResult()
         r = rospy.Rate(1)
         success = True        
         # start executing the action
@@ -35,7 +35,7 @@ class SwitchBotAction:
         if not command_type:
             command_type = 'command'
         try:
-            self._feedback.status = str(
+            feedback.status = str(
                 self.bots.control_device(
                     command=goal.command,
                     parameter=parameter,
@@ -44,13 +44,13 @@ class SwitchBotAction:
                 ))
         except Exception as e:
             rospy.logerr(str(e))
-            self._feedback.status = str(e)
+            feedback.status = str(e)
             success = False
         finally:
-            self._as.publish_feedback(self._feedback)
+            self._as.publish_feedback(feedback)
             r.sleep()
-            self._result.done = success
-            self._as.set_succeeded(self._result)
+            result.done = success
+            self._as.set_succeeded(result)
 
 
 if __name__ == '__main__':
