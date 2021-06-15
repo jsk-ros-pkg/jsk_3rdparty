@@ -94,5 +94,4 @@ transcript: [' こんにちは 。']
 ## Limitation
 - `/audio` topic must be 1channel, 16bit, 16000Hz and wave format.
 - DNN is computed on the CPU.
-- Sometimes Error `Failed to parse data: Start tag expected, '<' not found, line 1, column 1 (line 1)` occurs, but it will be fixed over time.
-- It will take some time (~30s) to start DNN version julius.
+- CPU usage is about 2% during non-speech and about 100% during speech.

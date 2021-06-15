@@ -67,7 +67,6 @@ class SocketTransport(Thread):
             except ValueError:
                 pass
             except RuntimeError as e:
-                recvbuf = ""
                 rospy.logerr("Failed to parse data: %s" % str(e))
 
     def is_connected(self):

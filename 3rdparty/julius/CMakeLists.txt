@@ -23,12 +23,7 @@ add_custom_command(
   COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.dictation-kit MD5SUM_DIR=${MD5SUM_DIR} INSTALL_DIR=${INSTALL_DIR}
 )
 
-add_custom_command(
-  OUTPUT dictation_kit_dnn_installed
-  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.dictation-kit-dnn INSTALL_DIR=${INSTALL_DIR}/dnn
-)
-
-add_custom_target(all_installed ALL DEPENDS julius_installed grammar_kit_installed dictation_kit_installed dictation_kit_dnn_installed)
+add_custom_target(all_installed ALL DEPENDS julius_installed grammar_kit_installed dictation_kit_installed)
 
 install(DIRECTORY
   ${INSTALL_DIR}/bin
