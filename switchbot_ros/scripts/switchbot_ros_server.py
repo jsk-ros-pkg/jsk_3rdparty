@@ -34,7 +34,7 @@ class SwitchBotAction:
         if not commandType:
             commandType = 'command'
         try:
-            self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, commandType=commandType, deviceName=goal.name))
+            self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, commandType=commandType, deviceName=goal.deviceName))
         except Exception as e:
             self._feedback.status = str(e)
             success = False
@@ -49,4 +49,3 @@ if __name__ == '__main__':
     rospy.init_node('switchbot')
     server = SwitchBotAction(rospy.get_name())
     rospy.spin()
-        
