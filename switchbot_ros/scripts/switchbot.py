@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import requests, json
-from os import path
+
+import json
+import os.path
+import requests
 
 
 class SwitchBotAPIClient(object):
@@ -28,7 +30,7 @@ class SwitchBotAPIClient(object):
         if devices_or_scenes not in ['devices', 'scenes']:
             raise ValueError('Please set devices_or_scenes variable devices or scenes')
 
-        url = path.join(self._host_domain, devices_or_scenes, service_id, service)
+        url = os.path.join(self._host_domain, devices_or_scenes, service_id, service)
 
         if method == 'GET':
             response = requests.get(
@@ -74,7 +76,7 @@ class SwitchBotAPIClient(object):
             elif response_json['statusCode'] == 190:
                 raise DeviceInternalError()
             else:
-                raise RuntimeError("Got unknown status code : " + str(response_json['statusCode']))
+                raise ValueError("Got unknown status code : " + str(response_json['statusCode']))
 
 
     def update_device_list(self):
@@ -112,7 +114,7 @@ class SwitchBotAPIClient(object):
         elif device_name:
             device_id = self.device_name_id[device_name]
         else:
-            raise RuntimeError("Please set device_id or device_name.")
+            raise ValueError("Please set device_id or device_name.")
 
         return self.request(service_id=device_id, service='status')['body']
 
@@ -131,7 +133,7 @@ class SwitchBotAPIClient(object):
         elif device_name:
             device_id = self.device_name_id[device_name]
         else:
-            raise RuntimeError("Please set device_id or device_name.")
+            raise ValueError("Please set device_id or device_name.")
         
         return self.request(method='POST', service_id=device_id, service='commands', json_body=json_body)['message']
 
@@ -145,7 +147,7 @@ class SwitchBotAPIClient(object):
         elif scene_name:
             scene_id = self.scene_name_id[scene_name]
         else:
-            raise RuntimeError("Please set scene_id or scene_name.")
+            raise ValueError("Please set scene_id or scene_name.")
 
         return self.request(method='POST', devices_or_scenes='scenes', service_id=scene_id, service='execute')['message']
 

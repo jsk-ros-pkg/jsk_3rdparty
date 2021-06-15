@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import rospy
 import actionlib
-from switchbot_ros.msg import SwitchBotCommandAction, SwitchBotCommandFeedback, SwitchBotCommandResult
+import rospy
+from switchbot_ros.msg import SwitchBotCommandAction
+from switchbot_ros.msg import SwitchBotCommandFeedback
+from switchbot_ros.msg import SwitchBotCommandResult
 from switchbot import SwitchBotAPIClient
 
 
@@ -15,8 +17,6 @@ class SwitchBotAction:
         self.token = rospy.get_param('~token')
         self.bots = SwitchBotAPIClient(token=self.token)
         # Actionlib
-        self._feedback = SwitchBotCommandFeedback()
-        self._result = SwitchBotCommandResult()
         self._as = actionlib.SimpleActionServer(
             '~switch', SwitchBotCommandAction,
             execute_cb=self.execute_cb, auto_start=False)
@@ -24,9 +24,10 @@ class SwitchBotAction:
 
         
     def execute_cb(self, goal):
+        self._feedback = SwitchBotCommandFeedback()
+        self._result = SwitchBotCommandResult()
         r = rospy.Rate(1)
-        success = True
-        
+        success = True        
         # start executing the action
         parameter, command_type = goal.parameter, goal.command_type
         if not parameter:
@@ -34,7 +35,13 @@ class SwitchBotAction:
         if not command_type:
             command_type = 'command'
         try:
-            self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, command_type=command_type, device_name=goal.device_name))
+            self._feedback.status = str(
+                self.bots.control_device(
+                    command=goal.command,
+                    parameter=parameter,
+                    command_type=command_type,
+                    device_name=goal.device_name
+                ))
         except Exception as e:
             rospy.logerr(str(e))
             self._feedback.status = str(e)
