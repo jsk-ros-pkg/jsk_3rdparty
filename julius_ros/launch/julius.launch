@@ -8,14 +8,14 @@
   <arg name="start_signal_action_timeout" default="0.3" doc="Timeout[s] for sounding start signal" />
   <arg name="dnn" default="false" doc="set true if you use DNN version julius"/>
   <!-- DNN version config -->
-  <arg unless="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
-  <arg unless="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
+  <arg if="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/dnn/logicalTri.bin" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
+  <arg if="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/dnn/binhmm.SID"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
   <arg name="bingram_file" default="$(find julius)/model/lang_m/bccwj.60k.bingram" doc="Binary N-gram file (Language model file)" />
   <arg name="htkdic_file" default="$(find julius)/model/lang_m/bccwj.60k.pdp.htkdic" doc="Pronunciation dictionary for language models" />
   <arg name="dnn_julius_file" default="$(find julius)/julius.dnnconf" doc="Feature conversion configuration file for DNN (Julius alone) version" />
   <!-- GMM version config -->
-  <arg if="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/dnn/logicalTri.bin" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
-  <arg if="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/dnn/binhmm.SID"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
+  <arg unless="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
+  <arg unless="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
   <arg name="word_file" default="$(find julius_ros)/data/udon.dic" doc="Word dictionary file (pronunciation dictionary file)" />
 
   <arg name="respawn" default="false" />
