@@ -51,11 +51,12 @@ class SwitchBotAPIClient:
         try:
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            print(e)
             if response.status_code == 422:
-                print("The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.")
+                raise InvalidRequestError()
             elif response.status_code == 429:
-                print("The client has exceeded the number of requests allowed for a given time window.")
+                raise ExceededRequestError()
+            else:
+                raise e
         else:
             if response_json['statusCode'] == 100:
                 return response_json
@@ -131,7 +132,7 @@ class SwitchBotAPIClient:
         else:
             raise RuntimeError("Please set deviceId or deviceName.")
         
-        return self.request(method='POST', Id=deviceId, service='commands', json_body=json_body)
+        return self.request(method='POST', Id=deviceId, service='commands', json_body=json_body)['message']
 
 
     def execute_scene(self, sceneId=None, sceneName=None):
@@ -145,7 +146,7 @@ class SwitchBotAPIClient:
         else:
             raise RuntimeError("Please set sceneId or sceneName.")
 
-        return self.request(method='POST', devices_or_scenes='scenes', Id=sceneId, service='execute')
+        return self.request(method='POST', devices_or_scenes='scenes', Id=sceneId, service='execute')['message']
 
 
 # Error classes
@@ -176,3 +177,16 @@ class HubDeviceOfflineError(DeviceError):
 class DeviceInternalError(DeviceError):
     def __str__(self):
         return("Device internal error due to device states not synchronized with server. Or command format is invalid")
+
+
+class SwitchBotAPIError(Exception):
+    def __init__(self):
+        pass
+
+class InvalidRequestError(SwitchBotAPIError):
+    def __str__(self):
+        return("The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.")
+
+class ExceededRequestError(SwitchBotAPIError):
+    def __str__(self):
+        return("The client has exceeded the number of requests allowed for a given time window.")
