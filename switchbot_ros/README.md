@@ -16,7 +16,7 @@ On switchbot App, profile -> settings, and press `version` for 10 times and you 
 ### Using switchbot ros
 Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal, like
 ```bash
-rostopic pub /switchbot_ros/goal switchbot_ros/SwitchBotCommandActionGoal "header:
+rostopic pub /switchbot_ros/switch/goal switchbot_ros/SwitchBotCommandActionGoal "header:
   seq: 0
   stamp:
     secs: 0
@@ -28,13 +28,13 @@ goal_id:
     nsecs: 0
   id: ''
 goal:
-  name: '/eng2/7f/73b2/test/button'
+  device_name: '/eng2/7f/73b2/test/button'
   command: 'press'
   parameter: ''
-  commandType: ''"
+  command_type: ''"
 ```
 ```bash
-rostopic pub /switchbot_ros/goal switchbot_ros/SwitchBotCommandActionGoal "header:
+rostopic pub /switchbot_ros/switch/goal switchbot_ros/SwitchBotCommandActionGoal "header:
   seq: 0
   stamp:
     secs: 0
@@ -46,9 +46,9 @@ goal_id:
     nsecs: 0
   id: ''
 goal:
-  name: '/myroom/light'
+  device_name: '/myroom/light'
   command: 'turnOn'
   parameter: ''
-  commandType: ''"
+  command_type: ''"
 ```
 Please see [here](https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices) for command details.
