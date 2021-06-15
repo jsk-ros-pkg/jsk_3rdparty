@@ -10,16 +10,16 @@ class SwitchBotAction:
     """
     Control your switchbot with ROS and SwitchBot API
     """
-    _feedback = SwitchBotCommandFeedback()
-    _result = SwitchBotCommandResult()
-    
-    def __init__(self, name):
+    def __init__(self):
         # SwitchBot configs
         self.token = rospy.get_param('~token')
         self.bots = SwitchBotAPIClient(token=self.token)
         # Actionlib
-        self._action_name = name
-        self._as = actionlib.SimpleActionServer(self._action_name, SwitchBotCommandAction, execute_cb=self.execute_cb, auto_start=False)
+        self._feedback = SwitchBotCommandFeedback()
+        self._result = SwitchBotCommandResult()
+        self._as = actionlib.SimpleActionServer(
+            '~switch', SwitchBotCommandAction,
+            execute_cb=self.execute_cb, auto_start=False)
         self._as.start()
 
         
@@ -36,6 +36,7 @@ class SwitchBotAction:
         try:
             self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, command_type=command_type, device_name=goal.device_name))
         except Exception as e:
+            rospy.logerr(str(e))
             self._feedback.status = str(e)
             success = False
         finally:
@@ -47,5 +48,5 @@ class SwitchBotAction:
 
 if __name__ == '__main__':
     rospy.init_node('switchbot')
-    server = SwitchBotAction(rospy.get_name())
+    server = SwitchBotAction()
     rospy.spin()

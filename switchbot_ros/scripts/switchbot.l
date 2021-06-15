@@ -3,7 +3,7 @@
 (ros::load-ros-manifest "switchbot_ros")
 (ros::roseus "switchboteus_client")
 
-(defun control-device (device_name command &key (parameter "") (command_type "") (topic-name "switchbot_ros") (wait nil))
+(defun control-device (device_name command &key (parameter "") (command_type "") (topic-name "switchbot_ros/switch") (wait nil))
   (when (boundp 'switchbot_ros::SwitchBotCommandAction)
     (let ((goal (instance switchbot_ros::SwitchBotCommandActionGoal :init))
           (ac (instance ros::simple-action-client :init
