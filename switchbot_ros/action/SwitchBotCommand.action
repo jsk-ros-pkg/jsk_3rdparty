@@ -1,8 +1,8 @@
 # Define the goal
-string deviceName
+string device_name
 string command
 string parameter
-string commandType
+string command_type
 ---
 # Define the result
 bool done

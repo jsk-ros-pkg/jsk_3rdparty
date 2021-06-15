@@ -28,13 +28,13 @@ class SwitchBotAction:
         success = True
         
         # start executing the action
-        parameter, commandType = goal.parameter, goal.commandType
+        parameter, command_type = goal.parameter, goal.command_type
         if not parameter:
             parameter = 'default'
-        if not commandType:
-            commandType = 'command'
+        if not command_type:
+            command_type = 'command'
         try:
-            self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, commandType=commandType, deviceName=goal.deviceName))
+            self._feedback.status = str(self.bots.control_device(command=goal.command, parameter=parameter, command_type=command_type, device_name=goal.device_name))
         except Exception as e:
             self._feedback.status = str(e)
             success = False
