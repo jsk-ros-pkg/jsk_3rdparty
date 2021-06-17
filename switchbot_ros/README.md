@@ -11,7 +11,7 @@ This is the package for using switchbot by ROS.
 Especially, please set your device name and enable cloud service.
 
 3. Get your token  
-On switchbot App, profile -> settings, and press `version` for 10 times and you can get token.
+On switchbot App, profile -> settings, and press `version` for 10 times and you can get token. For JSK members, we already have shared one [here](https://drive.google.com/file/d/1YZ4P4aaPemB_umB9S0xDG66BJt59-2lz/view?usp=sharing).
 
 ### Using switchbot ros
 Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal.
