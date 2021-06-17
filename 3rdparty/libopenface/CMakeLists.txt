@@ -3,10 +3,9 @@ project(libopenface)
 
 find_package(catkin REQUIRED mk)
 
-add_custom_target(libFaceAnalyzer ALL
-  DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libFaceAnalyzer.a)
-add_custom_target(libLandmarkDetector ALL
-  DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libLandmarkDetector.a)
+add_custom_target(libopenface ALL
+  DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libFaceAnalyzer.a
+          ${CATKIN_DEVEL_PREFIX}/lib/libLandmarkDetector.a)
 add_custom_command(OUTPUT ${CATKIN_DEVEL_PREFIX}/lib/libFaceAnalyzer.a ${CATKIN_DEVEL_PREFIX}/lib/libLandmarkDetector.a
   DEPENDS Makefile
   COMMAND cmake -E chdir ${CMAKE_CURRENT_BINARY_DIR} make -f ${PROJECT_SOURCE_DIR}/Makefile MK_DIR=${mk_PREFIX}/share/mk INSTALL_DIR=${CATKIN_DEVEL_PREFIX} MD5SUM_DIR=${PROJECT_SOURCE_DIR})
