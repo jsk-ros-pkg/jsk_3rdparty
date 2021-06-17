@@ -14,7 +14,9 @@ Especially, please set your device name and enable cloud service.
 On switchbot App, profile -> settings, and press `version` for 10 times and you can get token.
 
 ### Using switchbot ros
-Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal, like
+Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal.
+
+From command line
 ```bash
 rostopic pub /switchbot_ros/switch/goal switchbot_ros/SwitchBotCommandActionGoal "header:
   seq: 0
@@ -51,4 +53,11 @@ goal:
   parameter: ''
   command_type: ''"
 ```
+
+From roseus
+```
+(control-device "/eng2/7f/73b2/light/upper/switch" "turnOn")
+(control-device "/eng2/7f/73b2/light/lower/switch" "turnOn")
+```
+
 Please see [here](https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices) for command details.

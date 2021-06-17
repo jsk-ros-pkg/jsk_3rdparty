@@ -4,6 +4,10 @@
 (ros::roseus "switchboteus_client")
 
 (defun control-device (device_name command &key (parameter "") (command_type "") (topic-name "switchbot_ros/switch") (wait nil))
+  "
+  Please see the following page for command details.
+  https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices
+  "
   (when (boundp 'switchbot_ros::SwitchBotCommandAction)
     (let ((goal (instance switchbot_ros::SwitchBotCommandActionGoal :init))
           (ac (instance ros::simple-action-client :init
