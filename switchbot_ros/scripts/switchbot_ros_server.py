@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import actionlib
+import os.path
 import rospy
 from switchbot_ros.msg import SwitchBotCommandAction
 from switchbot_ros.msg import SwitchBotCommandFeedback
@@ -14,7 +15,13 @@ class SwitchBotAction:
     """
     def __init__(self):
         # SwitchBot configs
-        self.token = rospy.get_param('~token')
+        # '~token' can be file path or raw characters
+        token = rospy.get_param('~token')
+        if os.path.exists(token):
+            with open(token) as f:
+                self.token = f.read().replace('\n', '')
+        else:
+            self.token = token
         self.bots = SwitchBotAPIClient(token=self.token)
         # Actionlib
         self._as = actionlib.SimpleActionServer(
