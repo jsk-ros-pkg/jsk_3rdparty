@@ -23,6 +23,12 @@ class SwitchBotAction:
         else:
             self.token = token
         self.bots = SwitchBotAPIClient(token=self.token)
+        device_list_str = 'Switchbot device list:\n'
+        for device in self.bots.device_list:
+            device_list_str += 'Name: ' + str(device['deviceName'])
+            device_list_str += ', Type: ' + str(device['deviceType'])
+            device_list_str += '\n'
+        rospy.loginfo(device_list_str)
         # Actionlib
         self._as = actionlib.SimpleActionServer(
             '~switch', SwitchBotCommandAction,
