@@ -1,9 +1,15 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package libcmt
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package chaplus_ros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2.1.22 (2021-06-10)
 -------------------
+* add chat agent interface for ros (`#252 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/252>`_)
+
+  * add A3RT chat engine
+  * add chaplus ros interface see README.md for more information
+
+* Contributors: Ayaka Fujii
 
 2.1.21 (2020-08-19)
 -------------------
@@ -16,27 +22,18 @@ Changelog for package libcmt
 
 2.1.18 (2020-07-20)
 -------------------
-* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
 
-  * use .zip instead of git clone
-  * for OpenCV4 includce opencv2/imgproc/types_c.h
+2.1.17 (2020-04-16 21:51)
+-------------------------
 
-* Contributors: Kei Okada
-
-2.1.17 (2020-04-16)
--------------------
-
-2.1.16 (2020-04-16)
--------------------
+2.1.16 (2020-04-16 15:21)
+-------------------------
 
 2.1.15 (2019-12-12)
 -------------------
 
 2.1.14 (2019-11-21)
 -------------------
-* [libcmt] Support using OpenCV3 in kinetic (`#179 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/179>`_)
-  * Change dependency: libopencv-dev -> cv_bridge to support using OpenCV3 in kinetic
-* Contributors: Yuto Uchimi
 
 2.1.13 (2019-07-10)
 -------------------
@@ -46,8 +43,6 @@ Changelog for package libcmt
 
 2.1.11 (2018-08-29)
 -------------------
-* libcmt: opencv2/xfeatures2d.hpp only required between 3.1.0 <= OPENCV_VERSION_CODE < 3.2.0 (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
-* Contributors: Kei Okada
 
 2.1.10 (2018-04-25)
 -------------------
@@ -90,21 +85,15 @@ Changelog for package libcmt
 
 2.0.18 (2016-10-28)
 -------------------
-* add patch to fix opencv3 https://github.com/delmottea/libCMT/pull/18 (`#78 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/78>`_)
-* Contributors: Kei Okada
 
 2.0.17 (2016-10-22)
 -------------------
-* addbuildtool_depend
-* Contributors: Kei Okada
 
 2.0.16 (2016-10-17)
 -------------------
 
 2.0.15 (2016-10-16)
 -------------------
-* fix libcmt install process
-* Contributors: Kei Okada
 
 2.0.14 (2016-03-20)
 -------------------
@@ -115,31 +104,23 @@ Changelog for package libcmt
 2.0.12 (2015-11-26)
 -------------------
 
-2.0.11 (2015-10-07)
--------------------
+2.0.11 (2015-10-07 14:16)
+-------------------------
 
-2.0.10 (2015-10-07)
--------------------
+2.0.10 (2015-10-07 12:47)
+-------------------------
 
 2.0.9 (2015-09-26)
 ------------------
-* use libopencv-dev instad of opencv2, see `#23 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/23>`_
-* [libcmt] Disable ssl verify before chekingout git project
-* Contributors: Kei Okada, Ryohei Ueda
 
 2.0.8 (2015-09-15)
 ------------------
-* [libcmt] Depends on opencv2
-* Contributors: Ryohei Ueda
 
 2.0.7 (2015-09-14)
 ------------------
 
 2.0.6 (2015-09-08)
 ------------------
-* [libcmt] add git depend in package.xml
-* [libcmt] Fix email of maintainer
-* Contributors: Ryohei Ueda, Yuto Inagaki
 
 2.0.5 (2015-08-23)
 ------------------
@@ -149,12 +130,6 @@ Changelog for package libcmt
 
 2.0.3 (2015-08-01)
 ------------------
-* Update Changelog
-* [3rdparty] add libcmt
-* Contributors: Ryohei Ueda, Yuto Inagaki
-
-* [3rdparty] add libcmt
-* Contributors: Yuto Inagaki
 
 2.0.2 (2015-06-29)
 ------------------
@@ -164,9 +139,6 @@ Changelog for package libcmt
 
 2.0.0 (2015-06-19 10:41)
 ------------------------
-
-1.0.72 (2015-06-07)
--------------------
 
 1.0.71 (2015-05-17)
 -------------------

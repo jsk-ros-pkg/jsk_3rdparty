@@ -2,6 +2,24 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.22 (2021-06-10)
+-------------------
+* [respeaker_ros] Specify correct Python version in package.xml (`#247 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/247>`_)
+
+  * Fixes typo introduced in https://github.com/jsk-ros-pkg/jsk_3rdparty/commit/39be21894a38112a1633cf8385caf079c35536ff
+
+* Add respawn_delay to respeaker_node.py to reduce CPU load (`#241 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/241>`_)
+
+   * Kill respeaker_node.py when USBError occur to reduce CPU load
+
+* [respeaker_ros] fix default sound_play action name of speech_to_text.py (`#239 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/239>`_)
+* Mistakes I found when I tried to use respeaker_ros on hirovision (`#217 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/217>`_)
+
+  * add speech_recognition_msgs
+  * change the name from respeaker.launch to sample_respeaker.launch
+
+* Contributors: Koki Shinjo, Miyabi Tanemoto, Naoya Yamaguchi, Shun Hasegawa
+
 2.1.21 (2020-08-19)
 -------------------
 

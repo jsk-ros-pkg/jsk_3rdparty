@@ -2,6 +2,11 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.22 (2021-06-10)
+-------------------
+* relax rosping test for GAf( `#245 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/245>`_)
+* Contributors: Kei Okada
+
 2.1.21 (2020-08-19)
 -------------------
 

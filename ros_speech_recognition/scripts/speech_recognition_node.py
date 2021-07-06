@@ -142,7 +142,7 @@ class ROSSpeechRecognition(object):
         self.continuous = rospy.get_param("~continuous", False)
         if self.continuous:
             rospy.loginfo("Enabled continuous mode")
-            self.pub = rospy.Publisher("/Tablet/voice",
+            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "/Tablet/voice"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
         else:
