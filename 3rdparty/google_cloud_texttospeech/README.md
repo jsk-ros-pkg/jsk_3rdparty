@@ -44,7 +44,7 @@ Look at the following website for further details.
 [Google Cloud Text-to-Speech Supported voices and languages](https://cloud.google.com/text-to-speech/docs/voices)
 
 ```python
-client.say('你好', voice='yue-HK-Standard-A')
+client.say('你好', voice='cmn-TW-Wavenet-A')
 client.say('Hallo', voice='de-DE-Wavenet-A')
 ```
 
@@ -58,6 +58,6 @@ $ roseus
 
 (speak "JSKへようこそ。" :lang "ja-JP-Wavenet-B" :wait t)
 (speak "Welcome to JSK." :lang "en-US-Wavenet-A" :wait t)
-(speak "欢迎来到 JSK" :lang "yue-HK-Standard-A" :wait t)
+(speak "欢迎来到 JSK" :lang "cmn-TW-Wavenet-A" :wait t)
 (speak "Willkommen bei JSK" :lang "de-DE-Wavenet-A" :wait t)
 ```
