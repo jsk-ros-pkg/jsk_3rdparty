@@ -42,6 +42,8 @@ client.say('こんにちは', voice='ja')
 You can change the voice by changing the voice_name.
 Look at the following website for further details.
 [Google Cloud Text-to-Speech Supported voices and languages](https://cloud.google.com/text-to-speech/docs/voices)
+We can use standard and WaveNet voices.
+WaveNet voices are higher quality voices with different pricing; in the list, they have the voice type 'WaveNet'.
 
 ```python
 client.say('你好', voice='cmn-TW-Wavenet-A')
