@@ -25,6 +25,8 @@ roslaunch google_cloud_texttospeech google_cloud_texttospeech.launch credential:
 
 ### Say something
 
+#### For python users
+
 ```python
 import rospy
 from sound_play.libsoundplay import SoundClient
@@ -44,4 +46,18 @@ Look at the following website for further details.
 ```python
 client.say('你好', voice='yue-HK-Standard-A')
 client.say('Hallo', voice='da-DK-Wavenet-D')
+```
+
+#### For roseus users
+
+```
+$ roseus
+(load "package://pr2eus/speak.l")
+
+(ros::roseus "say_node")
+
+(speak "JSKへようこそ。" :lang "ja-JP-Wavenet-B" :wait t)
+(speak "Welcome to JSK." :lang "en-US-Wavenet-A" :wait t)
+(speak "欢迎来到 JSK" :lang "yue-HK-Standard-A" :wait t)
+(speak "Willkommen bei JSK" :lang "da-DK-Wavenet-D" :wait t)
 ```
