@@ -45,9 +45,13 @@ Look at the following website for further details.
 We can use standard and WaveNet voices.
 WaveNet voices are higher quality voices with different pricing; in the list, they have the voice type 'WaveNet'.
 
+You can also choose the language by specifying the language code.
+`ja` for Japanese, `de` for German, etc.
+
+
 ```python
 client.say('你好', voice='cmn-TW-Wavenet-A')
-client.say('Hallo', voice='de-DE-Wavenet-A')
+client.say('Hallo', voice='de)
 ```
 
 #### For roseus users
