@@ -53,7 +53,7 @@ You can also choose the language by specifying the language code.
 
 ```python
 client.say('你好', voice='cmn-TW-Wavenet-A')
-client.say('Hallo', voice='de)
+client.say('Hallo', voice='de')
 ```
 
 #### For roseus users
