@@ -45,7 +45,7 @@ Look at the following website for further details.
 
 ```python
 client.say('你好', voice='yue-HK-Standard-A')
-client.say('Hallo', voice='da-DK-Wavenet-D')
+client.say('Hallo', voice='de-DE-Wavenet-A')
 ```
 
 #### For roseus users
@@ -59,5 +59,5 @@ $ roseus
 (speak "JSKへようこそ。" :lang "ja-JP-Wavenet-B" :wait t)
 (speak "Welcome to JSK." :lang "en-US-Wavenet-A" :wait t)
 (speak "欢迎来到 JSK" :lang "yue-HK-Standard-A" :wait t)
-(speak "Willkommen bei JSK" :lang "da-DK-Wavenet-D" :wait t)
+(speak "Willkommen bei JSK" :lang "de-DE-Wavenet-A" :wait t)
 ```
