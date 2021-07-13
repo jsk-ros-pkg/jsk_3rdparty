@@ -36,3 +36,12 @@ client = SoundClient(sound_action='robotsound', sound_topic='robotsound')
 client.say('hello!')
 client.say('こんにちは', voice='ja')
 ```
+
+You can change the voice by changing the voice_name.
+Look at the following website for further details.
+[Google Cloud Text-to-Speech Supported voices and languages](https://cloud.google.com/text-to-speech/docs/voices)
+
+```python
+client.say('你好', voice='yue-HK-Standard-A')
+client.say('Hallo', voice='da-DK-Wavenet-D')
+```
