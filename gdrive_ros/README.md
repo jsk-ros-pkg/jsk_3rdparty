@@ -6,6 +6,12 @@ Google Drive file uploader for ROS
 
 ### Setup and build workspace 
 
+If you use 18.04 please run
+`
+```bash
+pip install oauth2client==4.1.3 rsa==4.5 pydrive==1.3.1
+```
+
 ```bash
 cd ~
 mkdir gdrive_ws/src -p
