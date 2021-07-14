@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import datetime
+from distutils.version import LooseVersion
 import os.path
+import pkg_resources
 import sys
 import time
 
@@ -15,6 +17,17 @@ from gdrive_ros.srv import MultipleUpload
 from gdrive_ros.srv import MultipleUploadResponse
 from gdrive_ros.srv import Upload
 from gdrive_ros.srv import UploadResponse
+
+
+if sys.version_info < 3 and \
+        LooseVersion(pkg_resources.get_distribution("rsa").version) \
+        >= LooseVersion('4.6.0'):
+    print('''rsa < 4.6.0 is required:
+    pip install oauth2client==4.2.3 rsa==4.5 pydrive==1.3.1
+    For more detailed information,
+    please read https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/gdrive_ros#trouble-shooting
+''', file=sys.stderr)
+    sys.exit(1)
 
 
 class GDriveServerNode(object):
