@@ -1,6 +1,9 @@
 # switchbot_ros
 This is the package for using switchbot by ROS.
 
+## System Component
+
+
 ## How to use?
 ### Setup switchbot
 1. Install the switchbot app to your phone(iPhone, Android) and create your switchbot account.  
@@ -61,3 +64,7 @@ From roseus
 ```
 
 Please see [here](https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices) for command details.
+
+
+### An example of controlling the elevator at Eng2 building at The University of Tokyo
+Please see [here](https://github.com/sktometometo/jsk_robot/blob/develop/spot/jsk_spot_robot/jsk_spot_behaviors/spot_basic_behaviors/src/spot_basic_behaviors/elevator_behavior.py) for controlling elevator example code by JSK Spot robot.
