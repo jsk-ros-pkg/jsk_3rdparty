@@ -2,7 +2,8 @@
 This is the package for using switchbot by ROS.
 
 ## System Component
-
+![Screenshot from 2021-07-17 12-43-06](https://user-images.githubusercontent.com/27789460/126024618-159f57e6-d17e-448f-a606-425b33bc1fff.png)
+JSK members can edit the original file [here](https://docs.google.com/presentation/d/18LIq5SMnkFJGJsdDV85V6G5Vyt8o6_0rvvhKwSjwWmk/edit?usp=sharing).
 
 ## How to use?
 ### Setup switchbot
