@@ -17,6 +17,7 @@ env:
     - ROS_PARALLEL_TEST_JOBS="-j8"
     - GIT_SSL_NO_VERIFY=1 # http://stackoverflow.com/questions/21181231/server-certificate-verification-failed-cafile-etc-ssl-certs-ca-certificates-c
   matrix:
+    - CHECK_PYTHON2_COMPILE=true
     - CHECK_PYTHON3_COMPILE=true
     - ROS_DISTRO=indigo  USE_DEB=true
     - ROS_DISTRO=kinetic USE_DEB=true
@@ -30,6 +31,7 @@ matrix:
     - env: ROS_DISTRO=hydro   USE_DEB=true USE_DOCKER=true
     - env: ROS_DISTRO=noetic  USE_DEB=true
 script:
+  - if [ "${CHECK_PYTHON2_COMPILE}" == "true" ]; then python2 -m compileall .; exit $?; fi
   - if [ "${CHECK_PYTHON3_COMPILE}" == "true" ]; then python3 -m compileall .; exit $?; fi
   - if [ "$ROS_DISTRO" == "indigo" ]; then export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0; $BEFORE_SCRIPT"; fi
   - source .travis/travis.sh
