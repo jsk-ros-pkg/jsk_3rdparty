@@ -4,7 +4,7 @@ Google Drive file uploader for ROS
 
 ## Installation
 
-### Setup and build workspace 
+### Setup and build workspace
 
 ```bash
 cd ~
@@ -15,6 +15,14 @@ rosdep install --ignore-src -from-paths . -y -r
 cd ~/gdrive_ws
 catkin init
 catkin build
+```
+
+### Trouble shooting
+
+If you use 18.04 and python2.7, please install following versions.
+`
+```bash
+pip install oauth2client==4.1.3 rsa==4.5 pydrive==1.3.1
 ```
 
 ### Do authentication of Google Drive API
