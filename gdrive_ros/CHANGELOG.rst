@@ -2,8 +2,8 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.23 (2021-07-21)
+-------------------
 * add rostest in test_depend (`#263 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/263>`_)
 * fix-typo-gdrive (`#272 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/272>`_)
 * add version check at top of gdrive_server_node (`#270 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/270>`_)

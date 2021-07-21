@@ -2,8 +2,8 @@
 Changelog for package google_cloud_texttospeech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.23 (2021-07-21)
+-------------------
 * [google_cloud_texttospeech] Fixed for 2.0.0 and later versions. (`#266 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/266>`_)
 * [google_cloud_texttospeech] Support multiple languages. (`#269 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/269>`_)
 
