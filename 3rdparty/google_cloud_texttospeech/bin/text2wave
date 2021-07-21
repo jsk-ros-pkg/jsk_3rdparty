@@ -1,9 +1,29 @@
 #!/usr/bin/env python
 
 import argparse
+from distutils.version import LooseVersion
 
-from google.cloud import texttospeech
+from google.cloud.texttospeech import TextToSpeechClient
+import pkg_resources
 import rospy
+
+
+# The submodules enums and types have been removed from v2.0.0
+# https://github.com/googleapis/python-texttospeech/blob/master/UPGRADING.md#enums-and-types  # NOQA
+texttospeech_version = pkg_resources.get_distribution(
+    "google-cloud-texttospeech").version
+if LooseVersion(texttospeech_version) >= LooseVersion('2.0.0'):
+    from google.cloud.texttospeech import AudioConfig
+    from google.cloud.texttospeech import AudioEncoding
+    from google.cloud.texttospeech import SsmlVoiceGender
+    from google.cloud.texttospeech import SynthesisInput
+    from google.cloud.texttospeech import VoiceSelectionParams
+else:
+    from google.cloud.texttospeech_v1.gapic.enums import AudioEncoding
+    from google.cloud.texttospeech_v1.gapic.enums import SsmlVoiceGender
+    from google.cloud.texttospeech_v1.types import AudioConfig
+    from google.cloud.texttospeech_v1.types import SynthesisInput
+    from google.cloud.texttospeech_v1.types import VoiceSelectionParams
 
 
 # You can see which language is available here
@@ -341,25 +361,31 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Instantiates a client
-    client = texttospeech.TextToSpeechClient()
+    client = TextToSpeechClient()
     with open(args.text, 'rb') as f:
-        synthesis_input = texttospeech.types.SynthesisInput(
+        synthesis_input = SynthesisInput(
             text=f.readline())
 
     name, language_code = determine_voice_name(
         args.evaluate.lstrip('(').rstrip(')'))
 
-    voice = texttospeech.types.VoiceSelectionParams(
+    voice = VoiceSelectionParams(
         language_code=language_code,
         name=name,
-        ssml_gender=texttospeech.enums.SsmlVoiceGender.FEMALE)
+        ssml_gender=SsmlVoiceGender.FEMALE)
 
     # Select the type of audio file you want returned
-    audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.MP3,
+    audio_config = AudioConfig(
+        audio_encoding=AudioEncoding.MP3,
         speaking_rate=speaking_rate)
-    response = client.synthesize_speech(
-        synthesis_input, voice, audio_config)
+    if LooseVersion(texttospeech_version) >= LooseVersion('2.0.0'):
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config)
+    else:
+        response = client.synthesize_speech(
+            synthesis_input, voice, audio_config)
     with open(args.output, 'wb') as out:
         # Write the response to the output file.
         out.write(response.audio_content)
