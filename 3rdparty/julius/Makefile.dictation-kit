@@ -18,6 +18,8 @@ INSTALL_DIR = `rospack find julius`
 installed.dict: $(SOURCE_DIR)/unpacked
 	rsync -a $(SOURCE_DIR)/model/ $(INSTALL_DIR)/model
 	rsync -a $(SOURCE_DIR)/*conf $(INSTALL_DIR)/conf
+	# Move julius.dnnconf to use correct model file path
+	mv $(INSTALL_DIR)/conf/julius.dnnconf $(INSTALL_DIR)/julius.dnnconf
 	touch installed.dict
 
 clean:
@@ -25,4 +27,5 @@ clean:
 	rm -rf $(SOURCE_DIR)
 	rm -rf $(INSTALL_DIR)/model
 	rm -rf $(INSTALL_DIR)/conf
+	rm -rf $(INSTALL_DIR)/julius.dnnconf
 	rm -rf installed.dict
