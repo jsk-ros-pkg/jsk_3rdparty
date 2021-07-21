@@ -2,6 +2,14 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add rostest in test_depend (`#263 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/263>`_)
+* fix-typo-gdrive (`#272 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/272>`_)
+* add version check at top of gdrive_server_node (`#270 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/270>`_)
+
+* Contributors: Koki Shinjo, Shingo Kitagawa
+
 2.1.22 (2021-06-10)
 -------------------
 * set max authentication trial times as infinite (`#249 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/249>`_)

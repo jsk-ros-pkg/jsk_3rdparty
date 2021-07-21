@@ -2,6 +2,12 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add sample_json (`#264 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/264>`_)
+
+* Contributors: Ayaka Fujii
+
 2.1.22 (2021-06-10)
 -------------------
 * add chat agent interface for ros (`#252 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/252>`_)

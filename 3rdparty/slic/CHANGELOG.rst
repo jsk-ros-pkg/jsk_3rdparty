@@ -2,6 +2,12 @@
 Changelog for package slic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [slic] fix typo in slic/CMakeLists.txt (`#261 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/261>`_)
+
+* Contributors: Shingo Kitagawa
+
 2.1.22 (2021-06-10)
 -------------------
 

@@ -2,6 +2,9 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.22 (2021-06-10)
 -------------------
 * enable to change topic name from speech_recognition.launch (`#254 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/254>`_)

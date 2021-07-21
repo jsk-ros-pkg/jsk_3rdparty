@@ -2,6 +2,9 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.22 (2021-06-10)
 -------------------
 * [respeaker_ros] Specify correct Python version in package.xml (`#247 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/247>`_)
