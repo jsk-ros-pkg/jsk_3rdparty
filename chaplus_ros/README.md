@@ -33,6 +33,14 @@ You can also create account via https://chaplus.work and reqeust [beta program](
 - ~chaplus_apikey_file (String: default: `rospack find chaplus_ros`/apikey.json
 
   Path to json file stores chaplus API key.
+  
+  
+- ~communication_sample_file (String: default: `rospack find chaplus_ros`/communication_sample.json
+
+  Path to json file of decided responses.
+  
+  If you do not want to use this, please set the parameter as `use_sample:=false` when roslaunch.
+  
 
 Sample Code
 -----------

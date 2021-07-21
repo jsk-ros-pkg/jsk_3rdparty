@@ -53,6 +53,7 @@ class ChaplusROS(object):
     def __init__(self):
 
         self.chatbot_engine = rospy.get_param("~chatbot_engine", "Chaplus")
+        self.use_sample = rospy.get_param("~use_sample", True)
         # please write your apikey to chaplus_ros/apikey.json
         r = rospkg.RosPack()
         apikey_path = rospy.get_param(
@@ -66,6 +67,16 @@ class ChaplusROS(object):
             rospy.logerr(
                 "echo '{\"apikey\": \00000000\"}' > `rospack find chaplus_ros`/apikey.json")
             sys.exit(e)
+
+        if self.use_sample==True:
+            communication_sample_path=rospy.get_param(
+                "~communication_sample_file", r.get_path('chaplus_ros')+"/communication_sample.json")
+            try:
+                with open(communication_sample_path) as j2:
+                    self.communication_sample_json = json.loads(j2.read(), strict=False)
+            except Exception as e:
+                rospy.logerr('Could not find {}'.format(communication_sample_path))
+                sys.exit(e)
 
         if self.chatbot_engine=="Chaplus":
             self.headers = {'content-type': 'text/json'}
@@ -89,7 +100,15 @@ class ChaplusROS(object):
         if self.chatbot_engine=="Chaplus":
             try:
                 rospy.loginfo("received {}".format(msg.data))
-                self.data = json.dumps({'utterance': msg.data})
+
+                if self.use_sample==True:
+                    self.data =json.dumps(
+                       {'utterance': msg.data,
+                        'agentstate': self.communication_sample_json["agentState"],
+                        'addition': self.communication_sample_json["addition"]
+                       })
+                else:
+                    self.data = json.dumps({'utterance': msg.data})
                 response = requests.post(
                     url=self.url, headers=self.headers, data=self.data)
                 response_json = response.json()

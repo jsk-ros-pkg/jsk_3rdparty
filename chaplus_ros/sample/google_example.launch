@@ -3,6 +3,8 @@
   <!-- you can choose chatbot_engine "Chaplus" or "A3RT" currently-->
   <arg name="chatbot_engine" default="Chaplus" />
 
+  <arg name="use_sample" default="True" />
+
   <!-- start talker
        subscribe /robotsound_jp sound_play/SoundRequest -->
   <include file="$(find aques_talk)/launch/aques_talk.launch" />
@@ -44,6 +46,7 @@
         output="screen" >
     <rosparam subst_value="true">
       chatbot_engine: $(arg chatbot_engine)
+      use_sample: $(arg use_sample)
     </rosparam>
   </node>
 
