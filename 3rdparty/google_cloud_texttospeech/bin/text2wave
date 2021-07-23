@@ -2,6 +2,10 @@
 
 import argparse
 from distutils.version import LooseVersion
+import hashlib
+import os
+import shutil
+import sys
 
 from google.cloud.texttospeech import TextToSpeechClient
 import pkg_resources
@@ -25,6 +29,11 @@ else:
     from google.cloud.texttospeech_v1.types import SynthesisInput
     from google.cloud.texttospeech_v1.types import VoiceSelectionParams
 
+
+cache_enabled = os.environ.get(
+    'GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED', True)
+cache_enabled = cache_enabled is True \
+    or cache_enabled == 'true'  # for launch env tag.
 
 # You can see which language is available here
 # https://cloud.google.com/text-to-speech/docs/voices
@@ -352,6 +361,47 @@ def determine_voice_name(voice_name):
     return name, language_code
 
 
+def get_cache_dir():
+    """Return cache dir.
+
+    Returns
+    -------
+    cache_dir : str
+        cache directory.
+    """
+    ros_home = os.getenv('ROS_HOME', os.path.expanduser('~/.ros'))
+    pkg_ros_home = os.path.join(ros_home, 'google_cloud_texttospeech')
+    default_cache_dir = os.path.join(pkg_ros_home, 'cache')
+    cache_dir = os.environ.get(
+        'GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_DIR',
+        default_cache_dir)
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+    return cache_dir
+
+
+def checksum_md5(filename, blocksize=8192):
+    """Calculate md5sum.
+
+    Parameters
+    ----------
+    filename : str or pathlib.Path
+        input filename.
+    blocksize : int
+        MD5 has 128-byte digest blocks (default: 8192 is 128x64).
+    Returns
+    -------
+    md5 : str
+        calculated md5sum.
+    """
+    filename = str(filename)
+    hash_factory = hashlib.md5()
+    with open(filename, 'rb') as f:
+        for chunk in iter(lambda: f.read(blocksize), b''):
+            hash_factory.update(chunk)
+    return hash_factory.hexdigest()
+
+
 if __name__ == '__main__':
     speaking_rate = rospy.get_param('~speaking_rate', 1.0)
     parser = argparse.ArgumentParser(description='')
@@ -363,11 +413,25 @@ if __name__ == '__main__':
     # Instantiates a client
     client = TextToSpeechClient()
     with open(args.text, 'rb') as f:
-        synthesis_input = SynthesisInput(
-            text=f.readline())
+        speech_text = f.readline()
+    synthesis_input = SynthesisInput(
+        text=speech_text)
 
     name, language_code = determine_voice_name(
         args.evaluate.lstrip('(').rstrip(')'))
+
+    if cache_enabled:
+        cache_dir = get_cache_dir()
+        md5 = checksum_md5(args.text)
+        cache_filename = os.path.join(
+            cache_dir,
+            '--'.join([md5, language_code, name, str(speaking_rate)])
+            + '.mp3')
+        if os.path.exists(cache_filename):
+            print('[Text2Wave] Using cached sound file ({}) for {}'
+                  .format(cache_filename, speech_text.decode('utf-8')))
+            shutil.copy(cache_filename, args.output)
+            sys.exit(0)
 
     voice = VoiceSelectionParams(
         language_code=language_code,
@@ -389,3 +453,7 @@ if __name__ == '__main__':
     with open(args.output, 'wb') as out:
         # Write the response to the output file.
         out.write(response.audio_content)
+    if cache_enabled:
+        text_cache_filename = os.path.splitext(cache_filename)[0] + '.txt'
+        shutil.copy(args.text, text_cache_filename)
+        shutil.copy(args.output, cache_filename)
