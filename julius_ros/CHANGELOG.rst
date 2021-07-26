@@ -2,6 +2,9 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.23 (2021-07-21)
 -------------------
 * Add DNN version julius (`#259 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/259>`_)
