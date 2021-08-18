@@ -2,6 +2,7 @@
 
 import actionlib
 import os.path
+from requests import ConnectionError
 import rospy
 from switchbot_ros.msg import SwitchBotCommandAction
 from switchbot_ros.msg import SwitchBotCommandFeedback
@@ -22,13 +23,17 @@ class SwitchBotAction:
                 self.token = f.read().replace('\n', '')
         else:
             self.token = token
-        self.bots = SwitchBotAPIClient(token=self.token)
-        device_list_str = 'Switchbot device list:\n'
-        for device in self.bots.device_list:
-            device_list_str += 'Name: ' + str(device['deviceName'])
-            device_list_str += ', Type: ' + str(device['deviceType'])
-            device_list_str += '\n'
-        rospy.loginfo(device_list_str)
+        try:
+            self.bots = SwitchBotAPIClient(token=self.token)
+            device_list_str = 'Switchbot device list:\n'
+            for device in self.bots.device_list:
+                device_list_str += 'Name: ' + str(device['deviceName'])
+                device_list_str += ', Type: ' + str(device['deviceType'])
+                device_list_str += '\n'
+            rospy.loginfo(device_list_str)
+        except ConnectionError as e: # If the machine is not connected to the internet
+            self.bots = None
+            rospy.logwarn('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
         # Actionlib
         self._as = actionlib.SimpleActionServer(
             '~switch', SwitchBotCommandAction,
@@ -48,6 +53,8 @@ class SwitchBotAction:
         if not command_type:
             command_type = 'command'
         try:
+            if not self.bots:
+                self.bots = SwitchBotAPIClient(token=self.token)
             feedback.status = str(
                 self.bots.control_device(
                     command=goal.command,
