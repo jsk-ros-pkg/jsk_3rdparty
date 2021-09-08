@@ -1,10 +1,10 @@
 all: openface 
 
 INSTALL_DIR=`rospack find libopenface`
-FILENAME =  OpenFace-a7b819f57a7cf12dbe7599644941c54f5e1a1a2b.zip
+FILENAME =  OpenFace-1d043c37a37f7b125cb3e0d854c8eee7df2d736b.zip
 TARBALL = build/$(FILENAME)
-SOURCE_DIR=build/OpenFace-a7b819f57a7cf12dbe7599644941c54f5e1a1a2b
-TARBALL_URL =  https://github.com/knorth55/OpenFace/archive/a7b819f57a7cf12dbe7599644941c54f5e1a1a2b.zip
+SOURCE_DIR= build/OpenFace-1d043c37a37f7b125cb3e0d854c8eee7df2d736b
+TARBALL_URL =  https://github.com/knorth55/OpenFace/archive/1d043c37a37f7b125cb3e0d854c8eee7df2d736b.zip
 UNPACK_CMD = unzip -q
 MD5SUM_DIR = $(CURDIR)
 MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
