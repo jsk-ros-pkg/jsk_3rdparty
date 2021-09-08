@@ -69,3 +69,10 @@ $ roseus
 (speak "欢迎来到 JSK" :lang "cmn-TW-Wavenet-A" :wait t)
 (speak "Willkommen bei JSK" :lang "de-DE-Wavenet-A" :wait t)
 ```
+
+### Tips
+
+By default, generated audio files are stored at `$HOME/.ros/google_cloud_texttospeech/cache`.
+If you want to change the cache directory, please set `GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_DIR` as an environment variable.
+
+If you don't want to cache the files, please set `GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED=false`.
