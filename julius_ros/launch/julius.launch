@@ -1,15 +1,24 @@
 <launch>
-  <arg name="conf_file" default="$(find julius_ros)/conf/main.jconf" />
-  <arg name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs" />
-  <arg name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" />
-  <arg name="word_file" default="$(find julius_ros)/data/udon.dic" />
-  <arg name="module_port" default="10500" />
-  <arg name="audio_port"  default="10501" />
-  <arg name="max_connection_retry" default="0" />
-  <arg name="default_threshold" default="0.9" />
-  <arg name="start_signal_action_timeout" default="0.3" />
-  <arg name="respawn" default="false" />
+  <!-- Julius server config common for DNN version and GMM version-->
+  <arg name="conf_file" default="$(find julius_ros)/conf/main.jconf" doc="Common Julius config file for DNN version and GMM version. Other configs are specified in the args of run_julius.sh" />
+  <arg name="module_port" default="10500" doc="Port number when julius is started in module mode." />
+  <arg name="audio_port"  default="10501" doc="Port number for outputting audio to julius module." />
+  <arg name="max_connection_retry" default="0" doc="Maximum number of times to try to connect to the server; if 0, it will try forever." />
+  <arg name="default_threshold" default="0.9" doc="Threshold for judging the recognition result as correct" />
+  <arg name="start_signal_action_timeout" default="0.3" doc="Timeout[s] for sounding start signal" />
+  <arg name="dnn" default="false" doc="set true if you use DNN version julius"/>
+  <!-- DNN version config -->
+  <arg if="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/dnn/logicalTri.bin" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
+  <arg if="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/dnn/binhmm.SID"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
+  <arg name="bingram_file" default="$(find julius)/model/lang_m/bccwj.60k.bingram" doc="Binary N-gram file (Language model file)" />
+  <arg name="htkdic_file" default="$(find julius)/model/lang_m/bccwj.60k.pdp.htkdic" doc="Pronunciation dictionary for language models" />
+  <arg name="dnn_julius_file" default="$(find julius)/julius.dnnconf" doc="Feature conversion configuration file for DNN (Julius alone) version" />
+  <!-- GMM version config -->
+  <arg unless="$(arg dnn)" name="hmm_def_file" default="$(find julius)/model/phone_m/jnas-tri-3k16-gid.hmmdefs"  doc="HTK's HMM definition file containing all the phoneme definitions in one place"/>
+  <arg unless="$(arg dnn)" name="hmm_list_file" default="$(find julius)/model/phone_m/logicalTri" doc="The logicalTri defines the correspondence between the logical triphone and the physical triphone" />
+  <arg name="word_file" default="$(find julius_ros)/data/udon.dic" doc="Word dictionary file (pronunciation dictionary file)" />
 
+  <arg name="respawn" default="false" />
   <arg name="launch_audio_capture" default="true" />
   <arg name="launch_sound_play" default="true" />
   <arg name="sound_play_topic" default="sound_play" />
@@ -32,7 +41,7 @@
   <!-- run julius (isolated word) -->
   <node name="julius_isolated" pkg="julius_ros" type="run_julius.sh"
         machine="$(arg machine)" respawn="$(arg respawn)"
-        output="$(arg julius_output)"
+        output="$(arg julius_output)" unless="$(arg dnn)"
         args="-C $(arg conf_file)
               -adport $(arg audio_port)
               -module $(arg module_port)
@@ -40,6 +49,20 @@
               -hlist $(arg hmm_list_file)
               -w $(arg word_file)
               $(arg julius_args)" />
+  <!-- run julius dnn with CPU -->
+  <node name="julius_isolated" pkg="julius_ros" type="run_julius.sh"
+        machine="$(arg machine)" respawn="$(arg respawn)"
+        output="$(arg julius_output)" if="$(arg dnn)"
+        args="-C $(arg conf_file)
+              -adport $(arg audio_port)
+              -module $(arg module_port)
+              -h $(arg hmm_def_file)
+              -hlist $(arg hmm_list_file)
+              -v $(arg htkdic_file)
+              -lmp 14 0
+              -lmp2 14 0
+              -d $(arg bingram_file)
+              -dnnconf $(arg dnn_julius_file)" />
 
   <!-- audio capture from microphone -->
   <node name="audio_capture" pkg="audio_capture" type="audio_capture"

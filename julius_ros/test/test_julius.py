@@ -14,7 +14,10 @@ class TestJulius(unittest.TestCase):
         self.transcripts.append(msg.transcript[0])
 
     def test_julius(self):
-        expected_sentences = ['わかめ', 'きつね']
+        if rospy.get_param('~dnn', False):
+            expected_sentences = [' わかめ 。']
+        else:
+            expected_sentences = ['わかめ', 'きつね']
         self.transcripts = []
         sub = rospy.Subscriber("speech_to_text", SpeechRecognitionCandidates,
                                self.on_speech)

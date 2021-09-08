@@ -2,6 +2,27 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+* Add DNN version julius (`#259 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/259>`_)
+
+  * Fix order of args in julius.launch
+  * Update README
+  * Do not use git-lfs and revert unnecessary change
+  * Add julius_ros test for DNN version
+  * Use audio port instead of microphone input
+  * Update README and julius.launch arg doc
+  * Use Julius config file in julius_ros
+  * Fix typo: input audio via port
+
+* Contributors: Naoya Yamaguchi
+
+2.1.22 (2021-06-10)
+-------------------
+
 2.1.21 (2020-08-19)
 -------------------
 

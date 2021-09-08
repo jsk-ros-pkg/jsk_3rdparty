@@ -16,6 +16,8 @@
        doc="English speaking speed (default: 100)" />
   <arg name="japanese_speed" default="100"
        doc="Japanese speaking speed (default: 100)" />
+  <arg name="cache" default="$(optenv GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED true)"
+       doc="Cache generated sound file (default: true)" />
 
   <node name="sound_play" if="$(arg use_english)"
         pkg="sound_play" type="soundplay_node.py"
@@ -27,6 +29,7 @@
     <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
     <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
+    <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />
     <rosparam subst_value="true">
       speaking_rate: $(arg english_speed)
     </rosparam>
@@ -42,6 +45,7 @@
     <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
     <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
+    <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />
     <rosparam subst_value="true">
       speaking_rate: $(arg japanese_speed)
     </rosparam>

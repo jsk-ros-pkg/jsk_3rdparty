@@ -2,6 +2,26 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+* enable to change topic name from speech_recognition.launch (`#254 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/254>`_)
+* support SpeakerDiarization, see https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#SpeechRecognitionAlternative (`#244 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/244>`_)
+
+  * [ros_speech_recognition] Add doc to speech_recognition.launch
+    add doc to args, and we need to use rosparm for device, not param. because 'device: ' causes
+    load_parameters: unable to set parameters (last param was [/speech_recognition/depth=16]): cannot marshal None unless allow_none is enabled  error
+  * more exception message for self.recognize
+
+* Use PYTHON_INTERPRETER python3 in ros_speech_recognition (`#225 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/225>`_)
+
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.21 (2020-08-19)
 -------------------
 * add missing packages, closes https://github.com/ros/rosdistro/pull/26216 (`#211 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/211>`_)

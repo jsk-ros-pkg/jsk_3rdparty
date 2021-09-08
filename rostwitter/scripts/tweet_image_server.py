@@ -117,11 +117,13 @@ class TweetImageServer(object):
             success = False
             rospy.logerr('Failed to post: {}'.format(ret))
 
+        res = TweetResult(success=success)
         if success:
             if goal.speak:
                 self.client.say('ついーとしました')
-            res = TweetResult(success=success)
             self.server.set_succeeded(res)
+        else:
+            self.server.set_aborted(res)
 
     def _image_cb(self, msg):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="1">
   <name>google_cloud_texttospeech</name>
-  <version>2.1.21</version>
+  <version>2.1.24</version>
   <description>The google_cloud_texttospeech package</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>

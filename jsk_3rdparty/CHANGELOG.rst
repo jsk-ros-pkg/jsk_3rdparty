@@ -2,6 +2,17 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+* [jsk_3rdparty] fix typo of dirname (`#238 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/238>`_)
+* Contributors: Koki Shinjo
+
 2.1.21 (2020-08-19)
 -------------------
 
