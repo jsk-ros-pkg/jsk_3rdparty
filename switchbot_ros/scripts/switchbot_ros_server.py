@@ -7,7 +7,7 @@ import rospy
 from switchbot_ros.msg import SwitchBotCommandAction
 from switchbot_ros.msg import SwitchBotCommandFeedback
 from switchbot_ros.msg import SwitchBotCommandResult
-from switchbot import SwitchBotAPIClient
+from switchbot_ros.switchbot import SwitchBotAPIClient
 
 
 class SwitchBotAction:
