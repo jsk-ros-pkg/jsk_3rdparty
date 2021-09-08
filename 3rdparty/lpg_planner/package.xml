@@ -13,5 +13,6 @@
   <author email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Hitoshi Kamada</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>mk</build_depend>
 
 </package>
