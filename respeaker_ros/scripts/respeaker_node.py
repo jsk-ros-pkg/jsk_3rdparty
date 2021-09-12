@@ -173,7 +173,7 @@ class RespeakerInterface(object):
             rospy.logerr(e)
             rospy.signal_shutdown('Shutdown this node because of USBError')
 
-        response = struct.unpack(b'ii', response.tostring())
+        response = struct.unpack(b'ii', response.tobytes())
 
         if data[2] == 'int':
             result = response[0]
@@ -283,7 +283,7 @@ class RespeakerAudio(object):
         data = np.reshape(data, (chunk_per_channel, self.channels))
         chan_data = data[:, self.channel]
         # invoke callback
-        self.on_audio(chan_data.tostring())
+        self.on_audio(chan_data.tobytes())
         return None, pyaudio.paContinue
 
     def start(self):
