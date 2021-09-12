@@ -50,7 +50,7 @@ class SpeechToText(object):
 
         self.pub_speech = rospy.Publisher(
             "speech_to_text", SpeechRecognitionCandidates, queue_size=1)
-        self.sub_audio = rospy.Subscriber("audio", AudioData, self.audio_cb)
+        self.sub_audio = rospy.Subscriber("speech_audio", AudioData, self.audio_cb)
 
     def tts_timer_cb(self, event):
         stamp = event.current_real
