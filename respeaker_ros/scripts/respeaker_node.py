@@ -386,7 +386,7 @@ class RespeakerNode(object):
         doa_rad = math.radians(self.respeaker.direction - 180.0)
         doa_rad = angles.shortest_angular_distance(
             doa_rad, math.radians(self.doa_yaw_offset))
-        doa = math.degrees(doa_rad)
+        doa = int(math.degrees(doa_rad))
 
         # vad
         if is_voice != self.prev_is_voice:
