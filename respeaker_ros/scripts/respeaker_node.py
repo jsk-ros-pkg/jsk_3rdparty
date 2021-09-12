@@ -279,7 +279,7 @@ class RespeakerAudio(object):
     def stream_callback(self, in_data, frame_count, time_info, status):
         # split channel
         data = np.fromstring(in_data, dtype=np.int16)
-        chunk_per_channel = len(data) / self.channels
+        chunk_per_channel = int(len(data) / self.channels)
         data = np.reshape(data, (chunk_per_channel, self.channels))
         chan_data = data[:, self.channel]
         # invoke callback
