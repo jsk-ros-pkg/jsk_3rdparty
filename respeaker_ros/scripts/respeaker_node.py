@@ -309,7 +309,7 @@ class RespeakerNode(object):
         suppress_pyaudio_error = rospy.get_param("~suppress_pyaudio_error", True)
         #
         self.respeaker = RespeakerInterface()
-        self.speech_audio_buffer = str()
+        self.speech_audio_buffer = b""
         self.is_speeching = False
         self.speech_stopped = rospy.Time(0)
         self.prev_is_voice = None
@@ -327,7 +327,7 @@ class RespeakerNode(object):
         self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error)
         self.speech_prefetch_bytes = int(
             self.speech_prefetch * self.respeaker_audio.rate * self.respeaker_audio.bitdepth / 8.0)
-        self.speech_prefetch_buffer = str()
+        self.speech_prefetch_buffer = b""
         self.respeaker_audio.start()
         self.info_timer = rospy.Timer(rospy.Duration(1.0 / self.update_rate),
                                       self.on_timer)
@@ -417,7 +417,7 @@ class RespeakerNode(object):
             self.is_speeching = True
         elif self.is_speeching:
             buf = self.speech_audio_buffer
-            self.speech_audio_buffer = str()
+            self.speech_audio_buffer = b""
             self.is_speeching = False
             duration = 8.0 * len(buf) * self.respeaker_audio.bitwidth
             duration = duration / self.respeaker_audio.rate / self.respeaker_audio.bitdepth
