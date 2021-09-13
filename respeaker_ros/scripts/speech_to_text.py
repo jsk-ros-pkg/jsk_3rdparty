@@ -23,7 +23,7 @@ class SpeechToText(object):
         # language of STT service
         self.language = rospy.get_param("~language", "en-GB")
         # ignore voice input while the robot is speaking
-        self.self_cancellation = rospy.get_param("~self_cancellation", False)
+        self.self_cancellation = rospy.get_param("~self_cancellation", True)
         # time to assume as SPEAKING after tts service is finished
         self.tts_tolerance = rospy.Duration.from_sec(
             rospy.get_param("~tts_tolerance", 1.0))
