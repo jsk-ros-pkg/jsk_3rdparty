@@ -173,7 +173,10 @@ class RespeakerInterface(object):
             rospy.logerr(e)
             rospy.signal_shutdown('Shutdown this node because of USBError')
 
-        response = struct.unpack(b'ii', response.tobytes())
+        if sys.version_info.major == 2:
+            response = struct.unpack(b'ii', response.tostring())
+        else:
+            response = struct.unpack(b'ii', response.tobytes())
 
         if data[2] == 'int':
             result = response[0]
