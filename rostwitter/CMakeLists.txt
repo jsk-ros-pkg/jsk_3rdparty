@@ -25,9 +25,20 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-install(PROGRAMS scripts/tweet.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# on noetic it needs catkin_install_python to support Python3
+# but it does not work on indigo for some reason...
+if($ENV{ROS_DISTRO} STREQUAL "indigo")
+  install(DIRECTORY scripts
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    USE_SOURCE_PERMISSIONS
+  )
+else()
+  file(GLOB SCRIPT_PROGRAMS scripts/*.py)
+  catkin_install_python(
+    PROGRAMS ${SCRIPT_PROGRAMS}
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/
+  )
+endif()
 
 install(DIRECTORY test
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
