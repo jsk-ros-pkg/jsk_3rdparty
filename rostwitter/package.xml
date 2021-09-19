@@ -28,6 +28,8 @@
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-simplejson</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-simplejson</exec_depend>
 
+  <test_depend>rostest</test_depend>
+
   <export>
 
   </export>
