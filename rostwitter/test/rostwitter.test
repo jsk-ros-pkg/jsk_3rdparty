@@ -1,7 +1,9 @@
 <launch>
+  <!-- tweet.py requires global account_info param  -->
   <param name="account_info" value="$(find rostwitter)/test/dummy_account.yaml" />
   <node pkg="rostwitter" type="tweet.py" name="tweet" >
   </node>
+  <!-- tweet_image_server.py requires private account_info param  -->
   <node pkg="rostwitter" type="tweet_image_server.py" name="tweet_image_server" >
     <param name="account_info" value="$(find rostwitter)/test/dummy_account.yaml" />
   </node>
