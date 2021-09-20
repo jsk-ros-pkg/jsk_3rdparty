@@ -3,7 +3,11 @@
 import json as simplejson
 import requests
 from requests_oauthlib import OAuth1
-from StringIO import StringIO
+# https://stackoverflow.com/questions/11914472/stringio-in-python3
+try:
+    from StringIO import StringIO ## for Python 2
+except ImportError:
+    from io import StringIO ## for Python 3
 
 import rospy
 

@@ -1,0 +1,19 @@
+<launch>
+  <!-- tweet.py requires global account_info param  -->
+  <param name="account_info" value="$(find rostwitter)/test/dummy_account.yaml" />
+  <node pkg="rostwitter" type="tweet.py" name="tweet" >
+  </node>
+  <!-- tweet_image_server.py requires private account_info param  -->
+  <node pkg="rostwitter" type="tweet_image_server.py" name="tweet_image_server" >
+    <param name="account_info" value="$(find rostwitter)/test/dummy_account.yaml" />
+  </node>
+
+  <!-- copy subscribe test node until https://github.com/ros/ros_comm/pull/2184 merged -->
+  <test test-name="subscribetest_test" pkg="rostwitter" type="subscribetest" time-limit="20" retry="2">
+    <rosparam>
+      topics:
+      - name: /tweet
+      - name: /tweet_image_server/tweet/goal
+    </rosparam>
+  </test>
+</launch>
