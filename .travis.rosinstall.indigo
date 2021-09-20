@@ -1,0 +1,6 @@
+# last kinetic release was 0.2.13,
+# rostwitter requries sound_play >= 0.3.7 https://github.com/ros-drivers/audio_common/pull/149
+- tar:
+    local-name: audio_common/sound_play
+    uri: https://github.com/ros-gbp/audio_common-release/archive/refs/tags/release/kinetic/sound_play/0.3.11-1.tar.gz
+    version: audio_common-release-release-kinetic-sound_play-0.3.11-1
