@@ -90,6 +90,7 @@ class GDriveServerNode(object):
         self.upload_server = rospy.Service('~upload', Upload, self._upload_cb)
         self.upload_multi_server = rospy.Service(
             '~upload_multi', MultipleUpload, self._upload_multi_cb)
+        rospy.loginfo('Finish initialization, Server started.')
 
     def _upload_cb(self, req):
         timestamp = '{0:%Y%m%d%H%M%S}'.format(datetime.datetime.now())
