@@ -10,9 +10,6 @@ import sys
 import time
 
 from httplib2 import ServerNotFoundError
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-from pydrive.files import ApiRequestError
 import rospy
 
 from gdrive_ros.srv import MultipleUpload
@@ -21,11 +18,32 @@ from gdrive_ros.srv import Upload
 from gdrive_ros.srv import UploadResponse
 
 
+try:
+    import pydrive2
+    use_pydrive2 = True
+except ImportError:
+    use_pydrive2 = False
+    print('''
+    It is recommended to upgrade to PyDrive2
+    pip install oauth2client==4.1.3 rsa==4.5 PyDrive2==1.4.14
+    ''')
+
+
+if use_pydrive2:
+    from pydrive2.auth import GoogleAuth
+    from pydrive2.drive import GoogleDrive
+    from pydrive2.files import ApiRequestError
+else:
+    from pydrive.auth import GoogleAuth
+    from pydrive.drive import GoogleDrive
+    from pydrive.files import ApiRequestError
+
+
 if sys.version_info < 3 and \
         LooseVersion(pkg_resources.get_distribution("rsa").version) \
         >= LooseVersion('4.6.0'):
     print('''rsa < 4.6.0 is required:
-    pip install oauth2client==4.2.3 rsa==4.5 pydrive==1.3.1
+    pip install oauth2client==4.1.3 rsa==4.5 PyDrive2==1.4.14
     For more detailed information,
     please read https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/gdrive_ros#trouble-shooting
 ''', file=sys.stderr)
