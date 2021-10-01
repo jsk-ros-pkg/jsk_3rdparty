@@ -19,7 +19,7 @@ env:
   matrix:
     - CHECK_PYTHON2_COMPILE=true
     - CHECK_PYTHON3_COMPILE=true
-    - ROS_DISTRO=indigo  USE_DEB=true
+    - ROS_DISTRO=indigo  USE_DEB=false
     - ROS_DISTRO=kinetic USE_DEB=true
     - ROS_DISTRO=kinetic USE_DEB=true DOCKER_IMAGE=i386/ubuntu:16.04 ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
     - ROS_DISTRO=melodic USE_DEB=true

@@ -1,0 +1,6 @@
+# last kinetic release was 0.2.13,
+# rostwitter requries sound_play >= 0.3.7 https://github.com/ros-drivers/audio_common/pull/149
+- git:
+    local-name: audio_common/sound_play
+    uri: https://github.com/k-okada/audio_common
+    version: indigo_setup

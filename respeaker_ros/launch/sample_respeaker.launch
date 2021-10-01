@@ -11,6 +11,8 @@
   <arg name="speech_to_text" default="speech_to_text"/>
   <!-- langage used in speech_to_text.py -->
   <arg name="language" default="en-US"/>
+  <!-- self cancellation -->
+  <arg name="self_cancellation" default="true"/>
 
   <node if="$(arg publish_tf)"
         name="static_transformer" pkg="tf" type="static_transform_publisher"
@@ -29,7 +31,7 @@
     <remap from="speech_to_text" to="$(arg speech_to_text)"/>
     <rosparam subst_value="true">
       language: $(arg language)
-      self_cancellation: true
+      self_cancellation: $(arg self_cancellation)
       tts_tolerance: 0.5
     </rosparam>
   </node>
