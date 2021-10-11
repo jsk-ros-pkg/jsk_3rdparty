@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>m5stack_ros</name>
+  <version>0.0.1</version>
+  <description>The m5stack_ros package</description>
+
+  <maintainer email="708yamaguchi@gmail.com">Naoya Yamaguchi</maintainer>
+  <author email="708yamaguchi@gmail.com">Naoya Yamaguchi</author>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>jsk_perception</exec_depend>
+  <exec_depend>rosserial_arduino</exec_depend>
+  <exec_depend>rosserial_client</exec_depend>
+  <exec_depend>rosserial_python</exec_depend>
+
+</package>

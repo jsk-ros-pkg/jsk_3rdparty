@@ -1,0 +1,13 @@
+- git:
+    local-name: jsk-ros-pkg/jsk_3rdparty
+    # TODO: Use jsk-ros-pkg/jsk_3rdparty before PR merge
+    # uri: https://github.com/jsk-ros-pkg/jsk_3rdparty.git
+    # version: master
+    uri: https://github.com/708yamaguchi/jsk_3rdparty.git
+    version: m5stack-ros
+# Use master branch if the following PR is merged
+# https://github.com/ros-drivers/rosserial/pull/570
+- git:
+    local-name: ros-drivers/rosserial
+    uri: https://github.com/sktometometo/rosserial.git
+    version: PR/melodic/add-bluetooth-hardware-backported
