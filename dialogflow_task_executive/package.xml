@@ -21,6 +21,7 @@
   <run_depend>python-dialogflow-pip</run_depend>
   
   <export>
+    <app_manager app_dir="${prefix}/apps"/>
   </export>
 
 </package>
