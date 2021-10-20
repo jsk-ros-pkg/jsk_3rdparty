@@ -1,6 +1,7 @@
 <launch>
   <arg name="run_app_manager" default="false" />
   <arg name="webhook_server" default="false" />
+  <arg name="run_task_executive" default="true" />
   <arg name="credential" default="$(env GOOGLE_APPLICATION_CREDENTIALS)"/>
   <arg name="project_id" default="$(env DIALOGFLOW_PROJECT_ID)"/>
 
@@ -22,7 +23,9 @@
 
   <node name="task_executive"
         pkg="dialogflow_task_executive" type="task_executive.py"
-        output="screen">
+        output="screen"
+        if="$(arg run_task_executive)"
+        >
     <rosparam subst_value="true">
     </rosparam>
   </node>
