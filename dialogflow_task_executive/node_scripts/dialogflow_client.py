@@ -137,9 +137,9 @@ class DialogflowClient(object):
                 self.input_cb_speech)
 
         self.pub_text = rospy.Publisher(
-                "text_reply", ConversationText, queue_size=1)
+                "dialogflow_text_reply", ConversationText, queue_size=1)
         self.sub_text = rospy.Subscriber(
-                "text_input", ConversationText, self.input_cb_text)
+                "dialogflow_text_input", ConversationText, self.input_cb_text)
 
         self.df_thread = threading.Thread(target=self.df_run)
         self.df_thread.daemon = True
@@ -176,7 +176,7 @@ class DialogflowClient(object):
             rospy.logdebug("Received input but ignored")
 
     def input_cb_text(self, msg):
-        self.queue.put((conversation_type,msg.conversation_id,msg.text))
+        self.queue.put((msg.conversation_type,msg.conversation_id,msg))
 
     def detect_intent_text(self, data, session):
         query = df.types.QueryInput(
@@ -257,11 +257,11 @@ class DialogflowClient(object):
                 elif isinstance(msg, SpeechRecognitionCandidates):
                     result = self.detect_intent_text(
                         msg.transcript[0], session)
-                elif isinstance(msg, String):
+                elif isinstance(msg, ConversationText):
                     result = self.detect_intent_text(
-                        msg.data, session)
+                        msg.text, session)
                 else:
-                    raise RuntimeError("Invalid data type msg: {}".format(msg))
+                    raise RuntimeError("Invalid data type msg: {}".format(type(msg)))
                 self.print_result(result)
                 self.publish_result(result)
                 self.reply_result(result, conversation_type, conversation_id)
