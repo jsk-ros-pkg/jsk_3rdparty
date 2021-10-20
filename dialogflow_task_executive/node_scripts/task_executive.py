@@ -6,8 +6,8 @@ import json
 import re
 import rospy
 
-from app_manager.msg import AppList
-from app_manager.srv import StartApp
+from app_manager.msg import AppList, KeyValue
+from app_manager.srv import StartApp, StartAppRequest
 from app_manager.srv import StopApp
 from std_srvs.srv import Empty
 
@@ -90,12 +90,16 @@ class AppManager(object):
         return map(lambda a: a.name,
                    self._latest_msg.available_apps)
 
-    def start_app(self, name):
+    def start_app(self, name, launch_args):
         if name in self.running_apps:
             raise RuntimeError("{} is already running".format(name))
         elif name not in self.available_apps:
             raise RuntimeError("{} is not available".format(name))
-        res = self._srv_start_app(name=name)
+        req = StartAppRequest()
+        req.name = name
+        for key, value in launch_args.items():
+            req.args.append(KeyValue(key=key,value=value))
+        res = self._srv_start_app(req)
         if res.started:
             rospy.loginfo("{} successfully started".format(name))
             return True
@@ -221,6 +225,10 @@ class TaskExecutive(object):
         try:
             params = json.loads(msg.parameters)
             rospy.set_param("/action/parameters", params)
+            # set launch_args
+            launch_args = {}
+            for key, value in params.items():
+                launch_args[key.encode('utf-8')] = value.encode('utf-8')
         except ValueError:
             rospy.logerr(
                 "Failed to parse parameters of action '{}'".format(msg.action))
@@ -228,7 +236,7 @@ class TaskExecutive(object):
         rospy.loginfo(
             "Starting '{}' with parameters '{}'"
             .format(msg.action, msg.parameters))
-        self.app_manager.start_app(action)
+        self.app_manager.start_app(action,launch_args)
 
     def app_start_cb(self, name):
         rospy.loginfo("{} started".format(name))
