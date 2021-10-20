@@ -17,7 +17,7 @@ from sound_play.msg import SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from std_msgs.msg import String
 
-from dialogflow_task_executive.msg import DialogResponse
+from dialogflow_task_executive.msg import DialogResponse, ConversationText
 
 
 class State(object):
@@ -110,11 +110,16 @@ class DialogflowClient(object):
             self.sub_hotword = rospy.Subscriber(
                 "hotword", String, self.hotword_cb)
             self.sub_audio = rospy.Subscriber(
-                "speech_audio", AudioData, self.input_cb)
+                "speech_audio", AudioData, self.input_cb_speech)
         else:
             self.sub_speech = rospy.Subscriber(
                 "speech_to_text", SpeechRecognitionCandidates,
-                self.input_cb)
+                self.input_cb_speech)
+
+        self.pub_text = rospy.Publisher(
+                "dialogflow_text_reply", ConversationText, queue_size=1)
+        self.sub_text = rospy.Subscriber(
+                "dialogflow_text_input", ConversationText, self.input_cb_text)
 
         self.df_thread = threading.Thread(target=self.df_run)
         self.df_thread.daemon = True
@@ -132,7 +137,7 @@ class DialogflowClient(object):
             rospy.loginfo("Hotword received")
             self.state.set(State.LISTENING)
 
-    def input_cb(self, msg):
+    def input_cb_speech(self, msg):
         if not self.enable_hotword:
             self.state.set(State.LISTENING)
         elif not self.use_audio:
@@ -140,10 +145,13 @@ class DialogflowClient(object):
             self.hotword_cb(String(data=msg.transcript[0]))
 
         if self.state == State.LISTENING:
-            self.queue.put(msg)
+            self.queue.put(('speech',0,msg))
             rospy.loginfo("Received input")
         else:
             rospy.logdebug("Received input but ignored")
+
+    def input_cb_text(self, msg):
+        self.queue.put((msg.conversation_type,msg.conversation_id,msg))
 
     def detect_intent_text(self, data, session):
         query = df.types.QueryInput(
@@ -175,25 +183,34 @@ class DialogflowClient(object):
         msg.intent_score = result.intent_detection_confidence
         self.pub_res.publish(msg)
 
-    def speak_result(self, result):
-        if self.sound_action is None:
-            return
-        msg = SoundRequest(
-            command=SoundRequest.PLAY_ONCE,
-            sound=SoundRequest.SAY,
-            volume=1.0,
-            arg=result.fulfillment_text.encode('utf-8'),
-            arg2=self.language)
-        self.sound_action.send_goal_and_wait(
-            SoundRequestGoal(sound_request=msg),
-            rospy.Duration(10.0))
+    def reply_result(self, result, conversation_type, conversation_id):
+        if conversation_type == 'speech':
+            if self.sound_action is None:
+                return
+            msg = SoundRequest(
+                command=SoundRequest.PLAY_ONCE,
+                sound=SoundRequest.SAY,
+                volume=1.0,
+                arg=result.fulfillment_text.encode('utf-8'),
+                arg2=self.language)
+            self.sound_action.send_goal_and_wait(
+                SoundRequestGoal(sound_request=msg),
+                rospy.Duration(10.0))
+        elif conversation_type == 'text':
+            msg = ConversationText(
+                    conversation_type=conversation_type,
+                    conversation_id=conversation_id,
+                    text=result.fulfillment_text.encode('utf-8'))
+            self.pub_text.publish(msg)
+        else:
+            raise RuntimeError('Unknown conversation type :{}'.format(speech))
 
     def df_run(self):
         while True:
             if rospy.is_shutdown():
                 break
             try:
-                msg = self.queue.get(timeout=0.1)
+                conversation_type, conversation_id, msg = self.queue.get(timeout=0.1)
                 rospy.loginfo("Processing")
                 if self.session_id is None:
                     self.session_id = str(uuid.uuid1())
@@ -207,11 +224,14 @@ class DialogflowClient(object):
                 elif isinstance(msg, SpeechRecognitionCandidates):
                     result = self.detect_intent_text(
                         msg.transcript[0], session)
+                elif isinstance(msg, ConversationText):
+                    result = self.detect_intent_text(
+                        msg.text, session)
                 else:
-                    raise RuntimeError("Invalid data")
+                    raise RuntimeError("Invalid data type msg: {}".format(type(msg)))
                 self.print_result(result)
                 self.publish_result(result)
-                self.speak_result(result)
+                self.reply_result(result, conversation_type, conversation_id)
                 if result.action == "Bye":
                     self.state.set(State.IDLE)
                     self.session_id = None
