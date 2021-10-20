@@ -1,6 +1,6 @@
 <launch>
   <arg name="run_app_manager" default="false" />
-  <arg name="applist" default="" />
+  <arg name="applist" default="$(find dialogflow_task_executive)/apps"/>
   <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)"/>
   <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
   <arg name="enable_hotword" default="true" />
@@ -43,6 +43,10 @@
   </node>
   
   <group if="$(arg run_app_manager)">
+    <rosparam>
+      /robot/type: dummy
+      /robot/name: test
+    </rosparam>
     <node pkg="app_manager" type="appmaster" name="appmaster"
           args="-p 11313"/>
     <node pkg="app_manager" type="app_manager" name="app_manager"

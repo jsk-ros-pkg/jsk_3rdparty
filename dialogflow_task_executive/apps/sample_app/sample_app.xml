@@ -1,0 +1,6 @@
+<launch>
+  <arg name="place" default="Tokyo"/>
+  <node name="sample_app_print" pkg="dialogflow_task_executive" type="sample_app_print.py" output="screen">
+      <param name="place" value="$(arg place)"/>
+  </node>
+</launch>
