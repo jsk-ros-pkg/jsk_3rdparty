@@ -138,7 +138,10 @@ void setup() {
   setupM5stackROS();
 
   Serial2.begin(115200, SERIAL_8N1, 21, 22);
-  jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * 100000);
+  // malloc size must be less than 8192 byte.
+  // https://www.mgo-tec.com/blog-entry-trouble-shooting-esp32-wroom.html/5#title30
+  // malloc size must be larger than the size of the JPEG image received from UnitV.
+  jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * 7000);
 
   nh.advertise(unitv_img_pub);
   nh.advertise(unitv_rects_pub);
