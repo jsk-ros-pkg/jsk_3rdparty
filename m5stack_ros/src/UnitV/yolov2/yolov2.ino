@@ -135,7 +135,7 @@ void pub_unitv_image () {
 }
 
 void setup() {
-  m5stack_ros_setup();
+  setupM5stackROS();
 
   Serial2.begin(115200, SERIAL_8N1, 21, 22);
   jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * 100000);
