@@ -145,7 +145,7 @@ class DialogflowClient(object):
             self.hotword_cb(String(data=msg.transcript[0]))
 
         if self.state == State.LISTENING:
-            self.queue.put(('speech',0,msg))
+            self.queue.put(('speech', 0, msg))
             rospy.loginfo("Received input")
         else:
             rospy.logdebug("Received input but ignored")
