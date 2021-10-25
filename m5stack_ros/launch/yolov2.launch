@@ -3,6 +3,7 @@
   <arg name="port" default="/dev/rfcomm1" />
   <arg name="baud" default="115200" />
   <arg name="unitv_image" value="/unitv_image" />
+  <arg name="gui" value="true" />
 
   <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
     <arg name="port" default="$(arg port)" />
@@ -25,4 +26,7 @@
     </rosparam>
   </node>
 
+  <node if="$(arg gui)" name="image_view_unitv" pkg="image_view" type="image_view">
+    <remap from="image" to="draw_rects/output"/>
+  </node>
 </launch>
