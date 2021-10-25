@@ -17,7 +17,8 @@ from sound_play.msg import SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from std_msgs.msg import String
 
-from dialogflow_task_executive.msg import DialogResponse, ConversationText
+from dialogflow_task_executive.msg import ConversationText
+from dialogflow_task_executive.msg import DialogResponse
 
 
 class State(object):
