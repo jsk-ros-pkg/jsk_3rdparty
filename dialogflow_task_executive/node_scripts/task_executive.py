@@ -99,7 +99,7 @@ class AppManager(object):
         req = StartAppRequest()
         req.name = name
         for key, value in launch_args.items():
-            req.args.append(KeyValue(key=key,value=value))
+            req.args.append(KeyValue(key=key, value=value))
         res = self._srv_start_app(req)
         if res.started:
             rospy.loginfo("{} successfully started".format(name))
