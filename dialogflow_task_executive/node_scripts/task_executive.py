@@ -7,7 +7,8 @@ import re
 import rospy
 
 from app_manager.msg import AppList, KeyValue
-from app_manager.srv import StartApp, StartAppRequest
+from app_manager.srv import StartApp
+from app_manager.srv import StartAppRequest
 from app_manager.srv import StopApp
 from std_srvs.srv import Empty
 
