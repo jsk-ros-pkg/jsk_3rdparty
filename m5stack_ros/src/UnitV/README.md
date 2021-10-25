@@ -49,29 +49,13 @@ In this section, you can use yolov2 recognition.
     - Burn [yolov2.kfpkg](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/data/yolov2.kfpkg) with kflash
     - Burn [yolov2.py](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2.py)  as boot.py with MaixPy (Tools -> Save open script to board(boot.py))
 
-5. Burn [yolov2.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2.ino) into M5Stack
+5. Burn [yolov2.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2.ino) into M5Stack with Arduino IDE.
 
-    - Launch Arduino IDE
+    - There are 2 connection types between M5Stack and computer: Bluetooth and Wi-Fi
 
-      ```bash
-      ~/arduino-x.y.z/arduino
-      ```
-
-    - Before burning, change `#define BLUETOOTH` line according to your connection type
-
-    - There are 3 connection types between M5Stack and computer: Bluetooth, Wi-Fi and USB
+    - Do not forget to setup connection according to your connection type. (e.g. edit #define line or Wi-Fi SSID)
 
     - Currently, USB connection is deprecated. This is because USB connection cannot use baud rate >= 115200. Baud rate 57600 is so slow that UnitV image cannot be transferred.
-
-    - If you use wifi, fill SSID and Password into [wifi.h](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/include/wifi.h) before burning.
-
-    - **Be careful** not to upload your password!
-
-    - To burn to M5Stack(`/dev/ttyUSB*`), you should belong to dialout group.
-
-      ```bash
-      sudo adduser $USER dialout
-      ```
 
 ## Run
 
@@ -79,7 +63,7 @@ In this section, you can use yolov2 recognition.
 
     - Connect M5Stack and UnitV with Grove cable.
 
-    - If you use Bluetooth connection, exec following commands. For detail, see [sktometometo's repo](https://github.com/sktometometo/M5Stack_Bluetooth_rosserial_example).
+    - If you use Bluetooth connection, exec following commands. For detail, see [this pull request](https://github.com/ros-drivers/rosserial/pull/569).
 
       ```bash
       sudo rfcomm bind 1 <Bluetooth MAC Address of M5Stack>
@@ -88,7 +72,7 @@ In this section, you can use yolov2 recognition.
 
     - Bluetooth MAC Address is printed on Arduino IDE Serial Monitor when M5Stack is started.
 
-2. Launch program
+2. Launch program: Start UniV recognition and visualize it.
 
     First, source setup.bash
 
@@ -107,18 +91,6 @@ In this section, you can use yolov2 recognition.
       ```bash
       roslaunch m5stack_ros yolov2.launch baud:=115200 port:=tcp
       ```
-
-    - For USB(deprecated),
-
-      ```bash
-      roslaunch m5stack_ros yolov2.launch baud:=57600 port:=(USB DEVICE like /dev/ttyUSB0)
-      ```
-
-3. See recognition result
-
-    ```bash
-    rosrun image_view image_view image:=/draw_rects/output
-    ```
 
 ## Trouble shooting
 
