@@ -6,7 +6,8 @@ import json
 import re
 import rospy
 
-from app_manager.msg import AppList, KeyValue
+from app_manager.msg import AppList
+from app_manager.msg import KeyValue
 from app_manager.srv import StartApp
 from app_manager.srv import StartAppRequest
 from app_manager.srv import StopApp
