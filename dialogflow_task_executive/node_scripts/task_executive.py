@@ -237,7 +237,7 @@ class TaskExecutive(object):
         rospy.loginfo(
             "Starting '{}' with parameters '{}'"
             .format(msg.action, msg.parameters))
-        self.app_manager.start_app(action,launch_args)
+        self.app_manager.start_app(action, launch_args)
 
     def app_start_cb(self, name):
         rospy.loginfo("{} started".format(name))
