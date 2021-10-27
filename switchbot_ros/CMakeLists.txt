@@ -22,3 +22,11 @@ generate_messages(
 catkin_package()
 
 include_directories()
+
+# install
+file(GLOB SCRIPTS scripts/*)
+
+catkin_install_python(
+  PROGRAMS ${SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
