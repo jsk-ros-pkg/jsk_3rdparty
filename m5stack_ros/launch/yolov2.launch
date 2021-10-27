@@ -2,8 +2,8 @@
 
   <arg name="port" default="/dev/rfcomm1" />
   <arg name="baud" default="115200" />
-  <arg name="unitv_image" value="/unitv_image" />
-  <arg name="gui" value="true" />
+  <arg name="unitv_image" default="/unitv_image" />
+  <arg name="gui" default="true" />
 
   <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
     <arg name="port" default="$(arg port)" />
