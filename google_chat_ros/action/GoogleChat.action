@@ -1,0 +1,10 @@
+# Define the goal
+string space
+string message_type
+string content
+---
+# Define the result
+bool done
+---
+# Define a feedback message
+string status

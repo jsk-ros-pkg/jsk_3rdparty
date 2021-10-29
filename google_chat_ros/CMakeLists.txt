@@ -8,6 +8,11 @@ find_package(
 
 catkin_python_setup()
 
+add_action_files(
+  FILES
+  GoogleChat.action
+)
+
 generate_messages(
   DEPENDENCIES
   std_msgs
@@ -17,3 +22,12 @@ generate_messages(
 catkin_package()
 
 include_directories()
+
+# install
+file(GLOB SCRIPTS scripts/*)
+
+catkin_install_python(
+  PROGRAMS ${SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
