@@ -24,10 +24,14 @@ catkin_package()
 include_directories()
 
 # install
-file(GLOB SCRIPTS scripts/*)
-
+file(GLOB PYTHON_SCRIPTS scripts/*.py)
 catkin_install_python(
-  PROGRAMS ${SCRIPTS}
+  PROGRAMS ${PYTHON_SCRIPTS}
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# launch
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 

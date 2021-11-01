@@ -1,7 +1,7 @@
 # Define the goal
 string space
 string message_type
-string content
+string content # if message_type is text, string, else json.
 ---
 # Define the result
 bool done
