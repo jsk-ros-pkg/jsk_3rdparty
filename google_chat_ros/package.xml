@@ -2,7 +2,7 @@
 <package format="3">
   <name>google_chat_ros</name>
   <version>2.1.25</version>
-  <description>use chat api clients via ROS</description>
+  <description>Use Google Chat API clients via ROS</description>
 
   <author email="obinata@jsk.imi.i.u-tokyo.ac.jp">Yoshiki Obinata</author>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>

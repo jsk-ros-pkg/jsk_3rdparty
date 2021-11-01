@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import actionlib
-from google_chat_ros.google_chat import GoogleChatClient
-from google_chat_ros.msg import GoogleChatAction
-from google_chat_ros.msg import GoogleChatFeedback
-from google_chat_ros.msg import GoogleChatResult
+from google_chat_ros.google_chat import GoogleChatRESTClient
+from google_chat_ros.msg import GoogleChatRESTAction
+from google_chat_ros.msg import GoogleChatRESTFeedback
+from google_chat_ros.msg import GoogleChatRESTResult
 import os.path
 import rospy
 
@@ -13,7 +13,7 @@ class GoogleChatActionServer:
     """
     def __init__(self):
         keyfile = rospy.get_param('~keyfile')
-        self._client = GoogleChatClient(keyfile)
+        self._client = GoogleChatRESTClient(keyfile)
         # Start google chat authentication and service
         rospy.loginfo("Starting Google Chat service...")
         try:
@@ -24,14 +24,14 @@ class GoogleChatActionServer:
             rospy.logerr(e)
         # ActionLib
         self._as = actionlib.SimpleActionServer(
-            '~googlechat', GoogleChatAction,
+            '~rest', GoogleChatRESTAction,
             execute_cb=self.execute_cb, auto_start=False
         )
         self._as.start()
 
     def execute_cb(self, goal):
-        feedback = GoogleChatFeedback()
-        result = GoogleChatResult()
+        feedback = GoogleChatRESTFeedback()
+        result = GoogleChatRESTResult()
         r = rospy.Rate(1)
         success = True        
         # start executing the action

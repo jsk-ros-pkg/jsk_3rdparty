@@ -10,7 +10,7 @@ catkin_python_setup()
 
 add_action_files(
   FILES
-  GoogleChat.action
+  GoogleChatREST.action
 )
 
 generate_messages(

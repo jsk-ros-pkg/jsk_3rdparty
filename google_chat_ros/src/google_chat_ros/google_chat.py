@@ -6,7 +6,7 @@ from httplib2 import Http
 import json
 from oauth2client.service_account import ServiceAccountCredentials
 
-class GoogleChatClient():
+class GoogleChatRESTClient():
     def __init__(self, keyfile):
         self._auth_scopes = "https://www.googleapis.com/auth/chat.bot"
         self.keyfile = keyfile
