@@ -24,6 +24,12 @@ catkin_package()
 include_directories()
 
 # install
+# euslisp
+file(GLOB EUSLISP_SCRIPTS scripts/*.l)
+install(FILES ${EUSLISP_SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+# python
 file(GLOB PYTHON_SCRIPTS scripts/*.py)
 catkin_install_python(
   PROGRAMS ${PYTHON_SCRIPTS}
