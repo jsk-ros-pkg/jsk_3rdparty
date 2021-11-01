@@ -38,9 +38,10 @@ goal:
   message_type: 'text'
   content: 'Hello world from ROS!'"
 ```
-#### From euslisp
+#### From roseus
 ```lisp
-;; todo
+(load "package://google_chat_ros/scripts/google-chat.l")
+(send-google-chat-message "YOUR_SPACE" "text" "Hello world from eus!")
 ```
 
 ## Google Chat Message types
