@@ -1,9 +1,14 @@
 # The package for using Google chat services with ROS
 
 ## What is this?
+Use Google Chat API with ROS.  
+![Screenshot from 2021-11-01 15-53-27](https://user-images.githubusercontent.com/27789460/139635911-66232c88-d3b9-4d7d-940e-966fbac9d800.png)  
+System components  
+![GoogleChatROS_system](https://user-images.githubusercontent.com/27789460/139635648-4ddbf9da-90e9-4b87-b958-ca996a8ffc4f.png)
+
 
 ## Create a service account and private key
-See (Google Official Document)[https://developers.google.com/chat/how-tos/service-accounts#step_1_create_service_account_and_private_key]. Please ensure to get JSON credetial file and save it. DO NOT LOST IT!
+See [Google Official Document](https://developers.google.com/chat/how-tos/service-accounts#step_1_create_service_account_and_private_key). Please ensure to get JSON credetial file and save it. DO NOT LOST IT!
 
 ## Use google chat ros
 ### Run the server
@@ -44,6 +49,6 @@ You can set Google Chat message type by setting `message_type` in ros message.
 Send simple text message.
 ### card
 Send Google Chat Card message.
-See (here)[https://developers.google.com/chat/api/guides/message-formats/cards] for details.
+See [here](https://developers.google.com/chat/api/guides/message-formats/cards) for details.
 
 
