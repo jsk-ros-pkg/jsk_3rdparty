@@ -35,7 +35,7 @@ goal_id:
     nsecs: 0
   id: ''
 goal:
-  space: 'AAAAaXKY29M'
+  space: 'YOUR_SPACE'
   message_type: 'text'
   content: 'Hello world from ROS!'"
 ```
