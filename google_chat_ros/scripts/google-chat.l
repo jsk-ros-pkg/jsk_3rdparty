@@ -3,7 +3,7 @@
 (ros::load-ros-manifest "google_chat_ros")
 (ros::roseus "google_chat_eus_client")
 
-(defun send-google-chat-message (space message-type content &key (topic-name "google_chat_ros/rest") (wait nil))
+(defun send-google-chat-message (space content &key (message-type "text") (topic-name "google_chat_ros/rest") (wait nil))
   (when (boundp 'google_chat_ros::GoogleChatRESTAction)
     (let ((goal (instance google_chat_ros::GoogleChatRESTActionGoal :init))
           (ac (instance ros::simple-action-client :init
