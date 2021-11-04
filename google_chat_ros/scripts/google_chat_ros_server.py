@@ -4,8 +4,8 @@ from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.msg import GoogleChatRESTAction
 from google_chat_ros.msg import GoogleChatRESTFeedback
 from google_chat_ros.msg import GoogleChatRESTResult
-import os.path
 import rospy
+
 
 class GoogleChatActionServer:
     """
@@ -33,9 +33,11 @@ class GoogleChatActionServer:
         feedback = GoogleChatRESTFeedback()
         result = GoogleChatRESTResult()
         r = rospy.Rate(1)
-        success = True        
+        success = True
         # start executing the action
-        space, message_type, content = goal.space, goal.message_type, goal.content
+        space = goal.space
+        message_type = goal.message_type
+        content = goal.content
         try:
             # establish the service
             self._client.build_service()
@@ -63,8 +65,8 @@ class GoogleChatActionServer:
             result.done = success
             self._as.set_succeeded(result)
 
+
 if __name__ == '__main__':
     rospy.init_node('google_chat')
     server = GoogleChatActionServer()
     rospy.spin()
-

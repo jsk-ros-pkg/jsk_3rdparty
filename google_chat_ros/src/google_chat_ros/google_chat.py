@@ -1,10 +1,9 @@
 from __future__ import print_function
 
 from apiclient.discovery import build
-from googleapiclient.errors import HttpError
 from httplib2 import Http
-import json
 from oauth2client.service_account import ServiceAccountCredentials
+
 
 class GoogleChatRESTClient():
     def __init__(self, keyfile):
@@ -23,7 +22,8 @@ class GoogleChatRESTClient():
 
     def send_text(self, space, text):
         parent = 'spaces/' + space
-        return self._chat.spaces().messages().create(parent=parent, body={'text':text}).execute() # returns same 403 error both authenticate error and not connected error
+        # returns same 403 error both authenticate error and not connected error
+        return self._chat.spaces().messages().create(parent=parent, body={'text': text}).execute()
 
     def send_card(self, space, content):
         pass
