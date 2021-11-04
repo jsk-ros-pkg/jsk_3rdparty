@@ -11,11 +11,21 @@ System components
 See [Google Official Document](https://developers.google.com/chat/how-tos/service-accounts#step_1_create_service_account_and_private_key). Please ensure to get JSON credetial file and save it. DO NOT LOST IT!  
 For JSK members, all keys are available at [Google Drive](https://drive.google.com/drive/folders/1Enbbta5QuZ-hrUWdTjVDEjDJc3j7Abxo?usp=sharing). If you make new  API keys, please upload them here.
 
-### 2. Use google chat ros
-#### 2.1 Run the server
+### 2. Build ROS workspace
+```bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
+mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
+git clone https://github.com/jsk-ros-pkg/jsk_3rdparty
+rosdep install --ignore-src --from-paths . -y -r
+cd ..
+catkin build
+```
+
+### 3. Use google chat ros
+#### 3.1 Run the server
 Execute
 ```bash
-roslaunch roslaunch google_chat_ros google_chat.launch keyfile:=${PATH_TO_keyfile.json}
+roslaunch google_chat_ros google_chat.launch keyfile:=${PATH_TO_keyfile.json}
 ```
 and run the action server.
 

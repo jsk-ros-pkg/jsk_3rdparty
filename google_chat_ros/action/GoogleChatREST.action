@@ -1,7 +1,32 @@
 # Define the goal
 string space
-string message_type
-string content # if message_type is text, string, else json.
+string message_type # supports "text" or "card".
+string content # if message_type is text string, else raw json text.
+##### RAW JSON TEXT EXAMPLE #####
+      # "sections": [
+      #   {
+      #     "widgets": [
+      #       {
+      #         "image": { "imageUrl": "https://..." }
+      #       },
+      #       {
+      #         "buttons": [
+      #           {
+      #             "textButton": {
+      #               "text": "OPEN IN GOOGLE MAPS",
+      #               "onClick": {
+      #                 "openLink": {
+      #                   "url": "https://..."
+      #                 }
+      #               }
+      #             }
+      #           }
+      #         ]
+      #       }
+      #     ]
+      #   }
+      # ]
+### END RAW JSON TEXT EXAMPLE ###
 ---
 # Define the result
 bool done
