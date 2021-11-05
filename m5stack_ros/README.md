@@ -167,6 +167,11 @@ With this package, you can use following devices. To use each device, please see
     - M5Stack Gray's internal 9-axis IMU
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/MPU9250)
 
+- [TVOC_SGP30](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30)
+
+    - TVOC/eCO2 Gas Sensor Unit
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/TVOC_SGP30)
+
 
 ## Tested environment
 

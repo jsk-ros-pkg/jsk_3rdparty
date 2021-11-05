@@ -1,3 +1,6 @@
+// Mainly copied from
+// https://github.com/m5stack/M5-ProductExampleCodes/tree/master/Unit/THERMAL/Arduino
+
 #include <m5stack_ros.h>
 #include <sensor_msgs/Image.h>
 #include <std_msgs/Int16.h>
