@@ -12,7 +12,7 @@ ros::Publisher chatter("chatter", &str_msg);
 void setup()
 {
   // Setup m5stack for ROS
-  m5stack_ros_setup();
+  setupM5stackROS();
   nh.advertise(chatter);
 
   // Visualization on m5stack monitor
