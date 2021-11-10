@@ -17,7 +17,8 @@ from sound_play.msg import SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from std_msgs.msg import String
 
-from dialogflow_task_executive.msg import DialogResponse, ConversationText
+from dialogflow_task_executive.msg import ConversationText
+from dialogflow_task_executive.msg import DialogResponse
 
 
 class State(object):
@@ -145,7 +146,7 @@ class DialogflowClient(object):
             self.hotword_cb(String(data=msg.transcript[0]))
 
         if self.state == State.LISTENING:
-            self.queue.put(('speech',0,msg))
+            self.queue.put(('speech', 0, msg))
             rospy.loginfo("Received input")
         else:
             rospy.logdebug("Received input but ignored")
