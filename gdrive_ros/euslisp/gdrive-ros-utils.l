@@ -16,12 +16,6 @@
                     (use-timestamp-file-title nil))
   (let ((req (instance gdrive_ros::UploadRequest :init))
         (res nil))
-    (if (and (not parents-path) (not parents-id))
-      (progn
-        (ros::ros-error "Both of parents-path and parents-id cannot be nil.")
-        (return-from upload-file nil)
-        )
-      nil)
     (send req :file_path file-path)
     (send req :file_title file-title)
     (send req :parents_path parents-path)
@@ -29,16 +23,11 @@
     (send req :use_timestamp_folder use-timestamp-folder)
     (send req :use_timestamp_file_title use-timestamp-file-title)
     (setq res (ros::service-call "/gdrive_server/upload" req t))
-    (if (send res :success)
-        (list (send res :success)
-              (send res :file_id)
-              (send res :file_url)
-              (send res :parents_id)
-              (send res :parents_url))
-      (progn
-        (ros::ros-error "Failed to upload.")
-        nil
-        ))
+    (list (send res :success)
+          (send res :file_id)
+          (send res :file_url)
+          (send res :parents_id)
+          (send res :parents_url))
     ))
 
 (defun upload-multiple-files
@@ -51,12 +40,6 @@
                     (use-timestamp-file-title nil))
   (let ((req (instance gdrive_ros::MultipleUploadRequest :init))
         (res nil))
-    (if (and (not parents-path) (not parents-id))
-      (progn
-        (ros::ros-error "Both of parents-path and parents-id cannot be nil.")
-        (return-from upload-file nil)
-        )
-      nil)
     (send req :file_paths file-paths)
     (send req :file_titles file-titles)
     (send req :parents_path parents-path)
