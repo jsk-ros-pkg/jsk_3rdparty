@@ -2,8 +2,8 @@
 
 (defun wait-for-gdrive-server (&rest args)
   (if args
-      (ros::wait-for-service "/gdrive_ros/upload" args)
-    (ros::wait-for-service "/gdrive_ros/upload" args)
+      (ros::wait-for-service "/gdrive_server/upload" args)
+    (ros::wait-for-service "/gdrive_server/upload")
     )
   )
 
@@ -18,7 +18,7 @@
         (res nil))
     (if (and (not parents-path) (not parents-id))
       (progn
-        (ros::log-error "Both of parents-path and parents-id cannot be nil.")
+        (ros::ros-error "Both of parents-path and parents-id cannot be nil.")
         (return-from upload-file nil)
         )
       nil)
@@ -28,7 +28,7 @@
     (send req :parents_id parents-id)
     (send req :use_timestamp_folder use-timestamp-folder)
     (send req :use_timestamp_file_title use-timestamp-file-title)
-    (setq res (ros::service-call "/gdrive_ros/upload" req t))
+    (setq res (ros::service-call "/gdrive_server/upload" req t))
     (if (send res :success)
         (list (send res :success)
               (send res :file_id)
@@ -36,7 +36,7 @@
               (send res :parents_id)
               (send res :parents_url))
       (progn
-        (ros::log-error "Failed to upload.")
+        (ros::ros-error "Failed to upload.")
         nil
         ))
     ))
@@ -53,7 +53,7 @@
         (res nil))
     (if (and (not parents-path) (not parents-id))
       (progn
-        (ros::log-error "Both of parents-path and parents-id cannot be nil.")
+        (ros::ros-error "Both of parents-path and parents-id cannot be nil.")
         (return-from upload-file nil)
         )
       nil)
@@ -63,7 +63,7 @@
     (send req :parents_id parents-id)
     (send req :use_timestamp_folder use-timestamp-folder)
     (send req :use_timestamp_file_title use-timestamp-file-title)
-    (setq res (ros::service-call "/gdrive_ros/upload_multi" req t))
+    (setq res (ros::service-call "/gdrive_server/upload_multi" req t))
     (list (send res :successes)
           (send res :file_ids)
           (send res :file_urls)
