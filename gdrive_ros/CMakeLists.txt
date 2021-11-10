@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 2.8.3)
 project(gdrive_ros)
 
 find_package(catkin REQUIRED COMPONENTS
+  rospy
   std_msgs
   message_generation
 )
+
+catkin_python_setup()
 
 add_service_files(
   FILES
@@ -22,12 +25,24 @@ catkin_package(
   message_runtime
 )
 
-install(DIRECTORY node_scripts
+catkin_install_python(PROGRAMS node_scripts/gdrive_server_node.py node_scripts/sample_gdrive_rospy_client.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(PROGRAMS euslisp/sample-gdrive-ros-client.l
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  USE_SOURCE_PERMISSIONS
 )
 
 install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+)
+
+install(DIRECTORY sample
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+)
+
+install(DIRECTORY euslisp
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )
