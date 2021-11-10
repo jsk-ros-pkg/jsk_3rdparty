@@ -1,8 +1,8 @@
 import rospy
-from .srv import MultipleUpload
-from .srv import MultipleUploadRequest
-from .srv import Upload
-from .srv import UploadRequest
+from gdrive_ros.srv import MultipleUpload
+from gdrive_ros.srv import MultipleUploadRequest
+from gdrive_ros.srv import Upload
+from gdrive_ros.srv import UploadRequest
 
 
 class GDriveROSClient:
