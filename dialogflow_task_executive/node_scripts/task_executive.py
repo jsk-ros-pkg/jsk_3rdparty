@@ -6,8 +6,10 @@ import json
 import re
 import rospy
 
-from app_manager.msg import AppList, KeyValue
-from app_manager.srv import StartApp, StartAppRequest
+from app_manager.msg import AppList
+from app_manager.msg import KeyValue
+from app_manager.srv import StartApp
+from app_manager.srv import StartAppRequest
 from app_manager.srv import StopApp
 from std_srvs.srv import Empty
 
@@ -98,7 +100,7 @@ class AppManager(object):
         req = StartAppRequest()
         req.name = name
         for key, value in launch_args.items():
-            req.args.append(KeyValue(key=key,value=value))
+            req.args.append(KeyValue(key=key, value=value))
         res = self._srv_start_app(req)
         if res.started:
             rospy.loginfo("{} successfully started".format(name))
@@ -236,7 +238,7 @@ class TaskExecutive(object):
         rospy.loginfo(
             "Starting '{}' with parameters '{}'"
             .format(msg.action, msg.parameters))
-        self.app_manager.start_app(action,launch_args)
+        self.app_manager.start_app(action, launch_args)
 
     def app_start_cb(self, name):
         rospy.loginfo("{} started".format(name))
