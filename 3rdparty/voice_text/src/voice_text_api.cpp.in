@@ -66,8 +66,8 @@ public:
     char* license_path_char = NULL;
     VTAPI_Init(NULL);
     this->hVTAPI = VTAPI_CreateHandle();
-    if (ret != VTAPI_SUCCESS) {
-      ROS_ERROR("VoiceText API ERROR when creating API handler. CODE: %d\n", ret);
+    if (this->hVTAPI == 0) {
+      ROS_ERROR("VoiceText API ERROR when creating API handler. : %s\n", VTAPI_GetLastErrorInfo(0)->szMsg);
     }
     if (!license_path_.empty()) {
       license_path_char = (char*)calloc(std::strlen(license_path_.c_str())+1, sizeof(char));
@@ -77,10 +77,9 @@ public:
     // Load engine
     this->hEngine = VTAPI_GetEngine("@VT_SPEAKER@", "@VT_TYPE@");
     ret = VTAPI_SetEngineHandle(this->hVTAPI, this->hEngine);
-    if(ret != VTAPI_SUCCESS){
-      ROS_ERROR("VoiceText API ERROR when creating engine handler. CODE: %d\n", ret);
+    if(ret < VTAPI_SUCCESS){
+      ROS_ERROR("VoiceText API ERROR when creating engine handler. CODE: %d, MESSAGE: %s \n", ret, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
     }
-    // ret = VT_LOADTTS_JPN((int)NULL, -1, db_path_char, license_path_char);
     free(db_path_char);
     if (!license_path_.empty()) free(license_path_char);
     // if (ret != VTAPI_SUCCESS) {
