@@ -42,9 +42,9 @@ else()
     set(VT_LIB_PATH ${VT_LIB_PATH_FILEIO})
   endif()
   if(VT_LIB_PATH)
-    message(WARNING "VoiceText library is found at ${VT_LIB_PATH}")
+    message(WARNING "VoiceText Engine library is found at ${VT_LIB_PATH}")
   else()
-    message(WARNING "VoiceText library is not found at ${VT_LIB_PATH_OLD} or ${VT_LIB_PATH_NEW} or ${VT_LIB_PATH_FILE}")
+    message(WARNING "VoiceText Engine library is not found at ${VT_LIB_PATH_OLD} or ${VT_LIB_PATH_NEW} or ${VT_LIB_PATH_FILE}")
   endif()
 endif()
 
@@ -54,16 +54,17 @@ set(VT_API_H ${VT_ROOT}/inc/vtapi.h)
 if(EXISTS ${VT_SDK_H})
   # use traditional sdk
   message(WARNING "Using SDK because ${VT_SDK_H} was found.")
-  configure_file(src/voice_text.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
+  set(VT_INCLUDE ${VT_SDK_H})
 elseif(EXISTS ${VT_API_H})
   # use new api
   message(WARNING "Using API because ${VT_SDK_H} was not found but ${VT_API_H} was found.")
   string(REPLACE "/" ";" _VT_ROOT_SPLIT ${VT_ROOT})
   list(GET _VT_ROOT_SPLIT 3 VT_SPEAKER)
   list(GET _VT_ROOT_SPLIT 4 VT_TYPE)
-  configure_file(src/voice_text_api.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
   set(VT_API_LIB_PATH ${VT_ROOT}/bin/libvtapi.so)
+  set(VT_INCLUDE ${VT_API_H})
 endif()
+configure_file(src/voice_text.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
 
 include_directories(
   ${Boost_INCLUDE_DIRS}
