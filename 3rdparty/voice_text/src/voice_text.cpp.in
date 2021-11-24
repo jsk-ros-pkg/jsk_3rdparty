@@ -21,7 +21,7 @@
 #ifdef USE_DUMMY_INCLUDE
 #include "dummy/vt_dummy.h"
 #else
-#include "@VT_ROOT@/inc/vt_jpn.h"
+#include "@VT_INCLUDE@"
 #endif
 
 #define PATH_MAX 1024
@@ -45,7 +45,13 @@ public:
 
   ~VoiceText() {
     if (initialized_) {
+      #ifdef _VTAPI_H_
+      VTAPI_ReleaseHandle(this->hVTAPI);
+      VTAPI_UnloadEngine(this->hEngine);
+      VTAPI_Exit();
+      #else
       VT_UNLOADTTS_JPN(-1);
+      #endif
     }
   }
 
@@ -64,9 +70,23 @@ public:
       license_path_char = (char*)calloc(std::strlen(license_path_.c_str())+1, sizeof(char));
       std::strcpy(license_path_char, license_path_.c_str());
     }
+    #ifdef _VTAPI_H_
+    VTAPI_Init("@VT_ROOT@/bin"); // set voice_text binary library path because it loads them dynamically
+    this->hVTAPI = VTAPI_CreateHandle();
+    if (this->hVTAPI == 0) {
+      ROS_ERROR("VoiceText API ERROR when creating API handler. : %s\n", VTAPI_GetLastErrorInfo(0)->szMsg);
+      return false;
+    }
+    VTAPI_SetLicenseFolder(license_path_char);
+    // Load engine
+    this->hEngine = VTAPI_GetEngine("@VT_SPEAKER@", "@VT_TYPE@");
+    ret = VTAPI_SetEngineHandle(this->hVTAPI, this->hEngine);
+    if(ret < VTAPI_SUCCESS){
+      ROS_ERROR("VoiceText API ERROR when creating engine handler. CODE: %d, MESSAGE: %s \n", ret, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
+      return false;
+    }
+    #else
     ret = VT_LOADTTS_JPN((int)NULL, -1, db_path_char, license_path_char);
-    free(db_path_char);
-    if (!license_path_.empty()) free(license_path_char);
     if (ret != VT_LOADTTS_SUCCESS) {
       ROS_FATAL("Failed to load TTS engine (code %d)", ret);
       if (ret == -1) {
@@ -74,6 +94,10 @@ public:
       }
       return false;
     }
+    #endif
+
+    free(db_path_char);
+    if (!license_path_.empty()) free(license_path_char);
 
     char szTmp[PATH_MAX];
     char szTmp2[PATH_MAX];
@@ -124,6 +148,23 @@ public:
     char* wave_char = (char*)calloc(std::strlen(req.wave_path.c_str())+1, sizeof(char));
     std::strcpy(wave_char, req.wave_path.c_str());
 
+    #ifdef _VTAPI_H_
+    VTAPI_AUDIO_INFO stAudio;   // audio configuration
+    int ret;
+    ret = VTAPI_SetOutputFile(this->hVTAPI, wave_char, FORMAT_16PCM_WAV);
+    if(ret != VTAPI_SUCCESS){
+      ROS_ERROR("VoiceText API ERROR when executing VTAPI_SetOutputFile. STATUS: %s\n", VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
+      res.ok = false;
+    }
+    // set input text file path
+    ret = VTAPI_TextToFile(this->hVTAPI, text_char, -1, TEXT_FORMAT_DEFAULT);
+    if(ret != VTAPI_SUCCESS){
+      ROS_ERROR("VoiceText API ERROR when executing VTAPI_TextToFile. STATUS: %s\n", VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
+      res.ok = false;
+    }
+    free(text_char);
+    free(wave_char);
+    #else
     int ret = VT_TextToFile_JPN(VT_FILE_API_FMT_S16PCM_WAVE,
                                 text_char,
                                 wave_char,
@@ -138,12 +179,12 @@ public:
 
     free(text_char);
     free(wave_char);
-
     if (ret != VT_FILE_API_SUCCESS) {
       ROS_ERROR("Failed to execute tts: (code: %d)", ret);
       res.ok = false;
       return true;
     }
+    #endif
 
     res.ok = true;
     return true;
@@ -156,6 +197,8 @@ public:
   ros::ServiceServer srv_;
   bool initialized_;
   std::string db_path_, license_path_;
+  VTAPI_HANDLE hVTAPI;
+  VTAPI_ENGINE_HANDLE hEngine;
 };
 
 int main(int argc, char** argv) {
