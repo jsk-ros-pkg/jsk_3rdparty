@@ -62,8 +62,7 @@ elseif(EXISTS ${VT_API_H})
   list(GET _VT_ROOT_SPLIT 3 VT_SPEAKER)
   list(GET _VT_ROOT_SPLIT 4 VT_TYPE)
   configure_file(src/voice_text_api.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
-  file(GLOB VT_API_LIB_PATH ${VT_ROOT}/bin/lib[a-z0-9]*.so)
-  message(WARNING "Linking ${VT_API_LIB_PATH}...")
+  set(VT_API_LIB_PATH ${VT_ROOT}/bin/libvtapi.so)
 endif()
 
 include_directories(

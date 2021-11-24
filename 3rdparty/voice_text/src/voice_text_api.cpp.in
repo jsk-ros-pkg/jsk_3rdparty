@@ -25,8 +25,6 @@
 #include "@VT_ROOT@/inc/vtapi.h"
 #endif
 
-#include "/usr/vt/hikari/D16/inc/vtapi.h" // TODO:Delete
-
 namespace fs = boost::filesystem;
 
 
@@ -64,7 +62,7 @@ public:
     char* db_path_char = (char*)calloc(std::strlen(db_path_.c_str())+1, sizeof(char));
     std::strcpy(db_path_char, db_path_.c_str());
     char* license_path_char = NULL;
-    VTAPI_Init(NULL);
+    VTAPI_Init("@VT_ROOT@/bin");
     this->hVTAPI = VTAPI_CreateHandle();
     if (this->hVTAPI == 0) {
       ROS_ERROR("VoiceText API ERROR when creating API handler. : %s\n", VTAPI_GetLastErrorInfo(0)->szMsg);
