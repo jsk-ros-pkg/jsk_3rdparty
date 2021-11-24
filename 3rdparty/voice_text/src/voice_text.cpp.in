@@ -201,8 +201,10 @@ public:
   ros::ServiceServer srv_;
   bool initialized_;
   std::string db_path_, license_path_;
+  #ifdef _VTAPI_H_
   VTAPI_HANDLE hVTAPI;
   VTAPI_ENGINE_HANDLE hEngine;
+  #endif
 };
 
 int main(int argc, char** argv) {
