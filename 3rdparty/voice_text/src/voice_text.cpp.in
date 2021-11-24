@@ -149,8 +149,12 @@ public:
     std::strcpy(wave_char, req.wave_path.c_str());
 
     #ifdef _VTAPI_H_
-    VTAPI_AUDIO_INFO stAudio;   // audio configuration
     int ret;
+    // set attributes
+    VTAPI_SetAttr(this->hVTAPI, ATTR_PITCH, config_.pitch);
+    VTAPI_SetAttr(this->hVTAPI, ATTR_SPEED, config_.speed);
+    VTAPI_SetAttr(this->hVTAPI, ATTR_VOLUME, config_.volume);
+    VTAPI_SetAttr(this->hVTAPI, ATTR_PAUSE, config_.pause);
     ret = VTAPI_SetOutputFile(this->hVTAPI, wave_char, FORMAT_16PCM_WAV);
     if(ret != VTAPI_SUCCESS){
       ROS_ERROR("VoiceText API ERROR when executing VTAPI_SetOutputFile. STATUS: %s\n", VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
