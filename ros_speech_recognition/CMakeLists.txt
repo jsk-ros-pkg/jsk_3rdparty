@@ -22,9 +22,10 @@ else()
   catkin_generate_virtualenv()
 endif()
 
+file(GLOB SCRIPT_PROGRAMS scripts/*.py)
 catkin_install_python(
-  PROGRAMS scripts/speech_recognition_node.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  PROGRAMS ${SCRIPT_PROGRAMS}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/
 )
 
 install(DIRECTORY launch
