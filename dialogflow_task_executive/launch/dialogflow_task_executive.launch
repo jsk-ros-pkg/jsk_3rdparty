@@ -16,7 +16,7 @@
 
 
   <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
-        args="/speech_to_text /speech_to_text_google /speech_to_text_julius" >
+        args="/speech_to_text /speech_to_text_google /speech_to_text_julius /speech_to_text_other" >
     <remap from="mux" to="speech_to_text_mux"/>
   </node>
 
