@@ -22,7 +22,11 @@
   <test test-name="test_ros_speech_recognition"
         name="test_ros_speech_recognition"
         pkg="jsk_tools"  type="test_topic_published.py" >
-    <param name="~topic_0" value="/Tablet/voice" />
-    <param name="~timeout_0" value="30" />
+    <rosparam>
+      topic_0: /Tablet/voice
+      timeout_0: 30
+      topic_1: /speech_recognition_candidates_to_string/output
+      timeout_1: 30
+    </rosparam>
   </test>
 </launch>
