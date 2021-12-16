@@ -36,10 +36,6 @@ install(FILES requirements.txt
 
 if(CATKIN_ENABLE_TESTING)
   find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
-  catkin_install_python(
-    PROGRAMS scripts/speech_recognition_node.py
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
   add_rostest(test/sample_ros_speech_recognition.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
