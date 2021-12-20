@@ -151,7 +151,7 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   
 * `~google_cloud_credentials_json` (`String`, default: `None`)
 
-  Path to credential json file.
+  Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
   This is valid only if `~engine` is `GoogleCloud`.
   
 * `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
