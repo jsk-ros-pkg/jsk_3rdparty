@@ -4,12 +4,13 @@
 
 import os
 import sys
-from respeaker_node import PARAMETERS, init_respeaker
+from respeaker_node import PARAMETERS, RespeakerInterface
 
 
 def main(out):
-    dev = init_respeaker()
-    if not dev:
+    try:
+        dev = RespeakerInterface()
+    except RuntimeError as e:
         print('No device found. Please connect a device.')
         return
     with open(out, "w") as f:
@@ -72,5 +73,5 @@ if __name__ == '__main__':
     else:
         outpath = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
-            "..", "cfg", "Respeaker.cfg")
+            "..", "config", "Respeaker.cfg")
     main(outpath)
