@@ -30,7 +30,7 @@ roslaunch google_chat_ros google_chat.launch keyfile:=${PATH_TO_keyfile.json}
 and run the action server.
 
 #### 2.2 Run the client
-First, you have to identify your chat room ID. You can get it from chat room's URL. If it is `https://mail.google.com/chat/u/0/#chat/space/XXXXXXXXXXX`, `XXXXXXXXXXX` becomes the ID.
+First, you have to identify your chat room. You can get it from chat room's URL. If it is `https://mail.google.com/chat/u/0/#chat/space/XXXXXXXXXXX`, `XXXXXXXXXXX` becomes the space name.
 ##### terminal example
 ```bash
 rostopic pub /google_chat_ros/rest/goal google_chat_ros/GoogleChatRESTActionGoal "header:
@@ -63,4 +63,5 @@ Send simple text message.
 Send Google Chat Card message.
 See [here](https://developers.google.com/chat/api/guides/message-formats/cards) for details.
 
-
+## Sending Images
+You have to get image's permanent link and attach its url to card type message. To get it, please consider using jsk_3rdparty/gdrive_ros.
