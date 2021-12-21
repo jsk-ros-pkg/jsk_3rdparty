@@ -73,5 +73,5 @@ if __name__ == '__main__':
     else:
         outpath = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
-            "..", "config", "Respeaker.cfg")
+            "..", "cfg", "Respeaker.cfg")
     main(outpath)
