@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_google_cloud_language)
 
+if($ENV{ROS_DISTRO} STREQUAL "indigo")
+  message(WARNING "following requirements.txt syntax is not support on 14.04")
+  message(WARNING "google-api-core[grpc]==1.31.5  # via google-cloud-language")
+  find_package(catkin)
+  catkin_package()
+  return()
+endif()
+
 find_package(
   catkin REQUIRED COMPONENTS
   actionlib_msgs
