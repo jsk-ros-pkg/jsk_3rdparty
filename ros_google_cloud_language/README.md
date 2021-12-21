@@ -14,7 +14,7 @@ Tutorials
 catkin b ros_google_cloud_language
 ```
 
-Do not install `google-cloud-language` manually, it is installed via `catkin_virtual_env` to work with rospy.
+Do not run `pip install google-cloud-language` manually, it is installed via `catkin_virtual_env` to work with rospy.
 
 
 2. Download google credentials file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
