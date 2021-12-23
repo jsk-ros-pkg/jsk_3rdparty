@@ -21,6 +21,7 @@ jobs:
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
+          EXTRA_DEB : "python-lxml"
           ROS_DISTRO : kinetic
           ROS_PARALLEL_TEST_JOBS : "-j8"
           ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
