@@ -20,6 +20,8 @@
       use_tts: true
       project_id: $(arg project_id)
     </rosparam>
+    <rosparam command="load" ns="/dialogflow_client/hotword"
+        file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
   </node>
 
   <node name="task_executive"

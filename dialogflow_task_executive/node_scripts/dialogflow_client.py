@@ -79,8 +79,9 @@ class DialogflowClient(object):
         self.timeout = rospy.get_param("~timeout", 10.0)
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
-        self.hotword = rospy.get_param(
-            "~hotword", ["ねえねえ", "こんにちは", "やあ"])
+        hotwords = rospy.get_param("~hotword", [])
+        self.hotwords = [ hotword.encode('utf-8') if isinstace(hotword, unicode ) else hotword
+                            for hotword in hotwords ]
 
         self.state = State()
         self.session_id = None
@@ -134,7 +135,7 @@ class DialogflowClient(object):
                 self.session_id = None
 
     def hotword_cb(self, msg):
-        if msg.data in self.hotword:
+        if msg.data in self.hotwords:
             rospy.loginfo("Hotword received")
             self.state.set(State.LISTENING)
 
