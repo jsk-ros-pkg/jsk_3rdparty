@@ -80,7 +80,7 @@ class DialogflowClient(object):
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
         hotwords = rospy.get_param("~hotword", [])
-        self.hotwords = [ hotword.encode('utf-8') if isinstace(hotword, unicode ) else hotword
+        self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
                             for hotword in hotwords ]
 
         self.state = State()
