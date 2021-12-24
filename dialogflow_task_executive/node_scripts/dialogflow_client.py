@@ -181,9 +181,15 @@ class DialogflowClient(object):
         msg = SoundRequest(
             command=SoundRequest.PLAY_ONCE,
             sound=SoundRequest.SAY,
-            volume=1.0,
-            arg=result.fulfillment_text.encode('utf-8'),
-            arg2=self.language)
+            volume=1.0)
+
+        # for japanese or utf-8 languages
+        if self.language == 'ja-JP':
+            msg.arg = result.fulfillment_text.encode('utf-8')
+            msg.arg2 = self.language
+        else:
+            msg.arg = result.fulfillment_text
+
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
             rospy.Duration(10.0))
