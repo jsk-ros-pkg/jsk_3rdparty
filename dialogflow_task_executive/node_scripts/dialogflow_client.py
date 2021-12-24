@@ -88,8 +88,10 @@ class DialogflowClient(object):
         self.last_spoken = rospy.Time(0)
 
         if self.use_tts:
+            soundplay_action_name = rospy.get_param(
+                '~soundplay_action_name', 'robotsound_jp')
             self.sound_action = actionlib.SimpleActionClient(
-                "robotsound_jp", SoundRequestAction)
+                soundplay_action_name, SoundRequestAction)
             if not self.sound_action.wait_for_server(rospy.Duration(5.0)):
                 self.sound_action = None
             else:
