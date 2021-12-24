@@ -73,6 +73,7 @@ class DialogflowClient(object):
 
         # use TTS feature
         self.use_tts = rospy.get_param("~use_tts", True)
+        self.volume = rospy.get_param('~volume', 1.0)
 
         # timeout for voice input activation by hotword
         self.timeout = rospy.get_param("~timeout", 10.0)
@@ -181,9 +182,10 @@ class DialogflowClient(object):
         msg = SoundRequest(
             command=SoundRequest.PLAY_ONCE,
             sound=SoundRequest.SAY,
-            volume=1.0,
+            volume=self.volume,
             arg=result.fulfillment_text.encode('utf-8'),
             arg2=self.language)
+
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
             rospy.Duration(10.0))
