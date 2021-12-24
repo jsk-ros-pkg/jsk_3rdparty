@@ -167,7 +167,7 @@ class DialogflowClient(object):
     def publish_result(self, result):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
-        if result.action is not 'input.unknown':
+        if result.action != 'input.unknown':
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
