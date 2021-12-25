@@ -285,6 +285,7 @@ class DialogflowAudioClient(DialogflowBase):
     def df_run(self):
         while True:
             if rospy.is_shutdown():
+                rospy.sleep(0.1)
                 break
             try:
                 msg = self.queue.get(timeout=0.1)
