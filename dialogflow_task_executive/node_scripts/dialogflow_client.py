@@ -247,7 +247,7 @@ class DialogflowAudioClient(DialogflowBase):
             self.queue.put(msg)
             rospy.loginfo("Received input")
         else:
-            rospy.logdebug("Received input but ignored")
+            rospy.logwarn("Received input but ignored")
 
     def detect_intent_audio(self, data, session):
         query = df.types.QueryInput(audio_config=self.audio_config)
