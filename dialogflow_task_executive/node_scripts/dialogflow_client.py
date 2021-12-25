@@ -169,9 +169,14 @@ class DialogflowClient(object):
         msg.header.stamp = rospy.Time.now()
         if result.action is not 'input.unknown':
             rospy.logwarn("Unknown action")
-        msg.query = result.query_text.encode("utf-8")
         msg.action = result.action
-        msg.response = result.fulfillment_text.encode("utf-8")
+
+        if self.language == 'ja-JP':
+            msg.query = result.query_text.encode("utf-8")
+            msg.response = result.fulfillment_text.encode("utf-8")
+        else:
+            msg.query = result.query_text
+            msg.response = result.fulfillment_text
         msg.fulfilled = result.all_required_params_present
         msg.parameters = MessageToJson(result.parameters)
         msg.speech_score = result.speech_recognition_confidence
