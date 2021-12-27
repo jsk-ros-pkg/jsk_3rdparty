@@ -20,6 +20,7 @@ jobs:
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
+          EXTRA_DEB : "python-lxml"
           ROS_DISTRO : indigo
           ROS_PARALLEL_TEST_JOBS: "-j8"
           # latest catkin_virtualenv with pip==21.0.1 is incompatible with python 2.x
