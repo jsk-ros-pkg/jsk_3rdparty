@@ -94,11 +94,6 @@ public:
       }
       return false;
     }
-    #endif
-
-    free(db_path_char);
-    if (!license_path_.empty()) free(license_path_char);
-
     char szTmp[PATH_MAX];
     char szTmp2[PATH_MAX];
     VT_GetTTSInfo_JPN(VT_BUILD_DATE, NULL, szTmp, PATH_MAX);
@@ -119,6 +114,10 @@ public:
     VT_GetTTSInfo_JPN(VT_CODEPAGE, NULL, &ret, sizeof(int));
     sprintf(szTmp2, "VT_GetTTSInfo_JPN(VT_CODEPAGE = %d\n", ret);
     ROS_INFO_STREAM(szTmp2);
+    #endif
+
+    free(db_path_char);
+    if (!license_path_.empty()) free(license_path_char);
 
     // advertise service
     srv_ = nh_.advertiseService("text_to_speech", &VoiceText::text_to_speech, this);
