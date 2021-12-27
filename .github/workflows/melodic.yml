@@ -19,3 +19,4 @@ jobs:
         with:
           ROS_DISTRO : melodic
           ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-p2"
