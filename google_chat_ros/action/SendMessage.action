@@ -1,6 +1,6 @@
 # Define the goal
 string space # space name, identify the chat room
-string message_type=text # supports "text" or "card".
+string message_type # supports "text" or "card".
 string content # if message_type is text, content is just string type. if message_type is card, content is expetcted json style below. See https://developers.google.com/chat/api/guides/message-formats/cards for details.
 ##### RAW JSON TEXT EXAMPLE #####
       # "sections": [

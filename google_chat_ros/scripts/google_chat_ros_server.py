@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import actionlib
 from google_chat_ros.google_chat import GoogleChatRESTClient
-from google_chat_ros.msg import GoogleChatRESTAction
-from google_chat_ros.msg import GoogleChatRESTFeedback
-from google_chat_ros.msg import GoogleChatRESTResult
+from google_chat_ros.msg import SendMessageAction
+from google_chat_ros.msg import SendMessageFeedback
+from google_chat_ros.msg import SendMessageResult
 import rospy
 
 
@@ -24,14 +24,14 @@ class GoogleChatActionServer:
             rospy.logerr(e)
         # ActionLib
         self._as = actionlib.SimpleActionServer(
-            '~rest', GoogleChatRESTAction,
+            '~send', SendMessageAction,
             execute_cb=self.execute_cb, auto_start=False
         )
         self._as.start()
 
     def execute_cb(self, goal):
-        feedback = GoogleChatRESTFeedback()
-        result = GoogleChatRESTResult()
+        feedback = SendMessageFeedback()
+        result = SendMessageResult()
         r = rospy.Rate(1)
         success = True
         # start executing the action

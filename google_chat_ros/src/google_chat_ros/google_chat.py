@@ -4,7 +4,6 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
-
 class GoogleChatRESTClient():
     def __init__(self, keyfile):
         self._auth_scopes = "https://www.googleapis.com/auth/chat.bot"
@@ -13,7 +12,7 @@ class GoogleChatRESTClient():
         self._chat = None
 
     def build_service(self):
-        """Authenticate Google REST API and start service by json key file.
+        """Authenticate Googel REST API and start service by json key file.
         Please see https://developers.google.com/chat/how-tos/service-accounts#step_1_create_service_account_and_private_key for details.
         :param keyfile_path: str, the file path of json key file
         """
@@ -27,3 +26,9 @@ class GoogleChatRESTClient():
 
     def send_card(self, space, content):
         pass
+
+    def list_members(self, space):
+        """Show member list in the space.
+        """
+        parent = 'spaces/' + space
+        return self._chat.spaces().members().list(parent=parent).execute()

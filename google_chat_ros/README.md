@@ -33,7 +33,7 @@ and run the action server.
 First, you have to identify your chat room. You can get it from chat room's URL. If it is `https://mail.google.com/chat/u/0/#chat/space/XXXXXXXXXXX`, `XXXXXXXXXXX` becomes the space name.
 ##### terminal example
 ```bash
-rostopic pub /google_chat_ros/rest/goal google_chat_ros/GoogleChatRESTActionGoal "header:
+rostopic pub /google_chat_ros/send/goal google_chat_ros/GoogleChatRESTActionGoal "header:
   seq: 0
   stamp:
     secs: 0
