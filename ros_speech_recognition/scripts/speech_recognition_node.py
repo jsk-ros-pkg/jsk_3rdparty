@@ -121,9 +121,14 @@ class ROSSpeechRecognition(object):
                               buffer_size=rospy.get_param("~buffer_size", 10240))
 
         # initialize sound play client
-        self.act_sound = actionlib.SimpleActionClient("sound_play", SoundRequestAction)
-        if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
-            rospy.logwarn("Failed to find sound_play action. Disabled audio alert")
+        if rospy.get_param('~enable_sound_play', True):
+            self.act_sound = actionlib.SimpleActionClient(
+                "sound_play", SoundRequestAction)
+            if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
+                rospy.logwarn("Failed to find sound_play action. "
+                              "Disabled audio alert")
+                self.act_sound = None
+        else:
             self.act_sound = None
         self.signals = {
             "start": rospy.get_param("~start_signal",
