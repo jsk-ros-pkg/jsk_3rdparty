@@ -1,11 +1,24 @@
 <launch>
-  <arg name="keyfile" />
+  <arg name="recieving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow."/>
+  <arg name="download_data" default="true" />
+  <arg name="download_data_timeout" default="10" />
+  <arg name="download_avatar" default="false" />
+  <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
+  <!-- <arg name="google_cloud_credentials_json" default=""/> -->
+  <!-- <arg name="host" default=""/> -->
+  <!-- <arg name="port" default=""/> -->
+  <!-- <arg name="ssl_certfile" default=""/> -->
+  <!-- <arg name="ssl_keyfile" default=""/> -->
   <arg name="respawn" default="true" />
 
   <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_server.py"
         respawn="$(arg respawn)" output="screen">
+    <rosparam command="load" file="$(arg yaml_file)" />
     <rosparam subst_value="true">
-      keyfile: $(arg keyfile)
+      recieving_mode: $(arg recieving_mode)
+      download_data_timeout: $(arg download_data_timeout)
+      download_data: $(arg download_data)
+      download_avatar: $(arg download_avatar)
     </rosparam>
   </node>
 </launch>
