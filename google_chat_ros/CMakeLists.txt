@@ -19,6 +19,7 @@ add_message_files(
   Message.msg
   RecieveMessage.msg
   Space.msg
+  SpaceActivity.msg
   User.msg
 )
 
