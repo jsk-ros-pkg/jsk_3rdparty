@@ -3,10 +3,24 @@ project(google_chat_ros)
 
 find_package(
   catkin REQUIRED COMPONENTS
+  rospy
   actionlib_msgs
+  sensor_msgs
+  std_msgs
+  message_generation
 )
 
 catkin_python_setup()
+
+add_message_files(
+  FILES
+  Annotation.msg
+  Attachment.msg
+  Message.msg
+  RecieveMessage.msg
+  Space.msg
+  User.msg
+)
 
 add_action_files(
   FILES
@@ -15,6 +29,7 @@ add_action_files(
 
 generate_messages(
   DEPENDENCIES
+  sensor_msgs
   std_msgs
   actionlib_msgs
 )
