@@ -36,7 +36,7 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
 * `sound_play` (`sound_play/SoundRequestAction`)
 
-  Action client to play sound on events. If the action server is not available or `~enable_sound_play` is `False`, no sound is played.
+  Action client to play sound on events. If the action server is not available or `~enable_sound_effect` is `False`, no sound is played.
   
 ### Subscribing Topics
 
@@ -52,7 +52,7 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
 ## Parameters
 
-* `~enable_sound_play` (`Bool`, default: `True`)
+* `~enable_sound_effect` (`Bool`, default: `True`)
 
     Flag to enable or disable sound to play sound on recognition.
 
