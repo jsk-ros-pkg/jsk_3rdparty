@@ -22,16 +22,15 @@ class Server(object):
         You need to set the path to certfile for ssl connection. You shouldn't use self-signed certificate.
         """
         rospack = rospkg.RosPack()
+        rospy.on_shutdown(self.killnode)
+        rospy.init_node('dialogflow_webhook_server', disable_signals=True)
         conffile = rospy.get_param('~webhook_config', os.path.join(rospack.get_path('dialogflow_task_executive'), 'config/webhook.json'))
-
         with open(conffile) as f:
             json_dict = json.load(f)
             self.host = json_dict['host']
             self.port = json_dict['port']
             self._certfile_path = json_dict['certfile']
             self._keyfile_path = json_dict['keyfile']
-        rospy.on_shutdown(self.killnode)
-        rospy.init_node('dialogflow_webhook_server', disable_signals=True)
         self._run_handler()
         
     def killnode(self):
