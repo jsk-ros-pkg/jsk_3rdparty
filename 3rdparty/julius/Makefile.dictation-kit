@@ -5,7 +5,7 @@ all: installed.dict
 VERSION = 4.4
 FILENAME = dictation-kit-v$(VERSION).zip
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://osdn.net/frs/redir.php?m=ymu&f=%2Fjulius%2F66544%2F$(FILENAME)"
+TARBALL_URL = "https://osdn.jp/dl/julius/$(FILENAME)"
 TARBALL_PATCH =
 SOURCE_DIR = build/dictation-kit-v$(VERSION)
 UNPACK_CMD = unzip -qq
