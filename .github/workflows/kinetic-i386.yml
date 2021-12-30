@@ -25,7 +25,7 @@ jobs:
           ROS_DISTRO : kinetic
           ROS_PARALLEL_TEST_JOBS : "-j8"
           ROS_PARALLEL_JOBS: "-j2"
-          CATKIN_PARALLEL_JOBS: "-p2"
+          CATKIN_PARALLEL_JOBS: "-vi -p2"
           ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
           # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/237 : (Note that pip==21.0.1 is incompatible with python 2.x)
           BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0"

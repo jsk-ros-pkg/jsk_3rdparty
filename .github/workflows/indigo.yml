@@ -24,7 +24,7 @@ jobs:
           ROS_DISTRO : indigo
           ROS_PARALLEL_TEST_JOBS: "-j8"
           ROS_PARALLEL_JOBS: "-j2"
-          CATKIN_PARALLEL_JOBS: "-p2"
+          CATKIN_PARALLEL_JOBS: "-vi -p2"
           # latest catkin_virtualenv with pip==21.0.1 is incompatible with python 2.x
           # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/237
           BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0"
