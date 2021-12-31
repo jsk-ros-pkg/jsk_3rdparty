@@ -12,7 +12,7 @@ include(ExternalProject)
 ExternalProject_Add(
   libcmt
   URL https://github.com/delmottea/libCMT/archive/e4d7ea42edafe13b1070ef4d595b2d6062d79d1a.zip
-  PATCH_COMMAND patch -p1 < ${PROJECT_SOURCE_DIR}/fix_opencv3.patch
+  PATCH_COMMAND cat ${PROJECT_SOURCE_DIR}/fix_opencv3.patch ${PROJECT_SOURCE_DIR}/fix_cmakelists.patch | patch -p1
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
   INSTALL_COMMAND echo "install"
   )

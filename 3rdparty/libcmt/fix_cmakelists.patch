@@ -1,0 +1,17 @@
+--- a/CMakeLists.txt.org	2021-12-29 14:21:03.129641573 +0900
++++ a/CMakeLists.txt	2021-12-29 14:22:36.929681548 +0900
+@@ -17,6 +17,7 @@
+ 
+ if(BUILD_MAIN)
+ 	add_executable(main main.cpp)
++	add_definitions(-Wno-write-strings)
+ 	if(BUILD_WITH_QT)
+ 		find_package(Qt4 REQUIRED)
+ 
+@@ -35,4 +36,4 @@
+ install(FILES CMT.h DESTINATION include/libcmt)
+ 
+ configure_file(libcmt.pc.in libcmt.pc @ONLY)
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcmt.pc DESTINATION lib/pkgconfig)
+\ No newline at end of file
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcmt.pc DESTINATION lib/pkgconfig)
