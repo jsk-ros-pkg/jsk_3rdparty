@@ -3,13 +3,13 @@
 
 import actionlib
 import dialogflow as df
+from google.oauth2.service_account import Credentials
 from google.protobuf.json_format import MessageToJson
 import pprint
 import Queue
 import rospy
 import threading
 import uuid
-import os
 
 from audio_common_msgs.msg import AudioData
 from sound_play.msg import SoundRequest
@@ -62,8 +62,6 @@ class State(object):
 class DialogflowClient(object):
 
     def __init__(self):
-        # project id for google cloud service
-        self.project_id = rospy.get_param("~project_id")
         # language for dialogflow
         self.language = rospy.get_param("~language", "ja-JP")
 
@@ -71,10 +69,6 @@ class DialogflowClient(object):
         self.use_audio = rospy.get_param("~use_audio", False)
         # sample rate of audio data
         self.audio_sample_rate = rospy.get_param("~audio_sample_rate", 16000)
-
-        # if GOOLGE_APPLICATION_CREDENTIALS is not set, use google_cloud_credentials_json param
-        if not "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
-            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = rospy.get_param("~google_cloud_credentials_json")
 
         # use TTS feature
         self.use_tts = rospy.get_param("~use_tts", True)
@@ -84,14 +78,32 @@ class DialogflowClient(object):
         self.timeout = rospy.get_param("~timeout", 10.0)
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
-        self.hotword = rospy.get_param(
-            "~hotword", ["ねえねえ", "こんにちは", "やあ"])
+        hotwords = rospy.get_param("~hotword", [])
+        self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
+                            for hotword in hotwords ]
 
         self.state = State()
         self.session_id = None
-        self.session_client = df.SessionsClient()
         self.queue = Queue.Queue()
-        self.last_spoken = rospy.Time(0)
+
+        credentials_json = rospy.get_param(
+            '~google_cloud_credentials_json', None)
+        if credentials_json is None:
+            rospy.loginfo("Loading credential json from env")
+            # project id for google cloud service
+            self.project_id = rospy.get_param("~project_id", None)
+            self.session_client = df.SessionsClient()
+        else:
+            rospy.loginfo("Loading credential json from rosparam")
+            credentials = Credentials.from_service_account_file(
+                credentials_json
+            )
+            self.project_id = credentials.project_id
+            self.session_client = df.SessionsClient(
+                credentials=credentials
+            )
+        if self.project_id is None:
+            rospy.logerr('project ID is not set')
 
         if self.use_tts:
             soundplay_action_name = rospy.get_param(
@@ -138,7 +150,7 @@ class DialogflowClient(object):
                 self.session_id = None
 
     def hotword_cb(self, msg):
-        if msg.data in self.hotword:
+        if msg.data in self.hotwords:
             rospy.loginfo("Hotword received")
             self.state.set(State.LISTENING)
 
@@ -201,9 +213,7 @@ class DialogflowClient(object):
         msg = SoundRequest(
             command=SoundRequest.PLAY_ONCE,
             sound=SoundRequest.SAY,
-            volume=self.volume,
-            arg=result.fulfillment_text.encode('utf-8'),
-            arg2=self.language)
+            volume=self.volume)
 
         # for japanese or utf-8 languages
         if self.language == 'ja-JP':
