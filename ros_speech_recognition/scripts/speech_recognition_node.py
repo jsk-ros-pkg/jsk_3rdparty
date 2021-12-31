@@ -17,6 +17,8 @@ from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from speech_recognition_msgs.srv import SpeechRecognition
 from speech_recognition_msgs.srv import SpeechRecognitionResponse
+from std_srvs.srv import Empty
+from std_srvs.srv import EmptyResponse
 
 from dynamic_reconfigure.server import Server
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
@@ -145,11 +147,20 @@ class ROSSpeechRecognition(object):
 
         self.stop_fn = None
         self.continuous = rospy.get_param("~continuous", False)
+        self.auto_start = rospy.get_param("~auto_start", True)
+        self.enable_audio_cb = self.auto_start
         if self.continuous:
             rospy.loginfo("Enabled continuous mode")
+            rospy.loginfo("Auto start: {}".format(self.auto_start))
             self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "/Tablet/voice"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
+            self.start_srv = rospy.Service(
+                "speech_recognition/start",
+                Empty, self.speech_recogniton_start_srv_cb)
+            self.stop_srv = rospy.Service(
+                "speech_recognition/stop",
+                Empty, self.speech_recogniton_stop_srv_cb)
         else:
             self.srv = rospy.Service("speech_recognition",
                                      SpeechRecognition,
@@ -241,6 +252,8 @@ class ROSSpeechRecognition(object):
         return recog_func(audio_data=audio, language=self.language, **self.args)
 
     def audio_cb(self, _, audio):
+        if not self.enable_audio_cb:
+            return
         try:
             rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
@@ -273,9 +286,12 @@ class ROSSpeechRecognition(object):
             self.audio, self.audio_cb, phrase_time_limit=self.phrase_time_limit)
         rospy.on_shutdown(self.on_shutdown)
 
-    def on_shutdown(self):
+    def stop_speech_recognition(self):
         if self.stop_fn is not None:
             self.stop_fn()
+
+    def on_shutdown(self):
+        self.stop_speech_recognition()
 
     def speech_recognition_srv_cb(self, req):
         res = SpeechRecognitionResponse()
@@ -327,8 +343,20 @@ class ROSSpeechRecognition(object):
                 self.play_sound("timeout", 0.1)
             return res
 
+    def speech_recogniton_start_srv_cb(self, req):
+        self.enable_audio_cb = True
+        self.start_speech_recognition()
+        rospy.loginfo("Start continuous mode")
+        return EmptyResponse()
+
+    def speech_recogniton_stop_srv_cb(self, req):
+        self.enable_audio_cb = False
+        self.stop_speech_recognition()
+        rospy.loginfo("Stop continuous mode")
+        return EmptyResponse()
+
     def spin(self):
-        if self.continuous:
+        if self.continuous and self.auto_start:
             self.start_speech_recognition()
         rospy.spin()
 
