@@ -29,7 +29,7 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_generate_virtualenv()
+catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 catkin_install_python(
