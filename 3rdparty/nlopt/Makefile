@@ -10,7 +10,7 @@ MK_DIR = $(shell rospack find mk)
 include $(MK_DIR)/download_unpack_build.mk
 
 installed: $(SOURCE_DIR)/unpacked
-	(cd $(SOURCE_DIR) && ./configure --enable-shared --with-cxx --prefix=$(DSTDIR) LIBS='-lstdc++' --without-octave && make && make install)
+	(cd $(SOURCE_DIR) && ./configure --enable-shared --with-cxx --prefix=$(DSTDIR) CXXFLAGS='-Wno-cpp -Wno-deprecated-declarations -Wno-nonnull -Wno-write-strings' LIBS='-lstdc++' --without-octave && make && make install)
 	touch installed
 clean:
 	-rm -rf include lib share $(SOURCE_DIR) installed

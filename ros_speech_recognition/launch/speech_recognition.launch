@@ -45,6 +45,7 @@
       engine: $(arg engine)
       language: $(arg language)
       continuous: $(arg continuous)
+      enable_sound_effect: $(arg launch_sound_play)
     </rosparam>
   </node>
 

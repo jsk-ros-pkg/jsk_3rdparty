@@ -1,12 +1,14 @@
 <launch>
   <!-- launch speech recognition -->
+
+  <arg name="launch_sound_play" default="false" doc="Launch sound_play node to speak" />
   <rosparam>
     <!-- We use rosbag which contains /speech_audio, which many /audio topics stuck together -->
     <!-- Therefore, we need long buffer size for this test -->
     /speech_recognition/buffer_size: 200000
   </rosparam>
   <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch">
-    <arg name="launch_sound_play" value="false" />
+    <arg name="launch_sound_play" value="$(arg launch_sound_play)" />
     <arg name="launch_audio_capture" value="false" />
     <arg name="audio_topic" value="/speech_audio" />
     <arg name="language" value="ja" />
