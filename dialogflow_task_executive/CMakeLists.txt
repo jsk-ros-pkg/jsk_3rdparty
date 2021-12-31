@@ -8,6 +8,19 @@ if($ENV{ROS_DISTRO} STREQUAL "indigo")
   catkin_package()
   return()
 endif()
+execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
+message("-- gcc dumpmachine returns ${gcc_dump_machine}")
+if(NOT gcc_dump_machine MATCHES "x86_64-.*")
+  message(WARNING "pip -i requirements.txt work only with i686 ???")
+  message(WARNING "`pip install grpcio` fails with
+  third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S: Assembler messages:
+  third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:306: Error: bad register name `%rbp'
+  third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:308: Error: bad register expression
+  third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:309: Error: bad register name `%rsp'")
+  find_package(catkin)
+  catkin_package()
+  return()
+endif()
 
 find_package(catkin REQUIRED COMPONENTS
     message_generation
