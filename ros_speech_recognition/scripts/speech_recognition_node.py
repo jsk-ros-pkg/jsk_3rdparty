@@ -121,9 +121,14 @@ class ROSSpeechRecognition(object):
                               buffer_size=rospy.get_param("~buffer_size", 10240))
 
         # initialize sound play client
-        self.act_sound = actionlib.SimpleActionClient("sound_play", SoundRequestAction)
-        if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
-            rospy.logwarn("Failed to find sound_play action. Disabled audio alert")
+        if rospy.get_param('~enable_sound_effect', True):
+            self.act_sound = actionlib.SimpleActionClient(
+                "sound_play", SoundRequestAction)
+            if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
+                rospy.logwarn("Failed to find sound_play action. "
+                              "Disabled sound effect on recognition.")
+                self.act_sound = None
+        else:
             self.act_sound = None
         self.signals = {
             "start": rospy.get_param("~start_signal",
@@ -239,9 +244,12 @@ class ROSSpeechRecognition(object):
         try:
             rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
+            self.play_sound("recognized", 0.05)
             rospy.loginfo("Result: %s" % result.encode('utf-8'))
+            self.play_sound("success", 0.1)
             msg = SpeechRecognitionCandidates(transcript=[result])
             self.pub.publish(msg)
+            return
         except SR.UnknownValueError as e:
             if self.dynamic_energy_threshold:
                 self.recognizer.adjust_for_ambient_noise(self.audio)
@@ -252,6 +260,7 @@ class ROSSpeechRecognition(object):
             rospy.logerr("Failed to recognize: %s" % str(e))
         except:
             rospy.logerr("Unexpected error: %s" % str(sys.exc_info()))
+        self.play_sound("timeout", 0.1)
 
     def start_speech_recognition(self):
         if self.dynamic_energy_threshold:
@@ -259,6 +268,7 @@ class ROSSpeechRecognition(object):
                 self.recognizer.adjust_for_ambient_noise(src)
                 rospy.loginfo("Set minimum energy threshold to {}".format(
                     self.recognizer.energy_threshold))
+        self.play_sound("start", 0.1)
         self.stop_fn = self.recognizer.listen_in_background(
             self.audio, self.audio_cb, phrase_time_limit=self.phrase_time_limit)
         rospy.on_shutdown(self.on_shutdown)

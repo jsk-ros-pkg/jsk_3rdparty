@@ -13,6 +13,14 @@ index 7a760d2..6aa3b40 100644
  set(CPACK_COMPONENTS_ALL assimp-bin ${LIBASSIMP_COMPONENT} ${LIBASSIMP-DEV_COMPONENT} assimp-dev)
  set(ASSIMP_LIBRARY_SUFFIX "" CACHE STRING "Suffix to append to library names")
  
+@@ -53,6 +53,7 @@
+   # enable multi-core compilation with MSVC
+   add_definitions(/MP)
+ endif()
++add_definitions(-Wno-address -Wno-dangling-else -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-misleading-indentation -Wno-nonnull-compare -Wno-reorder -Wno-strict-aliasing -Wno-strict-overflow -Wno-unused-function -Wno-unused-result -Wno-unused-variabled -Wno-int-in-bool-context -Wno-unused-variable)
+ 
+ INCLUDE (FindPkgConfig)
+ INCLUDE_DIRECTORIES( include )
 @@ -56,8 +56,8 @@ SET(ASSIMP_DEBUG_POSTFIX "d" CACHE STRING "Debug Postfitx for lib, samples and t
  option ( BUILD_SHARED_LIBS "Build a shared version of the library" ON )
  
