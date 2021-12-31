@@ -9,6 +9,7 @@ import Queue
 import rospy
 import threading
 import uuid
+import os
 
 from audio_common_msgs.msg import AudioData
 from sound_play.msg import SoundRequest
@@ -71,8 +72,13 @@ class DialogflowClient(object):
         # sample rate of audio data
         self.audio_sample_rate = rospy.get_param("~audio_sample_rate", 16000)
 
+        # if GOOLGE_APPLICATION_CREDENTIALS is not set, use google_cloud_credentials_json param
+        if not "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = rospy.get_param("~google_cloud_credentials_json")
+
         # use TTS feature
         self.use_tts = rospy.get_param("~use_tts", True)
+        self.volume = rospy.get_param('~volume', 1.0)
 
         # timeout for voice input activation by hotword
         self.timeout = rospy.get_param("~timeout", 10.0)
@@ -88,8 +94,10 @@ class DialogflowClient(object):
         self.last_spoken = rospy.Time(0)
 
         if self.use_tts:
+            soundplay_action_name = rospy.get_param(
+                '~soundplay_action_name', 'robotsound_jp')
             self.sound_action = actionlib.SimpleActionClient(
-                "robotsound_jp", SoundRequestAction)
+                soundplay_action_name, SoundRequestAction)
             if not self.sound_action.wait_for_server(rospy.Duration(5.0)):
                 self.sound_action = None
             else:
@@ -115,6 +123,8 @@ class DialogflowClient(object):
             self.sub_speech = rospy.Subscriber(
                 "speech_to_text", SpeechRecognitionCandidates,
                 self.input_cb)
+            self.sub_text = rospy.Subscriber(
+                "text", String, self.input_cb)
 
         self.df_thread = threading.Thread(target=self.df_run)
         self.df_thread.daemon = True
@@ -137,7 +147,12 @@ class DialogflowClient(object):
             self.state.set(State.LISTENING)
         elif not self.use_audio:
             # catch hotword from string
-            self.hotword_cb(String(data=msg.transcript[0]))
+            if isinstance(msg, SpeechRecognitionCandidates):
+                self.hotword_cb(String(data=msg.transcript[0]))
+            elif isinstance(msg, String):
+                self.hotword_cb(data)
+            else:
+                rospy.logerr("Unsupported data class {}".format(msg))
 
         if self.state == State.LISTENING:
             self.queue.put(msg)
@@ -166,9 +181,14 @@ class DialogflowClient(object):
         msg.header.stamp = rospy.Time.now()
         if result.action != 'input.unknown':
             rospy.logwarn("Unknown action")
-        msg.query = result.query_text.encode("utf-8")
         msg.action = result.action
-        msg.response = result.fulfillment_text.encode("utf-8")
+
+        if self.language == 'ja-JP':
+            msg.query = result.query_text.encode("utf-8")
+            msg.response = result.fulfillment_text.encode("utf-8")
+        else:
+            msg.query = result.query_text
+            msg.response = result.fulfillment_text
         msg.fulfilled = result.all_required_params_present
         msg.parameters = MessageToJson(result.parameters)
         msg.speech_score = result.speech_recognition_confidence
@@ -181,9 +201,17 @@ class DialogflowClient(object):
         msg = SoundRequest(
             command=SoundRequest.PLAY_ONCE,
             sound=SoundRequest.SAY,
-            volume=1.0,
+            volume=self.volume,
             arg=result.fulfillment_text.encode('utf-8'),
             arg2=self.language)
+
+        # for japanese or utf-8 languages
+        if self.language == 'ja-JP':
+            msg.arg = result.fulfillment_text.encode('utf-8')
+            msg.arg2 = self.language
+        else:
+            msg.arg = result.fulfillment_text
+
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
             rospy.Duration(10.0))
@@ -207,6 +235,9 @@ class DialogflowClient(object):
                 elif isinstance(msg, SpeechRecognitionCandidates):
                     result = self.detect_intent_text(
                         msg.transcript[0], session)
+                elif isinstance(msg, String):
+                    result = self.detect_intent_text(
+                        msg.data, session)
                 else:
                     raise RuntimeError("Invalid data")
                 self.print_result(result)

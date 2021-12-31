@@ -1,7 +1,17 @@
 <launch>
   <arg name="run_app_manager" default="false" />
-  <arg name="credential" default="$(env GOOGLE_APPLICATION_CREDENTIALS)"/>
-  <arg name="project_id" default="$(env DIALOGFLOW_PROJECT_ID)"/>
+  <arg name="applist" default="" />
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)"/>
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
+  <arg name="enable_hotword" default="true" />
+
+  <!-- options for dialogflow_client -->
+  <arg name="use_audio" default="false" />
+  <arg name="use_tts" default="true" />
+  <arg name="language" default="ja-JP" />
+  <arg name="soundplay_action_name" default="robotsound_jp" />
+  <arg name="volume" default="1.0" />
+
 
   <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
         args="/speech_to_text /speech_to_text_google /speech_to_text_julius" >
@@ -12,10 +22,14 @@
         pkg="dialogflow_task_executive" type="dialogflow_client.py"
         output="screen">
     <rosparam subst_value="true">
-      use_audio: false
-      language: ja-JP
-      use_tts: true
+      use_audio: $(arg use_audio)
+      use_tts: $(arg use_tts)
+      language: $(arg language)
+      soundplay_action_name: $(arg soundplay_action_name)
+      volume: $(arg volume)
       project_id: $(arg project_id)
+      google_cloud_credentials_json: $(arg credential)
+      enable_hotword: $(arg enable_hotword)
     </rosparam>
   </node>
 
