@@ -15,6 +15,7 @@ env:
     - USE_TRAVIS=true
     - USE_DOCKER=true
     - ROS_PARALLEL_TEST_JOBS="-j8"
+    - EXTRA_DEB="python-lxml" # add python-lxml due to https://github.com/ros/rosdistro/pull/31570
     - GIT_SSL_NO_VERIFY=1 # http://stackoverflow.com/questions/21181231/server-certificate-verification-failed-cafile-etc-ssl-certs-ca-certificates-c
   matrix:
     - CHECK_PYTHON2_COMPILE=true

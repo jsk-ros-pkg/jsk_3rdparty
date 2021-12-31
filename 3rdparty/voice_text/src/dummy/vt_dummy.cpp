@@ -10,3 +10,4 @@ int VT_LOADTTS_JPN(int, int, char*, char*) {
 };
 int VT_TextToFile_JPN(int, char *, char *, int, int, int, int, int, int, int) {};
 
+void VT_GetTTSInfo_JPN(int , char *, void *, int) {};
