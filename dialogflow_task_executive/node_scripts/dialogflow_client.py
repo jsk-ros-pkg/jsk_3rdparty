@@ -202,9 +202,7 @@ class DialogflowClient(object):
         msg = SoundRequest(
             command=SoundRequest.PLAY_ONCE,
             sound=SoundRequest.SAY,
-            volume=self.volume,
-            arg=result.fulfillment_text.encode('utf-8'),
-            arg2=self.language)
+            volume=self.volume)
 
         # for japanese or utf-8 languages
         if self.language == 'ja-JP':
