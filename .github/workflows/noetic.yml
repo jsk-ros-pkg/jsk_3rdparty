@@ -21,3 +21,4 @@ jobs:
         with:
           ROS_DISTRO : noetic
           ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
