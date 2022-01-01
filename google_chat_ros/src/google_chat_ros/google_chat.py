@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from apiclient.discovery import build
+from flask import Flask, request, json
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -32,3 +33,29 @@ class GoogleChatRESTClient():
         """
         parent = 'spaces/' + space
         return self._chat.spaces().members().list(parent=parent).execute()
+
+class GoogleChatHTTPSServer():
+    """The server for handling https request from Google chat API. Mainly used for recieving messages, events.
+    """
+    def __init__(self, conffile, callback):
+        self._app = Flask(__name__)
+        with open(conffile) as f:
+            json_dict = json.load(f)
+            self.host = json_dict['host']
+            self.port = json_dict['port']
+            self._certfile_path = json_dict['certfile']
+            self._keyfile_path = json_dict['keyfile']
+            self._callback = callback
+
+    @self._app.route('/', methods=['POST'])
+    def _on_event(self):
+        """Handles an event from Google Chat.
+        Please see https://developers.google.com/chat/api/guides/message-formats/events for details.
+        """
+        event = request.get_json()
+        self._callback(event)
+
+    def run(self):
+        self._app.run(debug=True, host=self.host, port=self.port)
+
+    

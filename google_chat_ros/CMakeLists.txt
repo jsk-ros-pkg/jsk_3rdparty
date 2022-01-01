@@ -16,10 +16,10 @@ add_message_files(
   FILES
   Annotation.msg
   Attachment.msg
+  MessageEvent.msg
   Message.msg
-  RecieveMessage.msg
   Space.msg
-  SpaceActivity.msg
+  SpaceEvent.msg
   User.msg
 )
 

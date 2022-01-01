@@ -1,35 +1,60 @@
 #!/usr/bin/env python
 import actionlib
+import gdown
 from google_chat_ros.google_chat import GoogleChatRESTClient
+from google_chat_ros.google_chat import GoogleChatHTTPSServer
+from google_chat_ros.msg import *
 from google_chat_ros.msg import SendMessageAction
 from google_chat_ros.msg import SendMessageFeedback
 from google_chat_ros.msg import SendMessageResult
+import requests
+from requests.exceptions import Timeout
 import rospy
 
 
-class GoogleChatActionServer:
+class GoogleChatROS(object):
     """
     Send request to Google Chat REST API via ROS
     """
     def __init__(self):
-        keyfile = rospy.get_param('~keyfile')
-        self._client = GoogleChatRESTClient(keyfile)
-        # Start google chat authentication and service
-        rospy.loginfo("Starting Google Chat service...")
+        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'none'
+
+        # For REST, sending message 
+        rest_keyfile = rospy.get_param('~keyfile')
+        self._client = GoogleChatRESTClient(rest_keyfile)
+        rospy.loginfo("Starting Google Chat REST service...")
         try:
-            self._client.build_service()
-            rospy.loginfo("Succeeded in starting Google Chat service")
+            self._client.build_service() # Start google chat authentication and service
+            rospy.loginfo("Succeeded in starting Google Chat REST service")
         except Exception as e:
-            rospy.logwarn("Failed to start Google Chat service")
+            rospy.logwarn("Failed to start Google Chat REST service")
             rospy.logerr(e)
-        # ActionLib
+
+        # For HTTPS, recieving message
+        if recieving_chat_mode == "url" or "dialogflow":
+            https_conffile = rospy.get_param('~conffile')
+            self.download_timeout = rospy.get_param('~download_timeout')
+            self.download_data = rospy.get_param('~download_data')
+            self.download_avator = rospy.get_param('~download_avator')
+            self._server = GoogleChatHTTPSServer(https_conffile, callback=self.https_post_cb)
+            self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent)
+            self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent)
+        # elif recieving_chat_mode == "dialogflow":
+        #     # TODO: subscribe dialogflow msg and pipe to chat message
+        #     pass
+        elif recieving_chat_mode == "none":
+            pass
+        else:
+            rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
+
+        # ROS ActionLib for REST
         self._as = actionlib.SimpleActionServer(
             '~send', SendMessageAction,
-            execute_cb=self.execute_cb, auto_start=False
+            execute_cb=self.rest_cb, auto_start=False
         )
         self._as.start()
 
-    def execute_cb(self, goal):
+    def rest_cb(self, goal):
         feedback = SendMessageFeedback()
         result = SendMessageResult()
         r = rospy.Rate(1)
@@ -65,8 +90,106 @@ class GoogleChatActionServer:
             result.done = success
             self._as.set_succeeded(result)
 
+    def https_post_cb(self, event):
+        """Parse Google Chat API json content and publish as a ROS Message.
+        See https://developers.google.com/chat/api/reference/rest 
+        to check what contents are included in the json.
+        :param event: A google Chat API POST request json content. 
+        See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
+        :rtype: None
+        """
+        # event/eventTime
+        event_time = event['eventTime']
+        # event/space
+        space = Space()
+        space.name = event['space']['name']
+        space.display_name = event['space']['displayName']
+        space.room = True if event['space']['type'] == "ROOM" else False
+        space.dm = True if event['space']['type'] == "DM" else False
+        # event/user
+        user = self._get_user_info(event['user'])
+        user = User()
+
+        if event['type'] == 'ADDED_TO_SPACE' or 'REMOVED_FROM_SPACE':
+            msg = SpaceEvent()
+            msg.event_time = event_time
+            msg.space = space
+            msg.user = user
+            msg.added = True if event['type'] == "ADDED_TO_SPACE" else False
+            msg.removed = True if event['type'] == "REMOVED_FROM_SPACE" else False
+            self._space_activity_pub.publish(msg)
+            return
+        elif event['type'] == 'MESSAGE':
+            msg = MessageEvent()
+            message = Message()
+            message_content = event['message']
+            message.name = message_content.get(['name'])
+            # event/message/sender
+            message.sender = User()
+            message.create_time = message_content.get('createTime')
+            message.text = message_content.get('text')
+            message.thread_name = message_content.get('thread').get('name') # TODO maybe error if not exists
+            # event/messsage/annotations
+            for item in message_content['annotations']:
+                annotation = Annotation()
+                annotation.length = item['length']
+                annotation.start_index = item['startIndex']
+                annotation.user = self._get_user_info(item['user'])
+                annotation.mention = True if item['type'] == 'USER_MENTION' else False
+                annotation.slash_command = True if item['type'] == 'SLASH_COMMAND' else False
+                message.annotations.append(annotation)
+            message.argument_text = message_content.get('argumentText')
+            # event/message/attachment
+            for item in message_content['attachment']:
+                message.attachments.append(self._get_attachment(item))                
+                attachment = Attachment()
+                attachment.name = item['name']
+            self._recieve_message_pub.publish(msg)
+            return
+        else:
+            rospy.logerr("Got unknown event type.")
+            return
+
+    def _get_user_info(self, item):
+        user = User()
+        user.name = item['name']
+        user.display_name = item['displayName']
+        user.avator_url = item['avatorUrl']
+        user.avator = self._get_image_from_uri(item['avator']) if self.download_avator else None
+        user.email = item['email']
+        user.bot = True if item['type'] == "BOT" else False
+        user.human = True if item['type'] == "HUMAN" else False
+        return user
+
+    def _get_attachment(self, item, download=False):
+        attachment = Attachment()
+        attachment.name = item['name']
+        attachment.content_name = item['contentName']
+        attachment.content_type = item['contentType']
+        attachment.thumnail_uri = item['thumnailUri']
+        attachment.download_uri = item['downloadUri']
+        attachment.drive_file = True if item['source'] == 'DRIVE_FILE' else False
+        attachment.uploaded_content = True if item['source'] == 'UPLOADED_CONTENT' else False
+        attachment.attachment_resource_name = item['attachmentDataRef']['resourceName']
+        attachment.drive_field_id = item['driveDataRef']['driveFileId']
+        # attachment.localpath = item[''] # TODO enable download option
+        return attachment
+
+    def _get_image_from_uri(self, uri):
+        img = None
+        try:
+            img = requests.get(uri, timeout=self.download_timeout).content
+        except Timeout:
+            rospy.logerr("Exceeded timelimit ({} sec) when downloading {}.".format(self.download_timeout, uri))
+        except Exception as e:
+            rospy.logwarn("Failed to get image from {}".format(uri))
+            rospy.logerr(e)
+        return img
+
+    def _download_attachment_from_uri(self, uri):        
+        return
 
 if __name__ == '__main__':
     rospy.init_node('google_chat')
-    server = GoogleChatActionServer()
+    server = GoogleChatROS()
     rospy.spin()
