@@ -11,6 +11,7 @@
   <arg name="engine" default="Google" doc="Speech to text engine. TTS engine, Google, GoogleCloud, Sphinx, Wit, Bing Houndify, IBM" />
   <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
   <arg name="continuous" default="false" doc="If false, /speech_recognition service is published. If true, /Tablet/voice topic is published." />
+  <arg name="google_cloud_credentials_json" default="''" doc="Credential JSON is only used when the engine is GoogleCloud." />
 
   <!-- sound play -->
   <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
@@ -46,6 +47,7 @@
       language: $(arg language)
       continuous: $(arg continuous)
       enable_sound_effect: $(arg launch_sound_play)
+      google_cloud_credentials_json: $(arg google_cloud_credentials_json)
     </rosparam>
   </node>
 
