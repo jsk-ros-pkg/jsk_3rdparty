@@ -8,6 +8,7 @@ import speech_recognition as SR
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import json
 import array
+import os
 import sys
 from threading import Lock
 
@@ -229,7 +230,12 @@ class ROSSpeechRecognition(object):
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
                 credentials_path = rospy.get_param("~google_cloud_credentials_json", None)
-                if credentials_path is not None:
+                if credentials_path is not None and len(credentials_path) > 0:
+                    if os.path.exists(credentials_path) is False:
+                        rospy.logerr(
+                            'google_cloud_credentials_json '
+                            '{} not exists.'.format(credentials_path))
+                        sys.exit(1)
                     with open(credentials_path) as j:
                         credentials_json = j.read()
                 else:
