@@ -11,10 +11,13 @@ import array
 import sys
 from threading import Lock
 
+import std_msgs.msg
 from audio_common_msgs.msg import AudioData
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 
+from speech_recognition_msgs.msg import SentenceInfo
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
+from speech_recognition_msgs.msg import WordInfo
 from speech_recognition_msgs.srv import SpeechRecognition
 from speech_recognition_msgs.srv import SpeechRecognitionResponse
 from std_srvs.srv import Empty
@@ -232,7 +235,8 @@ class ROSSpeechRecognition(object):
                 else:
                     credentials_json = None
                 self.args = {'credentials_json': credentials_json,
-                             'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None)}
+                             'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None),
+                             'show_all': True}
                 if rospy.has_param('~diarizationConfig') :
                     self.args.update({'user_config': {'diarizationConfig': rospy.get_param('~diarizationConfig') }})
             recog_func = self.recognizer.recognize_google_cloud
@@ -256,12 +260,39 @@ class ROSSpeechRecognition(object):
             return
         try:
             rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
+            header = std_msgs.msg.Header(stamp=rospy.Time.now())
             result = self.recognize(audio)
             self.play_sound("recognized", 0.05)
-            rospy.loginfo("Result: %s" % result.encode('utf-8'))
-            self.play_sound("success", 0.1)
-            msg = SpeechRecognitionCandidates(transcript=[result])
+            if self.engine == Config.SpeechRecognition_GoogleCloud:
+                if "results" not in result or len(result["results"]) == 0:
+                    raise SR.UnknownValueError()
+                transcript = []
+                confidence = []
+                sentences = []
+                for res in result["results"]:
+                    sent_info_msg = SentenceInfo(header=header)
+                    transcript.append(
+                        res["alternatives"][0]["transcript"].strip())
+                    confidence.append(res["alternatives"][0]['confidence'])
+                    for word in res["alternatives"][0]['words']:
+                        word_info_msg = WordInfo(
+                            start_time=word['startTime'],
+                            end_time=word['endTime'],
+                            word=word['word'])
+                        sent_info_msg.words.append(word_info_msg)
+                    sentences.append(sent_info_msg)
+                msg = SpeechRecognitionCandidates(
+                    transcript=transcript,
+                    confidence=confidence,
+                    sentences=sentences)
+                transcript = " ".join(transcript)
+            else:
+                transcript = result
+                msg = SpeechRecognitionCandidates(
+                    transcript=[transcript])
+            rospy.loginfo("Result: %s" % transcript.encode('utf-8'))
             self.pub.publish(msg)
+            self.play_sound("success", 0.1)
             return
         except SR.UnknownValueError as e:
             if self.dynamic_energy_threshold:
