@@ -33,7 +33,11 @@ You can download the key as JSON file in the age and save the JSON file in your 
 
 ![](./img/service_account_key.png)
 
-### Set environmental variables in your robot
+### Set configuration
+
+We have two options to set dialogflow service configuration, using environment variables or yaml file.
+
+#### Use environment variables
 
 We need to set two environment variables: `GOOGLE_APPLICATION_CREDENTIALS` and `DIALOGFLOW_PROJECT_ID`.
 
@@ -41,6 +45,20 @@ We need to set two environment variables: `GOOGLE_APPLICATION_CREDENTIALS` and `
   - Path to Service account key JSON file (i.e. `/etc/ros/hogehoge.json`)
 - `DIALOGFLOW_PROJECT_ID`
   - Dialogflow project ID (i.e. `pr2-hogehoge`)
+
+#### Use yaml file
+
+Write your path to service account key JSON file in yaml file, like
+
+```yaml
+google_cloud_credentials_json: /path/to/credentials/json/file
+```
+
+and pass the yaml file path as arg when launch, like
+
+```bash
+roslaunch dialogflow_task_executive dialogflow_task_executive.launch use_yaml:=true yaml_file:=/path/to/config/yamlfile.yaml
+```
 
 ## How to register new task in Dialogflow
 
