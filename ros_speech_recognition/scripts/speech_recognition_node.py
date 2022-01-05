@@ -12,6 +12,7 @@ import os
 import sys
 from threading import Lock
 
+import numpy as np
 import std_msgs.msg
 from audio_common_msgs.msg import AudioData
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
@@ -223,6 +224,7 @@ class ROSSpeechRecognition(object):
 
     def recognize(self, audio):
         recog_func = None
+        self.enable_diarization = False
         if self.engine == Config.SpeechRecognition_Google:
             if not self.args:
                 self.args = {'key': rospy.get_param("~google_key", None)}
@@ -244,7 +246,10 @@ class ROSSpeechRecognition(object):
                              'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None),
                              'show_all': True}
                 if rospy.has_param('~diarizationConfig') :
-                    self.args.update({'user_config': {'diarizationConfig': rospy.get_param('~diarizationConfig') }})
+                    diarizationConfig = rospy.get_param('~diarizationConfig')
+                    self.args.update({'user_config': {'diarizationConfig': diarizationConfig}})
+                    self.enable_diarization = diarizationConfig.get(
+                        'enableSpeakerDiarization', False)
             recog_func = self.recognizer.recognize_google_cloud
         elif self.engine == Config.SpeechRecognition_Sphinx:
             recog_func = self.recognizer.recognize_sphinx
@@ -277,15 +282,32 @@ class ROSSpeechRecognition(object):
                 sentences = []
                 for res in result["results"]:
                     sent_info_msg = SentenceInfo(header=header)
-                    transcript.append(
-                        res["alternatives"][0]["transcript"].strip())
-                    confidence.append(res["alternatives"][0]['confidence'])
+                    if self.enable_diarization is False:
+                        transcript.append(
+                            res["alternatives"][0]["transcript"].strip())
+                        confidence.append(res["alternatives"][0]['confidence'])
+                    prev_speaker = None
+                    trans = ''
+                    confs = []
                     for word in res["alternatives"][0]['words']:
+                        speaker = word.get('spekaerTag', 0)
+                        conf = word.get('confidence', 0.0)
                         word_info_msg = WordInfo(
-                            start_time=word['startTime'],
-                            end_time=word['endTime'],
-                            word=word['word'])
+                            start_time=word.get('startTime', '0.0s'),
+                            end_time=word.get('endTime', '0.0s'),
+                            word=word.get('word', ''),
+                            confidence=conf,
+                            speaker_tag=speaker)
                         sent_info_msg.words.append(word_info_msg)
+                        if self.enable_diarization is True \
+                            and prev_speaker != speaker:
+                            trans += "[{}]".format(speaker)
+                        prev_speaker = speaker
+                        trans += ' ' + word['word']
+                        confs.append(conf)
+                    if self.enable_diarization is True:
+                        transcript.append(trans)
+                        confidence.append(np.mean(conf))
                     sentences.append(sent_info_msg)
                 msg = SpeechRecognitionCandidates(
                     transcript=transcript,
