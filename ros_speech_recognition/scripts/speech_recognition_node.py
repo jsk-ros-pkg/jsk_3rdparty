@@ -295,8 +295,10 @@ class ROSSpeechRecognition(object):
                         # for more details, please see
                         # https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#wordinfo
                         word_info_msg = WordInfo(
-                            start_time=word.get('startTime', '0.0s'),
-                            end_time=word.get('endTime', '0.0s'),
+                            start_time=float(word.get(
+                                'startTime', '0.0s').rstrip('s')),
+                            end_time=float(word.get(
+                                'endTime', '0.0s').rstrip('s')),
                             word=word.get('word', ''),
                             confidence=conf,
                             speaker_tag=speaker)
