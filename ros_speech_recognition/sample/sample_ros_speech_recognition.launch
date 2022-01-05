@@ -1,0 +1,23 @@
+<launch>
+
+  <arg name="google_cloud_credentials_json" default="''" doc="Credential JSON is only used when the engine is GoogleCloud." />
+  <arg name="engine" default="GoogleCloud" doc="Speech to text engine. TTS engine, Google, GoogleCloud, Sphinx, Wit, Bing Houndify, IBM" />
+  <arg name="launch_sound_play" default="false" doc="Launch sound_play node to speak" />
+
+  <!-- launch bag file -->
+  <node name="rosbag_play"
+        pkg="rosbag" type="play"
+        args="$(find ros_speech_recognition)/sample/data/may_i_help_you.bag --loop">
+  </node>
+
+  <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch">
+    <arg name="launch_sound_play" value="$(arg launch_sound_play)" />
+    <arg name="engine" value="$(arg engine)" />
+    <arg name="launch_audio_capture" value="false" />
+    <arg name="audio_topic" value="/speech_audio" />
+    <arg name="language" value="en-US" />
+    <arg name="continuous" value="true" />
+    <arg name="google_cloud_credentials_json" value="$(arg google_cloud_credentials_json)" />
+  </include>
+
+</launch>
