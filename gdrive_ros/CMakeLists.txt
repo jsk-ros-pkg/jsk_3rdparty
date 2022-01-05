@@ -28,10 +28,6 @@ catkin_package(
 catkin_install_python(PROGRAMS node_scripts/gdrive_server_node.py node_scripts/sample_gdrive_rospy_client.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(PROGRAMS euslisp/sample-gdrive-ros-client.l
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
