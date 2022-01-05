@@ -12,7 +12,7 @@
   <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
   <arg name="continuous" default="false" doc="If false, /speech_recognition service is published. If true, /Tablet/voice topic is published." />
   <arg name="google_cloud_credentials_json" default="''" doc="Credential JSON is only used when the engine is GoogleCloud." />
-  <arg name="enable_speaker_diarization" default="false" doc="Enable speaker diarization option" />
+  <arg name="enable_speaker_diarization" default="false" doc="Enable speaker diarization option when the engine is GoogleCloud." />
 
   <!-- sound play -->
   <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
