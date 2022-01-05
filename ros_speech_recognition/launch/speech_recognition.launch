@@ -45,6 +45,14 @@
       engine: $(arg engine)
       language: $(arg language)
       continuous: $(arg continuous)
+      enable_sound_effect: $(arg launch_sound_play)
     </rosparam>
+  </node>
+
+
+  <node name="speech_recognition_candidates_to_string"
+        pkg="ros_speech_recognition" type="speech_recognition_candidates_to_string.py"
+        output="screen">
+    <remap from="~input" to="$(arg voice_topic)" />
   </node>
 </launch>
