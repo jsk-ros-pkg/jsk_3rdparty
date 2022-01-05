@@ -392,11 +392,14 @@ class ROSSpeechRecognition(object):
                 rospy.loginfo("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
 
                 try:
+                    header = std_msgs.msg.Header(stamp=rospy.Time.now())
                     result = self.recognize(audio)
                     rospy.loginfo("Result: %s" % result.encode('utf-8'))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
-                    res.result = SpeechRecognitionCandidates(transcript=[result])
+                    msg, _ = self.make_result_message_from_result(
+                        result, header=header)
+                    res.result = msg
                     return res
                 except SR.UnknownValueError:
                     if self.dynamic_energy_threshold:
