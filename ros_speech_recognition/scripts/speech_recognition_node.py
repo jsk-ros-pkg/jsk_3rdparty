@@ -266,6 +266,59 @@ class ROSSpeechRecognition(object):
 
         return recog_func(audio_data=audio, language=self.language, **self.args)
 
+    def make_result_message_from_result(self, result, header=None):
+        if header is None:
+            header = std_msgs.msg.Header(stamp=rospy.Time.now())
+        if self.engine == Config.SpeechRecognition_GoogleCloud:
+            if "results" not in result or len(result["results"]) == 0:
+                raise SR.UnknownValueError()
+            transcript = []
+            confidence = []
+            sentences = []
+            for res in result["results"]:
+                sent_info_msg = SentenceInfo(header=header)
+                if self.enable_diarization is False:
+                    transcript.append(
+                        res["alternatives"][0]["transcript"].strip())
+                    confidence.append(res["alternatives"][0]['confidence'])
+                prev_speaker = None
+                trans = ''
+                confs = []
+                for word in res["alternatives"][0]['words']:
+                    speaker = word.get('spekaerTag', 0)
+                    conf = word.get('confidence', 0.0)
+                    # for more details, please see
+                    # https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#wordinfo
+                    word_info_msg = WordInfo(
+                        start_time=float(word.get(
+                            'startTime', '0.0s').rstrip('s')),
+                        end_time=float(word.get(
+                            'endTime', '0.0s').rstrip('s')),
+                        word=word.get('word', ''),
+                        confidence=conf,
+                        speaker_tag=speaker)
+                    sent_info_msg.words.append(word_info_msg)
+                    if self.enable_diarization is True \
+                        and prev_speaker != speaker:
+                        trans += "[{}]".format(speaker)
+                    prev_speaker = speaker
+                    trans += ' ' + word['word']
+                    confs.append(conf)
+                if self.enable_diarization is True:
+                    transcript.append(trans)
+                    confidence.append(np.mean(conf))
+                sentences.append(sent_info_msg)
+            msg = SpeechRecognitionCandidates(
+                transcript=transcript,
+                confidence=confidence,
+                sentences=sentences)
+            transcript = " ".join(transcript)
+        else:
+            transcript = result
+            msg = SpeechRecognitionCandidates(
+                transcript=[transcript])
+        return msg, transcript
+
     def audio_cb(self, _, audio):
         if not self.enable_audio_cb:
             return
@@ -274,55 +327,9 @@ class ROSSpeechRecognition(object):
             header = std_msgs.msg.Header(stamp=rospy.Time.now())
             result = self.recognize(audio)
             self.play_sound("recognized", 0.05)
-            if self.engine == Config.SpeechRecognition_GoogleCloud:
-                if "results" not in result or len(result["results"]) == 0:
-                    raise SR.UnknownValueError()
-                transcript = []
-                confidence = []
-                sentences = []
-                for res in result["results"]:
-                    sent_info_msg = SentenceInfo(header=header)
-                    if self.enable_diarization is False:
-                        transcript.append(
-                            res["alternatives"][0]["transcript"].strip())
-                        confidence.append(res["alternatives"][0]['confidence'])
-                    prev_speaker = None
-                    trans = ''
-                    confs = []
-                    for word in res["alternatives"][0]['words']:
-                        speaker = word.get('spekaerTag', 0)
-                        conf = word.get('confidence', 0.0)
-                        # for more details, please see
-                        # https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#wordinfo
-                        word_info_msg = WordInfo(
-                            start_time=float(word.get(
-                                'startTime', '0.0s').rstrip('s')),
-                            end_time=float(word.get(
-                                'endTime', '0.0s').rstrip('s')),
-                            word=word.get('word', ''),
-                            confidence=conf,
-                            speaker_tag=speaker)
-                        sent_info_msg.words.append(word_info_msg)
-                        if self.enable_diarization is True \
-                            and prev_speaker != speaker:
-                            trans += "[{}]".format(speaker)
-                        prev_speaker = speaker
-                        trans += ' ' + word['word']
-                        confs.append(conf)
-                    if self.enable_diarization is True:
-                        transcript.append(trans)
-                        confidence.append(np.mean(conf))
-                    sentences.append(sent_info_msg)
-                msg = SpeechRecognitionCandidates(
-                    transcript=transcript,
-                    confidence=confidence,
-                    sentences=sentences)
-                transcript = " ".join(transcript)
-            else:
-                transcript = result
-                msg = SpeechRecognitionCandidates(
-                    transcript=[transcript])
-            rospy.loginfo("Result: %s" % transcript.encode('utf-8'))
+            msg, transcript = self.make_result_message_from_result(
+                result, header=header)
+            rospy.loginfo("Result: %s" % transcript)
             self.pub.publish(msg)
             self.play_sound("success", 0.1)
             return
