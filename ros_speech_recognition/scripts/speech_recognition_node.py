@@ -292,6 +292,8 @@ class ROSSpeechRecognition(object):
                     for word in res["alternatives"][0]['words']:
                         speaker = word.get('spekaerTag', 0)
                         conf = word.get('confidence', 0.0)
+                        # for more details, please see
+                        # https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize#wordinfo
                         word_info_msg = WordInfo(
                             start_time=word.get('startTime', '0.0s'),
                             end_time=word.get('endTime', '0.0s'),
