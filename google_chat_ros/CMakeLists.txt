@@ -18,6 +18,7 @@ add_message_files(
   Attachment.msg
   MessageEvent.msg
   Message.msg
+  SlashCommand.msg
   Space.msg
   SpaceEvent.msg
   User.msg

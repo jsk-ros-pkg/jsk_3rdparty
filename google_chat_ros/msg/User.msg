@@ -1,7 +1,7 @@
 string name
 string display_name
-string avator_url
-sensor_msgs/Image avator
+string avatar_url
+sensor_msgs/Image avatar
 string email
 bool bot
 bool human

@@ -31,26 +31,24 @@ class GoogleChatROS(object):
             rospy.logerr(e)
 
         # For POST, recieving message
-        if recieving_chat_mode == "url" or "dialogflow":
-            # https_conffile = rospy.get_param('~conffile')
+        if recieving_chat_mode in ("url", "dialogflow"):
             self.host = rospy.get_param('~host')
             self.port = int(rospy.get_param('~port'))
             self.ssl_certfile = rospy.get_param('~ssl_certfile')
             self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
-            self.download_timeout = rospy.get_param('~download_timeout')
+            self.download_timeout = rospy.get_param('~download_data_timeout')
             self.download_data = rospy.get_param('~download_data')
-            self.download_avator = rospy.get_param('~download_avator')
-            rospy.loginfo("Starting Google Chat HTTPS server...")
-            try:
-                self._server = GoogleChatHTTPSServer(
-                    self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.https_post_cb)
-                self._server.httpd.serve_forever()
-                rospy.on_shutdown(self._killnode)
-            except Exception as e:
-                rospy.logwarn("Failed to start Google Chat HTTPS server")
-                rospy.logerr(e)
+            self.download_avatar = rospy.get_param('~download_avatar')
             self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
+            rospy.loginfo("Starting Google Chat HTTPS server...")
+            # try:
+            self._server = GoogleChatHTTPSServer(
+                self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.https_post_cb)
+            self._server.run()
+            # except Exception as e:
+            # rospy.logwarn("Failed to start Google Chat HTTPS server")
+            # rospy.logerr(e)
         # elif recieving_chat_mode == "dialogflow":
         #     # TODO: subscribe dialogflow msg and pipe to chat message
         #     pass
@@ -59,6 +57,8 @@ class GoogleChatROS(object):
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
 
+        rospy.on_shutdown(self.killnode)
+
         # ROS ActionLib for REST
         self._as = actionlib.SimpleActionServer(
             '~send', SendMessageAction,
@@ -66,7 +66,7 @@ class GoogleChatROS(object):
         )
         self._as.start()
 
-    def _killnode(self):
+    def killnode(self):
         self._server.kill()
 
     def rest_cb(self, goal):
@@ -113,19 +113,19 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: None
         """
+        # rospy.loginfo(str(event))
         # event/eventTime
         event_time = event['eventTime']
         # event/space
         space = Space()
         space.name = event['space']['name']
-        space.display_name = event['space']['displayName']
         space.room = True if event['space']['type'] == "ROOM" else False
+        if space.room:
+            space.display_name = event['space']['displayName']
         space.dm = True if event['space']['type'] == "DM" else False
         # event/user
         user = self._get_user_info(event['user'])
-        user = User()
-
-        if event['type'] == 'ADDED_TO_SPACE' or 'REMOVED_FROM_SPACE':
+        if event['type'] == 'ADDED_TO_SPACE' or event['type'] == 'REMOVED_FROM_SPACE':
             msg = SpaceEvent()
             msg.event_time = event_time
             msg.space = space
@@ -136,29 +136,35 @@ class GoogleChatROS(object):
             return
         elif event['type'] == 'MESSAGE':
             msg = MessageEvent()
+            msg.event_time = event_time
+            msg.space = space
+            msg.user = user
             message = Message()
             message_content = event['message']
-            message.name = message_content.get(['name'])
+            message.name = message_content.get('name')
             # event/message/sender
-            message.sender = User()
+            message.sender = self._get_user_info(message_content['sender'])
             message.create_time = message_content.get('createTime')
             message.text = message_content.get('text')
             message.thread_name = message_content.get('thread').get('name') # TODO maybe error if not exists
             # event/messsage/annotations
-            for item in message_content['annotations']:
-                annotation = Annotation()
-                annotation.length = item['length']
-                annotation.start_index = item['startIndex']
-                annotation.user = self._get_user_info(item['user'])
-                annotation.mention = True if item['type'] == 'USER_MENTION' else False
-                annotation.slash_command = True if item['type'] == 'SLASH_COMMAND' else False
-                message.annotations.append(annotation)
+            if 'annotations' in message_content:
+                for item in message_content['annotations']:
+                    annotation = Annotation()
+                    annotation.length = item['length']
+                    annotation.start_index = item['startIndex']
+                    annotation.mention = True if item['type'] == 'USER_MENTION' else False
+                    if annotation.mention:
+                        annotation.user = self._get_user_info(item['userMention']['user'])
+                    annotation.slash_command = True if item['type'] == 'SLASH_COMMAND' else False
+                    message.annotations.append(annotation)
             message.argument_text = message_content.get('argumentText')
             # event/message/attachment
-            for item in message_content['attachment']:
-                message.attachments.append(self._get_attachment(item))                
-                attachment = Attachment()
-                attachment.name = item['name']
+            if 'attachment' in message_content:
+                for item in message_content['attachment']:
+                    message.attachments.append(self._get_attachment(item))
+            msg.message = message
+            rospy.logwarn(msg.event_time)
             self._recieve_message_pub.publish(msg)
             return
         else:
@@ -167,13 +173,14 @@ class GoogleChatROS(object):
 
     def _get_user_info(self, item):
         user = User()
-        user.name = item['name']
-        user.display_name = item['displayName']
-        user.avator_url = item['avatorUrl']
-        user.avator = self._get_image_from_uri(item['avator']) if self.download_avator else None
-        user.email = item['email']
-        user.bot = True if item['type'] == "BOT" else False
-        user.human = True if item['type'] == "HUMAN" else False
+        user.name = item.get('name')
+        user.display_name = item.get('displayName')
+        user.avatar_url = item.get('avatarUrl')
+        if self.download_avatar:
+            user.avatar = self._get_image_from_uri(item['avatar'])
+        user.email = item.get('email')
+        user.bot = True if item.get('type') == "BOT" else False
+        user.human = True if item.get('type') == "HUMAN" else False
         return user
 
     def _get_attachment(self, item, download=False):
@@ -205,6 +212,6 @@ class GoogleChatROS(object):
         return
 
 if __name__ == '__main__':
-    rospy.init_node('google_chat')
+    rospy.init_node('google_chat', disable_signals=True)
     node = GoogleChatROS()
     rospy.spin()
