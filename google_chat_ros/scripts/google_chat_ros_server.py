@@ -20,7 +20,7 @@ class GoogleChatROS(object):
         recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'none'
 
         # For REST, sending message 
-        rest_keyfile = rospy.get_param('~keyfile')
+        rest_keyfile = rospy.get_param('~google_cloud_credentials_json')
         self._client = GoogleChatRESTClient(rest_keyfile)
         rospy.loginfo("Starting Google Chat REST service...")
         try:
@@ -30,15 +30,27 @@ class GoogleChatROS(object):
             rospy.logwarn("Failed to start Google Chat REST service")
             rospy.logerr(e)
 
-        # For HTTPS, recieving message
+        # For POST, recieving message
         if recieving_chat_mode == "url" or "dialogflow":
-            https_conffile = rospy.get_param('~conffile')
+            # https_conffile = rospy.get_param('~conffile')
+            self.host = rospy.get_param('~host')
+            self.port = int(rospy.get_param('~port'))
+            self.ssl_certfile = rospy.get_param('~ssl_certfile')
+            self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
             self.download_timeout = rospy.get_param('~download_timeout')
             self.download_data = rospy.get_param('~download_data')
             self.download_avator = rospy.get_param('~download_avator')
-            self._server = GoogleChatHTTPSServer(https_conffile, callback=self.https_post_cb)
-            self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent)
-            self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent)
+            rospy.loginfo("Starting Google Chat HTTPS server...")
+            try:
+                self._server = GoogleChatHTTPSServer(
+                    self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.https_post_cb)
+                self._server.httpd.serve_forever()
+                rospy.on_shutdown(self._killnode)
+            except Exception as e:
+                rospy.logwarn("Failed to start Google Chat HTTPS server")
+                rospy.logerr(e)
+            self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
+            self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
         # elif recieving_chat_mode == "dialogflow":
         #     # TODO: subscribe dialogflow msg and pipe to chat message
         #     pass
@@ -53,6 +65,9 @@ class GoogleChatROS(object):
             execute_cb=self.rest_cb, auto_start=False
         )
         self._as.start()
+
+    def _killnode(self):
+        self._server.kill()
 
     def rest_cb(self, goal):
         feedback = SendMessageFeedback()
@@ -191,5 +206,5 @@ class GoogleChatROS(object):
 
 if __name__ == '__main__':
     rospy.init_node('google_chat')
-    server = GoogleChatROS()
+    node = GoogleChatROS()
     rospy.spin()
