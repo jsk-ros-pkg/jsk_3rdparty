@@ -42,13 +42,9 @@ class GoogleChatROS(object):
             self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
             rospy.loginfo("Starting Google Chat HTTPS server...")
-            # try:
             self._server = GoogleChatHTTPSServer(
                 self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.https_post_cb)
             self._server.run()
-            # except Exception as e:
-            # rospy.logwarn("Failed to start Google Chat HTTPS server")
-            # rospy.logerr(e)
         # elif recieving_chat_mode == "dialogflow":
         #     # TODO: subscribe dialogflow msg and pipe to chat message
         #     pass
@@ -151,21 +147,24 @@ class GoogleChatROS(object):
             if 'annotations' in message_content:
                 for item in message_content['annotations']:
                     annotation = Annotation()
-                    annotation.length = item['length']
-                    annotation.start_index = item['startIndex']
-                    annotation.mention = True if item['type'] == 'USER_MENTION' else False
+                    annotation.length = item.get('length')
+                    annotation.start_index = item.get('startIndex')
+                    annotation.mention = True if item.get('type') == 'USER_MENTION' else False
                     if annotation.mention:
                         annotation.user = self._get_user_info(item['userMention']['user'])
-                    annotation.slash_command = True if item['type'] == 'SLASH_COMMAND' else False
+                    annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
                     message.annotations.append(annotation)
-            message.argument_text = message_content.get('argumentText')
+            message.argument_text = message_content.get('argumentText', '')
             # event/message/attachment
             if 'attachment' in message_content:
                 for item in message_content['attachment']:
                     message.attachments.append(self._get_attachment(item))
             msg.message = message
             rospy.logwarn(msg.event_time)
-            self._recieve_message_pub.publish(msg)
+            try:
+                self._recieve_message_pub.publish(msg)
+            except Exception as e:
+                from IPython.terminal import embed; ipshell=embed.InteractiveShellEmbed(config=embed.load_default_config())(local_ns=locals())
             return
         else:
             rospy.logerr("Got unknown event type.")
@@ -173,27 +172,27 @@ class GoogleChatROS(object):
 
     def _get_user_info(self, item):
         user = User()
-        user.name = item.get('name')
-        user.display_name = item.get('displayName')
-        user.avatar_url = item.get('avatarUrl')
+        user.name = item.get('name', '')
+        user.display_name = item.get('displayName', '')
+        user.avatar_url = item.get('avatarUrl', '')
         if self.download_avatar:
             user.avatar = self._get_image_from_uri(item['avatar'])
-        user.email = item.get('email')
+        user.email = item.get('email', '')
         user.bot = True if item.get('type') == "BOT" else False
         user.human = True if item.get('type') == "HUMAN" else False
         return user
 
     def _get_attachment(self, item, download=False):
         attachment = Attachment()
-        attachment.name = item['name']
-        attachment.content_name = item['contentName']
-        attachment.content_type = item['contentType']
-        attachment.thumnail_uri = item['thumnailUri']
-        attachment.download_uri = item['downloadUri']
-        attachment.drive_file = True if item['source'] == 'DRIVE_FILE' else False
-        attachment.uploaded_content = True if item['source'] == 'UPLOADED_CONTENT' else False
-        attachment.attachment_resource_name = item['attachmentDataRef']['resourceName']
-        attachment.drive_field_id = item['driveDataRef']['driveFileId']
+        attachment.name = item.get('name', '')
+        attachment.content_name = item.get('contentName', '')
+        attachment.content_type = item.get('contentType', '')
+        attachment.thumnail_uri = item.get('thumnailUri', '')
+        attachment.download_uri = item.get('downloadUri', '')
+        attachment.drive_file = True if item.get('source') == 'DRIVE_FILE' else False
+        attachment.uploaded_content = True if item.get('source') == 'UPLOADED_CONTENT' else False
+        attachment.attachment_resource_name = item.get('attachmentDataRef', {}).get('resourceName', '')
+        attachment.drive_field_id = item.get('driveDataRef', {}).get('driveFileId', '')
         # attachment.localpath = item[''] # TODO enable download option
         return attachment
 

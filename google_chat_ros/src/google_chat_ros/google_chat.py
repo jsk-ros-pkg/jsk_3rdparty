@@ -83,17 +83,16 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
         Please see https://developers.google.com/chat/api/guides/message-formats/events for details.
         """
         user_agent = self.headers.get("User-Agent")
-        rospy.loginfo('user_agent' + str(user_agent))
+        print('user_agent' + str(user_agent))
         self._parse_json()
         self._callback(self.json_content)
         self._response()
 
     def _parse_json(self):
         content_len = int(self.headers.get("content-length"))
-        request_body = self.rfile.read(content_len).decode("utf-8")
+        request_body = self.rfile.read(content_len).decode('utf-8')
         rospy.loginfo(str(request_body))
-        self.json_content = json.loads(request_body)
-        # rospy.loginfo(str(self.json_content))
+        self.json_content = json.loads(request_body, object_hook=self._decode_dict) # json.loads returns unicode by default
 
     def _response(self):
         self.send_response(200)
@@ -106,3 +105,29 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
         self.send_response(400)
         self.end_headers()
 
+    ### helper functions
+    def _decode_list(self, data):
+        rv = []
+        for item in data:
+            if isinstance(item, unicode):
+                item = item.encode('utf-8')
+            elif isinstance(item, list):
+                item = self._decode_list(item)
+            elif isinstance(item, dict):
+                item = self._decode_dict(item)
+            rv.append(item)
+        return rv
+
+    def _decode_dict(self, data):
+        rv = {}
+        for key, value in data.iteritems():
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            elif isinstance(value, list):
+                value = self._decode_list(value)
+            elif isinstance(value, dict):
+                value = self._decode_dict(value)
+            rv[key] = value
+        return rv
