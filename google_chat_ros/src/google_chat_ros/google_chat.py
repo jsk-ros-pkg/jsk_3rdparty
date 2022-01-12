@@ -5,7 +5,8 @@ from httplib2 import Http
 import http.server as s
 import json
 from oauth2client.service_account import ServiceAccountCredentials
-import rospy
+import rospy # for logging
+import socket
 import ssl
 
 class GoogleChatRESTClient():
@@ -54,7 +55,13 @@ class GoogleChatHTTPSServer():
         self._callback = callback
 
     def __handler(self, *args):
-        GoogleChatHTTPSHandler(self._callback, *args)
+        try:
+            GoogleChatHTTPSHandler(self._callback, *args)
+        except socket.error as e:
+            if e.errno == 104: # SSL Connection reset error which can be ignored
+                rospy.logdebug(e)
+            else:
+                raise e
 
     def run(self):
         self._httpd = s.HTTPServer((self._host, self._port), self.__handler)
@@ -76,6 +83,7 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
         Please see https://developers.google.com/chat/api/guides/message-formats/events for details.
         """
         user_agent = self.headers.get("User-Agent")
+        rospy.loginfo('user_agent' + str(user_agent))
         self._parse_json()
         self._callback(self.json_content)
         self._response()
