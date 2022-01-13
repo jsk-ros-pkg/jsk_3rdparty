@@ -95,10 +95,7 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
 
     def _response(self):
         self.send_response(200)
-        # self.send_header('Content-type', 'application/json; charset=utf-8')
-        # self.send_header('Content-length', len(self.res_body.encode()))
         self.end_headers()
-        # self.wfile.write(self.res_body.encode('utf-8'))
 
     def _bad_request(self):
         self.send_response(400)
