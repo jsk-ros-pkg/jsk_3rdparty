@@ -27,12 +27,19 @@ class GoogleChatROS(object):
         try:
             self._client.build_service() # Start google chat authentication and service
             rospy.loginfo("Succeeded in starting Google Chat REST service")
+            # ROS ActionLib
+            self._as = actionlib.SimpleActionServer(
+            '~send', SendMessageAction,
+            execute_cb=self.rest_cb, auto_start=False
+            )
+            self._as.start()
         except Exception as e:
             rospy.logwarn("Failed to start Google Chat REST service")
             rospy.logerr(e)
 
         # For POST, recieving message
         if recieving_chat_mode in ("url", "dialogflow"):
+            # rosparams
             self.host = rospy.get_param('~host')
             self.port = int(rospy.get_param('~port'))
             self.ssl_certfile = rospy.get_param('~ssl_certfile')
@@ -40,6 +47,8 @@ class GoogleChatROS(object):
             self.download_data = rospy.get_param('~download_data')
             self.download_directory = rospy.get_param('~download_directory')
             self.download_avatar = rospy.get_param('~download_avatar')
+            rospy.on_shutdown(self.killnode) # shutdown https server
+            # ROS publisher
             self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
             rospy.loginfo("Starting Google Chat HTTPS server...")
@@ -53,15 +62,6 @@ class GoogleChatROS(object):
             pass
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
-
-        rospy.on_shutdown(self.killnode)
-
-        # ROS ActionLib for REST
-        self._as = actionlib.SimpleActionServer(
-            '~send', SendMessageAction,
-            execute_cb=self.rest_cb, auto_start=False
-        )
-        self._as.start()
 
     def killnode(self):
         self._server.kill()
