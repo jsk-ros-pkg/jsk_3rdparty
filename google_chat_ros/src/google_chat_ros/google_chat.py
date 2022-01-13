@@ -58,7 +58,7 @@ class GoogleChatHTTPSServer():
         try:
             GoogleChatHTTPSHandler(self._callback, *args)
         except socket.error as e:
-            if e.errno == 104: # SSL Connection reset error which can be ignored
+            if e.errno == 104: # ignore SSL Connection reset error
                 rospy.logdebug(e)
             else:
                 raise e
