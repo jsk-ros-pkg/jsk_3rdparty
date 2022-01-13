@@ -206,7 +206,7 @@ class GoogleChatROS(object):
         user.display_name = item.get('displayName', '')
         user.avatar_url = item.get('avatarUrl', '')
         if self.download_avatar:
-            user.avatar = self._get_image_from_uri(item['avatar'])
+            user.avatar = self._get_image_from_uri(user.avatar_url)
         user.email = item.get('email', '')
         user.bot = True if item.get('type') == "BOT" else False
         user.human = True if item.get('type') == "HUMAN" else False
