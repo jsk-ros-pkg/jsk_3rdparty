@@ -2,6 +2,7 @@
   <arg name="recieving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow."/>
   <arg name="download_data" default="true" />
   <arg name="download_data_timeout" default="10" />
+  <arg name="download_directory" default="/tmp" />
   <arg name="download_avatar" default="false" />
   <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
   <!-- <arg name="google_cloud_credentials_json" default=""/> -->
@@ -18,6 +19,7 @@
       recieving_mode: $(arg recieving_mode)
       download_data_timeout: $(arg download_data_timeout)
       download_data: $(arg download_data)
+      download_directory: $(arg download_directory)
       download_avatar: $(arg download_avatar)
     </rosparam>
   </node>

@@ -7,6 +7,7 @@ from google_chat_ros.msg import *
 from google_chat_ros.msg import SendMessageAction
 from google_chat_ros.msg import SendMessageFeedback
 from google_chat_ros.msg import SendMessageResult
+import os
 import requests
 from requests.exceptions import Timeout
 import rospy
@@ -36,8 +37,8 @@ class GoogleChatROS(object):
             self.port = int(rospy.get_param('~port'))
             self.ssl_certfile = rospy.get_param('~ssl_certfile')
             self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
-            self.download_timeout = rospy.get_param('~download_data_timeout')
             self.download_data = rospy.get_param('~download_data')
+            self.download_directory = rospy.get_param('~download_directory')
             self.download_avatar = rospy.get_param('~download_avatar')
             self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
@@ -109,18 +110,19 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: None
         """
-        # rospy.loginfo(str(event))
+        # GET EVENT TYPE
         # event/eventTime
-        event_time = event['eventTime']
+        event_time = event.get('eventTime')
         # event/space
         space = Space()
-        space.name = event['space']['name']
-        space.room = True if event['space']['type'] == "ROOM" else False
+        space.name = event.get('space').get('name')
+        space.room = True if event.get('space').get('type') == "ROOM" else False
         if space.room:
-            space.display_name = event['space']['displayName']
-        space.dm = True if event['space']['type'] == "DM" else False
+            space.display_name = event.get('space').get('displayName')
+        space.dm = True if event.get('space').get('type') == "DM" else False
         # event/user
-        user = self._get_user_info(event['user'])
+        user = self._get_user_info(event.get('user'))
+
         if event['type'] == 'ADDED_TO_SPACE' or event['type'] == 'REMOVED_FROM_SPACE':
             msg = SpaceEvent()
             msg.event_time = event_time
@@ -130,19 +132,22 @@ class GoogleChatROS(object):
             msg.removed = True if event['type'] == "REMOVED_FROM_SPACE" else False
             self._space_activity_pub.publish(msg)
             return
+
         elif event['type'] == 'MESSAGE':
             msg = MessageEvent()
             msg.event_time = event_time
             msg.space = space
             msg.user = user
             message = Message()
-            message_content = event['message']
-            message.name = message_content.get('name')
+            message_content = event.get('message', '')
+            message.name = message_content.get('name', '')
+
             # event/message/sender
-            message.sender = self._get_user_info(message_content['sender'])
-            message.create_time = message_content.get('createTime')
-            message.text = message_content.get('text')
-            message.thread_name = message_content.get('thread').get('name') # TODO maybe error if not exists
+            message.sender = self._get_user_info(message_content.get('sender'))
+            message.create_time = message_content.get('createTime', '')
+            message.text = message_content.get('text', '')
+            message.thread_name = message_content.get('thread', {}).get('name', '')
+
             # event/messsage/annotations
             if 'annotations' in message_content:
                 for item in message_content['annotations']:
@@ -151,21 +156,28 @@ class GoogleChatROS(object):
                     annotation.start_index = item.get('startIndex')
                     annotation.mention = True if item.get('type') == 'USER_MENTION' else False
                     if annotation.mention:
-                        annotation.user = self._get_user_info(item['userMention']['user'])
+                        annotation.user = self._get_user_info(item.get('userMention').get('user'))
                     annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
                     message.annotations.append(annotation)
             message.argument_text = message_content.get('argumentText', '')
+
             # event/message/attachment
             if 'attachment' in message_content:
                 for item in message_content['attachment']:
                     message.attachments.append(self._get_attachment(item))
             msg.message = message
-            rospy.logwarn(msg.event_time)
+
+            # rospy Publish
             try:
                 self._recieve_message_pub.publish(msg)
             except Exception as e:
                 from IPython.terminal import embed; ipshell=embed.InteractiveShellEmbed(config=embed.load_default_config())(local_ns=locals())
             return
+
+        elif event['type'] == 'CARD_CLICKED':
+            # TODO
+            return
+
         else:
             rospy.logerr("Got unknown event type.")
             return
@@ -182,7 +194,7 @@ class GoogleChatROS(object):
         user.human = True if item.get('type') == "HUMAN" else False
         return user
 
-    def _get_attachment(self, item, download=False):
+    def _get_attachment(self, item):
         attachment = Attachment()
         attachment.name = item.get('name', '')
         attachment.content_name = item.get('contentName', '')
@@ -193,22 +205,38 @@ class GoogleChatROS(object):
         attachment.uploaded_content = True if item.get('source') == 'UPLOADED_CONTENT' else False
         attachment.attachment_resource_name = item.get('attachmentDataRef', {}).get('resourceName', '')
         attachment.drive_field_id = item.get('driveDataRef', {}).get('driveFileId', '')
-        # attachment.localpath = item[''] # TODO enable download option
+        if self.download_data and attachment.download_uri:
+            self._download_content(uri=attachment.download_uri, filename=attachment.content_name)
+        if self.download_data and attachment.drive_field_id:
+            self._download_content(drive_id=attachment.drive_field_id)
         return attachment
 
     def _get_image_from_uri(self, uri):
-        img = None
         try:
-            img = requests.get(uri, timeout=self.download_timeout).content
+            img = requests.get(uri, timeout=10).content
         except Timeout:
-            rospy.logerr("Exceeded timelimit ({} sec) when downloading {}.".format(self.download_timeout, uri))
+            rospy.logerr("Exceeded timeout when downloading {}.".format(uri))
         except Exception as e:
             rospy.logwarn("Failed to get image from {}".format(uri))
             rospy.logerr(e)
-        return img
+        else:
+            return img
 
-    def _download_attachment_from_uri(self, uri):        
-        return
+    def _download_content(self, uri=None, drive_id=None, filename=''):
+        try:
+            if drive_id:
+                path = os.path.join(self.download_directory, drive_id)
+                gdown.download(id=drive_id, output=path)
+            elif uri:
+                path = os.path.join(self.download_directory, filename)
+                gdown.download(url=uri, output=path)
+        except Exception as e:
+            rospy.logwarn("Failed to download the attatched file.")
+            rospy.logerr(e)
+        else:
+            rospy.loginfo("Suceeded in downloading the attached file. Saved at {}".format(path))
+        finally:
+            return path
 
 if __name__ == '__main__':
     rospy.init_node('google_chat', disable_signals=True)
