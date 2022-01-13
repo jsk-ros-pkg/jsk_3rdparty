@@ -51,15 +51,26 @@ class GoogleChatROS(object):
             # ROS publisher
             self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
+
             rospy.loginfo("Starting Google Chat HTTPS server...")
-            self._server = GoogleChatHTTPSServer(
-                self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.https_post_cb)
+            # try:
+            if recieving_chat_mode == "url":
+                rospy.loginfo("Expected to get Google Chat Bot URL request")
+                self._server = GoogleChatHTTPSServer(
+                    self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb)
+            elif recieving_chat_mode == "dialogflow":
+                rospy.loginfo("Expected to get Google Chat Dialogflow request")
+                self._server = GoogleChatHTTPSServer(
+                    self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.dialogflow_cb)
+                # TODO: dialogflow publisher
             self._server.run()
-        # elif recieving_chat_mode == "dialogflow":
-        #     # TODO: subscribe dialogflow msg and pipe to chat message
-        #     pass
+            # except Exception as e:
+            #     rospy.logwarn("The error occurred while starting HTTPS server")
+            #     rospy.logerr(e)
+
         elif recieving_chat_mode == "none":
             pass
+
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
 
@@ -102,7 +113,7 @@ class GoogleChatROS(object):
             result.done = success
             self._as.set_succeeded(result)
 
-    def https_post_cb(self, event):
+    def event_cb(self, event):
         """Parse Google Chat API json content and publish as a ROS Message.
         See https://developers.google.com/chat/api/reference/rest 
         to check what contents are included in the json.
@@ -110,6 +121,7 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: None
         """
+        import json; rospy.loginfo(json.dumps(event, indent=2))
         # GET EVENT TYPE
         # event/eventTime
         event_time = event.get('eventTime')
@@ -152,8 +164,8 @@ class GoogleChatROS(object):
             if 'annotations' in message_content:
                 for item in message_content['annotations']:
                     annotation = Annotation()
-                    annotation.length = item.get('length')
-                    annotation.start_index = item.get('startIndex')
+                    annotation.length = int(item.get('length', 0))
+                    annotation.start_index = int(item.get('startIndex', 0))
                     annotation.mention = True if item.get('type') == 'USER_MENTION' else False
                     if annotation.mention:
                         annotation.user = self._get_user_info(item.get('userMention').get('user'))
@@ -181,6 +193,12 @@ class GoogleChatROS(object):
         else:
             rospy.logerr("Got unknown event type.")
             return
+
+    def dialogflow_cb(self, dialogflow_json):
+        original_request = dialogflow_json.get('originalDetectIntentRequest')
+        if original_request.get('source') == "hangouts":
+            data = original_request.get('payload').get('data')
+            self.event_cb(data.get('event'))
 
     def _get_user_info(self, item):
         user = User()

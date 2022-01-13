@@ -91,7 +91,6 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
     def _parse_json(self):
         content_len = int(self.headers.get("content-length"))
         request_body = self.rfile.read(content_len).decode('utf-8')
-        rospy.loginfo(str(request_body))
         self.json_content = json.loads(request_body, object_hook=self._decode_dict) # json.loads returns unicode by default
 
     def _response(self):
