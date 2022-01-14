@@ -5,9 +5,6 @@ import gdown
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
 from google_chat_ros.msg import *
-from google_chat_ros.msg import SendMessageAction
-from google_chat_ros.msg import SendMessageFeedback
-from google_chat_ros.msg import SendMessageResult
 import json
 import os
 import requests
@@ -74,7 +71,7 @@ class GoogleChatROS(object):
                 rospy.logerr(e)
 
         elif recieving_chat_mode == "none":
-            pass
+            rospy.logwarn("You cannot recieve Google Chat event because HTTPS server is not running.")
 
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
@@ -126,7 +123,8 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: None
         """
-        rospy.loginfo(json.dumps(event, indent=2)) # TODO delete
+        rospy.logdebug("GOOGLE CHAT ORIGINAL JSON EVENT")
+        rospy.logdebug(json.dumps(event, indent=2))
         # GET EVENT TYPE
         # event/eventTime
         event_time = event.get('eventTime')
@@ -155,36 +153,8 @@ class GoogleChatROS(object):
             msg.event_time = event_time
             msg.space = space
             msg.user = user
-            message = Message()
-            message_content = event.get('message', '')
-            message.name = message_content.get('name', '')
-
-            # event/message/sender
-            message.sender = self._get_user_info(message_content.get('sender'))
-            message.create_time = message_content.get('createTime', '')
-            message.text = message_content.get('text', '')
-            message.thread_name = message_content.get('thread', {}).get('name', '')
-
-            # event/messsage/annotations
-            if 'annotations' in message_content:
-                for item in message_content['annotations']:
-                    annotation = Annotation()
-                    annotation.length = int(item.get('length', 0))
-                    annotation.start_index = int(item.get('startIndex', 0))
-                    annotation.mention = True if item.get('type') == 'USER_MENTION' else False
-                    if annotation.mention:
-                        annotation.user = self._get_user_info(item.get('userMention').get('user'))
-                    annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
-                    message.annotations.append(annotation)
-            message.argument_text = message_content.get('argumentText', '')
-
-            # event/message/attachment
-            if 'attachment' in message_content:
-                for item in message_content['attachment']:
-                    message.attachments.append(self._get_attachment(item))
-            msg.message = message
-
-            # rospy Publish
+            msg.message = self._make_message_msg(event)
+            # rospy Publish TODO: delete try, except
             try:
                 self._recieve_message_pub.publish(msg)
             except Exception as e:
@@ -192,6 +162,7 @@ class GoogleChatROS(object):
             return
 
         elif event['type'] == 'CARD_CLICKED':
+            msg = CardEvent()
             # TODO
             return
 
@@ -217,6 +188,37 @@ class GoogleChatROS(object):
         if original_request.get('source') == "hangouts":
             data = original_request.get('payload').get('data')
             self.event_cb(data.get('event'))
+
+    def _make_message_msg(self, event):
+        message = Message()
+        message_content = event.get('message', '')
+        message.name = message_content.get('name', '')
+
+        # event/message/sender
+        message.sender = self._get_user_info(message_content.get('sender'))
+        message.create_time = message_content.get('createTime', '')
+        message.text = message_content.get('text', '')
+        message.thread_name = message_content.get('thread', {}).get('name', '')
+
+        # event/messsage/annotations
+        if 'annotations' in message_content:
+            for item in message_content['annotations']:
+                annotation = Annotation()
+                annotation.length = int(item.get('length', 0))
+                annotation.start_index = int(item.get('startIndex', 0))
+                annotation.mention = True if item.get('type') == 'USER_MENTION' else False
+                if annotation.mention:
+                    annotation.user = self._get_user_info(item.get('userMention').get('user'))
+                annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
+                message.annotations.append(annotation)
+        message.argument_text = message_content.get('argumentText', '')
+
+        # event/message/attachment
+        if 'attachment' in message_content:
+            for item in message_content['attachment']:
+                message.attachments.append(self._get_attachment(item))
+
+        return message
 
     def _get_user_info(self, item):
         user = User()

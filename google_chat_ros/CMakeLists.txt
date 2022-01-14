@@ -14,8 +14,11 @@ catkin_python_setup()
 
 add_message_files(
   FILES
+  ActionParameter.msg
   Annotation.msg
   Attachment.msg
+  CardEvent.msg
+  FormAction.msg
   MessageEvent.msg
   Message.msg
   SlashCommand.msg
