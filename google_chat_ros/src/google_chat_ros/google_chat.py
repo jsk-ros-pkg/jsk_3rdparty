@@ -24,13 +24,10 @@ class GoogleChatRESTClient():
         self.__credentials = ServiceAccountCredentials.from_json_keyfile_name(self.keyfile, self._auth_scopes)
         self._chat = build('chat', 'v1', http=self.__credentials.authorize(Http()))
 
-    def send_text(self, space, text):
+    def message_request(self, space, json_body):
         parent = 'spaces/' + space
         # returns same 403 error both authenticate error and not connected error
-        return self._chat.spaces().messages().create(parent=parent, body={'text': text}).execute()
-
-    def send_card(self, space, content):
-        pass
+        return self._chat.spaces().messages().create(parent=parent, body=json_body).execute()
 
     def list_members(self, space):
         """Show member list in the space.

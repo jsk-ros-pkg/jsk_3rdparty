@@ -5,9 +5,6 @@ import gdown
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
 from google_chat_ros.msg import *
-from google_chat_ros.msg import SendMessageAction
-from google_chat_ros.msg import SendMessageFeedback
-from google_chat_ros.msg import SendMessageResult
 import json
 import os
 import requests
@@ -52,8 +49,9 @@ class GoogleChatROS(object):
             self.download_avatar = rospy.get_param('~download_avatar')
             rospy.on_shutdown(self.killnode) # shutdown https server
             # ROS publisher
-            self._recieve_message_pub = rospy.Publisher("~recieve", MessageEvent, queue_size=1)
+            self._message_activity_pub = rospy.Publisher("~message_activity", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
+            self._card_activity_pub = rospy.Publisher("~card_activity", CardEvent, queue_size=1)
 
             rospy.loginfo("Starting Google Chat HTTPS server...")
             try:
@@ -74,7 +72,7 @@ class GoogleChatROS(object):
                 rospy.logerr(e)
 
         elif recieving_chat_mode == "none":
-            pass
+            rospy.logwarn("You cannot recieve Google Chat event because HTTPS server is not running.")
 
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
@@ -83,31 +81,58 @@ class GoogleChatROS(object):
         self._server.kill()
 
     def rest_cb(self, goal):
+        """Get ROS SendMessageAction Goal and send request to Google Chat API.
+        :param goal: ROS SendMessageAction Goal
+        :rtype: none
+        """
         feedback = SendMessageFeedback()
         result = SendMessageResult()
         r = rospy.Rate(1)
         success = True
-        # start executing the action
-        space = goal.space
-        message_type = goal.message_type
-        content = goal.content
+
+        json_body = {}
+        json_body['text'] = goal.text
+        json_body['thread'] = {'name': goal.thread_name}
+        json_body['cards'] = []
+
+        # Card
+        if goal.cards:
+            for card in goal.cards:
+                card_body = {}
+                # card/header
+                header = {}
+                header['title'] = card.header.title
+                header['subtitle'] = card.header.subtitle
+                header['imageStyle'] = 'AVATAR' if card.header.image_style_circular else 'IMAGE'
+                if card.header.image_url:
+                    header['imageUrl'] = card.header.image_url
+                elif card.header.image_filepath:
+                    header['imageUrl'] = self._upload_file(card.header.image_filepath)
+                # card/sections
+                sections = []
+                sections = self._make_sections_json(card.sections)
+                # card/actions
+                card_actions = []
+                for card_action_msg in card.card_actions:
+                    card_action = {}
+                    card_action['actionLabel'] = card_action_msg.action_label
+                    card_action['onClick'] = self._make_on_click_json(card_action_msg.on_click)
+                    card_actions.append(card_action)
+                card_body['header'] = header
+                card_body['sections'] = sections
+                card_body['cardActions'] = card_actions
+                card_body['name'] = card.name
+                json_body['cards'].append(card_body)
+
         try:
             # establish the service
             self._client.build_service()
-            if message_type == 'text':
-                rospy.loginfo("Send text type message")
-                feedback.status = str(
-                    self._client.send_text(
-                        space=space,
-                        text=content
-                    ))
-            elif message_type == 'card':
-                rospy.loginfo("Send card type message")
-                feedback.status = str(
-                    self._client.send_card(
-                        space=space,
-                        content=content
-                    ))
+            rospy.loginfo("Send text type message")
+            feedback.status = str(
+                self._client.message_request(
+                    space=goal.space,
+                    json_body=json_body
+                ))
         except Exception as e:
             rospy.logerr(str(e))
             feedback.status = str(e)
@@ -126,7 +151,8 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: None
         """
-        rospy.loginfo(json.dumps(event, indent=2)) # TODO delete
+        rospy.logdebug("GOOGLE CHAT ORIGINAL JSON EVENT")
+        rospy.logdebug(json.dumps(event, indent=2))
         # GET EVENT TYPE
         # event/eventTime
         event_time = event.get('eventTime')
@@ -155,44 +181,28 @@ class GoogleChatROS(object):
             msg.event_time = event_time
             msg.space = space
             msg.user = user
-            message = Message()
-            message_content = event.get('message', '')
-            message.name = message_content.get('name', '')
-
-            # event/message/sender
-            message.sender = self._get_user_info(message_content.get('sender'))
-            message.create_time = message_content.get('createTime', '')
-            message.text = message_content.get('text', '')
-            message.thread_name = message_content.get('thread', {}).get('name', '')
-
-            # event/messsage/annotations
-            if 'annotations' in message_content:
-                for item in message_content['annotations']:
-                    annotation = Annotation()
-                    annotation.length = int(item.get('length', 0))
-                    annotation.start_index = int(item.get('startIndex', 0))
-                    annotation.mention = True if item.get('type') == 'USER_MENTION' else False
-                    if annotation.mention:
-                        annotation.user = self._get_user_info(item.get('userMention').get('user'))
-                    annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
-                    message.annotations.append(annotation)
-            message.argument_text = message_content.get('argumentText', '')
-
-            # event/message/attachment
-            if 'attachment' in message_content:
-                for item in message_content['attachment']:
-                    message.attachments.append(self._get_attachment(item))
-            msg.message = message
-
-            # rospy Publish
-            try:
-                self._recieve_message_pub.publish(msg)
-            except Exception as e:
-                from IPython.terminal import embed; ipshell=embed.InteractiveShellEmbed(config=embed.load_default_config())(local_ns=locals())
+            msg.message = self._make_message_msg(event)
+            self._message_activity_pub.publish(msg)
             return
 
         elif event['type'] == 'CARD_CLICKED':
-            # TODO
+            msg = CardEvent()
+            msg.event_time = event_time
+            msg.space = space
+            msg.user = user
+            msg.message = self._make_message_msg(event)
+            if event.get('action'):
+                action = event.get('action')
+                msg.action.action_method_name = action.get('actionMethodName')
+                if action.get('actionMethodName', {}).get('parameters'):
+                    parameters = []
+                    for param in action.get('actionMethodName').get('parameters'):
+                        action_parameter = ActionParameter()
+                        action_parameter.key = param.get('key')
+                        action_parameter.value = param.get('value')
+                        parameters.append(action_parameter)
+                msg.action.parameters = parameters
+            self._card_activity_pub.publish(msg)
             return
 
         else:
@@ -218,6 +228,140 @@ class GoogleChatROS(object):
             data = original_request.get('payload').get('data')
             self.event_cb(data.get('event'))
 
+    def _make_message_msg(self, event):
+        message = Message()
+        message_content = event.get('message', '')
+        message.name = message_content.get('name', '')
+
+        # event/message/sender
+        message.sender = self._get_user_info(message_content.get('sender'))
+        message.create_time = message_content.get('createTime', '')
+        message.text = message_content.get('text', '')
+        message.thread_name = message_content.get('thread', {}).get('name', '')
+
+        # event/messsage/annotations
+        if 'annotations' in message_content:
+            for item in message_content['annotations']:
+                annotation = Annotation()
+                annotation.length = int(item.get('length', 0))
+                annotation.start_index = int(item.get('startIndex', 0))
+                annotation.mention = True if item.get('type') == 'USER_MENTION' else False
+                if annotation.mention:
+                    annotation.user = self._get_user_info(item.get('userMention').get('user'))
+                annotation.slash_command = True if item.get('type') == 'SLASH_COMMAND' else False
+                message.annotations.append(annotation)
+        message.argument_text = message_content.get('argumentText', '')
+
+        # event/message/attachment
+        if 'attachment' in message_content:
+            for item in message_content['attachment']:
+                message.attachments.append(self._get_attachment(item))
+
+        return message
+
+    def _make_sections_json(self, sections_msg):
+        """
+        :type msg: list of google_chat_ros.msgs/Section
+        :rtype json_body: list of json
+        """
+        json_body = []
+        for msg in sections_msg:
+            section = {}
+            section['header'] = msg.header
+            section['widgets'] = self._make_widget_markups_json(msg.widgets)
+            json_body.append(section)
+        return json_body
+
+    def _make_widget_markups_json(self, widgets_msg):
+        """Make widget markup json lists.
+        See https://developers.google.com/chat/api/reference/rest/v1/cards#widgetmarkup for details.
+        :rtype widgets_msg: list of google_chat_ros.msgs/WidgetMarkup
+        :rtype json_body: list of json
+        """
+        json_body = []
+        for msg in widgets_msg:
+            msg = WidgetMarkup() # TODO DEBUG
+            is_text = bool(msg.text_paragraph)
+            is_image = bool(msg.image.image_uri) or bool(msg.image.localpath)
+            is_keyval = bool(msg.key_value.content)
+            if (is_text & is_image) | (is_image & is_keyval) | (is_keyval & is_text):
+                rospy.logerr("Error happened when making widgetMarkup json. Please fill in one of the text_paragraph, image, key_value. Do not fill in more than two at the same time.")
+            elif is_text:
+                json_body.append({'textParagraph':msg.text_paragraph})
+            elif is_image:
+                image_json = {}
+                if msg.image.image_uri:
+                    image_json['imageUrl'] = msg.image.image_uri
+                elif msg.image.localpath:
+                    image_json['imageUrl'] = self._upload_file(msg.image.localpath)
+                image_json['onClick'] = self._make_on_click_json(msg.image.on_click)
+                image_json['aspectRatio'] = msg.image.aspect_ratio
+                json_body.append(image_json)
+            elif is_keyval:
+                keyval_json = {}
+                keyval_json['topLabel'] = msg.key_value.top_label
+                keyval_json['content'] = msg.key_value.content
+                keyval_json['contentMultiline'] = msg.key_value.content_multiline
+                keyval_json['bottomLabel'] = msg.key_value.bottom_label
+                keyval_json['onClick'] = self._make_on_click_json(msg.key_value.on_click)
+                if msg.key_value.icon:
+                    keyval_json['icon'] = msg.key_value.icon
+                elif msg.key_value.original_icon_url:
+                    keyval_json['iconUrl'] = msg.key_value.original_icon_url
+                elif msg.key_value.original_icon_localpath:
+                    keyval_json['iconUrl'] = self._upload_file(msg.key_value.original_icon_localpath)
+                keyval_json['button'] = self._make_button_json(msg.key_value.button)
+                json_body.append(keyval_json)
+        return json_body
+
+    def _make_on_click_json(self, on_click_msg):
+        """Make onClick json.
+        See https://developers.google.com/chat/api/reference/rest/v1/cards#onclick for details.
+        :rtype on_click_msg: google_chat_ros.msg/OnClick.msg
+        :rtype json_body: json
+        """
+        json_body = {}
+        if on_click_msg.action.action_method_name and on_click_msg.open_link_url:
+            rospy.logerr("Error happened when making onClick json. Please fill in one of the action, open_link_url. Do not fill in more than two at the same time.")
+        elif on_click_msg.action.action_method_name:
+            action = {}
+            action['actionMethodName'] = on_click_msg.action.action_method_name
+            parameters = []
+            for parameter in on_click_msg.action.parameters:
+                parameters.append({parameter['key']: parameter['value']})
+            action['parameters'] = parameters
+            json_body['action'] = action
+        elif on_click_msg.open_link_url:
+            json_body['openLink'] = on_click_msg.open_link_url
+        return json_body
+
+    def _make_button_json(self, button_msg):
+        """Make button json.
+        See https://developers.google.com/chat/api/reference/rest/v1/cards#button for details.
+        :rtype button_msg: google_chat_ros.msg/Button.msg
+        :rtype json_body: json
+        """
+        json_body = {}
+        if button_msg.text_button_name and button_msg.image_button_name:
+            rospy.logerr("Error happened when making Button json. Please fill in one of the text_button_name or image_button_name. Do not fill in more than two at the same time.")
+        elif button_msg.text_button_name:
+            rospy.loginfo("Build text button:{}".format(button_msg.text_button_name))
+            text_button = {}
+            text_button['text'] = button_msg.text_button_name
+            text_button['onClick'] = self._make_on_click_json(button_msg.text_button_on_click)
+            json_body['textButton'] = text_button
+        elif button_msg.image_button_name:
+            rospy.loginfo("Build image button:{}".format(button_msg.image_button_name))
+            image_button = {}
+            image_button['onClick'] = self._make_on_click_json(button_msg.image_button_on_click)
+            if button_msg.icon:
+                image_icon['icon'] = button_msg.icon
+            elif button_msg.original_icon_url:
+                image_icon['iconUrl'] = button_msg.original_icon_url
+            elif button_msg.original_icon_filepath:
+                image_icon['iconUrl'] = self._upload_file(button_msg.original_icon_filepath)
+        return json_body
+
     def _get_user_info(self, item):
         user = User()
         user.name = item.get('name', '')
@@ -229,6 +373,11 @@ class GoogleChatROS(object):
         user.bot = True if item.get('type') == "BOT" else False
         user.human = True if item.get('type') == "HUMAN" else False
         return user
+
+    def _upload_file(self, filepath):
+        # TODO
+        url = None
+        return url
 
     def _get_attachment(self, item):
         attachment = Attachment()
