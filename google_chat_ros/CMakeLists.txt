@@ -13,15 +13,7 @@ find_package(
 catkin_python_setup()
 
 add_message_files(
-  FILES
-  Annotation.msg
-  Attachment.msg
-  MessageEvent.msg
-  Message.msg
-  SlashCommand.msg
-  Space.msg
-  SpaceEvent.msg
-  User.msg
+  DIRECTORY msg
 )
 
 add_action_files(
