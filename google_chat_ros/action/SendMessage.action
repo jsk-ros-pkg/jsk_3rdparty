@@ -3,6 +3,7 @@ string text
 google_chat_ros/Card[] cards
 string thread_name
 string space
+google_chat_ros/Attachment[] attachments
 ---
 # Define the result
 bool done
