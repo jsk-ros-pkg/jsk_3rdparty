@@ -48,7 +48,7 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
     """
     def __init__(self, *args):
         self.dialogflow_pub = rospy.Publisher('dialog_response', DialogResponse, queue_size=1)
-        self.application_request_pub = rospy.Publisher('original_application_request', DialogResponse, queue_size=1)
+        self.application_request_pub = rospy.Publisher('original_application_request', OriginalDetectIntentRequest, queue_size=1)
         s.BaseHTTPRequestHandler.__init__(self, *args)
 
     def do_POST(self):
