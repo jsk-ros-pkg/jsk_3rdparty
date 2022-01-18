@@ -1,8 +1,0 @@
-<launch>
-  <arg name="webhook_config" default="$(find dialogflow_task_executive)/config/webhook.json" />
-  <node name="dialogflow_https_server" pkg="dialogflow_task_executive" type="webhook_server.py">
-    <rosparam subst_value="true">
-      webhook_config: $(arg webhook_config)
-    </rosparam>
-  </node>
-</launch>
