@@ -1,15 +1,18 @@
 #!/usr/bin/env python
-import actionlib
-from dialogflow_task_executive.msg import DialogResponse
 import gdown
-from google_chat_ros.google_chat import GoogleChatRESTClient
-from google_chat_ros.google_chat import GoogleChatHTTPSServer
-from google_chat_ros.msg import *
 import json
 import os
 import requests
 from requests.exceptions import Timeout
 from requests.exceptions import ConnectionError
+
+# ROS libraries
+import actionlib
+from dialogflow_task_executive.msg import DialogResponse
+from gdrive_ros.srv import *
+from google_chat_ros.google_chat import GoogleChatRESTClient
+from google_chat_ros.google_chat import GoogleChatHTTPSServer
+from google_chat_ros.msg import *
 import rospy
 
 
@@ -280,7 +283,6 @@ class GoogleChatROS(object):
         """
         json_body = []
         for msg in widgets_msg:
-            msg = WidgetMarkup() # TODO DEBUG
             is_text = bool(msg.text_paragraph)
             is_image = bool(msg.image.image_uri) or bool(msg.image.localpath)
             is_keyval = bool(msg.key_value.content)
@@ -375,9 +377,27 @@ class GoogleChatROS(object):
         return user
 
     def _upload_file(self, filepath):
-        # TODO
-        url = None
-        return url
+        """Get local filepath and upload to Google Drive
+        :param filepath: local file's path you want to upload
+        :type filepath: string
+        :returns: URL file exists
+        :rtype: string
+        """
+        # ROS service client
+        try:
+            rospy.wait_for_service("~upload", timeout=5.0)
+            gdrive_upload = rospy.ServiceProxy("~upload", Upload)
+        except rospy.ROSException as e:
+            rospy.logerr("No Google Drive ROS upload service was found. Please check gdrive_ros is correctly launched and service name is correct.")
+            return
+        # upload
+        try:
+            res = gdrive_upload(filepath)
+        except rospy.ServiceException as e:
+            rospy.logerr("Failed to call Google Drive upload service, status:{}".format(str(e)))
+        else:
+            url = res.file_url
+            return url
 
     def _get_attachment(self, item):
         attachment = Attachment()
