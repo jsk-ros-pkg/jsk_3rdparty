@@ -8,6 +8,7 @@ from switchbot_ros.msg import SwitchBotCommandAction
 from switchbot_ros.msg import SwitchBotCommandFeedback
 from switchbot_ros.msg import SwitchBotCommandResult
 from switchbot_ros.switchbot import SwitchBotAPIClient
+from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
 
 
 class SwitchBotAction:
@@ -40,7 +41,7 @@ class SwitchBotAction:
             execute_cb=self.execute_cb, auto_start=False)
         self._as.start()
 
-        
+
     def execute_cb(self, goal):
         feedback = SwitchBotCommandFeedback()
         result = SwitchBotCommandResult()
@@ -62,7 +63,7 @@ class SwitchBotAction:
                     command_type=command_type,
                     device_name=goal.device_name
                 ))
-        except Exception as e:
+        except (DeviceError, SwitchBotAPIError, KeyError) as e:
             rospy.logerr(str(e))
             feedback.status = str(e)
             success = False

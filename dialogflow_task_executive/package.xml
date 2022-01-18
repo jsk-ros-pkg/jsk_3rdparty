@@ -19,8 +19,9 @@
   <run_depend>app_manager</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>python-dialogflow-pip</run_depend>
-  
+
   <export>
+    <pip_requirements>requirements.txt</pip_requirements>
   </export>
 
 </package>

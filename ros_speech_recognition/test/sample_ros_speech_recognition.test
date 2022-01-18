@@ -1,12 +1,14 @@
 <launch>
   <!-- launch speech recognition -->
+
+  <arg name="launch_sound_play" default="false" doc="Launch sound_play node to speak" />
   <rosparam>
     <!-- We use rosbag which contains /speech_audio, which many /audio topics stuck together -->
     <!-- Therefore, we need long buffer size for this test -->
     /speech_recognition/buffer_size: 200000
   </rosparam>
   <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch">
-    <arg name="launch_sound_play" value="false" />
+    <arg name="launch_sound_play" value="$(arg launch_sound_play)" />
     <arg name="launch_audio_capture" value="false" />
     <arg name="audio_topic" value="/speech_audio" />
     <arg name="language" value="ja" />
@@ -22,7 +24,11 @@
   <test test-name="test_ros_speech_recognition"
         name="test_ros_speech_recognition"
         pkg="jsk_tools"  type="test_topic_published.py" >
-    <param name="~topic_0" value="/Tablet/voice" />
-    <param name="~timeout_0" value="30" />
+    <rosparam>
+      topic_0: /Tablet/voice
+      timeout_0: 30
+      topic_1: /speech_recognition_candidates_to_string/output
+      timeout_1: 30
+    </rosparam>
   </test>
 </launch>
