@@ -1,6 +1,15 @@
-You can recieve the Dialogflow webhook response by `webhook_server.py`.
-To use the node, you have to open the port and establish the SSL connection. If you've already opened 443 port but used by another process, you have to use haproxy.
+# Dialogflow webhook ros
+
+## What is this?
+The ros node to get Dialogflow webhook response. It gets the response from Dialogflow API and publish `DialogResponse.msg` and `OriginalDetectIntentRequest.msg` type messages.
+![jsk_3rdparty_dialogflow_webhook_ros](https://user-images.githubusercontent.com/27789460/149932575-3f7be321-977f-474a-9635-c38fcd815c69.jpg)
+
+## What you can do with this?
+If `dialogflow_task_executibe` subscribes `dialog_response` topic message (`DialogReponse.msg`) from this node, you can run app_manager's app from your device.  
 ![dialogflow_demo](https://user-images.githubusercontent.com/27789460/146872445-e1ef468a-63fd-4b1a-9eb3-83167e3cb446.gif)
+
+## Setup
+To use the node, you have to open the port and establish the SSL connection. If you've already opened 443 port but used by another process, you have to use haproxy.
 
 ### 1.Get SSL certificate
 
@@ -41,16 +50,7 @@ sudo systemctl start haproxy.service
 
 ### 3.setup dialogflow_task_exective webhook_server
 
-Your server's host name, port, certfile and keyfile should be passed to the node. The example `dialogflow_task_executive/config/webhook.json`, is as follows:
-
-```json
-{
-  "host": "dialogflow.yourdomain.com",
-  "port": 8090
-  "certfile": "/path/to/your/server.crt"
-  "keyfile": "/path/to/your/server.key"
-}
-```
+Your server's host name, port, ssl_certfile and ssl_keyfile should be passed to the node. Please set when you launch the node.
 
 It is true that `certfile` and `keyfile` are at `/etc/letsencrypt/live/$DOMAIN/`, however non-root users are not permitted to read the file. To avoid it, you exec
 ```bash
@@ -62,6 +62,13 @@ To secure the file, you exec
 sudo chmod go-rwx /path/to/your/server.crt
 sudo chmod go-rwx /path/to/your/server.key
 ```
+
+## Topics
+
+### Publishing
+- `dialog_response` (`dialogflow_task_executive/DialogResponse`)
+- `original_application_request` (`dialogflow_webhook_ros/OriginalDetectIntentRequest`)
+
 
 ## Author
 
