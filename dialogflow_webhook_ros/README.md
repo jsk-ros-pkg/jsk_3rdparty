@@ -48,7 +48,7 @@ sudo chmod -R go-rwx /etc/haproxy/certs
 sudo systemctl start haproxy.service
 ```
 
-### 3.setup dialogflow_task_exective webhook_server
+### 3.Setup dialogflow_task_exective webhook_server
 
 Your server's host name, port, ssl_certfile and ssl_keyfile should be passed to the node. Please set when you launch the node.
 
@@ -59,8 +59,21 @@ DOMAIN='dialogflow.yourdomain.com' sudo -E bash -c 'cat /etc/letsencrypt/live/$D
 ```
 To secure the file, you exec
 ```bash
-sudo chmod go-rwx /path/to/your/server.crt
+sudo chmod go-rwx /path/to/your/server.pem
 sudo chmod go-rwx /path/to/your/server.key
+```
+
+### 4.Launch the node
+Make the yaml file of configuration like
+```
+host: "yourdomain.com"
+port: 8090
+ssl_certfile: "/path/to/your/server.pem"
+ssl_keyfile: "/path/to/your/server.key"
+```
+and launch
+```bash
+roslaunch dialogflow_webhook_ros webhook_server.launch yaml_file:=/path/to/your/dialogflow_webhook.yaml
 ```
 
 ## Topics
