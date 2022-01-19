@@ -1,14 +1,9 @@
 <launch>
-  <arg name="host" />
-  <arg name="port" />
-  <arg name="ssl_certfile" />
-  <arg name="ssl_keyfile" />
-  <node name="dialogflow_webhook_ros_server" pkg="dialogflow_webhook_ros" type="webhook_server.py">
-    <rosparam subst_value="true">
-      host: $(arg host)
-      port: $(arg port)
-      ssl_certfile: $(arg ssl_certfile)
-      ssl_keyfile: $(arg ssl_keyfile)
-    </rosparam>
+  <arg name="yaml_file" doc="Yaml file of web settings." />
+  <arg name="respawn" default="true" />
+
+  <node name="dialogflow_webhook_ros_server" pkg="dialogflow_webhook_ros" type="webhook_server.py"
+	respawn="$(arg respawn)" output="screen">
+    <rosparam command="load" file="$(arg yaml_file)" />
   </node>
 </launch>

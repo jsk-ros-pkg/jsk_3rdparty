@@ -17,12 +17,12 @@ class Server(object):
     If the server received the message, it publishes the topic 'dialogflow_task_executive.msg DialogResponse' and send response to Google DialogFlow.
     """
     def __init__(self):
+        rospy.init_node('~dialogflow_webhook_server', disable_signals=True)
         self.host = rospy.get_param('~host')
         self.port = int(rospy.get_param('~port'))
         self.ssl_certfile = rospy.get_param('~ssl_certfile')
         self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
         rospy.on_shutdown(self.killnode)
-        rospy.init_node('~dialogflow_webhook_server', disable_signals=True)
         self._run_handler()
 
     def killnode(self):
@@ -77,14 +77,14 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
         # Dialogflow response query result
         dialogflow_msg = DialogResponse()
         dialogflow_msg.header.stamp = rospy.Time.now()
-        dialogflow_msg.query = self.json_content['queryResult']['queryText']
-        dialogflow_msg.action = self.json_content['queryResult']['action']
-        dialogflow_msg.response = self.json_content['queryResult']['fulfillmentText']
-        if self.json_content['queryResult']['allRequiredParamsPresent'] == 'True':
+        dialogflow_msg.query = self.json_content.get('queryResult', {}).get('queryText', '')
+        dialogflow_msg.action = self.json_content.get('queryResult', {}).get('action', '')
+        dialogflow_msg.response = self.json_content.get('queryResult', {}).get('fulfillmentText', '')
+        if self.json_content.get('queryResult', {}).get('allRequiredParamsPresent', '') == 'True':
             dialogflow_msg.fulfilled = True
-        dialogflow_msg.parameters = json.dumps(self.json_content['queryResult']['parameters'])
+        dialogflow_msg.parameters = json.dumps(self.json_content.get('queryResult', {}).get('parameters', ''))
         dialogflow_msg.speech_score = 1.0
-        dialogflow_msg.intent_score = self.json_content['queryResult']['intentDetectionConfidence']
+        dialogflow_msg.intent_score = self.json_content.get('queryResult', {}).get('intentDetectionConfidence', 0.0)
         rospy.logdebug("The query from Dialogflow \n" + str(dialogflow_msg))
         self.dialogflow_pub.publish(dialogflow_msg)
 
