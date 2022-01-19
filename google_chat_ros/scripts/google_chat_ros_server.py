@@ -8,6 +8,7 @@ from requests.exceptions import ConnectionError
 
 # ROS libraries
 import actionlib
+import ast
 from dialogflow_task_executive.msg import DialogResponse
 from dialogflow_webhook_ros.msg import OriginalDetectIntentRequest
 from gdrive_ros.srv import *
@@ -65,8 +66,8 @@ class GoogleChatROS(object):
                     rospy.on_shutdown(self.killhttpd) # shutdown https server
                     self._server.run()
                 elif recieving_chat_mode == "dialogflow":
-                    rospy.loginfo("Expected to get Google Chat Dialogflow request")
-                    self._sub = rospy.Subscriber("~original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
+                    rospy.loginfo("Expected to get OriginalDetectIntentRequest.msg from dialogflow webhook ros node.")
+                    self._sub = rospy.Subscriber("dialogflow_original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
 
             except ConnectionError as e:
                 rospy.logwarn("The error occurred while starting HTTPS server")
@@ -212,8 +213,10 @@ class GoogleChatROS(object):
 
     def dialogflow_cb(self, msg):
         if msg.source == "hangouts":
-            json_data = json.loads(msg.payload)
-            self.event_cb(json_data.get('data', {}).event('event', {}))
+            ast_data = ast.literal_eval(msg.payload)
+            json_dumped = json.dumps(ast_data)
+            json_data = json.loads(json_dumped)
+            self.event_cb(json_data.get('data', {}).get('event', {}))
 
     def _make_message_msg(self, event):
         message = Message()
