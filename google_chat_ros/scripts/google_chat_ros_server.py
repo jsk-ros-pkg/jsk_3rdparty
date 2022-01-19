@@ -9,6 +9,7 @@ from requests.exceptions import ConnectionError
 # ROS libraries
 import actionlib
 from dialogflow_task_executive.msg import DialogResponse
+from dialogflow_webhook_ros.msg import OriginalDetectIntentRequest
 from gdrive_ros.srv import *
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
@@ -43,14 +44,9 @@ class GoogleChatROS(object):
         # For POST, recieving message
         if recieving_chat_mode in ("url", "dialogflow"):
             # rosparams
-            self.host = rospy.get_param('~host')
-            self.port = int(rospy.get_param('~port'))
-            self.ssl_certfile = rospy.get_param('~ssl_certfile')
-            self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
             self.download_data = rospy.get_param('~download_data')
             self.download_directory = rospy.get_param('~download_directory')
             self.download_avatar = rospy.get_param('~download_avatar')
-            rospy.on_shutdown(self.killnode) # shutdown https server
             # ROS publisher
             self._message_activity_pub = rospy.Publisher("~message_activity", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
@@ -60,15 +56,17 @@ class GoogleChatROS(object):
             try:
                 if recieving_chat_mode == "url":
                     rospy.loginfo("Expected to get Google Chat Bot URL request")
+                    self.host = rospy.get_param('~host')
+                    self.port = int(rospy.get_param('~port'))
+                    self.ssl_certfile = rospy.get_param('~ssl_certfile')
+                    self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
                     self._server = GoogleChatHTTPSServer(
                         self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb)
+                    rospy.on_shutdown(self.killhttpd) # shutdown https server
+                    self._server.run()
                 elif recieving_chat_mode == "dialogflow":
                     rospy.loginfo("Expected to get Google Chat Dialogflow request")
-                    self._server = GoogleChatHTTPSServer(
-                        self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.dialogflow_cb)
-                    self._dialogflow_pub = rospy.Publisher("~dialogflow_response", DialogResponse, queue_size=1)
-
-                self._server.run()
+                    self._sub = rospy.Subscriber("~original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
 
             except ConnectionError as e:
                 rospy.logwarn("The error occurred while starting HTTPS server")
@@ -80,7 +78,7 @@ class GoogleChatROS(object):
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
 
-    def killnode(self):
+    def killhttpd(self):
         self._server.kill()
 
     def rest_cb(self, goal):
@@ -212,24 +210,10 @@ class GoogleChatROS(object):
             rospy.logerr("Got unknown event type.")
             return
 
-    def dialogflow_cb(self, dialogflow_json):
-        original_request = dialogflow_json.get('originalDetectIntentRequest')
-        query_result = dialogflow_json.get('queryResult')
-        # make ROS Dialogflow message
-        msg = DialogResponse()
-        msg.header.stamp = rospy.Time.now()
-        msg.query = query_result.get('queryText', '')
-        msg.action = query_result.get('action', '')
-        msg.response = query_result.get('fulfillmentText', '')
-        msg.fulfilled = True if query_result.get('allRequiredParamsPresent') == 'True' else False
-        msg.parameters = json.dumps(query_result['parameters'])
-        msg.speech_score = 1.0
-        msg.intent_score = query_result.get('intentDetectionConfidence')
-        self._dialogflow_pub.publish(msg)
-
-        if original_request.get('source') == "hangouts":
-            data = original_request.get('payload').get('data')
-            self.event_cb(data.get('event'))
+    def dialogflow_cb(self, msg):
+        if msg.source == "hangouts":
+            json_data = json.loads(msg.payload)
+            self.event_cb(json_data.get('data', {}).event('event', {}))
 
     def _make_message_msg(self, event):
         message = Message()
