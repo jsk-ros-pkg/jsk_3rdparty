@@ -13,7 +13,7 @@ To use the node, you have to open the port and establish the SSL connection. If 
 
 ### 1.Get SSL certificate
 
-I recommend to use certbot. Please read the [official guide](https://certbot.eff.org/lets-encrypt/ubuntubionic-other).
+I recommend to use certbot. Please read the [official guide](https://certbot.eff.org/lets-encrypt/) and check `My HTTP website is running Other on Ubuntu` .
 
 ### 2.(optional) Enable haproxy and establish forward proxy
 
