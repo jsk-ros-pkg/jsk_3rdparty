@@ -1,5 +1,7 @@
 <launch>
   <arg name="recieving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow."/>
+  <arg name="gdrive_upload_service" default="/gdrive_ros/upload" doc="The ROS service name of gdrive_ros upload"/>
+  <arg name="upload_data_timeout" default="20" />
   <arg name="download_data" default="true" />
   <arg name="download_data_timeout" default="10" />
   <arg name="download_directory" default="/tmp" />
@@ -12,6 +14,8 @@
         respawn="$(arg respawn)" output="screen">
     <rosparam subst_value="true">
       recieving_mode: $(arg recieving_mode)
+      gdrive_upload_service: $(arg gdrive_upload_service)
+      upload_data_timeout: $(arg upload_data_timeout)
       download_data_timeout: $(arg download_data_timeout)
       download_data: $(arg download_data)
       download_directory: $(arg download_directory)
