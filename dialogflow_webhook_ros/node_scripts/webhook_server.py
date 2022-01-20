@@ -74,9 +74,10 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
         """
         Publish ROS message.
         """
+        time_stamp = rospy.Time.now()
         # Dialogflow response query result
         dialogflow_msg = DialogResponse()
-        dialogflow_msg.header.stamp = rospy.Time.now()
+        dialogflow_msg.header.stamp = time_stamp
         dialogflow_msg.query = self.json_content.get('queryResult', {}).get('queryText', '')
         dialogflow_msg.action = self.json_content.get('queryResult', {}).get('action', '')
         dialogflow_msg.response = self.json_content.get('queryResult', {}).get('fulfillmentText', '')
@@ -90,6 +91,7 @@ class DialogFlowHandler(s.BaseHTTPRequestHandler):
 
         # Original Application request
         application_msg = OriginalDetectIntentRequest()
+        application_msg.header.stamp = time_stamp
         application_msg.source = self.json_content.get('originalDetectIntentRequest', {}).get('source', '')
         application_msg.version = self.json_content.get('originalDetectIntentRequest', {}).get('version', '')
         application_msg.payload = str(self.json_content.get('originalDetectIntentRequest', {}).get('payload', ''))
