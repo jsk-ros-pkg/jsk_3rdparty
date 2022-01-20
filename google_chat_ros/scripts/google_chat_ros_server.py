@@ -24,7 +24,7 @@ class GoogleChatROS(object):
     """
     def __init__(self):
         recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'none'
-
+        self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service')
         # For REST, sending message 
         rest_keyfile = rospy.get_param('~google_cloud_credentials_json')
         self._client = GoogleChatRESTClient(rest_keyfile)
@@ -45,6 +45,8 @@ class GoogleChatROS(object):
         # For POST, recieving message
         if recieving_chat_mode in ("url", "dialogflow"):
             # rosparams
+            self.upload_data_timeout = rospy.get_param('~upload_data_timeout')
+            self.upload_data_parents_path = rospy.get_param('~upload_data_parents_path')
             self.download_data = rospy.get_param('~download_data')
             self.download_directory = rospy.get_param('~download_directory')
             self.download_avatar = rospy.get_param('~download_avatar')
@@ -53,10 +55,10 @@ class GoogleChatROS(object):
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
             self._card_activity_pub = rospy.Publisher("~card_activity", CardEvent, queue_size=1)
 
-            rospy.loginfo("Starting Google Chat HTTPS server...")
             try:
                 if recieving_chat_mode == "url":
                     rospy.loginfo("Expected to get Google Chat Bot URL request")
+                    rospy.loginfo("Starting Google Chat HTTPS server...")
                     self.host = rospy.get_param('~host')
                     self.port = int(rospy.get_param('~port'))
                     self.ssl_certfile = rospy.get_param('~ssl_certfile')
@@ -95,9 +97,9 @@ class GoogleChatROS(object):
         json_body = {}
         json_body['text'] = goal.text
         json_body['thread'] = {'name': goal.thread_name}
-        json_body['cards'] = []
 
         # Card
+        json_body['cards'] = []
         if goal.cards:
             for card in goal.cards:
                 card_body = {}
@@ -128,8 +130,10 @@ class GoogleChatROS(object):
 
         try:
             # establish the service
+            # TODO debug
+            rospy.loginfo("Send json")
+            rospy.loginfo(str(json_body))
             self._client.build_service()
-            rospy.loginfo("Send text type message")
             feedback.status = str(
                 self._client.message_request(
                     space=goal.space,
@@ -271,7 +275,7 @@ class GoogleChatROS(object):
         json_body = []
         for msg in widgets_msg:
             is_text = bool(msg.text_paragraph)
-            is_image = bool(msg.image.image_uri) or bool(msg.image.localpath)
+            is_image = bool(msg.image.image_url) or bool(msg.image.localpath)
             is_keyval = bool(msg.key_value.content)
             if (is_text & is_image) | (is_image & is_keyval) | (is_keyval & is_text):
                 rospy.logerr("Error happened when making widgetMarkup json. Please fill in one of the text_paragraph, image, key_value. Do not fill in more than two at the same time.")
@@ -279,13 +283,14 @@ class GoogleChatROS(object):
                 json_body.append({'textParagraph':msg.text_paragraph})
             elif is_image:
                 image_json = {}
-                if msg.image.image_uri:
-                    image_json['imageUrl'] = msg.image.image_uri
+                if msg.image.image_url:
+                    image_json['imageUrl'] = msg.image.image_url
                 elif msg.image.localpath:
                     image_json['imageUrl'] = self._upload_file(msg.image.localpath)
                 image_json['onClick'] = self._make_on_click_json(msg.image.on_click)
-                image_json['aspectRatio'] = msg.image.aspect_ratio
-                json_body.append(image_json)
+                if msg.image.aspect_ratio:
+                    image_json['aspectRatio'] = msg.image.aspect_ratio
+                json_body.append({'image':image_json})
             elif is_keyval:
                 keyval_json = {}
                 keyval_json['topLabel'] = msg.key_value.top_label
@@ -300,7 +305,7 @@ class GoogleChatROS(object):
                 elif msg.key_value.original_icon_localpath:
                     keyval_json['iconUrl'] = self._upload_file(msg.key_value.original_icon_localpath)
                 keyval_json['button'] = self._make_button_json(msg.key_value.button)
-                json_body.append(keyval_json)
+                json_body.append({'KeyValue':keyval_json})
         return json_body
 
     def _make_on_click_json(self, on_click_msg):
@@ -363,7 +368,7 @@ class GoogleChatROS(object):
         user.human = True if item.get('type') == "HUMAN" else False
         return user
 
-    def _upload_file(self, filepath):
+    def _upload_file(self, filepath, return_id=False):
         """Get local filepath and upload to Google Drive
         :param filepath: local file's path you want to upload
         :type filepath: string
@@ -372,19 +377,26 @@ class GoogleChatROS(object):
         """
         # ROS service client
         try:
-            rospy.wait_for_service("~upload", timeout=5.0)
-            gdrive_upload = rospy.ServiceProxy("~upload", Upload)
+            rospy.wait_for_service(self.gdrive_ros_srv, timeout=self.upload_data_timeout)
+            gdrive_upload = rospy.ServiceProxy(self.gdrive_ros_srv, Upload)
         except rospy.ROSException as e:
             rospy.logerr("No Google Drive ROS upload service was found. Please check gdrive_ros is correctly launched and service name is correct.")
+            rospy.logerr(e)
             return
         # upload
         try:
-            res = gdrive_upload(filepath)
+            res = gdrive_upload(file_path=filepath)
         except rospy.ServiceException as e:
             rospy.logerr("Failed to call Google Drive upload service, status:{}".format(str(e)))
         else:
-            url = res.file_url
-            return url
+            if return_id:
+                drive_id = res.file_id
+                rospy.loginfo("Google drive ID:{}".format(drive_id))
+                return drive_id
+            else:
+                url = res.file_url
+                rospy.loginfo("Google drive URL:{}".format(url))
+                return url
 
     def _get_attachment(self, item):
         attachment = Attachment()
