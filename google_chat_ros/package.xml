@@ -26,6 +26,7 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>dialogflow_task_executive</exec_depend>
+  <exec_depend>dialogflow_webhook_ros</exec_depend>
   <exec_depend>gdrive_ros</exec_depend>
 
   <export>
