@@ -46,7 +46,6 @@ class GoogleChatROS(object):
         if recieving_chat_mode in ("url", "dialogflow"):
             # rosparams
             self.upload_data_timeout = rospy.get_param('~upload_data_timeout')
-            self.upload_data_parents_path = rospy.get_param('~upload_data_parents_path')
             self.download_data = rospy.get_param('~download_data')
             self.download_directory = rospy.get_param('~download_directory')
             self.download_avatar = rospy.get_param('~download_avatar')
@@ -104,14 +103,16 @@ class GoogleChatROS(object):
             for card in goal.cards:
                 card_body = {}
                 # card/header
-                header = {}
-                header['title'] = card.header.title
-                header['subtitle'] = card.header.subtitle
-                header['imageStyle'] = 'AVATAR' if card.header.image_style_circular else 'IMAGE'
-                if card.header.image_url:
-                    header['imageUrl'] = card.header.image_url
-                elif card.header.image_filepath:
-                    header['imageUrl'] = self._upload_file(card.header.image_filepath)
+                if card.header:
+                    header = {}
+                    header['title'] = card.header.title
+                    header['subtitle'] = card.header.subtitle
+                    header['imageStyle'] = 'AVATAR' if card.header.image_style_circular else 'IMAGE'
+                    card_body['header'] = header
+                    if card.header.image_url:
+                        header['imageUrl'] = card.header.image_url
+                    elif card.header.image_filepath:
+                        header['imageUrl'] = self._upload_file(card.header.image_filepath)
                 # card/sections
                 sections = []
                 sections = self._make_sections_json(card.sections)
@@ -122,9 +123,9 @@ class GoogleChatROS(object):
                     card_action['actionLabel'] = card_action_msg.action_label
                     card_action['onClick'] = self._make_on_click_json(card_action_msg.on_click)
                     card_actions.append(card_action)
-                card_body['header'] = header
                 card_body['sections'] = sections
-                card_body['cardActions'] = card_actions
+                if card_actions:
+                    card_body['cardActions'] = card_actions
                 card_body['name'] = card.name
                 json_body['cards'].append(card_body)
 
@@ -200,9 +201,9 @@ class GoogleChatROS(object):
             if event.get('action'):
                 action = event.get('action')
                 msg.action.action_method_name = action.get('actionMethodName')
-                if action.get('actionMethodName', {}).get('parameters'):
+                if action.get('parameters'):
                     parameters = []
-                    for param in action.get('actionMethodName').get('parameters'):
+                    for param in action.get('parameters'):
                         action_parameter = ActionParameter()
                         action_parameter.key = param.get('key')
                         action_parameter.value = param.get('value')
@@ -261,7 +262,8 @@ class GoogleChatROS(object):
         json_body = []
         for msg in sections_msg:
             section = {}
-            section['header'] = msg.header
+            if msg.header:
+                section['header'] = msg.header
             section['widgets'] = self._make_widget_markups_json(msg.widgets)
             json_body.append(section)
         return json_body
@@ -277,17 +279,26 @@ class GoogleChatROS(object):
             is_text = bool(msg.text_paragraph)
             is_image = bool(msg.image.image_url) or bool(msg.image.localpath)
             is_keyval = bool(msg.key_value.content)
+            # make buttons
+            buttons = []
+            buttons_msg = msg.buttons
+            for button_msg in buttons_msg:
+                buttons.append(self._make_button_json(button_msg))
+            if buttons:
+                json_body.append({'buttons':buttons})
+
             if (is_text & is_image) | (is_image & is_keyval) | (is_keyval & is_text):
                 rospy.logerr("Error happened when making widgetMarkup json. Please fill in one of the text_paragraph, image, key_value. Do not fill in more than two at the same time.")
             elif is_text:
-                json_body.append({'textParagraph':msg.text_paragraph})
+                json_body.append({'textParagraph':{'text':msg.text_paragraph}})
             elif is_image:
                 image_json = {}
                 if msg.image.image_url:
                     image_json['imageUrl'] = msg.image.image_url
                 elif msg.image.localpath:
                     image_json['imageUrl'] = self._upload_file(msg.image.localpath)
-                image_json['onClick'] = self._make_on_click_json(msg.image.on_click)
+                if msg.image.on_click.action.action_method_name or msg.image.on_click.open_link_url:
+                    image_json['onClick'] = self._make_on_click_json(msg.image.on_click)
                 if msg.image.aspect_ratio:
                     image_json['aspectRatio'] = msg.image.aspect_ratio
                 json_body.append({'image':image_json})
@@ -297,15 +308,17 @@ class GoogleChatROS(object):
                 keyval_json['content'] = msg.key_value.content
                 keyval_json['contentMultiline'] = msg.key_value.content_multiline
                 keyval_json['bottomLabel'] = msg.key_value.bottom_label
-                keyval_json['onClick'] = self._make_on_click_json(msg.key_value.on_click)
+                if msg.key_value.on_click.action.action_method_name or msg.key_value.on_click.open_link_url:
+                    keyval_json['onClick'] = self._make_on_click_json(msg.key_value.on_click)
                 if msg.key_value.icon:
                     keyval_json['icon'] = msg.key_value.icon
                 elif msg.key_value.original_icon_url:
                     keyval_json['iconUrl'] = msg.key_value.original_icon_url
                 elif msg.key_value.original_icon_localpath:
                     keyval_json['iconUrl'] = self._upload_file(msg.key_value.original_icon_localpath)
-                keyval_json['button'] = self._make_button_json(msg.key_value.button)
-                json_body.append({'KeyValue':keyval_json})
+                if msg.key_value.button.text_button_name or msg.key_value.button.image_button_name:
+                    keyval_json['button'] = self._make_button_json(msg.key_value.button)
+                json_body.append({'keyValue':keyval_json})
         return json_body
 
     def _make_on_click_json(self, on_click_msg):
@@ -322,11 +335,11 @@ class GoogleChatROS(object):
             action['actionMethodName'] = on_click_msg.action.action_method_name
             parameters = []
             for parameter in on_click_msg.action.parameters:
-                parameters.append({parameter['key']: parameter['value']})
+                parameters.append({'key':parameter.key, 'value':parameter.value})
             action['parameters'] = parameters
             json_body['action'] = action
         elif on_click_msg.open_link_url:
-            json_body['openLink'] = on_click_msg.open_link_url
+            json_body['openLink'] = {'url': on_click_msg.open_link_url}
         return json_body
 
     def _make_button_json(self, button_msg):
