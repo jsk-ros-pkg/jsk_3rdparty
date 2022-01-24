@@ -91,6 +91,14 @@ Your robot will execute the task from dialogflow.
 
 ![](./img/pr2_demo.gif)
 
+### Use text prompt
+
+Run text prompt script for text interface demo.
+
+```bash
+rosrun dialogflow_task_executive text_chat_prompt.py
+```
+
 ## Upstart example
 
 Edit a config file below and save it as `/etc/init/jsk-dialog.conf`
