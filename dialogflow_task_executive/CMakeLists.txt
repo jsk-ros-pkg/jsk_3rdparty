@@ -26,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     catkin_virtualenv
+    rostest
 )
 
 add_message_files(
@@ -45,6 +46,18 @@ catkin_package(
 catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
+file(GLOB TEST_SCRIPTS_FILES test/*.py)
+
+if(CATKIN_ENABLE_TESTING)
+  catkin_install_python(
+    PROGRAMS ${TEST_SCRIPTS_FILES}
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+  add_rostest(test/google_import.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
+endif()
+
 catkin_install_python(
   PROGRAMS ${NODE_SCRIPTS_FILES}
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
