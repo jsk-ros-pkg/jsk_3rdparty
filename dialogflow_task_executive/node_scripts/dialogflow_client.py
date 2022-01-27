@@ -154,6 +154,10 @@ class DialogflowClient(object):
             rospy.loginfo("Hotword received")
             self.state.set(State.LISTENING)
 
+    def text_cb(self, msg):
+        self.queue.put(msg)
+        rospy.loginfo("Recieved input")
+
     def input_cb(self, msg):
         if not self.enable_hotword:
             self.state.set(State.LISTENING)
@@ -161,8 +165,9 @@ class DialogflowClient(object):
             # catch hotword from string
             if isinstance(msg, SpeechRecognitionCandidates):
                 self.hotword_cb(String(data=msg.transcript[0]))
+            # if std_msgs/String was subscribed
             elif isinstance(msg, String):
-                self.hotword_cb(data)
+                self.text_cb(msg)
             else:
                 rospy.logerr("Unsupported data class {}".format(msg))
 
