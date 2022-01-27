@@ -43,7 +43,10 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
+  INPUT_REQUIREMENTS requirements.in
+)
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 file(GLOB TEST_SCRIPTS_FILES test/*.py)
@@ -52,10 +55,10 @@ if(CATKIN_ENABLE_TESTING)
   catkin_install_python(
     PROGRAMS ${TEST_SCRIPTS_FILES}
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+)
   add_rostest(test/google_import.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
-  )
+)
 endif()
 
 catkin_install_python(
