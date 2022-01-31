@@ -59,7 +59,7 @@ class WebRTCVADROS(object):
             return
         self._pub_is_speech.publish(Bool(is_speech))
         if self._current_speaking == True and is_speech == True:
-            self._speech_audio_buffer = self._speech_audio_buffer + input_data
+            self._speech_audio_buffer += input_data
         elif self._current_speaking == False and is_speech == True:
             self._speech_audio_buffer = input_data
             self._current_speaking = True
@@ -74,7 +74,8 @@ class WebRTCVADROS(object):
                 rospy.logwarn(
                     'speech duration: {} dropped'.format(speech_duration))
             self._current_speaking = False
-            self._speech_audio_buffer = b''
+            self._speech_audio_buffer = None
+            rospy.logwarn('Cleared speech_audio_buffer.')
 
 
 def main():
