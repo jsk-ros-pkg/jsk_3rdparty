@@ -10,6 +10,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <exec_depend>audio_common_msgs</exec_depend>
+  <exec_depend>audio_to_spectrogram</exec_depend>
   <exec_depend>image_transport</exec_depend>
   <exec_depend>jsk_perception</exec_depend>
   <exec_depend>rosserial_arduino</exec_depend>

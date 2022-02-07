@@ -1,0 +1,18 @@
+<launch>
+
+  <arg name="port" default="/dev/rfcomm1" />
+  <arg name="baud" default="115200" />
+  <arg name="gui" default="true" />
+
+  <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
+    <arg name="port" default="$(arg port)" />
+    <arg name="baud" default="$(arg baud)" />
+  </include>
+
+  <include file="$(find audio_to_spectrogram)/launch/audio_to_spectrogram.launch">
+    <arg name="launch_audio_capture" value="false" />
+    <arg name="mic_sampling_rate" value="44100" />
+    <arg name="gui" value="$(arg gui)" />
+  </include>
+
+</launch>

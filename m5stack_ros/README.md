@@ -171,6 +171,10 @@ With this package, you can use following devices. To use each device, please see
 
     - TVOC/eCO2 Gas Sensor Unit
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/TVOC_SGP30)
+- [PDM_SPM1423](https://shop.m5stack.com/products/pdm-microphone-unit-spm1423)
+
+    - Digital MEMS silicon-based microphone based on PDM (Pulse Density Modulation) signal.
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/PDM_SPM1423)
 
 
 ## Tested environment
