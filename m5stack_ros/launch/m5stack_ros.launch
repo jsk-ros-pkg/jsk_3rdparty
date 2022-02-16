@@ -3,12 +3,15 @@
        doc="For usb, /dev/tty***. For bluetooth, /dev/rfcomm*. For Wifi, tcp"/>
   <arg name="baud" default="57600"
        doc="For usb, 57600. For others, 115200"/>
+  <arg name="namespace" default="" doc="Namespace for serial_node.py"/>
 
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node"
-        output="screen" respawn="true" respawn_delay="10">
-    <rosparam subst_value="true">
-      port: $(arg port)
-      baud: $(arg baud)
-    </rosparam>
-  </node>
+  <group ns="$(arg namespace)">
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node"
+          output="screen" respawn="true" respawn_delay="10">
+      <rosparam subst_value="true">
+        port: $(arg port)
+        baud: $(arg baud)
+      </rosparam>
+    </node>
+  </group>
 </launch>
