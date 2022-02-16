@@ -33,5 +33,4 @@ void setup() {
 void loop() {
   pubAudio();
   nh.spinOnce();
-  delay(30);
 }
