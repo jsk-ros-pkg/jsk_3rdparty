@@ -122,6 +122,8 @@ class DialogflowClient(object):
         self.pub_res = rospy.Publisher(
             "dialog_response", DialogResponse, queue_size=1)
 
+        self.action_df_result = None
+        self.action_session = None
         self.text_as = actionlib.SimpleActionServer("~text_request", TextAction,
                                                     execute_cb=self.text_action_cb, auto_start=False)
 
@@ -163,16 +165,38 @@ class DialogflowClient(object):
         rospy.loginfo("Recieved input")
 
     def text_action_cb(self, goal):
-        # feedback = TextFeedback()
-        # result = TextResult()
-        # r = rospy.Rate(1)
-        # success = True
-        feedback = TextFeedback()
-        feedback.queue_added = False
-        self.queue.put(goal)
         rospy.loginfo("Recieved action goal")
+        # initialize
+        r = rospy.Rate(1)
+        feedback = TextFeedback()
+        result = TextResult()
+        success = True
+        # add queue
+        self.queue.put(goal)
         feedback.queue_added = True
         self.text_as.publish_feedback(feedback)
+        # Publish result
+        while True:
+            if self.action_df_result:
+                feedback.session = self.action_session
+                try:
+                    df_result = self.action_df_result
+                    result.response = self._build_dialogflow_msg(df_result)
+                    result.session = self.action_session
+                except Exception as e:
+                    rospy.logerr(str(e))
+                    feedback.status = str(e)
+                    success = False
+                finally:
+                    self.text_as.publish_feedback(feedback)
+                    r.sleep()
+                    result.done = success
+                    self.text_as.set_succeeded(result)
+                    # reset all
+                    self.action_df_result = None
+                    break
+            else:
+                pass
 
     def input_cb(self, msg):
         if not self.enable_hotword:
@@ -252,7 +276,6 @@ class DialogflowClient(object):
 
     def df_run(self):
         self.text_as.start()
-        as_rate = rospy.Rate(1)
         while True:
             if rospy.is_shutdown():
                 break
@@ -275,22 +298,13 @@ class DialogflowClient(object):
                     result = self.detect_intent_text(
                         msg.data, session)
                 elif isinstance(msg, TextGoal):
-                    as_success = True
-                    as_feedback = TextFeedback()
-                    as_result = TextResult()
-                    try:
+                    if not self.action_flag:
                         result = self.detect_intent_text(
                             msg.query, session)
-                        as_result.response = self._build_dialogflow_msg(result)
-                        as_result.session = session
-                    except Exception as e:
-                        as_feedback.status = str(e)
-                        as_success = False
-                    finally:
-                        self.text_as.publish_feedback(as_feedback)
-                        as_rate.sleep()
-                        as_result.done = as_success
-                        self.text_as.set_succeeded(as_result)
+                        self.action_df_result = result
+                        self.action_session = session
+                    else:
+                        pass
                 else:
                     raise RuntimeError("Invalid data")
                 self.print_result(result)

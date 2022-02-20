@@ -7,6 +7,6 @@ string session
 bool done
 ---
 # Define a feedback message
-string queue_added
+bool queue_added
 string session
 string status
