@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+import queue
+
+import rospy
+import actionlib
+
+from std_msgs.msg import String
+from google_chat_ros.msg import *
+from dialogflow_task_executive.msg import *
+from sound_play.msg import *
+
+class GoogleChatROSHelper(object):
+    """
+    Helper node for google chat ROS
+    """
+    def __init__(self):
+        # Get configuration params
+        self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_task_executive", False)
+        self.sound_play_jp = rospy.get_param("~sound_play_jp", False)
+        self._message_sub = rospy.Subscriber("~message_activity", MessageEvent, callback=self._message_cb)
+        self.recent_message_event = None
+
+    # GOOGLE CHAT
+    def send_chat_client(self, goal):
+        client = actionlib.SimpleActionClient('google_chat_ros_client', SendMessageAction)
+        client.wait_for_server()
+        client.send_goal(goal)
+        client.wait_for_result()
+        return client.get_result()
+
+    def dialogflow_task_exec_client(self, query):
+        """
+        :rtype: TextResult
+        """
+        client = actionlib.SimpleActionClient('dialogflow_task_executive_client', TextAction)
+        client.wait_for_server()
+        goal = TextGoal()
+        goal.query = query
+        client.send_goal(query)
+        client.wait_for_result()
+        return client.get_result()
+
+    # SOUND
+    def sound_client(self, goal):
+        client = actionlib.SimpleActionClient('robotsound_jp', SoundRequestAction)
+        client.wait_for_server()
+        client.send_goal(goal)
+        client.wait_for_result()
+        return client.get_result()
+
+    def _message_cb(self, data):
+        """
+        Callback function for subscribing MessageEvent.msg
+        """
+        sender_id = data.message.sender.name
+        sender_name = data.message.sender.display_name
+        thread_name = data.message.thread_name
+        text = data.message.argument_text
+        if self.to_dialogflow_task_executive:
+            chat_goal = SendMessageGoal()
+            chat_goal.thread_name = thread_name
+            dialogflow_res = self.dialogflow_task_exec_client(text)
+            content = "<users/{}> {}".format(sender_id, dialogflow_res.response.response)
+            chat_goal.text = content
+            send_chat_client(chat_goal)
+        if self.sound_play_jp:
+            sound_goal = SoundRequestGoal()
+            sound_goal.sound_request.sound = sound_goal.sound_request.SAY
+            sound_goal.sound_request.command = sound_goal.sound_request.PLAY_ONCE
+            sound_goal.sound_request.volume = 1.0
+            sound_goal.sound_request.arg = "{}さんから，{}というメッセージを受信しました".format(sender_name, text)
+            sound_client(sound_goal)
+
+if __name__ == '__main__':
+    rospy.init_node('google_chat_helper')
+    node = GoogleChatROSHelper()
+    rospy.spin()
