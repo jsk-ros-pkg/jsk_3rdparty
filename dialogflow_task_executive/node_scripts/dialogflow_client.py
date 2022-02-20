@@ -298,10 +298,9 @@ class DialogflowClient(object):
                     result = self.detect_intent_text(
                         msg.data, session)
                 elif isinstance(msg, TextGoal):
-                    if not self.action_flag:
-                        result = self.detect_intent_text(
+                    if not self.action_df_result:
+                        self.action_df_result = self.detect_intent_text(
                             msg.query, session)
-                        self.action_df_result = result
                         self.action_session = session
                     else:
                         pass
