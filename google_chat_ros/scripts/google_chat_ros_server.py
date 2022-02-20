@@ -63,7 +63,7 @@ class GoogleChatROS(object):
                     self.ssl_certfile = rospy.get_param('~ssl_certfile')
                     self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
                     self._server = GoogleChatHTTPSServer(
-                        self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb)
+                        self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb, user_agent='Google-Dynamite')
                     rospy.on_shutdown(self.killhttpd) # shutdown https server
                     self._server.run()
                 elif recieving_chat_mode == "dialogflow":
@@ -162,16 +162,16 @@ class GoogleChatROS(object):
         rospy.logdebug(json.dumps(event, indent=2))
         # GET EVENT TYPE
         # event/eventTime
-        event_time = event.get('eventTime')
+        event_time = event.get('eventTime', '')
         # event/space
         space = Space()
-        space.name = event.get('space').get('name')
-        space.room = True if event.get('space').get('type') == "ROOM" else False
+        space.name = event.get('space', {}).get('name', '')
+        space.room = True if event.get('space', {}).get('type', '') == "ROOM" else False
         if space.room:
-            space.display_name = event.get('space').get('displayName')
-        space.dm = True if event.get('space').get('type') == "DM" else False
+            space.display_name = event.get('space', {}).get('displayName', '')
+        space.dm = True if event.get('space', {}).get('type', '') == "DM" else False
         # event/user
-        user = self._get_user_info(event.get('user'))
+        user = self._get_user_info(event.get('user', {}))
 
         if event['type'] == 'ADDED_TO_SPACE' or event['type'] == 'REMOVED_FROM_SPACE':
             msg = SpaceEvent()
