@@ -25,6 +25,7 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
+    actionlib_msgs
     catkin_virtualenv
 )
 
@@ -33,9 +34,15 @@ add_message_files(
   DialogResponse.msg
 )
 
+add_action_files(
+  FILES
+  Text.action
+)
+
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actionlib_msgs
 )
 
 catkin_package(

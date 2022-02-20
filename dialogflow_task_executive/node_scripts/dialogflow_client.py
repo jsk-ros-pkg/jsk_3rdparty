@@ -19,6 +19,7 @@ from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from std_msgs.msg import String
 
 from dialogflow_task_executive.msg import DialogResponse
+from dialogflow_task_executive.msg import TextAction, TextGoal, TextResult, TextFeedback
 
 
 class State(object):
@@ -121,6 +122,9 @@ class DialogflowClient(object):
         self.pub_res = rospy.Publisher(
             "dialog_response", DialogResponse, queue_size=1)
 
+        self.text_as = actionlib.SimpleActionServer("~text_request", TextAction,
+                                                    execute_cb=self.text_action_cb, auto_start=False)
+
         if self.use_audio:
             self.audio_config = df.types.InputAudioConfig(
                 audio_encoding=df.enums.AudioEncoding.AUDIO_ENCODING_LINEAR_16,
@@ -157,6 +161,18 @@ class DialogflowClient(object):
     def text_cb(self, msg):
         self.queue.put(msg)
         rospy.loginfo("Recieved input")
+
+    def text_action_cb(self, goal):
+        # feedback = TextFeedback()
+        # result = TextResult()
+        # r = rospy.Rate(1)
+        # success = True
+        feedback = TextFeedback()
+        feedback.queue_added = False
+        self.queue.put(goal)
+        rospy.loginfo("Recieved action goal")
+        feedback.queue_added = True
+        self.text_as.publish_feedback(feedback)
 
     def input_cb(self, msg):
         if not self.enable_hotword:
@@ -232,6 +248,8 @@ class DialogflowClient(object):
             rospy.Duration(10.0))
 
     def df_run(self):
+        self.text_as.start()
+        as_rate = rospy.Rate(1)
         while True:
             if rospy.is_shutdown():
                 break
@@ -253,6 +271,23 @@ class DialogflowClient(object):
                 elif isinstance(msg, String):
                     result = self.detect_intent_text(
                         msg.data, session)
+                elif isinstance(msg, TextGoal):
+                    as_success = True
+                    as_feedback = TextFeedback()
+                    as_result = TextResult()
+                    try:
+                        result = self.detect_intent_text(
+                            msg.query, session)
+                        as_result.response = result
+                        as_result.session = session
+                    except Exception as e:
+                        as_feedback.status = str(e)
+                        as_success = False
+                    finally:
+                        self.text_as.publish_feedback(as_feedback)
+                        as_rate.sleep()
+                        as_result.done = as_success
+                        self.text_as.set_succeeded(as_result)
                 else:
                     raise RuntimeError("Invalid data")
                 self.print_result(result)
