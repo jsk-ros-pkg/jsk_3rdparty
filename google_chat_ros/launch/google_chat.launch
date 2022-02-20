@@ -11,6 +11,11 @@
   <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
   <arg name="respawn" default="true" />
 
+  <!-- params for helper -->
+  <arg name="use_helper" default="true" />
+  <arg name="to_dialogflow_task_executive" default="false" />
+  <arg name="sound_play_jp" default="true" />
+
   <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_server.py"
         respawn="$(arg respawn)" output="screen">
     <rosparam subst_value="true">
@@ -24,5 +29,13 @@
       google_cloud_credentials_json: $(arg google_cloud_credentials_json)
     </rosparam>
     <rosparam command="load" file="$(arg yaml_file)" if="$(arg use_yaml)"/>
+  </node>
+
+  <node name="google_chat_ros_helper" pkg="google_chat_ros" type="helper.py"
+        respawn="$(arg respawn)" output="screen" if="$(arg use_helper)">
+    <rosparam subst_value="true">
+      to_dialogflow_task_executive: $(arg to_dialogflow_task_executive)
+      sound_play_jp: $(arg sound_play_jp)
+    </rosparam>
   </node>
 </launch>
