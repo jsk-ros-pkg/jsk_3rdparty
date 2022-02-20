@@ -209,7 +209,7 @@ class DialogflowClient(object):
     def print_result(self, result):
         rospy.loginfo(pprint.pformat(result))
 
-    def publish_result(self, result):
+    def _build_dialogflow_msg(self, result):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
         if result.action != 'input.unknown':
@@ -226,6 +226,9 @@ class DialogflowClient(object):
         msg.parameters = MessageToJson(result.parameters)
         msg.speech_score = result.speech_recognition_confidence
         msg.intent_score = result.intent_detection_confidence
+
+    def publish_result(self, result):
+        msg = self._build_dialogflow_msg(result)
         self.pub_res.publish(msg)
 
     def speak_result(self, result):
@@ -278,7 +281,7 @@ class DialogflowClient(object):
                     try:
                         result = self.detect_intent_text(
                             msg.query, session)
-                        as_result.response = result
+                        as_result.response = self._build_dialogflow_msg(result)
                         as_result.session = session
                     except Exception as e:
                         as_feedback.status = str(e)
