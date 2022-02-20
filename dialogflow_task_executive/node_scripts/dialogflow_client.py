@@ -250,6 +250,7 @@ class DialogflowClient(object):
         msg.parameters = MessageToJson(result.parameters)
         msg.speech_score = result.speech_recognition_confidence
         msg.intent_score = result.intent_detection_confidence
+        return msg
 
     def publish_result(self, result):
         msg = self._build_dialogflow_msg(result)
@@ -299,8 +300,9 @@ class DialogflowClient(object):
                         msg.data, session)
                 elif isinstance(msg, TextGoal):
                     if not self.action_df_result:
-                        self.action_df_result = self.detect_intent_text(
+                        result = self.detect_intent_text(
                             msg.query, session)
+                        self.action_df_result = result
                         self.action_session = session
                     else:
                         pass
