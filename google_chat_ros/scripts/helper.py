@@ -55,13 +55,15 @@ class GoogleChatROSHelper(object):
         """
         sender_id = data.message.sender.name
         sender_name = data.message.sender.display_name
+        space = data.space.name
         thread_name = data.message.thread_name
         text = data.message.argument_text
         if self.to_dialogflow_task_executive:
             chat_goal = SendMessageGoal()
+            chat_goal.space = space.replace('spaces/', '')
             chat_goal.thread_name = thread_name
             dialogflow_res = self.dialogflow_task_exec_client(text)
-            content = "<users/{}> {}".format(sender_id, dialogflow_res.response.response)
+            content = "<{}> {}".format(sender_id, dialogflow_res.response.response)
             chat_goal.text = content
             self.send_chat_client(chat_goal)
         if self.sound_play_jp:
