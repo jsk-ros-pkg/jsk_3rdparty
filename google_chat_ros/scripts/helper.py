@@ -16,14 +16,14 @@ class GoogleChatROSHelper(object):
     """
     def __init__(self):
         # Get configuration params
-        self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_task_executive", False)
-        self.sound_play_jp = rospy.get_param("~sound_play_jp", False)
-        self._message_sub = rospy.Subscriber("~message_activity", MessageEvent, callback=self._message_cb)
+        self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_task_executive")
+        self.sound_play_jp = rospy.get_param("~sound_play_jp")
+        self._message_sub = rospy.Subscriber("google_chat_ros/message_activity", MessageEvent, callback=self._message_cb)
         self.recent_message_event = None
 
     # GOOGLE CHAT
     def send_chat_client(self, goal):
-        client = actionlib.SimpleActionClient('google_chat_ros_client', SendMessageAction)
+        client = actionlib.SimpleActionClient('google_chat_ros/send', SendMessageAction)
         client.wait_for_server()
         client.send_goal(goal)
         client.wait_for_result()
@@ -33,11 +33,11 @@ class GoogleChatROSHelper(object):
         """
         :rtype: TextResult
         """
-        client = actionlib.SimpleActionClient('dialogflow_task_executive_client', TextAction)
+        client = actionlib.SimpleActionClient('dialogflow_client/text_request', TextAction)
         client.wait_for_server()
         goal = TextGoal()
         goal.query = query
-        client.send_goal(query)
+        client.send_goal(goal)
         client.wait_for_result()
         return client.get_result()
 
@@ -63,14 +63,14 @@ class GoogleChatROSHelper(object):
             dialogflow_res = self.dialogflow_task_exec_client(text)
             content = "<users/{}> {}".format(sender_id, dialogflow_res.response.response)
             chat_goal.text = content
-            send_chat_client(chat_goal)
+            self.send_chat_client(chat_goal)
         if self.sound_play_jp:
             sound_goal = SoundRequestGoal()
             sound_goal.sound_request.sound = sound_goal.sound_request.SAY
             sound_goal.sound_request.command = sound_goal.sound_request.PLAY_ONCE
             sound_goal.sound_request.volume = 1.0
             sound_goal.sound_request.arg = "{}さんから，{}というメッセージを受信しました".format(sender_name, text)
-            sound_client(sound_goal)
+            self.sound_client(sound_goal)
 
 if __name__ == '__main__':
     rospy.init_node('google_chat_helper')

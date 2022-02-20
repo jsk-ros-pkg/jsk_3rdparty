@@ -38,7 +38,7 @@ class GoogleChatRESTClient():
 class GoogleChatHTTPSServer():
     """The server for getting https request from Google Chat
     """
-    def __init__(self, host, port, certfile, keyfile, callback):
+    def __init__(self, host, port, certfile, keyfile, callback, user_agent):
         """
         :param host: str, hostname
         :param port: int, port number
@@ -50,10 +50,11 @@ class GoogleChatHTTPSServer():
         self._certfile = certfile
         self._keyfile = keyfile
         self._callback = callback
+        self.user_agent = user_agent
 
     def __handler(self, *args):
         try:
-            GoogleChatHTTPSHandler(self._callback, *args)
+            GoogleChatHTTPSHandler(self._callback, self.user_agent, *args)
         except socket.error as e:
             if e.errno == 104: # ignore SSL Connection reset error
                 rospy.logdebug(e)
@@ -71,8 +72,9 @@ class GoogleChatHTTPSServer():
 class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
     """The handler for https request from Google chat API. Mainly used for recieving messages, events.
     """
-    def __init__(self, callback, *args):
+    def __init__(self, callback, user_agent, *args):
         self._callback = callback
+        self.user_agent = user_agent
         s.BaseHTTPRequestHandler.__init__(self, *args)
 
     def do_POST(self):
@@ -80,10 +82,11 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
         Please see https://developers.google.com/chat/api/guides/message-formats/events for details.
         """
         user_agent = self.headers.get("User-Agent")
-        print('user_agent' + str(user_agent))
-        self._parse_json()
-        self._callback(self.json_content)
-        self._response()
+        print('user_agent ' + str(user_agent))
+        if user_agent == self.user_agent:
+            self._parse_json()
+            self._callback(self.json_content)
+            self._response()
 
     def _parse_json(self):
         content_len = int(self.headers.get("content-length"))
