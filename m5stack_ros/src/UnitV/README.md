@@ -49,7 +49,7 @@ In this section, you can use yolov2 recognition.
     - Burn [yolov2.kfpkg](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/data/yolov2.kfpkg) with kflash
     - Burn [yolov2.py](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2.py)  as boot.py with MaixPy (Tools -> Save open script to board(boot.py))
 
-5. Burn [yolov2.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2.ino) into M5Stack with Arduino IDE.
+5. Burn [yolov2.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/m5stack_ros/unitv/firmware/yolov2/yolov2/yolov2.ino) into M5Stack with Arduino IDE.
 
     - There are 2 connection types between M5Stack and computer: Bluetooth and Wi-Fi
 
