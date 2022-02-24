@@ -45,6 +45,7 @@ def RGB_LED(r, g, b):
 
 
 def send_recog_image(img, obj=None):
+    global uart
     # Create recognition result data. 16+16+4=36 byte
     x_scale = 0.6
     y_scale = 0.6
@@ -84,6 +85,18 @@ def send_recog_image(img, obj=None):
     print("img.size(): {}".format(img.size()))
 
 
+def start_UART():
+    global uart
+    fm.register(35, fm.fpioa.UART1_TX, force=True)
+    fm.register(34, fm.fpioa.UART1_RX, force=True)
+    uart = UART(UART.UART1, 115200, 8, 0, 0, timeout=1000, read_buf_len=4096)
+
+
+def stop_UART():
+    fm.register(35, fm.fpioa.GPIOHS19, force=True)
+    fm.register(34, fm.fpioa.GPIOHS18, force=True)
+
+
 def send_data():
     img = sensor.snapshot()
     code = kpu.run_yolo2(task, img)
@@ -94,6 +107,24 @@ def send_data():
         send_recog_image(img)
 
 
+# If receive data, stop UART -> sleep -> start UART
+def receive_data():
+    recv_data = uart.read(4)
+    if recv_data is None:
+        return
+    if recv_data[0] == packet_header[0] and \
+       recv_data[1] == packet_header[1] and \
+       recv_data[2] == packet_header[2] and \
+       recv_data[3] == packet_header[3]:
+        stop_UART()
+        RGB_LED(0, 0, 0)
+        # M5Stack uses I2C during this sleep
+        time.sleep(2)
+        # M5Stack must start UART before the following start_UART()
+        start_UART()
+        RGB_LED(255, 255, 255)
+
+
 # Start signal LED
 RGB_LED(255, 255, 255)
 time.sleep(0.3)
@@ -101,13 +132,14 @@ RGB_LED(0, 0, 0)
 time.sleep(0.3)
 RGB_LED(255, 255, 255)
 
+
 # Main loop
 while(True):
     clock.tick()
     try:
-        if recog_flag:
-            send_data()
-            time.sleep(0.5)  # Save computation power
+        receive_data()
+        send_data()
+        time.sleep(0.5)  # Save computation power
     except Exception as e:
         print(e)
         print("Error occurred, but continue")
