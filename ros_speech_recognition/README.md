@@ -29,6 +29,14 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   result = client.recognize()  # Please say 'Hello, world!' towards microphone
   print result # => 'Hello, world!'
   ```
+
+4. Use from Euslisp
+
+  ```lisp
+  (ros::roseus "client")
+  (setq client (instance speech-recognition-client :init))
+  (setq result (send client :recognize)) ;; Please say 'Hello, world!` towards microphone
+  ```
   
 ## Interface
 
