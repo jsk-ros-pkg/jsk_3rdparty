@@ -22,7 +22,12 @@
   <exec_depend>python-pixel-ring-pip</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-pyaudio</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-pyaudio</exec_depend>
-  <exec_depend>python-pyusb-pip</exec_depend>
+  <!-- pyusb v1.1.0 and upper occur some problems in Python environment constructed with apt on Ubuntu18.04: -->
+  <!-- v1.1.0: compatible with Python2, but python-pip is too old to install it with.                        -->
+  <!-- v1.1.1: not compatible with Python2, but is released to Python2.                                      -->
+  <!-- See https://github.com/pyusb/pyusb/issues/363 for details.                                            -->
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2" version_lt="1.1.0">python-pyusb-pip</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python-pyusb-pip</exec_depend>
   <exec_depend>python-speechrecognition-pip</exec_depend>
   <test_depend>jsk_tools</test_depend>
 </package>
