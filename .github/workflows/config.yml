@@ -1,0 +1,144 @@
+# jsk_travis
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  check_python2:
+    runs-on: ubuntu-latest
+    name: check_python2
+
+    container: ubuntu:20.04
+
+    steps:
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Check Python2
+        run: |
+          apt update -q && apt install -y -q python2
+          python2 -m compileall .
+
+
+  check_python3:
+    runs-on: ubuntu-latest
+    name: check_python3
+
+    container: ubuntu:20.04
+
+    steps:
+      - name: Install latest git to download .git directory in actions/checkout@v2, git diff requries .git directory ( use sudo for ros-ubuntu )
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Check Python3
+        run: |
+          apt update -q && apt install -y -q python3 git 2to3
+          bash -c "ret=0; trap 'ret=1' ERR; python3 -m compileall .; 2to3 -w -f except -f execfile -f has_key -f raw_input -f zip .; find . -type f -exec grep -Iq . {} \; -a -not -regex '.*/node_scripts/[^/]*py' -exec 2to3 -w -f import {} \; ; git diff --exit-code . :^.travis > /dev/null; echo Exitting with \$ret; exit \$ret"
+          
+  
+  kinetic:
+    runs-on: ubuntu-latest
+    name: kinetic
+
+    container: ubuntu:16.04
+
+    steps:
+      - name: Install latest git ( use sudo for ros-ubuntu )
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Run jsk_travis
+        uses: jsk-ros-pkg/jsk_travis@master
+        with:
+          EXTRA_DEB : "python-lxml"
+          ROS_DISTRO : kinetic
+          ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
+
+
+  kinetic_i386:
+    runs-on: ubuntu-latest
+    name: kinetic_i386
+
+    container: i386/ubuntu:16.04
+
+    steps:
+      - name: Install latest git ( use sudo for ros-ubuntu )
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        run: |
+          git clone --depth=1 $GITHUB_SERVER_URL/$GITHUB_REPOSITORY $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE
+          git checkout -qf $GITHUB_SHA || (git fetch -q origin +$GITHUB_REF; git checkout -qf FETCH_HEAD)
+          git submodule update --init .travis
+      - name: Run jsk_travis
+        uses: jsk-ros-pkg/jsk_travis@master
+        with:
+          EXTRA_DEB : "python-lxml"
+          ROS_DISTRO : kinetic
+          ROS_PARALLEL_TEST_JOBS : "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
+          ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
+          # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/237 : (Note that pip==21.0.1 is incompatible with python 2.x)
+          BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0"
+
+
+  melodic:
+    runs-on: ubuntu-latest
+    name: melodic
+
+    container: ubuntu:18.04
+
+    steps:
+      - name: Install latest git ( use sudo for ros-ubuntu )
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Run jsk_travis
+        uses: jsk-ros-pkg/jsk_travis@master
+        with:
+          ROS_DISTRO : melodic
+          ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
+
+  noetic:
+    runs-on: ubuntu-latest
+    name: noetic
+
+    container: ubuntu:20.04
+
+    steps:
+      - name: Install latest git ( use sudo for ros-ubuntu )
+        run: |
+          echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections # set non interactive tzdata https://stackoverflow.com/questions/8671308/non-interactive-method-for-dpkg-reconfigure-tzdata
+          apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Run jsk_travis
+        uses: jsk-ros-pkg/jsk_travis@master
+        with:
+          ROS_DISTRO : noetic
+          ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
+
+  noetic-use-src:
+    runs-on: ubuntu-latest
+    name: noetic
+
+    container: ubuntu:20.04
+
+    steps:
+      - name: Install latest git ( use sudo for ros-ubuntu )
+        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+      - name: Chcekout
+        uses: actions/checkout@v2
+      - name: Run jsk_travis
+        uses: jsk-ros-pkg/jsk_travis@master
+        with:
+          ROS_DISTRO : noetic
+          ROS_PARALLEL_TEST_JOBS: "-j8"
+          CATKIN_PARALLEL_JOBS: "-i"
+          USE_DEB : false
+          
