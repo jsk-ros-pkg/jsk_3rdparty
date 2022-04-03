@@ -1,0 +1,5 @@
+<launch>
+  <test test-name="test_import"
+        pkg="dialogflow_task_executive"
+        type="test_import.py" />
+</launch>
