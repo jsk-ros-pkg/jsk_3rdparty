@@ -27,7 +27,10 @@ class SwitchBotAction:
         try:
             self.bots = SwitchBotAPIClient(token=self.token)
             device_list_str = 'Switchbot device list:\n'
-            for device in self.bots.device_list:
+            device_list = sorted(
+                self.bots.device_list,
+                key=lambda device: str(device['deviceName']))
+            for device in device_list:
                 device_list_str += 'Name: ' + str(device['deviceName'])
                 device_list_str += ', Type: ' + str(device['deviceType'])
                 device_list_str += '\n'
