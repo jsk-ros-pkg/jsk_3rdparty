@@ -123,6 +123,19 @@ script
 end script
 ```
 
+## Sample programs for JSK users
+
+1. Open [Dialogflow](https://dialogflow.cloud.google.com/?authuser=1#/editAgent/eternal-byte-236613/) and setup Intents and Entities.
+
+2. Download google credentials file. You can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
+
+
+3. Start sample code
+
+```
+roslaunch dialogflow_task_executive demo.launch google_cloud_credentials_json:=${HOME}/Downloads/eternal-byte-236613-4bc6962824d1.json
+```
+
 ## Author
 
 Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>

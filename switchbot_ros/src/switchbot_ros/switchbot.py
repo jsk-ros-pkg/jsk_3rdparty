@@ -111,7 +111,10 @@ class SwitchBotAPIClient(object):
         if device_id:
             pass
         elif device_name:
-            device_id = self.device_name_id[device_name]
+            try:
+                device_id = self.device_name_id[device_name]
+            except KeyError as e:
+                raise KeyError("Device name:{} is not registered at switchbot server. Please check the setting.".format(device_name))
         else:
             raise ValueError("Please set device_id or device_name.")
 
@@ -130,7 +133,10 @@ class SwitchBotAPIClient(object):
         if device_id:
             pass
         elif device_name:
-            device_id = self.device_name_id[device_name]
+            try:
+                device_id = self.device_name_id[device_name]
+            except KeyError as e:
+                raise KeyError("Device name:{} is not registered at switchbot server. Please check the setting.".format(device_name))
         else:
             raise ValueError("Please set device_id or device_name.")
         
@@ -144,7 +150,10 @@ class SwitchBotAPIClient(object):
         if scene_id:
             pass
         elif scene_name:
-            scene_id = self.scene_name_id[scene_name]
+            try:
+                scene_id = self.scene_name_id[scene_name]
+            except KeyError as e:
+                raise KeyError("Scene name:{} is not registered at switchbot server. Please check the setting.".format(scene_name))
         else:
             raise ValueError("Please set scene_id or scene_name.")
 

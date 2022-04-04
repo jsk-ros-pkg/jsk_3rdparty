@@ -15,7 +15,9 @@ JSK members can edit the original file [here](https://docs.google.com/presentati
 Especially, please set your device name and enable cloud service.
 
 3. Get your token  
-On switchbot App, profile -> settings, and press `version` for 10 times and you can get token. For JSK members, we already have shared one [here](https://drive.google.com/file/d/1YZ4P4aaPemB_umB9S0xDG66BJt59-2lz/view?usp=sharing).
+On switchbot App, profile -> settings, and press `version` for 10 times and you can get token.
+
+For JSK members, please see [this slide](https://docs.google.com/presentation/d/11UkuxVT4u_LcAYJQnPvt4mzxos9Qvflth5hgZmtqmyk/edit?usp=sharing) for account and token details and installed switchbots for our lab.
 
 ### Using switchbot ros
 Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal.
