@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import argparse
+import os
+
+import requests
+
+
+speaker_id_to_name = {
+    '1': '四国めたん-あまあま',
+    '2': 'ずんだもん-あまあま',
+    '3': '四国めたん-ノーマル',
+    '4': 'ずんだもん-ノーマル',
+    '5': '四国めたん-セクシー',
+    '6': 'ずんだもん-セクシー',
+    '7': '四国めたん-ツンツン',
+    '8': 'ずんだもん-ツンツン',
+    '9': '春日部つむぎ-ノーマル',
+    '10': '波音リツ-ノーマル',
+    '11': '雨晴はう-ノーマル',
+    '12': '玄野武宏-ノーマル',
+    '13': '白上虎太郎-ノーマル',
+    '14': '青山龍星-ノーマル',
+    '15': '冥鳴ひまり-ノーマル',
+    '16': '九州そら-あまあま',
+    '17': '九州そら-ノーマル',
+    '18': '九州そら-セクシー',
+    '19': '九州そら-ツンツン',
+    '20': '九州そら-ささやき',
+}
+
+name_to_speaker_id = {
+    b: a for a, b in speaker_id_to_name.items()
+}
+
+
+DEFAULT_SPEAKER_ID = '1'
+VOICEVOX_TEXTTOSPEECH_URL = os.environ.get(
+    'VOICEVOX_TEXTTOSPEECH_URL', 'localhost')
+VOICEVOX_TEXTTOSPEECH_PORT = os.environ.get(
+    'VOICEVOX_TEXTTOSPEECH_PORT', 50021)
+
+
+def determine_voice_name(voice_name):
+    if len(voice_name) == 0:
+        speaker_id = DEFAULT_SPEAKER_ID
+    else:
+        if voice_name.isdigit():
+            if voice_name in speaker_id_to_name:
+                speaker_id = voice_name
+            else:
+                print(
+                    '[Text2Wave] Invalid speaker_id ({}). Use default voice.'
+                    .format(speaker_id_to_name[DEFAULT_SPEAKER_ID]))
+                speaker_id = DEFAULT_SPEAKER_ID
+        else:
+            voice_name = voice_name.replace('ー', '-')
+            print(voice_name)
+            print(name_to_speaker_id.keys())
+            candidates = list(filter(
+                lambda name: name.startswith(voice_name),
+                name_to_speaker_id))
+            if candidates:
+                speaker_id = name_to_speaker_id[candidates[0]]
+            else:
+                print('[Text2Wave] Invalid voice_name ({}). Use default voice.'
+                      .format(speaker_id_to_name[DEFAULT_SPEAKER_ID]))
+                speaker_id = DEFAULT_SPEAKER_ID
+    print('[Text2Wave] Speak using voice_name ({})..'.format(
+        speaker_id_to_name[speaker_id]))
+    return speaker_id
+
+
+def request_synthesis(
+        sentence, output_path, speaker_id='1'):
+    headers = {'accept': 'application/json'}
+    data = {'text': sentence}
+    params = {
+        'speaker': speaker_id,
+        'text': sentence,
+    }
+    base_url = 'http://{}:{}'.format(
+        VOICEVOX_TEXTTOSPEECH_URL,
+        VOICEVOX_TEXTTOSPEECH_PORT)
+    url = '{}/audio_query'.format(base_url)
+    response = requests.post(url, headers=headers,
+                             params=params,
+                             json=data)
+    data = response.json()
+    url = '{}/synthesis'.format(base_url)
+    response = requests.post(url, headers=headers,
+                             params=params,
+                             json=data)
+    with open(output_path, 'wb') as f:
+        f.write(response.content)
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
+
+    with open(args.text, 'rb') as f:
+        speech_text = f.readline()
+
+    speaker_id = determine_voice_name(
+        args.evaluate.lstrip('(').rstrip(')'))
+    request_synthesis(speech_text,
+                      args.output,
+                      speaker_id)
