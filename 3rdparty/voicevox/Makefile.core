@@ -1,0 +1,35 @@
+# -*- makefile -*-
+
+all: installed.voicevox
+
+VERSION = 0.11.4
+FILENAME = core.zip
+TARBALL = build/$(FILENAME)
+TARBALL_URL = "https://github.com/VOICEVOX/voicevox_core/releases/download/0.11.4/core.zip"
+SOURCE_DIR = build/core
+UNPACK_CMD = unzip
+MD5SUM_DIR = $(CURDIR)/md5sum
+MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
+SCRIPT_DIR = $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+include $(shell rospack find mk)/download_unpack_build.mk
+INSTALL_DIR =	'./'
+
+
+installed.voicevox: $(SOURCE_DIR)/unpacked
+	mkdir -p $(INSTALL_DIR)/lib
+	cp build/core/lib*.so $(INSTALL_DIR)/lib/
+	cp build/core/*.bin $(INSTALL_DIR)/lib/
+	cp build/core/metas.json $(INSTALL_DIR)/lib/metas.json
+
+
+clean:
+	rm -rf $(TARBALL)
+	rm -rf $(SOURCE_DIR)
+	rm -rf $(INSTALL_DIR)/bin
+	rm -rf $(INSTALL_DIR)/include
+	rm -rf $(INSTALL_DIR)/lib
+	rm -rf $(INSTALL_DIR)/man
+	rm -rf $(INSTALL_DIR)/share
+	rm -rf installed.voicevox
+	rm -rf build
+	rm -rf patch
