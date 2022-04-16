@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="device" default="" />
+  <arg name="sound_play_respawn" default="true"
+       doc="Respawn sound_play node or not (default: true)" />
+
+  <node name="voicevox_server"
+        pkg="voicevox" type="server.py"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+  </node>
+
+  <node name="sound_play_jp"
+        pkg="sound_play" type="soundplay_node.py"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+    <remap from="robotsound" to="robotsound_jp"/>
+    <remap from="sound_play" to="robotsound_jp"/>
+    <env name="PATH" value="$(find voicevox)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+  </node>
+</launch>
