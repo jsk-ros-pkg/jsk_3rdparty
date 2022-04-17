@@ -24,6 +24,7 @@
   <build_depend>wget</build_depend>
 
   <exec_depend>python</exec_depend>
+  <exec_depend>python-requests</exec_depend>
   <exec_depend>sound_play</exec_depend>
   <exec_depend>unzip</exec_depend>
   <exec_depend>wget</exec_depend>
