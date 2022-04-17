@@ -1,13 +1,13 @@
 # -*- makefile -*-
 
-all: installed.viocevox_core
+all: installed.voicevox_model
 
-VERSION = 0.11.4
-FILENAME = core.zip
+VERSION = 1.10.0
+FILENAME = onnxruntime-linux-x64-$(VERSION).tgz
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://github.com/VOICEVOX/voicevox_core/releases/download/$(VERSION)/core.zip"
-SOURCE_DIR = build/core
-UNPACK_CMD = unzip
+TARBALL_URL = "https://github.com/microsoft/onnxruntime/releases/download/v$(VERSION)/$(FILENAME)"
+SOURCE_DIR = build/onnxruntime-linux-x64-$(VERSION)
+UNPACK_CMD = tar xvzf
 MD5SUM_DIR = $(CURDIR)/md5sum
 MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
 SCRIPT_DIR = $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -15,11 +15,9 @@ include $(shell rospack find mk)/download_unpack_build.mk
 INSTALL_DIR =	'./'
 
 
-installed.viocevox_core: $(SOURCE_DIR)/unpacked
+installed.voicevox_model: $(SOURCE_DIR)/unpacked
 	mkdir -p $(INSTALL_DIR)/lib
-	cp build/core/lib*.so $(INSTALL_DIR)/lib/
-	cp build/core/*.bin $(INSTALL_DIR)/lib/
-	cp build/core/metas.json $(INSTALL_DIR)/lib/metas.json
+	cp build/onnxruntime-linux-x64-$(VERSION)/lib/* $(INSTALL_DIR)/lib
 
 clean:
 	rm -rf $(TARBALL)
