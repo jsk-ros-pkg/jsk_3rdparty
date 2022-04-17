@@ -2,6 +2,27 @@
 
 ROS Interface for [VOICEVOX](https://voicevox.hiroshiba.jp/) (AI speech synthesis)
 
+## TERM
+
+[VOICEVOX](https://voicevox.hiroshiba.jp/) is basically free to use, but please check the terms of use below.
+
+[TERM](https://voicevox.hiroshiba.jp/term)
+
+Each voice synthesis character has its own rules. Please use this package according to those terms.
+
+| Character name  |  term link |
+| ---- | ---- |
+| 四国めたん | https://zunko.jp/con_ongen_kiyaku.html |
+| ずんだもん | https://zunko.jp/con_ongen_kiyaku.html |
+| 春日部つむぎ | https://tsukushinyoki10.wixsite.com/ktsumugiofficial/利用規約 |
+| 波音リツ | http://canon-voice.com/kiyaku.html |
+| 雨晴はう | https://amehau.com/?page_id=225 |
+| 玄野武宏 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 白上虎太郎 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 青山龍星 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 冥鳴ひまり | https://kotoran8zunzun.wixsite.com/my-site/利用規約 |
+| 九州そら | https://zunko.jp/con_ongen_kiyaku.html |
+
 ## Installation
 
 Build this package. Don't forget to do `git submodule update --init` in this package.
