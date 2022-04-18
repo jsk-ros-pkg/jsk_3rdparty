@@ -13,6 +13,7 @@ catkin_package()
 catkin_generate_virtualenv(
   INPUT_REQUIREMENTS requirements.in
   PYTHON_INTERPRETER python3
+  USE_SYSTEM_PACKAGES FALSE
 )
 
 add_custom_command(
