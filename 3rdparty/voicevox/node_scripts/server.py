@@ -538,7 +538,7 @@ def generate_app(
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    rospy.init_node('julius_server')
+    rospy.init_node('voicevox_server')
 
     rospack = rospkg.RosPack()
     voicevox_dir = osp.join(rospack.get_path('voicevox'), 'lib')
