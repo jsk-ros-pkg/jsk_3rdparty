@@ -40,6 +40,7 @@ catkin build voicevox
 roslaunch voicevox voicevox_texttospeech.launch
 ```
 
+<a id="saysomething"></a>
 ### Say something
 
 #### For python users
@@ -92,3 +93,11 @@ $ roseus
 
 (speak "JSKへようこそ。" :lang "波音リツ" :wait t :topic-name "robotsound_jp")
 ```
+
+### Tips
+
+Normally, the server for speech synthesis starts up at `http://localhost:50021`.
+You can change the url and port by setting values for `VOICEVOX_TEXTTOSPEECH_URL` and `VOICEVOX_TEXTTOSPEECH_PORT`.
+
+You can also set the default character by setting `VOICEVOX_DEFAULT_SPEAKER_ID`.
+Please refer to [here](#saysomething) for the speaker id.
