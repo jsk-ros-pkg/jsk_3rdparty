@@ -9,6 +9,7 @@ from functools import lru_cache
 import imp
 import json
 import multiprocessing
+import os
 import os.path as osp
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -23,16 +24,23 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Query
 from fastapi import Response
-import rospy
 import rospkg
+import rospy
 import soundfile
 from starlette.responses import FileResponse
 import uvicorn
 
 
+PKG_NAME = 'voicevox'
 abs_path = osp.dirname(osp.abspath(__file__))
 voicevox_engine = imp.load_package(
     'voicevox_engine', osp.join(abs_path, 'voicevox_engine/voicevox_engine'))
+rospack = rospkg.RosPack()
+voicevox_dir = rospack.get_path(PKG_NAME)
+voicevox_lib_dir = osp.join(voicevox_dir, 'lib')
+# set pyopenjtalk's dic.tar.gz file
+os.environ['OPEN_JTALK_DICT_DIR'] = osp.join(
+    voicevox_dir, 'dict', 'open_jtalk_dic_utf_8-1.11')
 
 
 from voicevox_engine import __version__
@@ -540,9 +548,7 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
     rospy.init_node('voicevox_server')
 
-    rospack = rospkg.RosPack()
-    voicevox_dir = osp.join(rospack.get_path('voicevox'), 'lib')
-    voicelib_dir = [Path(voicevox_dir)]
+    voicelib_dir = [Path(voicevox_lib_dir)]
     use_gpu = False
     host = rospy.get_param('~host', "127.0.0.1")
     port = rospy.get_param('~port', 50021)
