@@ -1,4 +1,5 @@
 build
-requirements.txt
 lib
+node_scripts/voicevox_engine
+requirements.txt
 !.gitignore
