@@ -1,0 +1,24 @@
+# -*- makefile -*-
+
+all: installed.voicevox_engine
+
+VERSION = 0.11.4
+FILENAME = $(VERSION).tar.gz
+TARBALL = build/$(FILENAME)
+TARBALL_URL = "https://github.com/VOICEVOX/voicevox_engine/archive/refs/tags/$(FILENAME)"
+SOURCE_DIR = build/voicevox_engine-$(VERSION)
+UNPACK_CMD = tar xvzf
+MD5SUM_DIR = $(CURDIR)/md5sum
+MD5SUM_FILE = $(MD5SUM_DIR)/voicevox_engine.tar.gz.md5sum
+include $(shell rospack find mk)/download_unpack_build.mk
+INSTALL_DIR =	'./'
+
+
+installed.voicevox_engine: $(SOURCE_DIR)/unpacked
+	cp -r build/voicevox_engine-$(VERSION) $(INSTALL_DIR)/node_scripts/voicevox_engine
+
+clean:
+	rm -rf $(TARBALL)
+	rm -rf $(SOURCE_DIR)
+	rm -rf $(INSTALL_DIR)/node_scripts/voicevox_engine
+	rm -rf build
