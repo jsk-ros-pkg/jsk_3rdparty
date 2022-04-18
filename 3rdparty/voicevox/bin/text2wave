@@ -72,10 +72,24 @@ def determine_voice_name(voice_name):
     return speaker_id
 
 
+def convert_to_str(x):
+    if isinstance(x, str):
+        pass
+    elif isinstance(x, bytes):
+        x = x.decode('utf-8')
+    else:
+        raise ValueError(
+            'Invalid input x type: {}'
+            .format(type(x)))
+    return x
+
+
 def request_synthesis(
         sentence, output_path, speaker_id='1'):
     headers = {'accept': 'application/json'}
-    data = {'text': sentence}
+
+    sentence = convert_to_str(sentence)
+    speaker_id = convert_to_str(speaker_id)
     params = {
         'speaker': speaker_id,
         'text': sentence,
@@ -85,8 +99,7 @@ def request_synthesis(
         VOICEVOX_TEXTTOSPEECH_PORT)
     url = '{}/audio_query'.format(base_url)
     response = requests.post(url, headers=headers,
-                             params=params,
-                             json=data)
+                             params=params)
     data = response.json()
     url = '{}/synthesis'.format(base_url)
     response = requests.post(url, headers=headers,
@@ -94,7 +107,6 @@ def request_synthesis(
                              json=data)
     with open(output_path, 'wb') as f:
         f.write(response.content)
-
 
 
 if __name__ == '__main__':
