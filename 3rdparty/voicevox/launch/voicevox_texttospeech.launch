@@ -3,6 +3,8 @@
   <arg name="device" default="" />
   <arg name="sound_play_respawn" default="true"
        doc="Respawn sound_play node or not (default: true)" />
+  <arg name="default_speaker" default="2"
+       doc="Default speaker for VOICEVOX" />
 
   <node name="voicevox_server"
         pkg="voicevox" type="server.py"
@@ -16,6 +18,7 @@
         output="screen" >
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
+    <env name="VOICEVOX_DEFAULT_SPEAKER_ID" value="$(arg default_speaker)" />
     <env name="PATH" value="$(find voicevox)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
   </node>
