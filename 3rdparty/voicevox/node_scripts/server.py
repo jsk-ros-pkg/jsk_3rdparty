@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This code was created based on the following link's code.
 # https://github.com/VOICEVOX/voicevox_engine/blob/0.11.4/run.py
