@@ -35,7 +35,10 @@ name_to_speaker_id = {
 }
 
 
-DEFAULT_SPEAKER_ID = '1'
+DEFAULT_SPEAKER_ID = os.environ.get(
+    'VOICEVOX_DEFAULT_SPEAKER_ID', '2')
+if not DEFAULT_SPEAKER_ID.isdigit():
+    DEFAULT_SPEAKER_ID = name_to_speaker_id[DEFAULT_SPEAKER_ID]
 VOICEVOX_TEXTTOSPEECH_URL = os.environ.get(
     'VOICEVOX_TEXTTOSPEECH_URL', 'localhost')
 VOICEVOX_TEXTTOSPEECH_PORT = os.environ.get(
@@ -55,9 +58,6 @@ def determine_voice_name(voice_name):
                     .format(speaker_id_to_name[DEFAULT_SPEAKER_ID]))
                 speaker_id = DEFAULT_SPEAKER_ID
         else:
-            voice_name = voice_name.replace('ー', '-')
-            print(voice_name)
-            print(name_to_speaker_id.keys())
             candidates = list(filter(
                 lambda name: name.startswith(voice_name),
                 name_to_speaker_id))
