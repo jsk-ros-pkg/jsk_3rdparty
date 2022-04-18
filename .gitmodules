@@ -1,7 +1,3 @@
 [submodule ".travis"]
 	path = .travis
 	url = https://github.com/jsk-ros-pkg/jsk_travis
-[submodule "3rdparty/voicevox/node_scripts/voicevox_engine"]
-	branch = 0.11.4
-	path = 3rdparty/voicevox/node_scripts/voicevox_engine
-	url = https://github.com/VOICEVOX/voicevox_engine

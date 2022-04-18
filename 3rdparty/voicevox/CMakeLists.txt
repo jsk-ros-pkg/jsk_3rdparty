@@ -31,7 +31,17 @@ add_custom_command(
   INSTALL_DIR=${INSTALL_DIR}
 )
 
-add_custom_target(all_installed ALL DEPENDS voicevox_model_installed voicevox_core_installed)
+add_custom_command(
+  OUTPUT voicevox_engine_installed
+  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.engine
+  MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  INSTALL_DIR=${INSTALL_DIR}
+)
+
+add_custom_target(all_installed ALL DEPENDS
+  voicevox_model_installed
+  voicevox_core_installed
+  voicevox_engine_installed)
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 catkin_install_python(
