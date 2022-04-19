@@ -97,6 +97,7 @@ jobs:
         run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
       - name: Chcekout
         run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           git clone --depth=1 $GITHUB_SERVER_URL/$GITHUB_REPOSITORY $GITHUB_WORKSPACE
           cd $GITHUB_WORKSPACE
           git checkout -qf $GITHUB_SHA || (git fetch -q origin +$GITHUB_REF; git checkout -qf FETCH_HEAD)
