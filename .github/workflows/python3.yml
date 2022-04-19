@@ -12,7 +12,9 @@ jobs:
     steps:
       - name: Chcekout
         uses: actions/checkout@v2
+      - name: work around permission issue  # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Check Python3
         run: |
-          apt update -q && apt install -y -q python3
-          python3 -m compileall .
+          apt update -q && apt install -y -q python3 git 2to3
+          bash -c "ret=0; trap 'ret=1' ERR; python3 -m compileall .; 2to3 -w -f except -f execfile -f has_key -f import -f raw_input -f zip .; git diff --exit-code . > /dev/null; echo Exitting with \$ret; exit \$ret"
