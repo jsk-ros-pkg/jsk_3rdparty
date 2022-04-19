@@ -25,7 +25,7 @@ Each voice synthesis character has its own rules. Please use this package accord
 
 ## Installation
 
-Build this package. Don't forget to do `git submodule update --init` in this package.
+Build this package.
 
 ```bash
 cd /path/to/catkin_workspace
