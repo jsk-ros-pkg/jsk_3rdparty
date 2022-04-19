@@ -112,7 +112,7 @@ class ChaplusROS(object):
                 response = requests.post(
                     url=self.url, headers=self.headers, data=self.data)
                 response_json = response.json()
-                if not response_json.has_key('bestResponse'):
+                if 'bestResponse' not in response_json:
                     best_response = "ごめんなさい、よくわからないです"
                 else:
                     best_response = response_json['bestResponse']['utterance']
@@ -130,7 +130,7 @@ class ChaplusROS(object):
                 params = {"apikey": self.apikey, "query": msg.data,}
                 response = requests.post(self.endpoint, params)
                 response_json = response.json()
-                if not response_json.has_key('results'):
+                if 'results' not in response_json:
                     best_response = "ごめんなさい、よくわからないです"
                 else:
                     best_response = response_json["results"][0]["reply"]
