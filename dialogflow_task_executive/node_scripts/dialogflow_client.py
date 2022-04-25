@@ -124,7 +124,7 @@ class DialogflowClient(object):
 
         self.action_df_result = None
         self.action_session = None
-        self.text_as = actionlib.SimpleActionServer("~text_request", TextAction,
+        self.text_as = actionlib.SimpleActionServer("~text_action", TextAction,
                                                     execute_cb=self.text_action_cb, auto_start=False)
 
         if self.use_audio:
@@ -165,38 +165,41 @@ class DialogflowClient(object):
         rospy.loginfo("Recieved input")
 
     def text_action_cb(self, goal):
+        # TODO add cancel new goal feature preempt
         rospy.loginfo("Recieved action goal")
+        r = rospy.Rate(10)
         # initialize
-        r = rospy.Rate(1)
         feedback = TextFeedback()
         result = TextResult()
-        success = True
+        success = False
         # add queue
         self.queue.put(goal)
         feedback.queue_added = True
-        self.text_as.publish_feedback(feedback)
         # Publish result
-        while True:
+        t_start = rospy.Time.now()
+        timeout = rospy.Duration(10) # set 10sec timeout
+        while (rospy.Time.now() - t_start) < timeout:
             if self.action_df_result:
+                # feedback
                 feedback.session = self.action_session
-                try:
-                    df_result = self.action_df_result
-                    result.response = self._build_dialogflow_msg(df_result)
-                    result.session = self.action_session
-                except Exception as e:
-                    rospy.logerr(str(e))
-                    feedback.status = str(e)
-                    success = False
-                finally:
-                    self.text_as.publish_feedback(feedback)
-                    r.sleep()
-                    result.done = success
-                    self.text_as.set_succeeded(result)
-                    # reset all
-                    self.action_df_result = None
-                    break
+                self.text_as.publish_feedback(feedback)
+                # result
+                df_result = self.action_df_result
+                result.response = self._create_dialogflow_msg(df_result)
+                result.session = self.action_session
+                result.done = True
+                self.text_as.set_succeeded(result)
+                # clear
+                self.action_df_result = None
+                self.action_session = None
+                break
             else:
-                pass
+                feedback.status = "No response from dialogflow server"
+                self.text_as.publish_feedback(feedback)
+            r.sleep() # 10 hz
+        if not success:
+            result.done = False
+
 
     def input_cb(self, msg):
         if not self.enable_hotword:
@@ -233,7 +236,7 @@ class DialogflowClient(object):
     def print_result(self, result):
         rospy.loginfo(pprint.pformat(result))
 
-    def _build_dialogflow_msg(self, result):
+    def _create_dialogflow_msg(self, result):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
         if result.action != 'input.unknown':
@@ -253,7 +256,7 @@ class DialogflowClient(object):
         return msg
 
     def publish_result(self, result):
-        msg = self._build_dialogflow_msg(result)
+        msg = self._create_dialogflow_msg(result)
         self.pub_res.publish(msg)
 
     def speak_result(self, result):
@@ -299,7 +302,7 @@ class DialogflowClient(object):
                     result = self.detect_intent_text(
                         msg.data, session)
                 elif isinstance(msg, TextGoal):
-                    if not self.action_df_result:
+                    if self.action_df_result is None:
                         result = self.detect_intent_text(
                             msg.query, session)
                         self.action_df_result = result
