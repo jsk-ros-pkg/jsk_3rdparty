@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import gdown
 import json
 import os
@@ -14,6 +14,7 @@ from dialogflow_webhook_ros.msg import OriginalDetectIntentRequest
 from gdrive_ros.srv import *
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
+from google_chat_ros.google_chat import GoogleChatPubSubClient
 from google_chat_ros.msg import *
 import rospy
 
@@ -23,11 +24,12 @@ class GoogleChatROS(object):
     Send request to Google Chat REST API via ROS
     """
     def __init__(self):
-        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'none'
+        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'pubsub', 'none'
         self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service')
-        # For REST, sending message 
-        rest_keyfile = rospy.get_param('~google_cloud_credentials_json')
-        self._client = GoogleChatRESTClient(rest_keyfile)
+        google_credentials = rospy.get_param('~google_cloud_credentials_json')
+
+        # For sending message
+        self._client = GoogleChatRESTClient(google_credentials)
         rospy.loginfo("Starting Google Chat REST service...")
         try:
             self._client.build_service() # Start google chat authentication and service
@@ -42,8 +44,8 @@ class GoogleChatROS(object):
             rospy.logwarn("Failed to start Google Chat REST service")
             rospy.logerr(e)
 
-        # For POST, recieving message
-        if recieving_chat_mode in ("url", "dialogflow"):
+        # For recieving message
+        if recieving_chat_mode in ("url", "dialogflow", "pubsub"):
             # rosparams
             self.upload_data_timeout = rospy.get_param('~upload_data_timeout')
             self.download_data = rospy.get_param('~download_data')
@@ -54,31 +56,37 @@ class GoogleChatROS(object):
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
             self._card_activity_pub = rospy.Publisher("~card_activity", CardEvent, queue_size=1)
 
-            try:
-                if recieving_chat_mode == "url":
-                    rospy.loginfo("Expected to get Google Chat Bot URL request")
-                    rospy.loginfo("Starting Google Chat HTTPS server...")
-                    self.host = rospy.get_param('~host')
-                    self.port = int(rospy.get_param('~port'))
-                    self.ssl_certfile = rospy.get_param('~ssl_certfile')
-                    self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
+            if recieving_chat_mode == "url":
+                rospy.loginfo("Expected to get Google Chat Bot URL request")
+                rospy.loginfo("Starting Google Chat HTTPS server...")
+                self.host = rospy.get_param('~host')
+                self.port = int(rospy.get_param('~port'))
+                self.ssl_certfile = rospy.get_param('~ssl_certfile')
+                self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
+                try:
                     self._server = GoogleChatHTTPSServer(
                         self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb, user_agent='Google-Dynamite')
                     rospy.on_shutdown(self.killhttpd) # shutdown https server
                     self._server.run()
-                elif recieving_chat_mode == "dialogflow":
-                    rospy.loginfo("Expected to get OriginalDetectIntentRequest.msg from dialogflow webhook ros node.")
-                    self._sub = rospy.Subscriber("dialogflow_original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
-
-            except ConnectionError as e:
-                rospy.logwarn("The error occurred while starting HTTPS server")
-                rospy.logerr(e)
+                except ConnectionError as e:
+                    rospy.logwarn("The error occurred while starting HTTPS server")
+                    rospy.logerr(e)
+            elif recieving_chat_mode == "dialogflow":
+                rospy.loginfo("Expected to get OriginalDetectIntentRequest.msg from dialogflow webhook ros node.")
+                self._sub = rospy.Subscriber("dialogflow_original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
+            elif recieving_chat_mode == "pubsub":
+                rospy.loginfo("Expected to use Google Cloud Pub Sub service")
+                self.project_id = rospy.get_param("~project_id")
+                self.subscription_id = rospy.get_param("~subscription_id")
+                self._pubsub_client = GoogleChatPubSubClient(
+                    self.project_id, self.subscription_id, self.event_cb, google_credentials)
+                self._pubsub_client.run()
 
         elif recieving_chat_mode == "none":
             rospy.logwarn("You cannot recieve Google Chat event because HTTPS server is not running.")
 
         else:
-            rospy.logerr("Please choose recieving_mode param from dialogflow, https, none.")
+            rospy.logerr("Please choose recieving_mode param from dialogflow, https, pubsub, none.")
 
     def killhttpd(self):
         self._server.kill()

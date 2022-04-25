@@ -1,5 +1,5 @@
 <launch>
-  <arg name="recieving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow."/>
+  <arg name="recieving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow, pubsub, none."/>
   <arg name="gdrive_upload_service" default="/gdrive_ros/upload" doc="The ROS service name of gdrive_ros upload"/>
   <arg name="upload_data_timeout" default="20" />
   <arg name="download_data" default="true" />
