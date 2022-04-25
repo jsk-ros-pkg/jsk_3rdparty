@@ -1,6 +1,9 @@
 from __future__ import print_function
 
 from apiclient.discovery import build
+from concurrent.futures import TimeoutError
+from google.cloud import pubsub_v1
+from google.oauth2 import service_account
 from httplib2 import Http
 import http.server as s
 import json
@@ -127,3 +130,26 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
                 value = self._decode_dict(value)
             rv[key] = value
         return rv
+
+class GoogleChatPubSubClient():
+    def __init__(self, project_id, subscription_id, callback, keyfile):
+        self._callback = callback
+        auth_scopes = "https://www.googleapis.com/auth/pubsub"
+        self.__credentials = ServiceAccountCredentials.from_json_keyfile_name(keyfile, auth_scopes)
+        self._sub = pubsub_v1.SubscriberClient(credentials=self.__credentials)
+        sub_path = self._sub.subscription_path(project_id, subscription_id)
+        self._streaming_pull_future = self._sub.subscribe(sub_path, callback=self._pubsub_cb)
+
+    def _pubsub_cb(self, message):
+        rospy.logdebug("Recieved {message}")
+        rospy.logdebug(message.data)
+        self._callback(message.data)
+        message.ack()
+
+    def run(self):
+        with self._sub:
+            try:
+                self._streaming_pull_future.result()
+            except KeyboardInterrupt:
+                self._streaming_pull_future.cancel()
+                self._streaming_pull_future.result()
