@@ -176,6 +176,10 @@ With this package, you can use following devices. To use each device, please see
     - Digital MEMS silicon-based microphone based on PDM (Pulse Density Modulation) signal.
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/PDM_SPM1423)
 
+- [JOYSTICK](https://docs.m5stack.com/en/unit/joystick)
+
+    - Joystick control input unit, supports three-axis control signal input (X/Y-axis offset analog input, Z-axis key digital input).
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/JOYSTICK)
 
 ## Tested environment
 
