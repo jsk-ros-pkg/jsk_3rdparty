@@ -18,6 +18,6 @@
     (setq speech-recog-res (ros::service-call "speech_recognition" speech-recog-req))
     (ros::ros-info "~A" speech-recog-req)
     (setq text (send (send speech-recog-res :result) :transcript))
-    (when (listp text)
+    (unless (null text)
       (ros::ros-info "~A" (elt text 0)))
     text))
