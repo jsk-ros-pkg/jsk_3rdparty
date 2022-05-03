@@ -10,24 +10,23 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-setuptools</buildtool_depend>
-  <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
+  <buildtool_depend>python3-setuptools</buildtool_depend>
 
   <build_depend>message_generation</build_depend>
 
-  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-googleapi</exec_depend>
-  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-googleapi</exec_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>python-httplib2</exec_depend>
-  <exec_depend>python-oauth2client</exec_depend>
-  <exec_depend>python-flask</exec_depend>
-  <exec_depend>python-gdown</exec_depend>
   <exec_depend>rospy</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>dialogflow_task_executive</exec_depend>
-  <exec_depend>dialogflow_webhook_ros</exec_depend>
   <exec_depend>gdrive_ros</exec_depend>
+
+  <exec_depend>python3-gdown-pip</exec_depend>
+  <exec_depend>python3-googleapi</exec_depend>
+  <exec_depend>python3-google-auth-pip</exec_depend>
+  <exec_depend>python3-google-auth-httplib2-pip</exec_depend>
+  <exec_depend>python3-google-auth-oauthlib-pip</exec_depend>
+  <exec_depend>python3-google-cloud-pubsub-pip</exec_depend>
+  <exec_depend>python3-httplib2</exec_depend>
+  <exec_depend>python3-oauth2client</exec_depend>
 
   <export>
   </export>

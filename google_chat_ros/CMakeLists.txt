@@ -5,7 +5,6 @@ find_package(
   catkin REQUIRED COMPONENTS
   rospy
   actionlib_msgs
-  sensor_msgs
   std_msgs
   message_generation
 )
@@ -23,7 +22,6 @@ add_action_files(
 
 generate_messages(
   DEPENDENCIES
-  sensor_msgs
   std_msgs
   actionlib_msgs
 )
