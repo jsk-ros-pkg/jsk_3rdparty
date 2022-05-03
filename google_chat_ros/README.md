@@ -21,26 +21,41 @@ The way you recieve Google Chat event from API server depends on your system. If
 #### HTTPS mode
 When you send the message, the node uses Google REST API. 
 When you recieve the message, Google Chat API sends https request to your machine and the node handles it.
-<!-- TODO add figure -->
+
+![google_chat_https_system](https://user-images.githubusercontent.com/27789460/166410618-6ae286bd-86d8-47e8-87c9-bae0c66493ed.png)
+
 You have to prepare SSL certificate. Self-signed one is not available because of Google security issue. Please use the service like Let's Encrypt. In Google Cloud console, please choose `App URL` as connection settings and fill the URL in the App URL form.
+
+![google_chat_https](https://user-images.githubusercontent.com/27789460/166408349-09520454-4c55-4ca7-bbdc-1d3f27e243b9.png)
 
 <a id="pubsub"></a>
 #### Pub/Sub mode
 When you send the message, the node uses Google REST API.
 When you recieve the message, the node uses Google Pub/Sub API's subscription. The node has already established its connection to Google Pub/Sub API when you launch it.
-<!-- TODO add figure -->
+
+![google_chat_pubsub_system](https://user-images.githubusercontent.com/27789460/166410714-03f16096-eea4-4eeb-9487-5ab3df309332.png)
+
 The way how to set up in Google Cloud console shows below.
-1. Authorize the existing Google Chat API project to access Google Cloud Pub/Sub service
+##### 1. Authorize the existing Google Chat API project to access Google Cloud Pub/Sub service  
 In IAM settings in the console, please add the role `Pub/Sub Admin` to service account.
-<!-- TODO add figure -->
-1. Create Pub/Sub topic and subscriber
+
+![pubsub_admin_mosaic](https://user-images.githubusercontent.com/27789460/166408915-832a279f-da9e-463b-86e4-8a18ad5e4f5a.png)
+
+##### 2. Create Pub/Sub topic and subscriber  
 In Pub/Sub settings in the console, please add the topic and subscriptions.
 In the figure, we set the topic name `chat`, the subscription name `chat-sub` as an example.
-<!-- TODO add figure -->
+
+![pubsub_topic_mosaic](https://user-images.githubusercontent.com/27789460/166409434-8f7fa329-1ae1-4cc4-aba2-82f43c2de16f.png)
+
+![pubsub_subscription](https://user-images.githubusercontent.com/27789460/166409454-cc59ec43-f59e-4b63-a1b8-fadefcdd46ce.png)
+
 Note that if you set the topic name `chat`, the full name of it becomes `projects/<project_name>/topics/chat`. Please confirm the subsciptions subscribes the full name not short one.
-1. Set Google Chat API Conncection settings
+
+##### 3. Set Google Chat API Connection settings  
 Please choose `Cloud Pub/Sub` as connection settings and fill the full topic name in the Topic Name form.
-<!-- TODO add figure -->
+
+![google_chat_pubsub](https://user-images.githubusercontent.com/27789460/166408478-b662b73c-35a8-43e8-aaaa-93efdd48e486.png)
+
 
 ### 1.3 Install/Build the ROS node
 If you want to build from the source 
@@ -80,6 +95,8 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
   text: 'Hello!'
   space: 'spaces/<space name>'"
 ```
+![google_chat_text](https://user-images.githubusercontent.com/27789460/166410345-4ba29050-a83d-42c7-9dfe-0babc0486001.png)
+
 
 #### Sending a message with KeyValue card
 ``` bash
@@ -98,6 +115,8 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
                 icon: 'DESCRIPTION'
   space: 'spaces/<space name>'"
 ```
+![google_chat_keyvalue](https://user-images.githubusercontent.com/27789460/166410374-f94a9da7-45fb-4915-929e-3181891d7293.png)
+
 
 <a id="interactive"></a>
 #### Sending an Interactive button
@@ -134,8 +153,10 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
 
   space: 'spaces/<space name>'"
 ```
+![google_chat_interactive_button](https://user-images.githubusercontent.com/27789460/166410386-395daab4-158c-4f47-b0c3-324b2f258ffd.png)
 
-#### Sending a message with a image
+
+#### Sending a message with an image
 See [Here](#image).
 
 <a id="recieve"></a>
@@ -179,7 +200,7 @@ user:
   human: True
 ```
 
-#### Recieving a message with a image or gdrive file and download it
+#### Recieving a message with an image or gdrive file and download it
 <!-- TODO add link to example -->
 
 <a id="event"></a>
@@ -241,12 +262,16 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
   space: 'spaces/<space name>'
   thread_name: 'spaces/<space name>/threads/<thread name>'"
 ```
+![google_chat_interact](https://user-images.githubusercontent.com/27789460/166410418-c2bdc2e5-9916-4b50-a705-f838d86681aa.png)
+
+
 The important point is that the client node has to remember the `thread_name` which the card event was occured at and send response to it.
 
+<a id="optional"></a>
 ## 5. Optional functions
 <a id="image"></a>
-### 5.1 Sending a message with a image
-To send a image, you have to use `card` type message. If you want to add the image uploaded to a storage server available for everyone, you just add its URI like
+### 5.1 Sending a message with an image
+To send an image, you have to use `card` type message. If you want to add the image uploaded to a storage server available for everyone, you just add its URI like
 ``` yaml
 rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal "goal:
   cards:
@@ -274,10 +299,3 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
 ```
 ### 5.2 Recieving a message with images or gdrive file
 You have to set rosparam `~download_data` True, `~download_directory`. If the node recieved the message with image or google drive file, it automatically downloads to `~donwload_directory` path.
-
-##### roseus example
-```lisp
-(load "package://google_chat_ros/scripts/google-chat.l")
-(send-google-chat-message "YOUR_SPACE" "text" "Hello world from eus!")
-```
-
