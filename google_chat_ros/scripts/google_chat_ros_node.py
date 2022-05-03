@@ -66,7 +66,7 @@ class GoogleChatROS(object):
                 try:
                     self._server = GoogleChatHTTPSServer(
                         self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb, user_agent='Google-Dynamite')
-                    rospy.on_shutdown(self.killhttpd) # shutdown https server
+                    rospy.on_shutdown(self.killhttpd) # shutdown https server TODO is this okay in try ?
                     self._server.run()
                 except ConnectionError as e:
                     rospy.logwarn("The error occurred while starting HTTPS server")
@@ -78,18 +78,22 @@ class GoogleChatROS(object):
                 rospy.loginfo("Expected to use Google Cloud Pub Sub service")
                 self.project_id = rospy.get_param("~project_id")
                 self.subscription_id = rospy.get_param("~subscription_id")
+                rospy.on_shutdown(self.killpubsub)
                 self._pubsub_client = GoogleChatPubSubClient(
                     self.project_id, self.subscription_id, self.event_cb, google_credentials)
                 self._pubsub_client.run()
 
         elif recieving_chat_mode == "none":
-            rospy.logwarn("You cannot recieve Google Chat event because HTTPS server is not running.")
+            rospy.logwarn("You cannot recieve Google Chat event because HTTPS server or Google Cloud Pub/Sub is not running.")
 
         else:
             rospy.logerr("Please choose recieving_mode param from dialogflow, https, pubsub, none.")
 
     def killhttpd(self):
         self._server.kill()
+
+    def killpubsub(self):
+        self._pubsub_client.kill()
 
     def rest_cb(self, goal):
         """Get ROS SendMessageAction Goal and send request to Google Chat API.
@@ -108,6 +112,8 @@ class GoogleChatROS(object):
         # Card
         json_body['cards'] = []
         if goal.cards:
+            if goal.update_message:
+                json_body['actionResponse'] = {"type": "UPDATE_MESSAGE"}
             for card in goal.cards:
                 card_body = {}
                 # card/header
@@ -138,16 +144,16 @@ class GoogleChatROS(object):
                 json_body['cards'].append(card_body)
 
         try:
-            # establish the service
-            # TODO debug
-            rospy.loginfo("Send json")
-            rospy.loginfo(str(json_body))
+            rospy.logdebug("Send json")
+            rospy.logdebug(str(json_body))
             self._client.build_service()
-            feedback.status = str(
-                self._client.message_request(
-                    space=goal.space,
-                    json_body=json_body
-                ))
+            res = self._client.message_create(
+                space=goal.space,
+                json_body=json_body
+            )
+            result.message_result = self._make_message_msg({'message': res})
+            # TODO add the result of what card was sent
+            # result.cards_result =
         except Exception as e:
             rospy.logerr(str(e))
             feedback.status = str(e)
@@ -158,13 +164,13 @@ class GoogleChatROS(object):
             result.done = success
             self._as.set_succeeded(result)
 
-    def event_cb(self, event):
+    def event_cb(self, event: dict, publish_topic=True):
         """Parse Google Chat API json content and publish as a ROS Message.
         See https://developers.google.com/chat/api/reference/rest 
         to check what contents are included in the json.
         :param event: A google Chat API POST request json content. 
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
-        :rtype: None
+        :rtype: ros message
         """
         rospy.logdebug("GOOGLE CHAT ORIGINAL JSON EVENT")
         rospy.logdebug(json.dumps(event, indent=2))
@@ -188,8 +194,9 @@ class GoogleChatROS(object):
             msg.user = user
             msg.added = True if event['type'] == "ADDED_TO_SPACE" else False
             msg.removed = True if event['type'] == "REMOVED_FROM_SPACE" else False
-            self._space_activity_pub.publish(msg)
-            return
+            if publish_topic:
+                self._space_activity_pub.publish(msg)
+            return msg
 
         elif event['type'] == 'MESSAGE':
             msg = MessageEvent()
@@ -197,8 +204,9 @@ class GoogleChatROS(object):
             msg.space = space
             msg.user = user
             msg.message = self._make_message_msg(event)
-            self._message_activity_pub.publish(msg)
-            return
+            if publish_topic:
+                self._message_activity_pub.publish(msg)
+            return msg
 
         elif event['type'] == 'CARD_CLICKED':
             msg = CardEvent()
@@ -217,8 +225,9 @@ class GoogleChatROS(object):
                         action_parameter.value = param.get('value')
                         parameters.append(action_parameter)
                 msg.action.parameters = parameters
-            self._card_activity_pub.publish(msg)
-            return
+            if publish_topic:
+                self._card_activity_pub.publish(msg)
+            return msg
 
         else:
             rospy.logerr("Got unknown event type.")
@@ -464,6 +473,6 @@ class GoogleChatROS(object):
             return path
 
 if __name__ == '__main__':
-    rospy.init_node('google_chat', disable_signals=True)
+    rospy.init_node('google_chat')
     node = GoogleChatROS()
     rospy.spin()
