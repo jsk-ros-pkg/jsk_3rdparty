@@ -7,6 +7,7 @@ find_package(
   actionlib_msgs
   std_msgs
   message_generation
+  rostest
 )
 
 catkin_python_setup()
@@ -29,6 +30,16 @@ generate_messages(
 catkin_package()
 
 include_directories()
+
+# import test
+file(GLOB TEST_SCRIPT_FILES test/*.py)
+if(CATKIN_ENABLE_TESTING)
+  catkin_install_python(
+    PROGRAMS ${TEST_SCRIPT_FILES}
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+  add_rostest(test/import.test)
+endif()
 
 # install
 # euslisp
