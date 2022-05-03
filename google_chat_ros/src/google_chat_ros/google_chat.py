@@ -1,9 +1,8 @@
-from __future__ import print_function
-
 from apiclient.discovery import build
+import base64
 from concurrent.futures import TimeoutError
 from google.cloud import pubsub_v1
-from google.oauth2 import service_account
+from google.oauth2.service_account import Credentials
 from httplib2 import Http
 import http.server as s
 import json
@@ -27,16 +26,18 @@ class GoogleChatRESTClient():
         self.__credentials = ServiceAccountCredentials.from_json_keyfile_name(self.keyfile, self._auth_scopes)
         self._chat = build('chat', 'v1', http=self.__credentials.authorize(Http()))
 
-    def message_request(self, space, json_body):
-        parent = 'spaces/' + space
+    def message_create(self, space, json_body):
+        if not space.startswith('spaces/'):
+            raise RuntimeError("Space name must begin with spaces/")
         # returns same 403 error both authenticate error and not connected error
-        return self._chat.spaces().messages().create(parent=parent, body=json_body).execute()
+        return self._chat.spaces().messages().create(parent=space, body=json_body).execute()
 
     def list_members(self, space):
         """Show member list in the space.
         """
-        parent = 'spaces/' + space
-        return self._chat.spaces().members().list(parent=parent).execute()
+        if not space.startswith('spaces/'):
+            raise RuntimeError("Space name must begin with spaces/")
+        return self._chat.spaces().members().list(parent=space).execute()
 
 class GoogleChatHTTPSServer():
     """The server for getting https request from Google Chat
@@ -94,7 +95,7 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
     def _parse_json(self):
         content_len = int(self.headers.get("content-length"))
         request_body = self.rfile.read(content_len).decode('utf-8')
-        self.json_content = json.loads(request_body, object_hook=self._decode_dict) # json.loads returns unicode by default
+        self.json_content = json.loads(request_body) # json.loads returns unicode by default
 
     def _response(self):
         self.send_response(200)
@@ -104,46 +105,19 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
         self.send_response(400)
         self.end_headers()
 
-    ### helper functions
-    def _decode_list(self, data):
-        rv = []
-        for item in data:
-            if isinstance(item, unicode):
-                item = item.encode('utf-8')
-            elif isinstance(item, list):
-                item = self._decode_list(item)
-            elif isinstance(item, dict):
-                item = self._decode_dict(item)
-            rv.append(item)
-        return rv
-
-    def _decode_dict(self, data):
-        rv = {}
-        for key, value in data.iteritems():
-            if isinstance(key, unicode):
-                key = key.encode('utf-8')
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
-            elif isinstance(value, list):
-                value = self._decode_list(value)
-            elif isinstance(value, dict):
-                value = self._decode_dict(value)
-            rv[key] = value
-        return rv
-
 class GoogleChatPubSubClient():
     def __init__(self, project_id, subscription_id, callback, keyfile):
         self._callback = callback
-        auth_scopes = "https://www.googleapis.com/auth/pubsub"
-        self.__credentials = ServiceAccountCredentials.from_json_keyfile_name(keyfile, auth_scopes)
+        self.__credentials = Credentials.from_service_account_file(keyfile)
         self._sub = pubsub_v1.SubscriberClient(credentials=self.__credentials)
         sub_path = self._sub.subscription_path(project_id, subscription_id)
         self._streaming_pull_future = self._sub.subscribe(sub_path, callback=self._pubsub_cb)
 
     def _pubsub_cb(self, message):
-        rospy.logdebug("Recieved {message}")
-        rospy.logdebug(message.data)
-        self._callback(message.data)
+        rospy.loginfo("Recieved {message}")
+        rospy.loginfo(message.data)
+        json_content = json.loads(message.data)
+        self._callback(json_content)
         message.ack()
 
     def run(self):
@@ -152,4 +126,6 @@ class GoogleChatPubSubClient():
                 self._streaming_pull_future.result()
             except KeyboardInterrupt:
                 self._streaming_pull_future.cancel()
-                self._streaming_pull_future.result()
+
+    def kill(self):
+        self._streaming_pull_future.cancel()

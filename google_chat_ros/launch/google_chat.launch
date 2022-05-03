@@ -10,13 +10,21 @@
   <arg name="use_yaml" default="true" doc="Whether you use yaml file or not."/>
   <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
   <arg name="respawn" default="true" />
+  <!-- For https mode -->
+  <arg name="host" default="localhost" />
+  <arg name="port" default="443" />
+  <arg name="ssl_certfile" default="default" />
+  <arg name="ssl_keyfile" default="default" />
+  <!-- For pubsub mode -->
+  <arg name="project_id" default="default" />
+  <arg name="subscription_id" default="default" />
 
   <!-- params for helper -->
   <arg name="use_helper" default="true" />
   <arg name="to_dialogflow_task_executive" default="false" />
   <arg name="sound_play_jp" default="true" />
 
-  <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_server.py"
+  <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_node.py"
         respawn="$(arg respawn)" output="screen">
     <rosparam subst_value="true">
       recieving_mode: $(arg recieving_mode)
@@ -27,6 +35,12 @@
       download_directory: $(arg download_directory)
       download_avatar: $(arg download_avatar)
       google_cloud_credentials_json: $(arg google_cloud_credentials_json)
+      host: $(arg host)
+      port: $(arg port)
+      ssl_certfile: $(arg ssl_certfile)
+      ssl_keyfile: $(arg ssl_keyfile)
+      project_id: $(arg project_id)
+      subscription_id: $(arg subscription_id)
     </rosparam>
     <rosparam command="load" file="$(arg yaml_file)" if="$(arg use_yaml)"/>
   </node>
