@@ -114,8 +114,8 @@ class GoogleChatPubSubClient():
         self._streaming_pull_future = self._sub.subscribe(sub_path, callback=self._pubsub_cb)
 
     def _pubsub_cb(self, message):
-        rospy.loginfo("Recieved {message}")
-        rospy.loginfo(message.data)
+        rospy.logdebug("Recieved {message}")
+        rospy.logdebug(message.data)
         json_content = json.loads(message.data)
         self._callback(json_content)
         message.ack()
