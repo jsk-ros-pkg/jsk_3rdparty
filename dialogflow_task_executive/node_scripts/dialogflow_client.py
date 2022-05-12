@@ -114,9 +114,9 @@ class DialogflowBase(object):
 class DialogflowTextClient(DialogflowBase):
 
     def __init__(self):
-        super(DialogflowBase, self).__init__()
+        super(DialogflowTextClient, self).__init__()
         self._as = actionlib.SimpleActionServer("~text_action", DialogTextAction,
-                                               execute_cb=self.cb, auto_start=False)
+                                                execute_cb=self.cb, auto_start=False)
 
     def cb(self, goal):
         feedback = DialogTextFeedback()
@@ -147,7 +147,7 @@ class DialogflowTextClient(DialogflowBase):
 class DialogflowAudioClient(DialogflowBase):
 
     def __init__(self):
-        super(DialogflowBase, self).__init__()
+        super(DialogflowAudioClient, self).__init__()
         # language for dialogflow
         self.language = rospy.get_param("~language", "ja-JP")
 
