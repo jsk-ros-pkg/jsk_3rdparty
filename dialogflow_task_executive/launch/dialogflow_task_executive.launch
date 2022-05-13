@@ -6,6 +6,7 @@
   <arg name="enable_hotword" default="true" />
 
   <!-- options for dialogflow_client -->
+  <arg name="launch_dialogflow" default="true" />
   <arg name="use_audio" default="false" />
   <arg name="use_tts" default="true" />
   <arg name="language" default="ja-JP" />
@@ -18,22 +19,24 @@
     <remap from="mux" to="speech_to_text_mux"/>
   </node>
 
-  <node name="dialogflow_client"
-        pkg="dialogflow_task_executive" type="dialogflow_client.py"
-        output="screen">
-    <rosparam subst_value="true">
-      use_audio: $(arg use_audio)
-      use_tts: $(arg use_tts)
-      language: $(arg language)
-      soundplay_action_name: $(arg soundplay_action_name)
-      volume: $(arg volume)
-      project_id: $(arg project_id)
-      google_cloud_credentials_json: $(arg credential)
-      enable_hotword: $(arg enable_hotword)
-    </rosparam>
-    <rosparam command="load" ns="/dialogflow_client/hotword"
-        file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
-  </node>
+  <group if="$(arg launch_dialogflow)">
+    <node name="dialogflow_client"
+          pkg="dialogflow_ros" type="dialogflow_client.py"
+          output="screen">
+      <rosparam subst_value="true">
+        use_audio: $(arg use_audio)
+        use_tts: $(arg use_tts)
+        language: $(arg language)
+        soundplay_action_name: $(arg soundplay_action_name)
+        volume: $(arg volume)
+        project_id: $(arg project_id)
+        google_cloud_credentials_json: $(arg credential)
+        enable_hotword: $(arg enable_hotword)
+      </rosparam>
+      <rosparam command="load" ns="/dialogflow_client/hotword"
+                file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
+    </node>
+  </group>
 
   <node name="task_executive"
         pkg="dialogflow_task_executive" type="task_executive.py"

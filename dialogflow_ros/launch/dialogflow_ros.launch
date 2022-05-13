@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="launch_dialogflow" default="true" />
+  <arg name="use_audio" default="false" />
+  <arg name="use_tts" default="true" />
+  <arg name="language" default="ja-JP" />
+  <arg name="soundplay_action_name" default="robotsound_jp" />
+  <arg name="volume" default="1.0" />
+
+  <node name="dialogflow_client"
+        pkg="dialogflow_ros" type="dialogflow_client.py"
+        output="screen">
+    <rosparam subst_value="true">
+      use_audio: $(arg use_audio)
+      use_tts: $(arg use_tts)
+      language: $(arg language)
+      soundplay_action_name: $(arg soundplay_action_name)
+      volume: $(arg volume)
+      project_id: $(arg project_id)
+      google_cloud_credentials_json: $(arg credential)
+      enable_hotword: $(arg enable_hotword)
+    </rosparam>
+    <rosparam command="load" ns="/dialogflow_client/hotword"
+              file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
+  </node>
+
+</launch>
