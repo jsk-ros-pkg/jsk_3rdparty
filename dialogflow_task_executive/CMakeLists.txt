@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(dialogflow_task_executive)
 
-if($ENV{ROS_DISTRO} STREQUAL "indigo")
-  message(WARNING "following requirements.txt syntax is not support on 14.04")
-  message(WARNING "google-api-core[grpc]==1.31.5  # via google-cloud-language")
-  find_package(catkin)
-  catkin_package()
-  return()
-endif()
 execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("-- gcc dumpmachine returns ${gcc_dump_machine}")
 if(NOT gcc_dump_machine MATCHES "x86_64-.*")
@@ -42,7 +35,17 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
+if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+  message(WARNING "following requirements.txt syntax is not support on 14.04")
+  message(WARNING "google-api-core[grpc]==1.31.5  # via google-cloud-language")
+  message(WARNING "so we intentionally use requirements.txt")
+  message(WARNING "To use this program, we need to run")
+  message(WARNING "sed -i 's/upgrade_pip=True/upgrade_pip=False/' /opt/ros/indigo/share/catkin_virtualenv/cmake/build_venv.py")
+  message(WARNING "to prevent upgrading to latest pip, which is not Python2 compatible")
+  catkin_generate_virtualenv()
+else()
+  catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
+endif()
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 catkin_install_python(
