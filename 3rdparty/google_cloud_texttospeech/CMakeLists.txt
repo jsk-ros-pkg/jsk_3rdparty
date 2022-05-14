@@ -3,11 +3,10 @@ project(google_cloud_texttospeech)
 
 find_package(catkin REQUIRED)
 
+catkin_python_setup()
+
 catkin_package()
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
-
-catkin_install_python(PROGRAMS bin/text2wave 
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin)

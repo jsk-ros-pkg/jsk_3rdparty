@@ -1,0 +1,1 @@
+from google_cloud_texttospeech.google_cloud_texttospeech_plugin import GoogleCloudTextToSpeechPlugin
