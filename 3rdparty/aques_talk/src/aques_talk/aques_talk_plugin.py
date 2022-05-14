@@ -9,10 +9,14 @@ from sound_play.sound_play_plugin import SoundPlayPlugin
 
 
 class AquesTalkPlugin(SoundPlayPlugin):
+    _default_voice = 'aq_f1c'
+
     def __init__(self):
         super(AquesTalkPlugin, self).__init__()
 
     def sound_play_say_plugin(self, text, voice):
+        if voice is None or voice == '':
+            voice = self._default_voice
         txtfile = tempfile.NamedTemporaryFile(
             prefix='sound_play', suffix='.txt')
         (wavfile, wavfilename) = tempfile.mkstemp(
@@ -36,7 +40,7 @@ class AquesTalkPlugin(SoundPlayPlugin):
             txtfile.flush()
 
             jptext_file = "/tmp/_voice_text_%s.txt" % os.getpid()
-            phont_file = "aq_f1c.phont"
+            phont_file = "{}.phont".format(voice)
             phont_file = "%s/phont/%s" % (
                 rospkg.RosPack().get_path("aques_talk"), phont_file)
 
