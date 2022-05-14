@@ -3,6 +3,8 @@ project(aques_talk)
 
 find_package(catkin REQUIRED)
 
+catkin_python_setup()
+
 catkin_package()
 
 # Considering the use of docker in addition to the usual use,
@@ -44,6 +46,3 @@ install(FILES text2wave
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
-
-
-
