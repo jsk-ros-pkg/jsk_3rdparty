@@ -21,7 +21,7 @@
 
   <group if="$(arg launch_dialogflow)">
     <node name="dialogflow_client"
-          pkg="dialogflow_ros" type="dialogflow_client.py"
+          pkg="dialogflow_task_executive" type="dialogflow_client.py"
           output="screen">
       <rosparam subst_value="true">
         use_audio: $(arg use_audio)
