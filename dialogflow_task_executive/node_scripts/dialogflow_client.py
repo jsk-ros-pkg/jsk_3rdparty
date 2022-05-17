@@ -117,6 +117,7 @@ class DialogflowTextClient(DialogflowBase):
         super(DialogflowTextClient, self).__init__()
         self._as = actionlib.SimpleActionServer("~text_action", DialogTextAction,
                                                 execute_cb=self.cb, auto_start=False)
+        self._as.start()
 
     def cb(self, goal):
         feedback = DialogTextFeedback()
