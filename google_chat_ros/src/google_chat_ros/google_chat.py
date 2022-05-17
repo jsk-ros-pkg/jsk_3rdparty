@@ -55,6 +55,7 @@ class GoogleChatHTTPSServer():
         self._keyfile = keyfile
         self._callback = callback
         self.user_agent = user_agent
+        self.__RUN = True
 
     def __handler(self, *args):
         try:
@@ -68,10 +69,12 @@ class GoogleChatHTTPSServer():
     def run(self):
         self._httpd = s.HTTPServer((self._host, self._port), self.__handler)
         self._httpd.socket = ssl.wrap_socket(self._httpd.socket, certfile=self._certfile, keyfile=self._keyfile)
-        self._httpd.serve_forever()
+        while self.__RUN:
+            self._httpd.handle_request()
 
     def kill(self):
-        self._httpd.shutdown()
+        self.__RUN = False
+        self._httpd.server_close()
 
 class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
     """The handler for https request from Google chat API. Mainly used for recieving messages, events.
