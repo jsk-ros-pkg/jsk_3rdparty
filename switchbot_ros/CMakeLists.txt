@@ -8,6 +8,12 @@ find_package(
 
 catkin_python_setup()
 
+add_message_files(
+  FILES
+  Device.msg
+  DeviceArray.msg
+)
+
 add_action_files(
   FILES
   SwitchBotCommand.action
