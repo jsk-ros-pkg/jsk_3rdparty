@@ -21,8 +21,8 @@
 
   <!-- params for helper -->
   <arg name="use_helper" default="true" />
-  <arg name="to_dialogflow_task_executive" default="false" />
-  <arg name="sound_play_jp" default="true" />
+  <arg name="to_dialogflow_client" default="false" />
+  <arg name="debug_sound" default="false" />
 
   <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_node.py"
         respawn="$(arg respawn)" output="screen">
@@ -48,8 +48,8 @@
   <node name="google_chat_ros_helper" pkg="google_chat_ros" type="helper.py"
         respawn="$(arg respawn)" output="screen" if="$(arg use_helper)">
     <rosparam subst_value="true">
-      to_dialogflow_task_executive: $(arg to_dialogflow_task_executive)
-      sound_play_jp: $(arg sound_play_jp)
+      to_dialogflow_client: $(arg to_dialogflow_client)
+      debug_sound: $(arg debug_sound)
     </rosparam>
   </node>
 </launch>
