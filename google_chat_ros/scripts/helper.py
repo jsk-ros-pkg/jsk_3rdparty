@@ -16,8 +16,8 @@ class GoogleChatROSHelper(object):
     """
     def __init__(self):
         # Get configuration params
-        self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_task_executive")
-        self.sound_play_jp = rospy.get_param("~sound_play_jp")
+        self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_client")
+        self.sound_play_jp = rospy.get_param("~debug_sound")
         self._message_sub = rospy.Subscriber("google_chat_ros/message_activity", MessageEvent, callback=self._message_cb)
         self.recent_message_event = None
 
@@ -29,11 +29,11 @@ class GoogleChatROSHelper(object):
         client.wait_for_result()
         return client.get_result()
 
-    def dialogflow_task_exec_client(self, query):
+    def dialogflow_action_client(self, query):
         """
         :rtype: TextResult
         """
-        client = actionlib.SimpleActionClient('dialogflow_client/text_request', TextAction)
+        client = actionlib.SimpleActionClient('dialogflow_client/text', DialogTextAction)
         client.wait_for_server()
         goal = TextGoal()
         goal.query = query
@@ -62,7 +62,7 @@ class GoogleChatROSHelper(object):
             chat_goal = SendMessageGoal()
             chat_goal.space = space.replace('spaces/', '')
             chat_goal.thread_name = thread_name
-            dialogflow_res = self.dialogflow_task_exec_client(text)
+            dialogflow_res = self.dialogflow_action_client(text)
             content = "<{}> {}".format(sender_id, dialogflow_res.response.response)
             chat_goal.text = content
             self.send_chat_client(chat_goal)
