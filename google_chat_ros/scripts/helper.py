@@ -33,7 +33,7 @@ class GoogleChatROSHelper(object):
         """
         :rtype: TextResult
         """
-        client = actionlib.SimpleActionClient('dialogflow_client/text', DialogTextAction)
+        client = actionlib.SimpleActionClient('dialogflow_client/text_action', DialogTextAction)
         client.wait_for_server()
         goal = TextGoal()
         goal.query = query
@@ -60,7 +60,7 @@ class GoogleChatROSHelper(object):
         text = data.message.argument_text
         if self.to_dialogflow_task_executive:
             chat_goal = SendMessageGoal()
-            chat_goal.space = space.replace('spaces/', '')
+            chat_goal.space = space
             chat_goal.thread_name = thread_name
             dialogflow_res = self.dialogflow_action_client(text)
             content = "<{}> {}".format(sender_id, dialogflow_res.response.response)
