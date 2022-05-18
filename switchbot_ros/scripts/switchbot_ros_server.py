@@ -35,7 +35,7 @@ class SwitchBotAction:
             execute_cb=self.execute_cb, auto_start=False)
         self._as.start()
         # Topic
-        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latched=True)
+        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latch=True)
         self.published = False
 
     def get_switchbot_client(self):
