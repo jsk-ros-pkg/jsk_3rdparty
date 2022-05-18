@@ -35,28 +35,27 @@ class SwitchBotAction:
             execute_cb=self.execute_cb, auto_start=False)
         self._as.start()
         # Topic
-        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1)
+        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latched=True)
+        self.published = False
 
     def get_switchbot_client(self):
-
         try:
             return SwitchBotAPIClient(token=self.token)
         except ConnectionError:  # If the machine is not connected to the internet
-            rospy.logwarn('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
+            rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
             return None
 
     def spin(self):
-
         rate = rospy.Rate(1)
         while not rospy.is_shutdown():
             rate.sleep()
             if self.bots is None:
                 self.bots = self.get_switchbot_client()
-            else:
+            elif not self.published:
                 self.publish_devices()
+                self.published = True
 
     def print_devices(self):
-
         if self.bots is None:
             return
         device_list_str = 'Switchbot device list:\n'
@@ -70,7 +69,6 @@ class SwitchBotAction:
         rospy.loginfo(device_list_str)
 
     def publish_devices(self):
-
         if self.bots is None:
             return
         msg = DeviceArray()
