@@ -5,9 +5,8 @@
 
 (defun get-devices (&key (topic-name "switchbot_ros/devices"))
   (let (msg)
-   (setq msg (one-shot-subscribe topic-name switchbot_ros::DeviceArray))
-   msg
-   ))
+    (setq msg (one-shot-subscribe topic-name switchbot_ros::DeviceArray))
+    msg))
 
 (defun control-device (device_name command &key (parameter "") (command_type "") (topic-name "switchbot_ros/switch") (wait nil))
   "
