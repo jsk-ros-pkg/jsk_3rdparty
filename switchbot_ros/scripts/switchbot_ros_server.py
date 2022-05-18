@@ -40,7 +40,9 @@ class SwitchBotAction:
 
     def get_switchbot_client(self):
         try:
-            return SwitchBotAPIClient(token=self.token)
+            client = SwitchBotAPIClient(token=self.token)
+            rospy.loginfo('Switchbot API Client initialized.')
+            return client
         except ConnectionError:  # If the machine is not connected to the internet
             rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
             return None
