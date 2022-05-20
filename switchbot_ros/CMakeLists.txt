@@ -3,10 +3,17 @@ project(switchbot_ros)
 
 find_package(
   catkin REQUIRED COMPONENTS
+  message_generation
   actionlib_msgs
 )
 
 catkin_python_setup()
+
+add_message_files(
+  FILES
+  Device.msg
+  DeviceArray.msg
+)
 
 add_action_files(
   FILES
