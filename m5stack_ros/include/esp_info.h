@@ -1,8 +1,6 @@
 // Please see
 // https://www.mgo-tec.com/blog-entry-chip-info-esp-wroom-32-esp32.html
 
-#include<M5Stack.h>
-
 void esp_info() {
   Serial.println("-----------------------------");
 

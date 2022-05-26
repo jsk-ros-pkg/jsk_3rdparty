@@ -1,14 +1,25 @@
 // See
 // https://qiita.com/ntrlmt/items/b7794f5f0705e1971b72
 
+// If you use M5Stack, define M5STACK
+// If you use M5StickC, define M5STICK_C
+// If you use M5StickC, define M5STICK_C_PLUS
+#define M5STACK
+
+#if defined(M5STACK)
+  #include <M5Stack.h>
+#elif defined(M5STICK_C)
+  #include <M5StickC.h>
+#elif defined(M5STICK_C_PLUS)
+  #include <M5StickCPlus.h>
+#endif
+
+#include <esp_info.h>
+
 // Define connection type.
 // If you use Bluetooth, define ROSSERIAL_ARDUINO_BLUETOOTH
 // If you use Wi-Fi, define ROSSERIAL_ARDUINO_TCP
 // If you use USB, do not define anything
-
-#include <M5Stack.h>
-#include <esp_info.h>
-
 #if defined(ROSSERIAL_ARDUINO_TCP)
   #include <ros.h>
   #include <wifi.h>
@@ -28,8 +39,10 @@ ros::NodeHandle_<ArduinoHardware, 25, 25, 8192, 8192> nh;
 
 void setupM5stackROS() {
   M5.begin();
-  M5.Speaker.begin();
-  M5.Speaker.mute();
+  #if defined(M5STACK)
+    M5.Speaker.begin();
+    M5.Speaker.mute();
+  #endif
   Serial.begin(115200);
   esp_info();
 
