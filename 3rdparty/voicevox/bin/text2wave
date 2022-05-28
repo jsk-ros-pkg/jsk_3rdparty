@@ -3,8 +3,13 @@
 
 import argparse
 import os
+import shutil
+import sys
 
 import requests
+
+from voicevox.filecheck_utils import checksum_md5
+from voicevox.filecheck_utils import get_cache_dir
 
 
 speaker_id_to_name = {
@@ -43,6 +48,10 @@ VOICEVOX_TEXTTOSPEECH_URL = os.environ.get(
     'VOICEVOX_TEXTTOSPEECH_URL', 'localhost')
 VOICEVOX_TEXTTOSPEECH_PORT = os.environ.get(
     'VOICEVOX_TEXTTOSPEECH_PORT', 50021)
+cache_enabled = os.environ.get(
+    'ROS_VOICEVOX_TEXTTOSPEECH_CACHE_ENABLED', True)
+cache_enabled = cache_enabled is True \
+    or cache_enabled == 'true'  # for launch env tag.
 
 
 def determine_voice_name(voice_name):
@@ -121,6 +130,24 @@ if __name__ == '__main__':
 
     speaker_id = determine_voice_name(
         args.evaluate.lstrip('(').rstrip(')'))
+
+    if cache_enabled:
+        cache_dir = get_cache_dir()
+        md5 = checksum_md5(args.text)
+        cache_filename = os.path.join(
+            cache_dir,
+            '--'.join([md5, speaker_id])
+            + '.wav')
+        if os.path.exists(cache_filename):
+            print('[Text2Wave] Using cached sound file ({}) for {}'
+                  .format(cache_filename, speech_text.decode('utf-8')))
+            shutil.copy(cache_filename, args.output)
+            sys.exit(0)
+
     request_synthesis(speech_text,
                       args.output,
                       speaker_id)
+    if cache_enabled:
+        text_cache_filename = os.path.splitext(cache_filename)[0] + '.txt'
+        shutil.copy(args.text, text_cache_filename)
+        shutil.copy(args.output, cache_filename)
