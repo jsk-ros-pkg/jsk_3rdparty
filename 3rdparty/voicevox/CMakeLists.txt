@@ -6,6 +6,8 @@ find_package(catkin REQUIRED
   catkin_virtualenv
 )
 
+catkin_python_setup()
+
 set(INSTALL_DIR ${PROJECT_SOURCE_DIR})
 
 catkin_package()
