@@ -5,11 +5,14 @@
        doc="Respawn sound_play node or not (default: true)" />
   <arg name="default_speaker" default="2"
        doc="Default speaker for VOICEVOX" />
+  <arg name="cpu_num_threads" default="1"
+       doc="Number of cpu threads" />
 
   <node name="voicevox_server"
         pkg="voicevox" type="server.py"
         respawn="$(arg sound_play_respawn)"
         output="screen" >
+    <param name="cpu_num_threads" value="$(arg cpu_num_threads)" />
   </node>
 
   <node name="sound_play_jp"
