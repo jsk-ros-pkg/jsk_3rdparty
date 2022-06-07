@@ -231,6 +231,8 @@ class TaskExecutive(object):
             launch_args = {}
             for key, value in params.items():
                 launch_args[key.encode('utf-8')] = value.encode('utf-8')
+        except AttributeError as e:
+            rospy.logerr(e)
         except ValueError:
             rospy.logerr(
                 "Failed to parse parameters of action '{}'".format(msg.action))
