@@ -10,7 +10,6 @@ from requests.exceptions import ConnectionError
 import actionlib
 import ast
 from dialogflow_task_executive.msg import DialogResponse
-from dialogflow_webhook_ros.msg import OriginalDetectIntentRequest
 from gdrive_ros.srv import *
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
@@ -24,7 +23,7 @@ class GoogleChatROS(object):
     Send request to Google Chat REST API via ROS
     """
     def __init__(self):
-        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'dialogflow', 'url', 'pubsub', 'none'
+        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'url', 'pubsub', 'none'
         self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service')
         google_credentials = rospy.get_param('~google_cloud_credentials_json')
 
@@ -71,9 +70,6 @@ class GoogleChatROS(object):
                 except ConnectionError as e:
                     rospy.logwarn("The error occurred while starting HTTPS server")
                     rospy.logerr(e)
-            elif recieving_chat_mode == "dialogflow":
-                rospy.loginfo("Expected to get OriginalDetectIntentRequest.msg from dialogflow webhook ros node.")
-                self._sub = rospy.Subscriber("dialogflow_original_application_request", OriginalDetectIntentRequest, self.dialogflow_cb)
             elif recieving_chat_mode == "pubsub":
                 rospy.loginfo("Expected to use Google Cloud Pub Sub service")
                 self.project_id = rospy.get_param("~project_id")
