@@ -31,13 +31,13 @@ class GoogleChatROSHelper(object):
 
     def dialogflow_action_client(self, query):
         """
-        :rtype: TextResult
+        :rtype: DialogTextActionResult
         """
         client = actionlib.SimpleActionClient('dialogflow_client/text_action', DialogTextAction)
         client.wait_for_server()
-        goal = TextGoal()
-        goal.query = query
-        client.send_goal(goal)
+        goal = DialogTextActionGoal()
+        goal.goal.query = query
+        client.send_goal(goal.goal)
         client.wait_for_result()
         return client.get_result()
 
