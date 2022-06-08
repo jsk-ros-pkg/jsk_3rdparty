@@ -2,7 +2,7 @@
 The ROS wrapper for Google Chat API
 1. [Installation Guide](#install)
 1. [Sending the message](#send)
-1. [Recieving the message](#recieve)
+1. [Receiving the message](#recieve)
 1. [Handling the event](#event)
 1. [Optional functions](#optional)
 1. [Helper nodes](#helper)
@@ -69,12 +69,12 @@ catkin build
 ```
 ### 1.4 Launch the node
 #### HTTPS mode
-You have to set rosparams `recieving_mode=https`, `google_cloud_credentials_json`, `host`, `port`, `ssl_certfile`, `ssl_keyfile`.
+You have to set rosparams `receiving_mode=https`, `google_cloud_credentials_json`, `host`, `port`, `ssl_certfile`, `ssl_keyfile`.
 #### Pub/Sub mode
-You have to set rosparams `recieving_mode=pubsub`, `google_cloud_credentials_json`, `project_id`, `subscription_id`. `subscription_id` would be `chat-sub` if you follow [Pub/Sub mode](#pubsub) example. 
+You have to set rosparams `receiving_mode=pubsub`, `google_cloud_credentials_json`, `project_id`, `subscription_id`. `subscription_id` would be `chat-sub` if you follow [Pub/Sub mode](#pubsub) example. 
 ##### Example
 ```bash
-roslaunch google_chat_ros google_chat.launch recieving_mode:=pubsub google_cloud_credentials_json:=/path/to/<project_id>-XXXXXXXX.json project_id:=<project_id> subscription_id:=chat-sub
+roslaunch google_chat_ros google_chat.launch receiving_mode:=pubsub google_cloud_credentials_json:=/path/to/<project_id>-XXXXXXXX.json project_id:=<project_id> subscription_id:=chat-sub
 ```
 <a id="send"></a>
 ## 2. Sending the message
@@ -160,13 +160,13 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
 See [Here](#image).
 
 <a id="recieve"></a>
-## 3. Recieving the messages
+## 3. Receiving the messages
 ### 3.1 ROS Topic
 When the bot was mentioned, the node publishes `~message_activity` topic.
 
 ### 3.2 Examples
 
-#### Recieving a text message 
+#### Receiving a text message 
 ```yaml
 event_time: "2022-04-28T06:25:26.884623Z"
 space:
@@ -200,7 +200,7 @@ user:
   human: True
 ```
 
-#### Recieving a message with an image or gdrive file and download it
+#### Receiving a message with an image or gdrive file and download it
 <!-- TODO add link to example -->
 
 <a id="event"></a>
@@ -297,5 +297,5 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
                 localpath: '/home/user/Pictures/image.png'
   space: 'spaces/<your space>'
 ```
-### 5.2 Recieving a message with images or gdrive file
+### 5.2 Receiving a message with images or gdrive file
 You have to set rosparam `~download_data` True, `~download_directory`. If the node recieved the message with image or google drive file, it automatically downloads to `~donwload_directory` path.

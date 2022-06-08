@@ -23,7 +23,7 @@ class GoogleChatROS(object):
     Send request to Google Chat REST API via ROS
     """
     def __init__(self):
-        recieving_chat_mode = rospy.get_param('~recieving_mode') # select from 'url', 'pubsub', 'none'
+        receiving_chat_mode = rospy.get_param('~receiving_mode') # select from 'url', 'pubsub', 'none'
         self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service')
         google_credentials = rospy.get_param('~google_cloud_credentials_json')
 
@@ -43,8 +43,8 @@ class GoogleChatROS(object):
             rospy.logwarn("Failed to start Google Chat REST service")
             rospy.logerr(e)
 
-        # For recieving message
-        if recieving_chat_mode in ("url", "dialogflow", "pubsub"):
+        # For receiving message
+        if receiving_chat_mode in ("url", "dialogflow", "pubsub"):
             # rosparams
             self.upload_data_timeout = rospy.get_param('~upload_data_timeout')
             self.download_data = rospy.get_param('~download_data')
@@ -55,7 +55,7 @@ class GoogleChatROS(object):
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
             self._card_activity_pub = rospy.Publisher("~card_activity", CardEvent, queue_size=1)
 
-            if recieving_chat_mode == "url":
+            if receiving_chat_mode == "url":
                 rospy.loginfo("Expected to get Google Chat Bot URL request")
                 rospy.loginfo("Starting Google Chat HTTPS server...")
                 self.host = rospy.get_param('~host')
@@ -70,7 +70,7 @@ class GoogleChatROS(object):
                 except ConnectionError as e:
                     rospy.logwarn("The error occurred while starting HTTPS server")
                     rospy.logerr(e)
-            elif recieving_chat_mode == "pubsub":
+            elif receiving_chat_mode == "pubsub":
                 rospy.loginfo("Expected to use Google Cloud Pub Sub service")
                 self.project_id = rospy.get_param("~project_id")
                 self.subscription_id = rospy.get_param("~subscription_id")
@@ -79,11 +79,11 @@ class GoogleChatROS(object):
                 rospy.on_shutdown(self.killpubsub)
                 self._pubsub_client.run()
 
-        elif recieving_chat_mode == "none":
+        elif receiving_chat_mode == "none":
             rospy.logwarn("You cannot recieve Google Chat event because HTTPS server or Google Cloud Pub/Sub is not running.")
 
         else:
-            rospy.logerr("Please choose recieving_mode param from dialogflow, https, pubsub, none.")
+            rospy.logerr("Please choose receiving_mode param from dialogflow, https, pubsub, none.")
 
     def killhttpd(self):
         self._server.kill()
