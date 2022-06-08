@@ -77,7 +77,7 @@ class GoogleChatHTTPSServer():
         self._httpd.server_close()
 
 class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
-    """The handler for https request from Google chat API. Mainly used for recieving messages, events.
+    """The handler for https request from Google chat API. Mainly used for receiving messages, events.
     """
     def __init__(self, callback, user_agent, *args):
         self._callback = callback
