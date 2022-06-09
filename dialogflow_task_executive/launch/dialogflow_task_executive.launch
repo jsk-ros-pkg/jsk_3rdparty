@@ -1,7 +1,7 @@
 <launch>
   <arg name="run_app_manager" default="false" />
   <arg name="applist" default="" />
-  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)"/>
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)" doc="Read credentials JSON from this value when use_yaml is false." />
   <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
   <arg name="enable_hotword" default="true" />
 

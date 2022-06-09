@@ -1,5 +1,5 @@
 <launch>
-  <arg name="google_cloud_credentials_json" default="" />
+  <arg name="google_cloud_credentials_json" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)" doc="Read credentials JSON from this value when use_yaml is false." />
   <arg name="project_id" default="eternal-byte-236613" />
   <include file="$(find dialogflow_task_executive)/launch/dialogflow_task_executive.launch" >
     <arg name="credential" value="$(arg google_cloud_credentials_json)" />
