@@ -1,0 +1,11 @@
+# Define the goal
+string query
+---
+# Define the result
+DialogResponse response
+string session
+bool done
+---
+# Define a feedback message
+string session
+string status
