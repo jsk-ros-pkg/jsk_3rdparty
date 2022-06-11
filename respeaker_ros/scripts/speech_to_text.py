@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # Author: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
+from __future__ import division
+
 import actionlib
 import rospy
 try:
@@ -9,8 +11,10 @@ try:
 except ImportError as e:
     raise ImportError(str(e) + '\nplease try "pip install speechrecognition"')
 
+import numpy as np
 from actionlib_msgs.msg import GoalStatus, GoalStatusArray
 from audio_common_msgs.msg import AudioData
+from audio_common_msgs.msg import AudioInfo
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 
@@ -18,8 +22,26 @@ from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 class SpeechToText(object):
     def __init__(self):
         # format of input audio data
-        self.sample_rate = rospy.get_param("~sample_rate", 16000)
-        self.sample_width = rospy.get_param("~sample_width", 2)
+        if rospy.get_param('~audio_info', None):
+            rospy.loginfo('Extract audio info params from {}'.format(
+                rospy.get_param('~audio_info')))
+            audio_info_msg = rospy.wait_for_message(
+                rospy.get_param('~audio_info'), AudioInfo)
+            self.sample_rate = audio_info_msg.sample_rate
+            self.sample_width = audio_info_msg.bitrate // self.sample_rate // 8
+            self.channels = audio_info_msg.channels
+        else:
+            self.sample_rate = rospy.get_param("~sample_rate", 16000)
+            self.sample_width = rospy.get_param("~sample_width", 2)
+            self.channels = rospy.get_param("~channels", 1)
+        if self.sample_width == 2:
+            self.dtype = 'int16'
+        elif self.sample_width == 4:
+            self.dtype = 'int32'
+        else:
+            raise NotImplementedError('sample_width {} is not supported'
+                                      .format(self.sample_width))
+        self.target_channel = rospy.get_param("~target_channel", 0)
         # language of STT service
         self.language = rospy.get_param("~language", "ja-JP")
         # ignore voice input while the robot is speaking
@@ -78,7 +100,11 @@ class SpeechToText(object):
         if self.is_canceling:
             rospy.loginfo("Speech is cancelled")
             return
-        data = SR.AudioData(msg.data, self.sample_rate, self.sample_width)
+
+        data = SR.AudioData(
+            np.frombuffer(msg.data, dtype=self.dtype)[
+                self.target_channel::self.channels].tobytes(),
+            self.sample_rate, self.sample_width)
         try:
             rospy.loginfo("Waiting for result %d" % len(data.get_raw_data()))
             result = self.recognizer.recognize_google(
