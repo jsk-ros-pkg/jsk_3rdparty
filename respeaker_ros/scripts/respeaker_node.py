@@ -16,6 +16,7 @@ import struct
 import sys
 import time
 from audio_common_msgs.msg import AudioData
+from audio_common_msgs.msg import AudioInfo
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool, Int32, ColorRGBA
 from dynamic_reconfigure.server import Server
@@ -333,6 +334,8 @@ class RespeakerNode(object):
         self.pub_doa_raw = rospy.Publisher("sound_direction", Int32, queue_size=1, latch=True)
         self.pub_doa = rospy.Publisher("sound_localization", PoseStamped, queue_size=1, latch=True)
         self.pub_audio = rospy.Publisher("audio", AudioData, queue_size=10)
+        self.pub_audio_info = rospy.Publisher("audio_info", AudioInfo,
+                                              queue_size=1, latch=True)
         self.pub_speech_audio = rospy.Publisher("speech_audio", AudioData, queue_size=10)
         # init config
         self.config = None
@@ -347,6 +350,14 @@ class RespeakerNode(object):
                                       self.on_timer)
         self.timer_led = None
         self.sub_led = rospy.Subscriber("status_led", ColorRGBA, self.on_status_led)
+
+        info_msg = AudioInfo(
+            channels=self.n_channel,
+            sample_rate=self.respeaker_audio.rate,
+            sample_format='S16LE',
+            bitrate=self.respeaker_audio.rate * self.respeaker_audio.bitdepth,
+            coding_format='WAVE')
+        self.pub_audio_info.publish(info_msg)
 
     def on_shutdown(self):
         self.info_timer.shutdown()
