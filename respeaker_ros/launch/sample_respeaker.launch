@@ -13,6 +13,8 @@
   <arg name="language" default="en-US"/>
   <!-- self cancellation -->
   <arg name="self_cancellation" default="true"/>
+  <!-- audio info topic name -->
+  <arg name="audio_info" default="audio_info"/>
 
   <node if="$(arg publish_tf)"
         name="static_transformer" pkg="tf" type="static_transform_publisher"
@@ -20,16 +22,21 @@
 
   <node if="$(arg launch_respeaker)"
         name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
-        respawn="true" respawn_delay="10" />
+        respawn="true" respawn_delay="10" >
+    <rosparam subst_value="true" >
+      publish_multichannel: $(arg publish_multichannel)
+    </rosparam>
+  </node>
 
   <node if="$(arg launch_soundplay)"
         name="sound_play" pkg="sound_play" type="soundplay_node.py"/>
 
   <node name="speech_to_text" pkg="respeaker_ros" type="speech_to_text.py"
         output="screen">
-    <remap from="audio" to="$(arg audio)"/>
+    <remap from="audio" to="/speech_audio"/>
     <remap from="speech_to_text" to="$(arg speech_to_text)"/>
     <rosparam subst_value="true">
+      audio_info: $(arg audio_info)
       language: $(arg language)
       self_cancellation: $(arg self_cancellation)
       tts_tolerance: 0.5
