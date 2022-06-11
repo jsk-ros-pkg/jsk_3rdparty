@@ -222,7 +222,9 @@ class RespeakerInterface(object):
 
 
 class RespeakerAudio(object):
-    def __init__(self, on_audio, channel=0, suppress_error=True):
+    def __init__(self, on_audio, channel=0, suppress_error=True,
+                 publish_multichannel=False):
+        self.publish_multichannel = publish_multichannel
         self.on_audio = on_audio
         with ignore_stderr(enable=suppress_error):
             self.pyaudio = pyaudio.PyAudio()
@@ -255,7 +257,6 @@ class RespeakerAudio(object):
         if self.channels != 6:
             rospy.logwarn("%d channel is found for respeaker" % self.channels)
             rospy.logwarn("You may have to update firmware.")
-        self.channel = min(self.channels - 1, max(0, self.channel))
 
         self.stream = self.pyaudio.open(
             input=True, start=False,
@@ -285,7 +286,10 @@ class RespeakerAudio(object):
         data = np.frombuffer(in_data, dtype=np.int16)
         chunk_per_channel = int(len(data) / self.channels)
         data = np.reshape(data, (chunk_per_channel, self.channels))
-        chan_data = data[:, self.channel]
+        if self.publish_multichannel is True:
+            chan_data = data
+        else:
+            chan_data = data[:, self.channel]
         # invoke callback
         self.on_audio(chan_data.tobytes())
         return None, pyaudio.paContinue
@@ -307,6 +311,7 @@ class RespeakerNode(object):
         self.doa_xy_offset = rospy.get_param("~doa_xy_offset", 0.0)
         self.doa_yaw_offset = rospy.get_param("~doa_yaw_offset", 90.0)
         self.speech_prefetch = rospy.get_param("~speech_prefetch", 0.5)
+        self.publish_multichannel = rospy.get_param("~publish_multichannel", False)
         self.speech_continuation = rospy.get_param("~speech_continuation", 0.5)
         self.speech_max_duration = rospy.get_param("~speech_max_duration", 7.0)
         self.speech_min_duration = rospy.get_param("~speech_min_duration", 0.1)
@@ -330,9 +335,16 @@ class RespeakerNode(object):
         self.config = None
         self.dyn_srv = Server(RespeakerConfig, self.on_config)
         # start
-        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error)
+        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error,
+                                              publish_multichannel=self.publish_multichannel)
+        self.n_channel = 1
+        if self.publish_multichannel:
+            self.n_channel = self.respeaker_audio.channels
         self.speech_prefetch_bytes = int(
-            self.speech_prefetch * self.respeaker_audio.rate * self.respeaker_audio.bitdepth / 8.0)
+            self.n_channel
+            * self.speech_prefetch
+            * self.respeaker_audio.rate
+            * self.respeaker_audio.bitdepth / 8.0)
         self.speech_prefetch_buffer = b""
         self.respeaker_audio.start()
         self.info_timer = rospy.Timer(rospy.Duration(1.0 / self.update_rate),
@@ -434,7 +446,7 @@ class RespeakerNode(object):
             self.speech_audio_buffer = b""
             self.is_speeching = False
             duration = 8.0 * len(buf) * self.respeaker_audio.bitwidth
-            duration = duration / self.respeaker_audio.rate / self.respeaker_audio.bitdepth
+            duration = duration / self.respeaker_audio.rate / self.respeaker_audio.bitdepth / self.n_channel
             rospy.loginfo("Speech detected for %.3f seconds" % duration)
             if self.speech_min_duration <= duration < self.speech_max_duration:
 
