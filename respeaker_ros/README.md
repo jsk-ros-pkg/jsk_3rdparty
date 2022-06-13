@@ -91,37 +91,37 @@ A ROS Package for Respeaker Mic Array
 
   - ### Publishing topics
 
-    - `~audio` (`audio_common_msgs/AudioData`)
+    - `audio` (`audio_common_msgs/AudioData`)
 
       Processed audio for ASR. 1 channel.
 
-    - `~audio_info` (`audio_common_msgs/AudioInfo`)
+    - `audio_info` (`audio_common_msgs/AudioInfo`)
 
       Audio info with respect to `~audio`.
 
-    - `~audio_raw` (`audio_common_msgs/AudioData`)
+    - `audio_raw` (`audio_common_msgs/AudioData`)
 
       Micarray audio data has 4-channels. Maybe you need to update respeaker firmware.
 
       If the firmware isn't supported, this will not be output.
 
-    - `~audio_info_raw` (`audio_common_msgs/AudioInfo`)
+    - `audio_info_raw` (`audio_common_msgs/AudioInfo`)
 
       Audio info with respect to `~audio_raw`.
 
       If the firmware isn't supported, this will not be output.
 
-    - `~speech_audio` (`audio_common_msgs/AudioData`)
+    - `speech_audio` (`audio_common_msgs/AudioData`)
 
       Audio data while a person is speaking using the VAD function.
 
-    - `~speech_audio_raw` (`audio_common_msgs/AudioData`)
+    - `speech_audio_raw` (`audio_common_msgs/AudioData`)
 
       Audio data has 4-channels while a person is speaking using the VAD function.
 
       If the firmware isn't supported, this will not be output.
 
-    - `~audio_merged_playback` (`audio_common_msgs/AudioData`)
+    - `audio_merged_playback` (`audio_common_msgs/AudioData`)
 
       Data that combines the sound of mic and speaker.
 
