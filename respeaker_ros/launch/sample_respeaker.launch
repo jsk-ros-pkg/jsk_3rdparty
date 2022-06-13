@@ -15,8 +15,6 @@
   <arg name="self_cancellation" default="true"/>
   <!-- audio info topic name -->
   <arg name="audio_info" default="audio_info"/>
-  <!-- publish multi channel option -->
-  <arg name="publish_multichannel" default="false"/>
 
   <node if="$(arg publish_tf)"
         name="static_transformer" pkg="tf" type="static_transform_publisher"
@@ -25,9 +23,6 @@
   <node if="$(arg launch_respeaker)"
         name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
         respawn="true" respawn_delay="10" >
-    <rosparam subst_value="true" >
-      publish_multichannel: $(arg publish_multichannel)
-    </rosparam>
   </node>
 
   <node if="$(arg launch_soundplay)"
