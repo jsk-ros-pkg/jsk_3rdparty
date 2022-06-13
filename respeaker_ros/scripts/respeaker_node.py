@@ -339,6 +339,12 @@ class RespeakerNode(object):
                                               publish_multichannel=self.publish_multichannel)
         self.n_channel = 1
         if self.publish_multichannel:
+            # The respeaker has 4 or 6 microphones.
+            # Multiple microphones can be used for
+            # beam forming (strengthening the sound in a specific direction)
+            # and sound localization (the respeaker outputs the azimuth
+            # direction, but the multichannel can estimate
+            # the elevation direction). etc.
             self.n_channel = self.respeaker_audio.channels
         self.speech_prefetch_bytes = int(
             self.n_channel
