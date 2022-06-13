@@ -368,6 +368,8 @@ class RespeakerNode(object):
             # Channel 3: mic3 raw data
             # Channel 4: mic4 raw data
             # Channel 5: merged playback
+            # For more detail, please see
+            # https://wiki.seeedstudio.com/ReSpeaker_Mic_Array_v2.0/
             # (self.n_channel - 2) = 4 channels are multiple microphones.
             self.pub_audio_raw = rospy.Publisher("audio_raw", AudioData,
                                                  queue_size=10)
