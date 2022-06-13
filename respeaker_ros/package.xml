@@ -15,6 +15,7 @@
   <exec_depend>flac</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sound_play</exec_depend>
   <exec_depend>speech_recognition_msgs</exec_depend>
   <exec_depend>tf</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-numpy</exec_depend>
