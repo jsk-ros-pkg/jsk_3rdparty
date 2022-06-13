@@ -183,6 +183,60 @@ A ROS Package for Respeaker Mic Array
 
       If this value is `True`, suppress error from pyaudio.
 
+## Parameters for speech_to_text.py
+
+  - ### Publishing topics
+
+    - `~speech_to_text` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
+
+      Recognized text.
+
+  - ### Subscribing topics
+
+    - `audio` (`audio_common_msgs/AudioData`)
+
+      Input audio.
+
+  - ### Parameters
+
+    - `~audio_info` (`String`, default: ``)
+
+      audio_info (`audio_common_msgs/AudioInfo`) topic. If this value is specified, `~sample_rate`, `~sample_width` and `~channels` parameters are obtained from the topic.
+
+    - `~sample_rate` (`Int`, default: `16000`)
+
+      Sampling rate.
+
+    - `~sample_width` (`Int`, default: `2`)
+
+      Sample with.
+
+    - `~channels` (`Int`, default: `1`)
+
+      Number of channels.
+
+    - `~target_channel` (`Int`, default: `0`)
+
+      Target number of channel.
+
+    - `~language` (`String`, default: `ja-JP`)
+
+      language of speech to text service. For English users, you can specify `en-US`.
+
+    - `~self_cancellation` (`Bool`, default: `True`)
+
+      ignore voice input while the robot is speaking.
+
+    - `~tts_tolerance` (`String`, default: `1.0`)
+
+      time to assume as SPEAKING after tts service is finished.
+
+    - `~tts_action_names` (`List[String]`, default: `['sound_play']`)
+
+       If `~self_chancellation` is `True`, this value will be used.
+
+       When the actions are active, do nothing with the callback that subscribes to `audio`.
+
 ## Use cases
 
 ### Voice Recognition
