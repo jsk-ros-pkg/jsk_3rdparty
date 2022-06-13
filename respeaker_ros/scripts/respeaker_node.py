@@ -233,9 +233,7 @@ class RespeakerInterface(object):
 
 
 class RespeakerAudio(object):
-    def __init__(self, on_audio, channel=0, suppress_error=True,
-                 publish_multichannel=False):
-        self.publish_multichannel = publish_multichannel
+    def __init__(self, on_audio, channel=0, suppress_error=True):
         self.on_audio = on_audio
         with ignore_stderr(enable=suppress_error):
             self.pyaudio = pyaudio.PyAudio()
@@ -297,12 +295,8 @@ class RespeakerAudio(object):
         data = np.frombuffer(in_data, dtype=np.int16)
         chunk_per_channel = int(len(data) / self.channels)
         data = np.reshape(data, (chunk_per_channel, self.channels))
-        if self.publish_multichannel is True:
-            chan_data = data
-        else:
-            chan_data = data[:, self.channel]
         # invoke callback
-        self.on_audio(chan_data.tobytes())
+        self.on_audio(data)
         return None, pyaudio.paContinue
 
     def start(self):
@@ -322,7 +316,6 @@ class RespeakerNode(object):
         self.doa_xy_offset = rospy.get_param("~doa_xy_offset", 0.0)
         self.doa_yaw_offset = rospy.get_param("~doa_yaw_offset", 90.0)
         self.speech_prefetch = rospy.get_param("~speech_prefetch", 0.5)
-        self.publish_multichannel = rospy.get_param("~publish_multichannel", False)
         self.speech_continuation = rospy.get_param("~speech_continuation", 0.5)
         self.speech_max_duration = rospy.get_param("~speech_max_duration", 7.0)
         self.speech_min_duration = rospy.get_param("~speech_min_duration", 0.1)
@@ -341,24 +334,18 @@ class RespeakerNode(object):
         self.pub_audio = rospy.Publisher("audio", AudioData, queue_size=10)
         self.pub_audio_info = rospy.Publisher("audio_info", AudioInfo,
                                               queue_size=1, latch=True)
+        self.pub_audio_raw_info = rospy.Publisher("audio_info_raw", AudioInfo,
+                                                  queue_size=1, latch=True)
         self.pub_speech_audio = rospy.Publisher("speech_audio", AudioData, queue_size=10)
         # init config
         self.config = None
         self.dyn_srv = Server(RespeakerConfig, self.on_config)
         # start
-        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error,
-                                              publish_multichannel=self.publish_multichannel)
-        self.n_channel = 1
-        if self.publish_multichannel:
-            # The respeaker has 4 or 6 microphones.
-            # Multiple microphones can be used for
-            # beam forming (strengthening the sound in a specific direction)
-            # and sound localization (the respeaker outputs the azimuth
-            # direction, but the multichannel can estimate
-            # the elevation direction). etc.
-            self.n_channel = self.respeaker_audio.channels
+        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error)
+        self.n_channel = self.respeaker_audio.channels
+
         self.speech_prefetch_bytes = int(
-            self.n_channel
+            1
             * self.speech_prefetch
             * self.respeaker_audio.rate
             * self.respeaker_audio.bitdepth / 8.0)
@@ -369,13 +356,43 @@ class RespeakerNode(object):
         self.timer_led = None
         self.sub_led = rospy.Subscriber("status_led", ColorRGBA, self.on_status_led)
 
+        # processed audio for ASR
         info_msg = AudioInfo(
-            channels=self.n_channel,
+            channels=1,
             sample_rate=self.respeaker_audio.rate,
             sample_format='S16LE',
             bitrate=self.respeaker_audio.rate * self.respeaker_audio.bitdepth,
             coding_format='WAVE')
         self.pub_audio_info.publish(info_msg)
+
+        if self.n_channel > 1:
+            # The respeaker has 4 microphones.
+            # Multiple microphones can be used for
+            # beam forming (strengthening the sound in a specific direction)
+            # and sound localization (the respeaker outputs the azimuth
+            # direction, but the multichannel can estimate
+            # the elevation direction). etc.
+
+            # Channel 0: processed audio for ASR
+            # Channel 1: mic1 raw data
+            # Channel 2: mic2 raw data
+            # Channel 3: mic3 raw data
+            # Channel 4: mic4 raw data
+            # Channel 5: merged playback
+            # (self.n_channel - 2) = 4 channels are multiple microphones.
+            self.pub_audio_raw = rospy.Publisher("audio_raw", AudioData,
+                                                 queue_size=10)
+            self.pub_audio_merged_playback = rospy.Publisher(
+                "audio_merged_playback", AudioData,
+                queue_size=10)
+            info_raw_msg = AudioInfo(
+                channels=self.n_channel - 2,
+                sample_rate=self.respeaker_audio.rate,
+                sample_format='S16LE',
+                bitrate=(self.respeaker_audio.rate *
+                         self.respeaker_audio.bitdepth),
+                coding_format='WAVE')
+            self.pub_audio_raw_info.publish(info_raw_msg)
 
     def on_shutdown(self):
         self.info_timer.shutdown()
@@ -415,13 +432,20 @@ class RespeakerNode(object):
                                        oneshot=True)
 
     def on_audio(self, data):
-        self.pub_audio.publish(AudioData(data=data))
+        # take processed audio for ASR.
+        processed_data = data[:, 0].tobytes()
+        self.pub_audio.publish(AudioData(data=processed_data))
+        if self.n_channel > 1:
+            self.pub_audio_raw.publish(
+                AudioData(data=data[:, 1:5].reshape(-1).tobytes()))
+            self.pub_audio_merged_playback.publish(
+                AudioData(data=data[:, 5].tobytes()))
         if self.is_speeching:
             if len(self.speech_audio_buffer) == 0:
                 self.speech_audio_buffer = self.speech_prefetch_buffer
-            self.speech_audio_buffer += data
+            self.speech_audio_buffer += processed_data
         else:
-            self.speech_prefetch_buffer += data
+            self.speech_prefetch_buffer += processed_data
             self.speech_prefetch_buffer = self.speech_prefetch_buffer[-self.speech_prefetch_bytes:]
 
     def on_timer(self, event):
