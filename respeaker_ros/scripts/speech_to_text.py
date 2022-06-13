@@ -22,11 +22,12 @@ from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 class SpeechToText(object):
     def __init__(self):
         # format of input audio data
-        if rospy.get_param('~audio_info', None):
+        audio_info_topic_name = rospy.get_param('~audio_info', '')
+        if len(audio_info_topic_name) > 0:
             rospy.loginfo('Extract audio info params from {}'.format(
-                rospy.get_param('~audio_info')))
+                audio_info_topic_name))
             audio_info_msg = rospy.wait_for_message(
-                rospy.get_param('~audio_info'), AudioInfo)
+                audio_info_topic_name, AudioInfo)
             self.sample_rate = audio_info_msg.sample_rate
             self.sample_width = audio_info_msg.bitrate // self.sample_rate // 8
             self.channels = audio_info_msg.channels
