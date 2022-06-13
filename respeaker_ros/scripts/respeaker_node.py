@@ -394,6 +394,16 @@ class RespeakerNode(object):
                 coding_format='WAVE')
             self.pub_audio_raw_info.publish(info_raw_msg)
 
+            self.speech_audio_raw_buffer = b""
+            self.speech_raw_prefetch_buffer = b""
+            self.pub_speech_audio_raw = rospy.Publisher(
+                "speech_audio_raw", AudioData, queue_size=10)
+            self.speech_raw_prefetch_bytes = int(
+                self.n_channel - 2
+                * self.speech_prefetch
+                * self.respeaker_audio.rate
+                * self.respeaker_audio.bitdepth / 8.0)
+
     def on_shutdown(self):
         self.info_timer.shutdown()
         try:
@@ -436,17 +446,26 @@ class RespeakerNode(object):
         processed_data = data[:, 0].tobytes()
         self.pub_audio.publish(AudioData(data=processed_data))
         if self.n_channel > 1:
+            raw_audio_data = data[:, 1:5].reshape(-1).tobytes()
             self.pub_audio_raw.publish(
-                AudioData(data=data[:, 1:5].reshape(-1).tobytes()))
+                AudioData(data=raw_audio_data))
             self.pub_audio_merged_playback.publish(
                 AudioData(data=data[:, 5].tobytes()))
         if self.is_speeching:
             if len(self.speech_audio_buffer) == 0:
                 self.speech_audio_buffer = self.speech_prefetch_buffer
+                if self.n_channel > 1:
+                    self.speech_audio_raw_buffer = self.speech_raw_prefetch_buffer
             self.speech_audio_buffer += processed_data
+            if self.n_channel > 1:
+                self.speech_audio_raw_buffer += raw_audio_data
         else:
             self.speech_prefetch_buffer += processed_data
             self.speech_prefetch_buffer = self.speech_prefetch_buffer[-self.speech_prefetch_bytes:]
+            if self.n_channel > 1:
+                self.speech_raw_prefetch_buffer += raw_audio_data
+                self.speech_raw_prefetch_buffer = self.speech_raw_prefetch_buffer[
+                    -self.speech_raw_prefetch_bytes:]
 
     def on_timer(self, event):
         stamp = event.current_real or rospy.Time.now()
