@@ -29,8 +29,9 @@ class RespeakerNode(object):
         self.pub_doa_raw = rospy.Publisher("sound_direction", Int32, queue_size=1, latch=True)
         self.pub_doa = rospy.Publisher("sound_localization", PoseStamped, queue_size=1, latch=True)
         self.pub_audio = rospy.Publisher("audio", AudioData, queue_size=10)
-        self.pub_audio_info = rospy.Publisher("audio_info", AudioInfo,
-                                              queue_size=1, latch=True)
+        if enable_audio_info is True:
+            self.pub_audio_info = rospy.Publisher("audio_info", AudioInfo,
+                                                  queue_size=1, latch=True)
         self.pub_audio_raw_info = rospy.Publisher("audio_info_raw", AudioInfo,
                                                   queue_size=1, latch=True)
         self.pub_speech_audio = rospy.Publisher("speech_audio", AudioData, queue_size=10)
@@ -54,13 +55,14 @@ class RespeakerNode(object):
         self.sub_led = rospy.Subscriber("status_led", ColorRGBA, self.on_status_led)
 
         # processed audio for ASR
-        info_msg = AudioInfo(
-            channels=1,
-            sample_rate=self.respeaker_audio.rate,
-            sample_format='S16LE',
-            bitrate=self.respeaker_audio.rate * self.respeaker_audio.bitdepth,
-            coding_format='WAVE')
-        self.pub_audio_info.publish(info_msg)
+        if enable_audio_info is True:
+            info_msg = AudioInfo(
+                channels=1,
+                sample_rate=self.respeaker_audio.rate,
+                sample_format='S16LE',
+                bitrate=self.respeaker_audio.rate * self.respeaker_audio.bitdepth,
+                coding_format='WAVE')
+            self.pub_audio_info.publish(info_msg)
 
         if self.n_channel > 1:
             # The respeaker has 4 microphones.
@@ -84,14 +86,15 @@ class RespeakerNode(object):
             self.pub_audio_merged_playback = rospy.Publisher(
                 "audio_merged_playback", AudioData,
                 queue_size=10)
-            info_raw_msg = AudioInfo(
-                channels=self.n_channel - 2,
-                sample_rate=self.respeaker_audio.rate,
-                sample_format='S16LE',
-                bitrate=(self.respeaker_audio.rate *
-                         self.respeaker_audio.bitdepth),
-                coding_format='WAVE')
-            self.pub_audio_raw_info.publish(info_raw_msg)
+            if enable_audio_info is True:
+                info_raw_msg = AudioInfo(
+                    channels=self.n_channel - 2,
+                    sample_rate=self.respeaker_audio.rate,
+                    sample_format='S16LE',
+                    bitrate=(self.respeaker_audio.rate *
+                             self.respeaker_audio.bitdepth),
+                    coding_format='WAVE')
+                self.pub_audio_raw_info.publish(info_raw_msg)
 
             self.speech_audio_raw_buffer = b""
             self.speech_raw_prefetch_buffer = b""

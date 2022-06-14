@@ -4,6 +4,8 @@
 
 from __future__ import division
 
+import sys
+
 import actionlib
 import rospy
 try:
@@ -14,7 +16,13 @@ except ImportError as e:
 import numpy as np
 from actionlib_msgs.msg import GoalStatus, GoalStatusArray
 from audio_common_msgs.msg import AudioData
-from audio_common_msgs.msg import AudioInfo
+enable_audio_info = True
+try:
+    from audio_common_msgs.msg import AudioInfo
+except Exception as e:
+    rospy.logwarn('audio_common_msgs/AudioInfo message is not exists.'
+                 ' AudioInfo message will not be published.')
+    enable_audio_info = False
 from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 
@@ -24,6 +32,11 @@ class SpeechToText(object):
         # format of input audio data
         audio_info_topic_name = rospy.get_param('~audio_info', '')
         if len(audio_info_topic_name) > 0:
+            if enable_audio_info is False:
+                rospy.logerr(
+                    'audio_common_msgs/AudioInfo message is not exists.'
+                    ' Giving ~audio_info is not valid in your environment.')
+                sys.exit(1)
             rospy.loginfo('Extract audio info params from {}'.format(
                 audio_info_topic_name))
             audio_info_msg = rospy.wait_for_message(
