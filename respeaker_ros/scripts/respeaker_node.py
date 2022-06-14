@@ -399,7 +399,7 @@ class RespeakerNode(object):
             self.pub_speech_audio_raw = rospy.Publisher(
                 "speech_audio_raw", AudioData, queue_size=10)
             self.speech_raw_prefetch_bytes = int(
-                self.n_channel - 2
+                (self.n_channel - 2)
                 * self.speech_prefetch
                 * self.respeaker_audio.rate
                 * self.respeaker_audio.bitdepth / 8.0)
