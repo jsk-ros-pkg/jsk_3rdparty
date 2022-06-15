@@ -119,9 +119,15 @@ class GoogleChatPubSubClient():
     def _pubsub_cb(self, message):
         rospy.logdebug("Recieved {message}")
         rospy.logdebug(message.data)
-        json_content = json.loads(message.data)
-        self._callback(json_content)
-        message.ack()
+        try:
+            json_content = json.loads(message.data)
+            self._callback(json_content)
+        except Exception as e:
+            rospy.logerr("Failed to handle the request from Cloud PubSub.")
+            rospy.logerr("It might be caused because of invalid type message from GCP")
+            rospy.logerr("{}".str(e))
+        finally:
+            message.ack()
 
     def run(self):
         with self._sub:
