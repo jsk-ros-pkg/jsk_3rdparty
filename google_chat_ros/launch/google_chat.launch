@@ -7,7 +7,7 @@
   <arg name="download_directory" default="/tmp" />
   <arg name="download_avatar" default="false" />
   <arg name="google_cloud_credentials_json" default="" />
-  <arg name="use_yaml" default="true" doc="Whether you use yaml file or not."/>
+  <arg name="use_yaml" default="false" doc="Whether you use yaml file or not."/>
   <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
   <arg name="respawn" default="true" />
   <!-- For https mode -->
