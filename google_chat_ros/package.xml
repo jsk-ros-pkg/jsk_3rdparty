@@ -13,21 +13,14 @@
   <buildtool_depend>python3-setuptools</buildtool_depend>
 
   <build_depend>message_generation</build_depend>
+  <build_depend>catkin_virtualenv</build_depend>
 
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>gdrive_ros</exec_depend>
 
-  <exec_depend>python3-gdown-pip</exec_depend>
-  <exec_depend>python3-googleapi</exec_depend>
-  <exec_depend>python3-google-auth-pip</exec_depend>
-  <exec_depend>python3-google-auth-httplib2-pip</exec_depend>
-  <exec_depend>python3-google-auth-oauthlib-pip</exec_depend>
-  <exec_depend>python3-google-cloud-pubsub-pip</exec_depend>
-  <exec_depend>python3-httplib2</exec_depend>
-  <exec_depend>python3-oauth2client</exec_depend>
-
   <export>
+    <pip_requirements>requirements.txt</pip_requirements>
   </export>
 </package>

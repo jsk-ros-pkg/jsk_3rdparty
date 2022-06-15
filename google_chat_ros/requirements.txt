@@ -1,0 +1,8 @@
+gdown==4.4.0
+google-api-python-client==2.49.0
+google-auth==2.6.6
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==0.5.1
+google-cloud-pubsub==2.12.1
+httplib2==0.20.4
+oauth2client==4.1.3
