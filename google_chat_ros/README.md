@@ -51,7 +51,15 @@ In the figure, we set the topic name `chat`, the subscription name `chat-sub` as
 
 Note that if you set the topic name `chat`, the full name of it becomes `projects/<project_name>/topics/chat`. Please confirm the subsciptions subscribes the full name not short one.
 
-##### 3. Set Google Chat API Connection settings  
+##### 3. Grant publish rigts on your topic
+In order for Google Chat to publish messages to your topic, it must have publishing rights to the topic. To grant Google Chat these permissions, assign the Pub/Sub Publisher role to the following service account
+```
+chat-api-push@system.gserviceaccount.com
+```
+![google_chat_pubsub_permission](https://user-images.githubusercontent.com/27789460/173894738-cc169b21-0873-4def-9179-f686a2ae68ec.png)
+
+
+##### 4. Set Google Chat API Connection settings  
 Please choose `Cloud Pub/Sub` as connection settings and fill the full topic name in the Topic Name form.
 
 ![google_chat_pubsub](https://user-images.githubusercontent.com/27789460/166408478-b662b73c-35a8-43e8-aaaa-93efdd48e486.png)
