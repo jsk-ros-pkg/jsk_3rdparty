@@ -8,6 +8,7 @@
   <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)" doc="Read credentials JSON from this value when use_yaml is false." />
   <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
   <arg name="enable_hotword" default="true" />
+  <arg name="always_publish_result" default="true" doc="Always publish dialog_response topic even the node gets actionlib request." />
 
   <node name="dialogflow_client"
         pkg="dialogflow_task_executive" type="dialogflow_client.py"
@@ -21,6 +22,7 @@
       project_id: $(arg project_id)
       google_cloud_credentials_json: $(arg credential)
       enable_hotword: $(arg enable_hotword)
+      always_publish_result: $(arg always_publish_result)
     </rosparam>
     <rosparam command="load" ns="/dialogflow_client/hotword"
               file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
