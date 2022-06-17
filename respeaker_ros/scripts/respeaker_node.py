@@ -119,13 +119,11 @@ class RespeakerInterface(object):
             self.dev.reset()
         except usb.core.USBError:
             rospy.logerr(
-                "You have to give the right permission on respeaker device")
-            rospy.logerr(
-                "Please run the command as followings to register udev rules")
-            rospy.logerr(
-                "\n" + "$ roscd respeaker_ros"
-                + "\n" + "$ sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules"
-                + "\n" + "$ sudo systemctl restart udev") # NOQA
+                "You may have to give the right permission on respeaker device. "
+                "Please run the command as followings to register udev rules.\n"
+                "$ roscd respeaker_ros \n"
+                "$ sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules \n"
+                "$ sudo systemctl restart udev \n") # NOQA
             raise
         self.pixel_ring = usb_pixel_ring_v2.PixelRing(self.dev)
         self.set_led_think()
