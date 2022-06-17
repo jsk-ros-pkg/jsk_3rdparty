@@ -123,7 +123,9 @@ class RespeakerInterface(object):
                 "Please run the command as followings to register udev rules.\n"
                 "$ roscd respeaker_ros \n"
                 "$ sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules \n"
-                "$ sudo systemctl restart udev \n") # NOQA
+                "$ sudo systemctl restart udev \n"
+                "You may find further details at https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/respeaker_ros/README.md"
+            ) # NOQA
             raise
         self.pixel_ring = usb_pixel_ring_v2.PixelRing(self.dev)
         self.set_led_think()
