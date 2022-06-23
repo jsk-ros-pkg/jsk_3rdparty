@@ -69,6 +69,11 @@ A ROS Package for Respeaker Mic Array
     rostopic echo /is_speeching        # Result of VAD
     rostopic echo /audio               # Raw audio
     rostopic echo /speech_audio        # Audio data while speeching
+    rostopic echo /speech_to_text      # Voice recognition
+    # Voice recognition result for Japanese
+    rostopic echo --filter "print(m.transcript[0])" /speech_to_text
+    rostopic echo --filter "print('transcript: [%s]\n---'%(', '.join(map(lambda x: '\'%s\''%(x.decode('utf-8')), m.transcript))))" /speech_to_text
+    rostopic echo /speech_to_text | ascii2uni -a U -q
     ```
 
     You can also set various parameters via `dynamic_reconfigure`.
