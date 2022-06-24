@@ -72,6 +72,7 @@ A ROS Package for Respeaker Mic Array
     rostopic echo /speech_to_text      # Voice recognition
     # Voice recognition result for Japanese
     rostopic echo --filter "print(m.transcript[0])" /speech_to_text
+    rostopic echo --filter "print('transcript: [%s]\n---'%(', '.join(map(str, m.transcript))))" /speech_to_text
     rostopic echo /speech_to_text | ascii2uni -a U -q
     ```
 
