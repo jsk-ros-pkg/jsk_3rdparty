@@ -11,7 +11,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>audio_stream_msgs</build_depend>
+  <build_depend>audio_common_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>interactive_markers</build_depend>
   <build_depend>roscpp</build_depend>
@@ -21,8 +21,7 @@
   <build_depend>tf2_ros</build_depend>
   <build_depend>visualization_msgs</build_depend>
 
-  <exec_depend>audio_stream</exec_depend>
-  <exec_depend>audio_stream_msgs</exec_depend>
+  <exec_depend>audio_common_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>interactive_markers</exec_depend>
   <exec_depend>roscpp</exec_depend>
@@ -34,6 +33,18 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
 
-  <export>
-  </export>
+  <test_depend>audio_common_msgs</test_depend>
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>interactive_markers</test_depend>
+  <test_depend>roscpp</test_depend>
+  <test_depend>rospy</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rviz</test_depend>
+  <test_depend>spatial_audio</test_depend>
+  <test_depend>spatial_audio_msgs</test_depend>
+  <test_depend>tf2</test_depend>
+  <test_depend>tf2_ros</test_depend>
+  <test_depend>visualization_msgs</test_depend>
+
+  <export></export>
 </package>

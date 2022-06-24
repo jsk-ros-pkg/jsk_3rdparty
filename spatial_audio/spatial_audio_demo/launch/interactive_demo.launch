@@ -1,85 +1,50 @@
 <launch>
-    <arg name="audio_source_frame_id" default="audio_source" />
-    <arg name="head_frame_id"   default="head" />
-    <arg name="filename" default="$(find audio_stream_demo)/sound/amenoyoru.wav" />
+    <arg name="audio_source_frame_id" default="audio_source"/>
+    <arg name="head_frame_id" default="head"/>
+    <arg name="filename" default="$(find spatial_audio_demo)/sound/amenoyoru.wav"/>
+    <arg name="debug" default="false"/>
 
-    <node
-        name="audio_source_interactive_marker"
-        pkg="spatial_audio_demo"
-        type="audio_source_interactive_marker"
-        output="log"
-        required="true"
-        >
-        <param name="~description" value="" />
-        <param name="~name" value="audio_source_interactive_marker" />
-        <param name="~fixed_frame_id"  value="$(arg head_frame_id)" />
-        <param name="~source_frame_id" value="$(arg audio_source_frame_id)" />
-        <param name="~base_scale" value="0.1" />
-        <param name="~marker_scale" value="0.05" />
-        <param name="~position_x" value="0.0" />
-        <param name="~position_y" value="-1.0" />
-        <param name="~position_z" value="0.0" />
-        <param name="~color_r" value="0.8" />
-        <param name="~color_g" value="0.1" />
-        <param name="~color_b" value="0.1" />
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find spatial_audio_demo)/config/rosconsole_debug.conf" if="$(arg debug)"/>
+
+    <node name="audio_source_interactive_marker" pkg="spatial_audio_demo" type="audio_source_interactive_marker" output="log" required="true">
+        <param name="~description" value=""/>
+        <param name="~name" value="audio_source_interactive_marker"/>
+        <param name="~fixed_frame_id" value="$(arg head_frame_id)"/>
+        <param name="~source_frame_id" value="$(arg audio_source_frame_id)"/>
+        <param name="~base_scale" value="0.1"/>
+        <param name="~marker_scale" value="0.05"/>
+        <param name="~position_x" value="0.0"/>
+        <param name="~position_y" value="-1.0"/>
+        <param name="~position_z" value="0.0"/>
+        <param name="~color_r" value="0.8"/>
+        <param name="~color_g" value="0.1"/>
+        <param name="~color_b" value="0.1"/>
     </node>
 
-    <node
-        name="spatial_audio_server_node"
-        pkg="spatial_audio"
-        type="spatial_audio_server_node"
-        output="screen"
-        required="true"
-        >
-        <param name="~head_frame_id" value="$(arg head_frame_id)" />
-        <param name="~num_spinthread" value="5" />
+    <node pkg="spatial_audio" name="spatial_audio_server_node" type="spatial_audio_server_node" output="screen" required="true">
+        <param name="~head_frame_id" value="$(arg head_frame_id)"/>
+        <param name="~num_spinthread" value="5"/>
     </node>
 
-    <node
-        name="rviz"
-        pkg="rviz"
-        type="rviz"
-        args="-d $(find spatial_audio_demo)/rviz/interactive_demo.rviz"
-        output="log"
-        required="true"
-        />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find spatial_audio_demo)/rviz/interactive_demo.rviz" output="log" required="true"/>
 
-    <node
-        name="stl_marker"
-        pkg="spatial_audio_demo"
-        type="stl_marker.py"
-        output="log"
-        >
-        <param name="~frame_id" value="$(arg head_frame_id)" />
-        <param name="~scale" value="0.001" />
-        <param name="~mesh_resource" value="package://spatial_audio_demo/mesh/head.stl" />
-        <param name="~color_r" value="0.1" />
-        <param name="~color_g" value="0.1" />
-        <param name="~color_b" value="0.8" />
+    <node name="stl_marker" pkg="spatial_audio_demo" type="stl_marker.py" output="log">
+        <param name="~frame_id" value="$(arg head_frame_id)"/>
+        <param name="~scale" value="0.001"/>
+        <param name="~mesh_resource" value="package://spatial_audio_demo/mesh/male_head.stl"/>
+        <param name="~color_r" value="0.8"/>
+        <param name="~color_g" value="0.8"/>
+        <param name="~color_b" value="0.8"/>
     </node>
 
-    <node
-        name="audio_stream_publisher"
-        pkg="audio_stream"
-        type="audio_stream_publisher.py"
-        output="screen"
-        required="true"
-        >
-        <param name="~filename" value="$(arg filename)" />
-        <param name="~max_precede" value="0.1" />
+    <node name="audio_stream_publisher" pkg="spatial_audio_demo" type="audio_stream_publisher.py" output="screen" required="true">
+        <param name="~filename" value="$(arg filename)"/>
+        <param name="~max_precede" value="0.1"/>
     </node>
 
-    <node
-        name="simple_client"
-        pkg="spatial_audio_demo"
-        type="simple_client.py"
-        output="screen"
-        >
-        <param name="~id" value="0" />
-        <param name="~frame_id" value="$(arg audio_source_frame_id)" />
-        <param name="~source_topicname_audio" value="/audio_stream_publisher/audio" />
-        <param name="~source_topicname_info" value="/audio_stream_publisher/info" />
-
-        <remap from="~service" to="spatial_audio_server_node/play_source" />
+    <node name="simple_client" pkg="spatial_audio_demo" type="simple_client.py" output="screen">
+        <param name="~source_frame_id" value="$(arg audio_source_frame_id)"/>
+        <param name="~stream_topic_audio" value="/audio_stream_publisher/audio"/>
+        <param name="~stream_topic_info" value="/audio_stream_publisher/info"/>
     </node>
 </launch>

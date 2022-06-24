@@ -1,0 +1,27 @@
+<launch>
+    <arg name="audio_source_frame_id" default="audio_source" />
+    <arg name="head_frame_id" default="head" />
+    <arg name="filename" default="$(find spatial_audio_demo)/sound/amenoyoru.wav" />
+    <arg name="debug" default="false" />
+
+    <node pkg="spatial_audio" name="spatial_audio_server_node" type="spatial_audio_server_node" output="screen" required="true">
+        <param name="~head_frame_id" value="$(arg head_frame_id)" />
+        <param name="~num_spinthread" value="5" />
+    </node>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 0 0 0 $(arg head_frame_id) $(arg audio_source_frame_id)" />
+
+    <node name="audio_stream_publisher" pkg="spatial_audio_demo" type="audio_stream_publisher.py" output="screen" required="true">
+        <param name="~filename" value="$(arg filename)" />
+        <param name="~max_precede" value="0.1" />
+    </node>
+
+    <test test-name="test_spatial_audio_client_with_auto_play" pkg="spatial_audio_demo" type="test_spatial_audio.py" name="test_spatial_audio_with_auto_play" time-limit="30.0">
+        <rosparam subst_value="true">
+            source_frame_id: $(arg audio_source_frame_id)
+            stream_topic_audio: /audio_stream_publisher/audio
+            stream_topic_info: /audio_stream_publisher/info
+            auto_play: True
+        </rosparam>
+    </test>
+</launch>

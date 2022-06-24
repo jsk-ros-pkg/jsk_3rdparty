@@ -8,10 +8,17 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+add_message_files(
+  FILES
+  AudioSource.msg
+  AudioSourceArray.msg
+)
 
 add_service_files(
   FILES
-  PlaySpatialAudio.srv
+  AddSpatialAudio.srv
+  UpdateSpatialAudio.srv
+  TriggerSpatialAudio.srv
 )
 
 generate_messages(

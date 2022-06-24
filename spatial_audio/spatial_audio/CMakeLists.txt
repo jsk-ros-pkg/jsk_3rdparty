@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 2.8.3)
 
 project(spatial_audio)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++17)
 
 find_package(catkin REQUIRED COMPONENTS
-    audio_stream_msgs
+    audio_common_msgs
     spatial_audio_msgs
     geometry_msgs
     roscpp
@@ -17,11 +17,13 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Boost REQUIRED)
 find_package(OpenAL REQUIRED)
 
+catkin_python_setup()
+
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS 
-        audio_stream_msgs
+        audio_common_msgs
         spatial_audio_msgs
         geometry_msgs
         roscpp
@@ -50,4 +52,9 @@ target_link_libraries(
     ${catkin_LIBRARIES}
     ${Boost_LIBRARIES}
     ${OPENAL_LIBRARY}
+)
+target_compile_definitions(
+    spatial_audio_server_node
+    PRIVATE
+    AL_ALEXT_PROTOTYPES
 )
