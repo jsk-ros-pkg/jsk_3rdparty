@@ -1,0 +1,56 @@
+<launch>
+    <arg name="head_frame_id" default="head"/>
+    <arg name="sound_device" default=""/>
+    <arg name="joy_device" default="/dev/input/js0"/>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find spatial_audio_demo)/config/rosconsole_debug.conf"/>
+
+    <node pkg="joy" type="joy_node" name="joy">
+        <rosparam subst_value="true">
+            joy: $(arg joy_device)
+        </rosparam>
+    </node>
+
+    <node name="spatial_audio_server_node" pkg="spatial_audio" type="spatial_audio_server_node" output="log" required="true">
+        <param name="~head_frame_id" value="$(arg head_frame_id)"/>
+        <param name="~num_spinthread" value="5"/>
+    </node>
+
+    <node pkg="sound_navigator" type="beacon_sound_publisher.py" name="beacon_sound_publisher" output="screen">
+        <rosparam subst_value="true">
+            base_sound_file: $(find sound_navigator)/sound/beacon.wav
+        </rosparam>
+    </node>
+
+    <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py">
+        <param name="device" value="$(arg sound_device)"/>
+        <param name="loop_rate" value="100"/>
+    </node>
+
+    <node pkg="sound_navigator" type="sound_navigator" name="sound_navigator" output="screen">
+        <remap from="~input_joy" to="/joy"/>
+        <rosparam subst_value="true">
+            head_frame_id: $(arg head_frame_id)
+            frame_id_target_sound: target_sound
+            target_sound_stream_topic_audio: /beacon_sound_publisher/audio
+            target_sound_stream_topic_info: /beacon_sound_publisher/info
+            axis_x_target_sound: 1
+            axis_x_inverted_target_sound: False
+            axis_y_target_sound: 3
+            axis_y_inverted_target_sound: False
+            button_watch_out: 1
+            button_stop: 0
+        </rosparam>
+    </node>
+
+    <node name="stl_marker" pkg="spatial_audio_demo" type="stl_marker.py" output="log">
+        <param name="~frame_id" value="$(arg head_frame_id)"/>
+        <param name="~scale" value="0.001"/>
+        <param name="~mesh_resource" value="package://spatial_audio_demo/mesh/male_head.stl"/>
+        <param name="~color_r" value="0.8"/>
+        <param name="~color_g" value="0.8"/>
+        <param name="~color_b" value="0.8"/>
+    </node>
+
+    <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find sound_navigator)/config/sound_navigator.rviz"/>
+</launch>

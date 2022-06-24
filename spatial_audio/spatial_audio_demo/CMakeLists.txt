@@ -17,6 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Boost REQUIRED)
 
+catkin_python_setup()
+
+generate_dynamic_reconfigure_options(
+    cfg/BeaconSoundPublisher.cfg
+)
+
 catkin_package(
   CATKIN_DEPENDS
       audio_common_msgs
@@ -42,6 +48,14 @@ add_executable(audio_source_interactive_marker
 )
 target_link_libraries(audio_source_interactive_marker
     ${catkin_LIBRARIES}
+)
+
+#########
+# Install #
+#########
+catkin_install_python(
+    PROGRAMS node_scripts/sound_navigator
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 #########
