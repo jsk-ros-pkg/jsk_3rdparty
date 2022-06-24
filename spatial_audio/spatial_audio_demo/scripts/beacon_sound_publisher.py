@@ -7,7 +7,7 @@ import sys
 import os
 import numpy as np
 from dynamic_reconfigure.server import Server
-from sound_navigator.cfg import BeaconSoundPublisherConfig
+from spatial_audio_demo.cfg import BeaconSoundPublisherConfig
 from audio_common_msgs.msg import AudioData, AudioInfo
 
 

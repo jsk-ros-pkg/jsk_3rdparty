@@ -16,9 +16,9 @@
         <param name="~num_spinthread" value="5"/>
     </node>
 
-    <node pkg="sound_navigator" type="beacon_sound_publisher.py" name="beacon_sound_publisher" output="screen">
+    <node pkg="spatial_audio_demo" type="beacon_sound_publisher.py" name="beacon_sound_publisher" output="screen">
         <rosparam subst_value="true">
-            base_sound_file: $(find sound_navigator)/sound/beacon.wav
+            base_sound_file: $(find spatial_audio_demo)/sound/beacon.wav
         </rosparam>
     </node>
 
@@ -27,7 +27,7 @@
         <param name="loop_rate" value="100"/>
     </node>
 
-    <node pkg="sound_navigator" type="sound_navigator" name="sound_navigator" output="screen">
+    <node pkg="spatial_audio_demo" type="sound_navigator" name="sound_navigator" output="screen">
         <remap from="~input_joy" to="/joy"/>
         <rosparam subst_value="true">
             head_frame_id: $(arg head_frame_id)
@@ -52,5 +52,5 @@
         <param name="~color_b" value="0.8"/>
     </node>
 
-    <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find sound_navigator)/config/sound_navigator.rviz"/>
+    <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find spatial_audio_demo)/config/sound_navigator.rviz"/>
 </launch>

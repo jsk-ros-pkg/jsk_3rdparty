@@ -3,7 +3,7 @@
 
 import rospy
 
-from sound_navigator.sound_navigator_node import SoundNavigatorNode
+from spatial_audio_demo.sound_navigator_node import SoundNavigatorNode
 
 
 if __name__ == '__main__':
