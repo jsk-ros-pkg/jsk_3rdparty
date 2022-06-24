@@ -31,7 +31,7 @@
     <node name="stl_marker" pkg="spatial_audio_demo" type="stl_marker.py" output="log">
         <param name="~frame_id" value="$(arg head_frame_id)"/>
         <param name="~scale" value="0.001"/>
-        <param name="~mesh_resource" value="package://spatial_audio_demo/mesh/male_head.stl"/>
+        <param name="~mesh_resource" value="package://spatial_audio_demo/mesh/head.stl"/>
         <param name="~color_r" value="0.8"/>
         <param name="~color_g" value="0.8"/>
         <param name="~color_b" value="0.8"/>

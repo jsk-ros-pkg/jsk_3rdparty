@@ -6,6 +6,7 @@ add_definitions(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   audio_common_msgs
+  dynamic_reconfigure
   interactive_markers
   roscpp
   rospy
@@ -54,7 +55,13 @@ target_link_libraries(audio_source_interactive_marker
 # Install #
 #########
 catkin_install_python(
-    PROGRAMS node_scripts/sound_navigator
+    PROGRAMS
+        scripts/audio_stream_publisher.py
+        scripts/distance_beep_publisher.py
+        scripts/sound_navigator
+        scripts/beacon_sound_publisher.py
+        scripts/simple_client.py
+        scripts/stl_marker.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
