@@ -35,6 +35,9 @@
   <run_depend>julius</run_depend>
   <run_depend>julius_ros</run_depend>
   <run_depend>sesame_ros</run_depend>
+  <run_depend>spatial_audio</run_depend>
+  <run_depend>spatial_audio_msgs</run_depend>
+  <run_depend>spatial_audio_demo</run_depend>
   <run_depend>dialogflow_task_executive</run_depend>
   <run_depend>gdrive_ros</run_depend>
   <run_depend>google_cloud_texttospeech</run_depend>
