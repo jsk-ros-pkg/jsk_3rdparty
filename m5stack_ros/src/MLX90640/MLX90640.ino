@@ -6,6 +6,8 @@
 #include <std_msgs/Int16.h>
 #include "MLX90640.h"
 
+#define DRAW_ON_LCD
+
 std_msgs::Int16 min_msg;
 ros::Publisher min_pub("thermal/min_temp", &min_msg);
 
@@ -75,6 +77,11 @@ void pubImage(float *p, uint8_t rows, uint8_t cols)
 void setup()
 {
   setupM5stackROS();
+  #ifdef DRAW_ON_LCD
+    M5.Lcd.setBrightness(255);
+  #else
+    M5.Lcd.setBrightness(0);
+  #endif
   setupMLX90640();
   nh.advertise(min_pub);
   nh.advertise(max_pub);
@@ -84,6 +91,11 @@ void setup()
 
 void loop()
 {
+  #ifdef DRAW_ON_LCD
+    M5.Lcd.setBrightness(255);
+  #else
+    M5.Lcd.setBrightness(0);
+  #endif
   loopMLX90640();
   pubMinTemp();
   pubMaxTemp();
