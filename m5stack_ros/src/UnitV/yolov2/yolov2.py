@@ -37,6 +37,8 @@ recog_flag = True
 
 # Packet header for UART, 4 byte
 packet_header = bytearray([0xFF, 0xD8, 0xEA, 0x01])
+packet_stop = bytearray([0xFF, 0xD8, 0xEA, 0x02])
+packet_start = bytearray([0xFF, 0xD8, 0xEA, 0x03])
 
 
 def RGB_LED(r, g, b):
@@ -112,10 +114,8 @@ def receive_data():
     recv_data = uart.read(4)
     if recv_data is None:
         return
-    if recv_data[0] == packet_header[0] and \
-       recv_data[1] == packet_header[1] and \
-       recv_data[2] == packet_header[2] and \
-       recv_data[3] == packet_header[3]:
+    # Temporary stop UART for M5Stack to use I2C
+    if recv_data == packet_header:
         stop_UART()
         RGB_LED(0, 0, 0)
         # M5Stack uses I2C during this sleep
@@ -123,6 +123,16 @@ def receive_data():
         # M5Stack must start UART before the following start_UART()
         start_UART()
         RGB_LED(255, 255, 255)
+    # Sleep UnitV to save computation power until start_header has come
+    elif recv_data == packet_stop:
+        RGB_LED(0, 0, 0)
+        while True:
+            time.sleep(1)
+            recv_data = uart.read(4)
+            if recv_data is not None and \
+               recv_data == packet_start:
+                RGB_LED(255, 255, 255)
+                return
 
 
 # Start signal LED
