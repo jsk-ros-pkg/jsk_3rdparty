@@ -184,6 +184,11 @@ With this package, you can use following devices. To use each device, please see
     - Joystick control input unit, supports three-axis control signal input (X/Y-axis offset analog input, Z-axis key digital input).
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/JOYSTICK)
 
+- [EARTH](https://shop.m5stack.com/products/earth-sensor-unit)
+
+    - Soil Moisture Sensor for measuring the moisture in soil and similar materials.
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/EARTH)
+
 ## Tested environment
 
 ### Hardware
