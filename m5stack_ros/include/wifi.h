@@ -14,10 +14,11 @@ void setupWiFi() {
   uint8_t i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
   if (i == 21) {
-    Serial.print("Could not connect to"); Serial.println(ssid);
-    while (1) delay(500);
+    Serial.print("Could not connect to "); Serial.println(ssid);
   }
-  Serial.print("Ready! Use ");
-  Serial.print(WiFi.localIP());
-  Serial.println(" to access client");
+  else {
+    Serial.print("Ready! Use ");
+    Serial.print(WiFi.localIP());
+    Serial.println(" to access client");
+  }
 }
