@@ -1,15 +1,11 @@
 // See
 // https://qiita.com/Nabeshin/items/9268dc88927123319549
 
-#include <m5stack_ros.h>
+#include <m5stack_ros_with_battery.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <jsk_recognition_msgs/Rect.h>
 #include <jsk_recognition_msgs/RectArray.h>
 #include <jsk_recognition_msgs/ClassificationResult.h>
-
-#include <IP5306.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/UInt16.h>
 
 // UART jpg communication
 typedef struct {
@@ -20,8 +16,20 @@ typedef struct {
 jpeg_data_t jpeg_data;
 #define DATA_SIZE 64 // data size except image data
 
+#define DRAW_ON_LCD
+#ifdef DRAW_ON_LCD
+  // See https://qiita.com/Nabeshin/items/9268dc88927123319549
+  #define LGFX_M5STACK
+  // LovyanGFX version 0.4.1 is used
+  #include <LovyanGFX.hpp>
+  static LGFX lcd;
+#endif
+
 // Byte array to detect packet header
 static const uint8_t packet_header[4] = { 0xFF, 0xD8, 0xEA, 0x01 };
+// Byte array to stop/start UnitV
+static const uint8_t packet_stop[4] = { 0xFF, 0xD8, 0xEA, 0x02 };
+static const uint8_t packet_start[4] = { 0xFF, 0xD8, 0xEA, 0x03 };
 
 sensor_msgs::CompressedImage unitv_img_msg;
 ros::Publisher unitv_img_pub("unitv_image/compressed", &unitv_img_msg);
@@ -30,16 +38,11 @@ ros::Publisher unitv_rects_pub("unitv_image/rects", &unitv_rects_msg);
 jsk_recognition_msgs::ClassificationResult unitv_class_msg;
 ros::Publisher unitv_class_pub("unitv_image/class", &unitv_class_msg);
 
-std_msgs::UInt16 level_msg;
-ros::Publisher level_pub("battery_level", &level_msg);
-std_msgs::Bool charging_msg;
-ros::Publisher charging_pub("is_charging", &charging_msg);
-
 char class_str[17];
 int rects[4] = {0, 0, 0, 0};
 int proba = 0;
 
-int loop_count = 0;
+int loop_count = 100;
 
 void receive_recog_image() {
   uint8_t rx_buffer[DATA_SIZE];
@@ -143,14 +146,45 @@ void pub_unitv_image () {
   char *target_names[1] = {"dummy"};
   unitv_class_msg.target_names = target_names;
   unitv_class_pub.publish( &unitv_class_msg );
+
+  #ifdef DRAW_ON_LCD
+    lcd.drawJpg(jpeg_data.buf, jpeg_data.length,0, 0, 320, 240, 0, 0, ::JPEG_DIV_NONE);
+    // Camera image is scaled in UnitV
+    // We need to calculate rectanble position considering the scale
+    float scale = 0.6;
+    M5.Lcd.drawRect(
+      int(rects[0] / scale),
+      int(rects[1] / scale),
+      int(rects[2] / scale),
+      int(rects[3] / scale),
+      RED);
+    int string_x = max(0, min(320, int(rects[0]/scale)));
+    int string_y = max(0, min(320, int(rects[1]/scale)));
+    M5.Lcd.drawString(
+      class_str,
+      string_x,
+      string_y);
+  #endif
 }
 
-void write_data() {
+// Send packet to temporary disable UnitV UART
+void write_packet_header() {
   Serial2.write(packet_header, 4);
 }
 
+// Send packet to stop UnitV
+void write_packet_stop() {
+  Serial2.write(packet_stop, 4);
+}
+
+// Send packet to start UnitV
+// This is effective only when UnitV is already stopped
+void write_packet_start() {
+  Serial2.write(packet_start, 4);
+}
+
 void enableI2C() {
-  write_data();
+  write_packet_header();
   delay(1000);
   Serial2.end();
   Wire.begin();
@@ -161,51 +195,73 @@ void disableI2C() {
   Serial2.begin(115200, SERIAL_8N1, 21, 22);
 }
 
-void publishBattery() {
-  measureIP5306();
-  level_msg.data = battery_level;
-  charging_msg.data = isCharging;
-  level_pub.publish(&level_msg);
-  charging_pub.publish(&charging_msg);
-  nh.spinOnce();
+void wait_for_unitv_image() {
+  Serial.println("Wait for UnitV image to come.");
+  while (!Serial2.available()) {
+    delay(10);
+  }
+  receive_recog_image();
+  Serial.println("UnitV image has come.");
 }
 
 void setup() {
+  // Setup ROS except battery modules
   setupM5stackROS();
+  #ifdef DRAW_ON_LCD
+    lcd.init();
+    lcd.setRotation(1);
+    lcd.setBrightness(255);
+    lcd.setColorDepth(16);
+    lcd.clear();
+    M5.Lcd.setTextSize(3);
+  #else
+    M5.Lcd.setBrightness(0);
+  #endif
+  nh.advertise(unitv_img_pub);
+  nh.advertise(unitv_rects_pub);
+  nh.advertise(unitv_class_pub);
 
   // malloc size must be less than 8192 byte.
   // https://www.mgo-tec.com/blog-entry-trouble-shooting-esp32-wroom.html/5#title30
   // malloc size must be larger than the size of the JPEG image received from UnitV.
   jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * 7000);
 
+  // Wait for UnitV to initialize (to start accepting write_data() input)
   Serial.println("Wait for UnitV to wake up");
   Serial2.begin(115200, SERIAL_8N1, 21, 22);
-  delay(8000);
-  enableI2C();
-  setupIP5306();
-  disableI2C();
+  wait_for_unitv_image();
 
-  nh.advertise(unitv_img_pub);
-  nh.advertise(unitv_rects_pub);
-  nh.advertise(unitv_class_pub);
-  nh.advertise(level_pub);
-  nh.advertise(charging_pub);
+  // Temporary disable UART and enable I2C. In the meantime, initialize battery module.
+  enableI2C();
+  M5.Power.begin();
+  afterSetup();
+  disableI2C();
 }
 
 void loop() {
-  // For every 100 UnitV images published, battery info is published.
-  // Note that UnitV image is published at about 1Hz
-  if (loop_count == 100) {
-    enableI2C();
-    publishBattery();
-    disableI2C();
-    loop_count = 0;
-  }
-
   // Publish UnitV image
   if (Serial2.available()) {
     receive_recog_image();
-    pub_unitv_image();
+    // For every 100 UnitV images published, battery info is published.
+    // Note that UnitV image is published at about 1Hz
+    if (loop_count == 100) {
+      enableI2C();
+      measureIP5306();
+      disableI2C();
+      if (is_sleeping || isCharging) {
+        // Stop UnitV to save computation power and M5Stack battery
+        wait_for_unitv_image();
+        write_packet_stop();
+        Serial.println("Stop UnitV to save battery");
+      }
+      beforeLoop(false);
+      write_packet_start();
+      Serial.println("Restart UnitV");
+      loop_count = 0;
+    }
+    else {
+      pub_unitv_image();
+    }
     loop_count++;
     Serial.print("loop_count: ");
     Serial.println(loop_count);
