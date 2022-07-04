@@ -41,10 +41,9 @@ catkin_generate_virtualenv(
   )
 
 # import test
-file(GLOB TEST_SCRIPT_FILES test/*.py)
 if(CATKIN_ENABLE_TESTING)
   catkin_install_python(
-    PROGRAMS ${TEST_SCRIPT_FILES}
+    PROGRAMS test/test_import.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
   add_rostest(test/import.test
