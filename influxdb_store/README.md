@@ -148,6 +148,14 @@ rossetmaster fetch1075
 roslaunch influxdb_store fetch_influxdb_logger.launch robot_name:=fetch1075
 ```
 
+### Baxter
+
+```bash
+rossetip
+rossetmaster baxter
+roslaunch influxdb_store baxter_influxdb_logger.launch robot_name:=baxter
+```
+
 ### Systemctl services
 
 Please see [jsk_database](https://github.com/knorth55/jsk_database).
