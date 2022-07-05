@@ -40,7 +40,7 @@ class JointStatesLogger(object):
                     "type": "position"
                 },
                 "time": influx_time,
-                "fields": dict(zip(joint_names, position))
+                "fields": dict(list(zip(joint_names, position)))
             })
             self.query.append({
                 "measurement": "joint_states",
@@ -48,7 +48,7 @@ class JointStatesLogger(object):
                     "type": "velocity"
                 },
                 "time": influx_time,
-                "fields": dict(zip(joint_names, velocity))
+                "fields": dict(list(zip(joint_names, velocity)))
             })
             self.query.append({
                 "measurement": "joint_states",
@@ -56,7 +56,7 @@ class JointStatesLogger(object):
                     "type": "effort"
                 },
                 "time": influx_time,
-                "fields": dict(zip(joint_names, effort))
+                "fields": dict(list(zip(joint_names, effort)))
             })
 
     def _timer_cb(self, event):
