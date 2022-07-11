@@ -1,7 +1,11 @@
 // Copied from
 // https://github.com/m5stack/M5Unit-ENV/blob/eaa1983195c034b98b03918e4dd3521a894f9daa/examples/Unit_ENVIII_M5Core/Unit_ENVIII_M5Core.ino
-// Adafruit_BMP280 version 2.6.3 is used
-// https://github.com/adafruit/Adafruit_BMP280_Library
+//
+// Required libraries are
+// - M5Unit-ENV
+//   https://github.com/m5stack/M5Unit-ENV
+// - Adafruit_BMP280 version 2.6.3
+//   https://github.com/adafruit/Adafruit_BMP280_Library
 
 #include <m5stack_ros.h>
 #include <std_msgs/Float32.h>

@@ -2,6 +2,11 @@
 
 Publish [ENV III](https://docs.m5stack.com/en/unit/envIII) temperature, humidity and atmospheric pressure sensor data.
 
+## Dependencies
+
+- [M5Unit-ENV](https://github.com/m5stack/M5Unit-ENV)
+- [Adafruit BMP280 Driver](https://github.com/adafruit/Adafruit_BMP280_Library)
+
 ## Overview
 
 Published topics:
