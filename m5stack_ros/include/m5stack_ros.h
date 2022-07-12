@@ -34,6 +34,10 @@
   #include <ros.h>
 #endif
 
+// If ROSSERIAL_ARDUINO_BLUETOOTH is defined,
+// BluetoothSerial is used as well as Hardwareserial
+#include <print.h>
+
 // MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE
 ros::NodeHandle_<ArduinoHardware, 25, 25, 8192, 8192> nh;
 
@@ -52,6 +56,7 @@ void setupM5stackROS(char *name) {
     nh.initNode();
   #elif defined(ROSSERIAL_ARDUINO_BLUETOOTH)
     nh.initNode(name);
+    SerialBT.begin(name);
   #else
     nh.getHardware()->setBaud(57600);
     nh.initNode();
