@@ -49,16 +49,13 @@ void setupM5stackROS(char *name) {
   #if defined(ROSSERIAL_ARDUINO_TCP)
     setupWiFi();
     nh.getHardware()->setConnection(server);
+    nh.initNode();
   #elif defined(ROSSERIAL_ARDUINO_BLUETOOTH)
+    nh.initNode(name);
   #else
     nh.getHardware()->setBaud(57600);
+    nh.initNode();
   #endif
-
-#if defined(ROSSERIAL_ARDUINO_BLUETOOTH)
-  nh.initNode(name);
-#else
-  nh.initNode();
-#endif
 }
 
 void setupM5stackROS() {
