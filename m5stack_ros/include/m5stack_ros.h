@@ -37,7 +37,7 @@
 // MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE
 ros::NodeHandle_<ArduinoHardware, 25, 25, 8192, 8192> nh;
 
-void setupM5stackROS() {
+void setupM5stackROS(char *name) {
   M5.begin();
   #if defined(M5STACK)
     M5.Speaker.begin();
@@ -54,5 +54,13 @@ void setupM5stackROS() {
     nh.getHardware()->setBaud(57600);
   #endif
 
+#if defined(ROSSERIAL_ARDUINO_BLUETOOTH)
+  nh.initNode(name);
+#else
   nh.initNode();
+#endif
+}
+
+void setupM5stackROS() {
+    setupM5stackROS("ROSSERIAL_BLUETOOTH");
 }
