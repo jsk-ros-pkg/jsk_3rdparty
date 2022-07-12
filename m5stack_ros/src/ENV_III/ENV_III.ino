@@ -7,6 +7,8 @@
 // - Adafruit_BMP280 version 2.6.3
 //   https://github.com/adafruit/Adafruit_BMP280_Library
 
+#define ROSSERIAL_ARDUINO_BLUETOOTH
+
 #include <m5stack_ros.h>
 #include <std_msgs/Float32.h>
 #include <M5_ENV_III.h>
@@ -60,7 +62,7 @@ void publishENV() {
 }
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS ENVIII");
   setupENV();
 
   nh.advertise(tmp_pub);
@@ -72,5 +74,5 @@ void loop() {
   loopENV();
   publishENV();
   nh.spinOnce();
-  delay(2000);
+  delay(10);
 }
