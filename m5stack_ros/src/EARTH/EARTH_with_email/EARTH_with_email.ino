@@ -41,7 +41,7 @@ void blackScreen()
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS EARTH");
   setupEARTH();
   blackScreen();
 

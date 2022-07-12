@@ -76,7 +76,7 @@ void pubImage(float *p, uint8_t rows, uint8_t cols)
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS MLX90640");
   #ifdef DRAW_ON_LCD
     M5.Lcd.setBrightness(255);
   #else

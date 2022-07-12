@@ -10,7 +10,7 @@ ros::Publisher temp_pub("temperature", &temp_msg);
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS MPU9250");
   setupMPU9250();
   nh.advertise(imu_pub);
   nh.advertise(temp_pub);

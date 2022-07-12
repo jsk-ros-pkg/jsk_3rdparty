@@ -10,7 +10,7 @@ ros::Publisher charging_pub("is_charging", &charging_msg);
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS IP5306");
   setupIP5306();
 
   nh.advertise(level_pub);

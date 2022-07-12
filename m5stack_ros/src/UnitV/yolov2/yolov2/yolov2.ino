@@ -163,7 +163,7 @@ void pub_unitv_image () {
 }
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS UnitV yolov2");
   #ifdef DRAW_ON_LCD
     lcd.init();
     lcd.setRotation(1);

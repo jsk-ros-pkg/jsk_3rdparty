@@ -206,7 +206,7 @@ void wait_for_unitv_image() {
 
 void setup() {
   // Setup ROS except battery modules
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS UnitV yolov2");
   #ifdef DRAW_ON_LCD
     lcd.init();
     lcd.setRotation(1);

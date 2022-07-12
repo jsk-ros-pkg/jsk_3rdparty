@@ -9,7 +9,7 @@ ros::Publisher moisture_pub("moisture", &moisture_msg);
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS EARTH");
   setupEARTH();
 
   nh.advertise(moist_pub);

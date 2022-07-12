@@ -34,7 +34,7 @@ void pubAudio() {
 }
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS PDM SPM1423");
   setupIP5306();
   microPhoneSetup();
   header("PDM Unit", BLACK);

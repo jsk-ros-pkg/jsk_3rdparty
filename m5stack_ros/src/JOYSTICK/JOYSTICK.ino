@@ -6,7 +6,7 @@ sensor_msgs::Joy joy_msg;
 ros::Publisher joy_pub("joy", &joy_msg);
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS JOYSTICK");
   Wire.begin(21, 22, 400000UL);
   setupJoystick();
   nh.advertise(joy_pub);

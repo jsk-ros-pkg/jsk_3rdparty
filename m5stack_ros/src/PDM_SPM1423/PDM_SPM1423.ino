@@ -23,7 +23,7 @@ void pubAudio() {
 }
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS PDM SPM1423");
   microPhoneSetup();
   header("PDM Unit", BLACK);
   nh.advertise(audio_pub);

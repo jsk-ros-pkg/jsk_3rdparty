@@ -7,7 +7,7 @@ ros::Publisher tof_pub("tof", &tof_msg);
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS VL53L0X");
   setupVL53L0X();
 
   nh.advertise(tof_pub);

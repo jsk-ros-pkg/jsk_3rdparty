@@ -74,7 +74,7 @@ void loopTVOCSGP30() {
 }
 
 void setup() {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS TVOC SGP30");
   setupTVOCSGP30();
   nh.advertise(tvoc_pub);
   nh.advertise(eco2_pub);

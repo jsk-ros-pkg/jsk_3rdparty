@@ -7,7 +7,7 @@ ros::Publisher proximity_pub("proximity", &proximity_msg);
 
 void setup()
 {
-  setupM5stackROS();
+  setupM5stackROS("M5Stack ROS VCNL4040");
   setupVCNL4040();
 
   nh.advertise(proximity_pub);
