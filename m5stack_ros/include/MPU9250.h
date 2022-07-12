@@ -7,6 +7,7 @@
 // #define M5STACK_200Q
 
 #include <M5Stack.h>
+#include <print.h>
 
 float accX = 0.0F;
 float accY = 0.0F;
@@ -71,16 +72,38 @@ void displayMPU9250() {
   M5.Lcd.setTextColor(GREEN , BLACK);
   M5.Lcd.setTextSize(2);
 
+  char buffer[100];
+  // Gyroscope
   M5.Lcd.setCursor(0, 10);
-  M5.Lcd.printf("Gyro [o/s]\n", gyroX, gyroY, gyroZ);
-  M5.Lcd.printf("%6.2f  %6.2f  %6.2f      ", gyroX, gyroY, gyroZ);
+  sprintf(buffer, "Gyro [o/s]\n");
+  M5.Lcd.printf(buffer);
+  PRINT(buffer);
+  sprintf(buffer, "%6.2f  %6.2f  %6.2f      ", gyroX, gyroY, gyroZ);
+  M5.Lcd.printf(buffer);
+  PRINTLN(buffer);
+  // accelerometer
   M5.Lcd.setCursor(0, 65);
-  M5.Lcd.print("Accel [G]\n");
-  M5.Lcd.printf(" %5.2f   %5.2f   %5.2f   ", accX, accY, accZ);
+  sprintf(buffer, "Accel [G]\n");
+  M5.Lcd.print(buffer);
+  PRINT(buffer);
+  sprintf(buffer, "%5.2f   %5.2f   %5.2f   ", accX, accY, accZ);
+  M5.Lcd.printf(buffer);
+  PRINTLN(buffer);
+  // AHRS
   M5.Lcd.setCursor(0, 120);
-  M5.Lcd.print("AHRS\n");
-  M5.Lcd.printf(" %5.2f   %5.2f   %5.2f   ", pitch, roll, yaw);
+  sprintf(buffer, "AHRS\n");
+  M5.Lcd.printf(buffer);
+  PRINT(buffer);
+  sprintf(buffer, "%5.2f   %5.2f   %5.2f   ", pitch, roll, yaw);
+  M5.Lcd.printf(buffer);
+  PRINTLN(buffer);
+  // Temperature
   M5.Lcd.setCursor(0, 175);
-  M5.Lcd.print("Temp [C]\n");
-  M5.Lcd.printf("%.2f", temp);
+  sprintf(buffer, "Temp [C]\n");
+  M5.Lcd.printf(buffer);
+  PRINT(buffer);
+  sprintf(buffer, "%5.2f", temp);
+  M5.Lcd.printf(buffer);
+  PRINTLN(buffer);
+  PRINTLN("");
 }

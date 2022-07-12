@@ -8,6 +8,7 @@
 */
 
 #include <driver/i2s.h>
+#include <print.h>
 
 #define PIN_CLK  22
 #define PIN_DATA 21
@@ -111,6 +112,8 @@ void calcVolume() {
     volume += adc_data * adc_data;
   }
   volume /= audio_size_16bit;
+  PRINT("volume: ");
+  PRINTLN(volume);
 }
 
 

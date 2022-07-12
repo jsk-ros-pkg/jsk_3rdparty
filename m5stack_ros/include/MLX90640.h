@@ -31,6 +31,7 @@
   Open the serial monitor at 9600 baud to see the output
 */
 #include <M5Stack.h>
+#include <print.h>
 #include <Wire.h>
 
 #include "MLX90640_API.h"
@@ -171,7 +172,7 @@ void setupMLX90640()
 }
 
 
-void loopMLX90640()
+void measureMLX90640()
 {
   loopTime = millis();
   startTime = loopTime;
@@ -424,6 +425,16 @@ void loopMLX90640()
     // M5.Lcd.drawCircle(160, 120, 6, TFT_WHITE);     // update center spot icon
     // M5.Lcd.drawLine(160, 110, 160, 130, TFT_WHITE); // vertical line
     // M5.Lcd.drawLine(150, 120, 170, 120, TFT_WHITE); // horizontal line
+    PRINT("Min temp: ");
+    PRINT(min_v);
+    PRINTLN("[C]");
+    PRINT("Max temp: ");
+    PRINT(max_v);
+    PRINTLN("[C]");
+    PRINT("Spot temp: ");
+    PRINT(spot_v);
+    PRINTLN("[C]");
+    PRINTLN("");
   }
   loopTime = millis();
   endTime = loopTime;

@@ -1,5 +1,13 @@
-#include <MPU9250.h>
+// See https://github.com/tom2rd/ESP32room/blob/master/MPU9250/IMU.ino
+
+// define must ahead #include <M5Stack.h>
+// #define M5STACK_MPU6886
+ #define M5STACK_MPU9250
+// #define M5STACK_MPU6050
+// #define M5STACK_200Q
+
 #include <m5stack_ros.h>
+#include <MPU9250.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Temperature.h>
 

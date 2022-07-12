@@ -96,7 +96,7 @@ void loop()
   #else
     M5.Lcd.setBrightness(0);
   #endif
-  loopMLX90640();
+  measureMLX90640();
   pubMinTemp();
   pubMaxTemp();
   pubCenterTemp();

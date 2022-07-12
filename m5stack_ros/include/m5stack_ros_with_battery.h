@@ -75,9 +75,11 @@ void checkCharge(bool read_battery = true) {
   // Do not enter main loop when is_sleeping is true
   while (is_sleeping || isCharging) {
     if (is_sleeping) {
+      PRINTLN("Sleeping ...");
       delay(1000);
     }
     if (isCharging) {
+      PRINTLN("Charging ...")
       M5.Lcd.setBrightness(255);
       blinkCharging();
     }
