@@ -71,7 +71,7 @@ void afterSetup() {
 
 // This function is additional loop process for m5stack_ros.
 // This function should be called after every loop()
-void beforeLoop(bool read_battery = true) {
+void checkCharge(bool read_battery = true) {
   // Do not enter main loop when is_sleeping is true
   while (is_sleeping || isCharging) {
     if (is_sleeping) {

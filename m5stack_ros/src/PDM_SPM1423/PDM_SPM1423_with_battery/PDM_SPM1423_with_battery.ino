@@ -52,7 +52,7 @@ void loop() {
     // Publish battery info while stopping publishing audio info
     // This is because I2C and I2S share the pin and they can't be measured simultaneously
     enableI2C();
-    beforeLoop();
+    checkCharge();
     disableI2C();
     loop_count = 0;
     // Remove noisy audio data right after I2S starts

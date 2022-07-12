@@ -92,7 +92,7 @@ void setup()
 
 void loop()
 {
-  beforeLoop();
+  checkCharge();
   #ifdef DRAW_ON_LCD
     M5.Lcd.setBrightness(255);
   #else

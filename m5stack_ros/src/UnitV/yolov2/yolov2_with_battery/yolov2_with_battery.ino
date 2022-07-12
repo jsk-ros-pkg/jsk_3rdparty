@@ -254,7 +254,7 @@ void loop() {
         write_packet_stop();
         Serial.println("Stop UnitV to save battery");
       }
-      beforeLoop(false);
+      checkCharge(false);
       write_packet_start();
       Serial.println("Restart UnitV");
       loop_count = 0;

@@ -84,7 +84,7 @@ void setup() {
 }
 
 void loop() {
-  beforeLoop();
+  checkCharge();
 
   loopTVOCSGP30();
 

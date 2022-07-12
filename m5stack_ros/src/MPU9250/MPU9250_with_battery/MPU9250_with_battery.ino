@@ -20,7 +20,7 @@ void setup()
 
 void loop()
 {
-  beforeLoop();
+  checkCharge();
 
   measureMPU9250();
   displayMPU9250();
