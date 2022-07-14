@@ -40,7 +40,7 @@ void publishBattery(bool read_battery = true) {
   nh.spinOnce();
 }
 
-void blinkCharging() {
+void fillChargeIcon() {
   // 背景を真っ黒に塗りつぶす
   M5.Lcd.fillScreen(BLACK);
   // 電池へそ
@@ -53,12 +53,29 @@ void blinkCharging() {
   // 充電マーク
   M5.Lcd.fillTriangle(160, 65, 140, 110, 160, 110, BLACK);
   M5.Lcd.fillTriangle(160, 135, 180, 90, 160, 90, BLACK);
+}
+
+void blinkChargeIcon(bool read_battery = true) {
+  if (read_battery) {
+    measureIP5306();
+  }
+  fillChargeIcon();
   // 点滅
   delay(3000);
   M5.Lcd.sleep();
   M5.Lcd.setBrightness(0);
   delay(3000);
   M5.Lcd.wakeup();
+  M5.Lcd.setBrightness(255);
+}
+
+void lightChargeIcon(bool read_battery = true) {
+  // Check battery and update monitor every 30 seconds
+  if (read_battery) {
+    measureIP5306();
+  }
+  fillChargeIcon();
+  delay(30 * 1000);
   M5.Lcd.setBrightness(255);
 }
 
@@ -81,7 +98,9 @@ void checkCharge(bool read_battery = true) {
     if (isCharging) {
       PRINTLN("Charging ...")
       M5.Lcd.setBrightness(255);
-      blinkCharging();
+      // If we want to blink charge icon, use blinkChargeIcon()
+      // blinkChargeIcon(read_battery);
+      lightChargeIcon(read_battery);
     }
     nh.spinOnce();
     publishBattery(read_battery);
