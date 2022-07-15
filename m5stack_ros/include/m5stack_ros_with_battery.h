@@ -70,12 +70,14 @@ void blinkChargeIcon(bool read_battery = true) {
 }
 
 void lightChargeIcon(bool read_battery = true) {
-  // Check battery and update monitor every 30 seconds
+  // Currently, SerialClient connection timeout is 5*3=15 seconds
+  // https://github.com/sktometometo/rosserial/blob/7b1bdfe6ee7fd14c0a0685cdbc674275f3aeb53b/rosserial_python/src/rosserial_python/SerialClient.py#L459
+  // To avoid "Lost sync with device" error, check battery and update monitor every 10 (< 15) seconds
   if (read_battery) {
     measureIP5306();
   }
   fillChargeIcon();
-  delay(30 * 1000);
+  delay(10 * 1000);
   M5.Lcd.setBrightness(255);
 }
 
