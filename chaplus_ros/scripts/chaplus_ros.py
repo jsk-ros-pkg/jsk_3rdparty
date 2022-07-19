@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+1# -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
 #
@@ -85,7 +85,7 @@ class ChaplusROS(object):
 
         elif self.chatbot_engine=="A3RT":
             self.apikey = apikey_json['apikey_a3rt']
-            self.endpoint = "https://api.a3rt.recruit-tech.co.jp/talk/v1/smalltalk"
+            self.endpoint = "https://api.a3rt.recruit.co.jp/talk/v1/smalltalk"
 
         else:
             rospy.logerr("please use chatbot_engine Chaplus or A3RT")
