@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-1# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Software License Agreement (BSD License)
 #
