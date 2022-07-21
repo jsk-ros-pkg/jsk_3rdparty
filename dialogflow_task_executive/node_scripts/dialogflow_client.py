@@ -10,6 +10,7 @@ try:
     import Queue
 except ImportError:
     import queue as Queue
+import os
 import rospy
 import threading
 import uuid
@@ -105,7 +106,7 @@ class DialogflowBase(object):
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
-        if self.language == 'ja-JP':
+        if self.language == 'ja-JP' and os.environ["ROS_PYTHON_VERSION"] == "2":
             msg.query = result.query_text.encode("utf-8")
             msg.response = result.fulfillment_text.encode("utf-8")
         else:
@@ -140,9 +141,7 @@ class DialogflowTextClient(DialogflowBase):
             )
             df_result = self.detect_intent_text(goal.query, session)
             result.session = session
-            rospy.logwarn("session: {}".format(type(result.session)))
             result.response = self.make_dialog_msg(df_result)
-            rospy.logwarn("response: {}".format(type(result.response)))
             success = True
         except Exception as e:
             rospy.logerr(str(e))
@@ -268,7 +267,7 @@ class DialogflowAudioClient(DialogflowBase):
             volume=self.volume)
 
         # for japanese or utf-8 languages
-        if self.language == 'ja-JP':
+        if self.language == 'ja-JP' and os.environ["ROS_PYTHON_VERSION"] == "2":
             msg.arg = result.fulfillment_text.encode('utf-8')
             msg.arg2 = self.language
         else:
