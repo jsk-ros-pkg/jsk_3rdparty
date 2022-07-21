@@ -86,7 +86,7 @@ class DialogflowBase(object):
         self.pub_res = rospy.Publisher(
             "dialog_response", DialogResponse, queue_size=1)
         self.always_publish_result = rospy.get_param(
-            "~always_publish_result", True)
+            "~always_publish_result", False)
 
     def detect_intent_text(self, data, session):
         query = df.types.QueryInput(
