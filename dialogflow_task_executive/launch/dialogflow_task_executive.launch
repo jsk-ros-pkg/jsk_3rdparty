@@ -21,23 +21,17 @@
   </node>
 
   <group if="$(arg launch_dialogflow)">
-    <node name="dialogflow_client"
-          pkg="dialogflow_task_executive" type="dialogflow_client.py"
-          output="screen">
-      <rosparam subst_value="true">
-        use_audio: $(arg use_audio)
-        use_tts: $(arg use_tts)
-        language: $(arg language)
-        soundplay_action_name: $(arg soundplay_action_name)
-        volume: $(arg volume)
-        project_id: $(arg project_id)
-        google_cloud_credentials_json: $(arg credential)
-        enable_hotword: $(arg enable_hotword)
-        always_publish_result: $(arg always_publish_result)
-      </rosparam>
-      <rosparam command="load" ns="/dialogflow_client/hotword"
-                file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
-    </node>
+    <include file="$(find dialogflow_task_executive)/launch/dialogflow_ros.launch">
+      <arg name="use_audio" value="$(arg use_audio)" />
+      <arg name="use_tts" value="$(arg use_tts)" />
+      <arg name="language" value="$(arg language)" />
+      <arg name="soundplay_action_name" value="$(arg soundplay_action_name)" />
+      <arg name="volume" value="$(arg volume)" />
+      <arg name="credential" value="$(arg credential)" />
+      <arg name="project_id" value="$(arg project_id)" />
+      <arg name="enable_hotword" value="$(arg enable_hotword)" />
+      <arg name="always_publish_result" value="$(arg always_publish_result)" />
+    </include>
   </group>
 
   <node name="task_executive"
