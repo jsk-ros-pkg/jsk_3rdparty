@@ -6,7 +6,10 @@ import dialogflow as df
 from google.oauth2.service_account import Credentials
 from google.protobuf.json_format import MessageToJson
 import pprint
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 import rospy
 import threading
 import uuid
@@ -137,7 +140,9 @@ class DialogflowTextClient(DialogflowBase):
             )
             df_result = self.detect_intent_text(goal.query, session)
             result.session = session
+            rospy.logwarn("session: {}".format(type(result.session)))
             result.response = self.make_dialog_msg(df_result)
+            rospy.logwarn("response: {}".format(type(result.response)))
             success = True
         except Exception as e:
             rospy.logerr(str(e))
@@ -172,8 +177,11 @@ class DialogflowAudioClient(DialogflowBase):
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
         hotwords = rospy.get_param("~hotword", [])
-        self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
-                            for hotword in hotwords ]
+        try:
+            self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
+                              for hotword in hotwords ]
+        except NameError:
+            self.hotwords = hotwords
 
         self.state = State()
         self.queue = Queue.Queue()
