@@ -23,6 +23,7 @@
   <node name="audio_capture" pkg="audio_capture" type="audio_capture"
         if="$(arg launch_audio_capture)"
         respawn="true">
+    <remap from="audio" to="$(arg audio_topic)" />
     <rosparam subst_value="true">
       format: wave
       channels: $(arg n_channel)
@@ -45,6 +46,14 @@
       engine: $(arg engine)
       language: $(arg language)
       continuous: $(arg continuous)
+      enable_sound_effect: $(arg launch_sound_play)
     </rosparam>
+  </node>
+
+
+  <node name="speech_recognition_candidates_to_string"
+        pkg="ros_speech_recognition" type="speech_recognition_candidates_to_string.py"
+        output="screen">
+    <remap from="~input" to="$(arg voice_topic)" />
   </node>
 </launch>

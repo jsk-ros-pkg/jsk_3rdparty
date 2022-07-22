@@ -15,10 +15,24 @@ JSK members can edit the original file [here](https://docs.google.com/presentati
 Especially, please set your device name and enable cloud service.
 
 3. Get your token  
-On switchbot App, profile -> settings, and press `version` for 10 times and you can get token. For JSK members, we already have shared one [here](https://drive.google.com/file/d/1YZ4P4aaPemB_umB9S0xDG66BJt59-2lz/view?usp=sharing).
+On switchbot App, profile -> settings, and press `version` for 10 times and you can get token.
 
-### Using switchbot ros
+For JSK members, please see [this slide](https://docs.google.com/presentation/d/11UkuxVT4u_LcAYJQnPvt4mzxos9Qvflth5hgZmtqmyk/edit?usp=sharing) for account and token details and installed switchbots for our lab.
+
+### How to launch switchbot ros
 Execute `roslaunch switchbot_ros switchbot.launch token:=YOUR_TOKEN` and publish ActionGoal.
+
+### ROS API
+
+The `switchbot_ros` node provides APIs below.
+
+#### `~/devices` topic ( Type: `switchbot_ros/DeviceArray` )
+
+This topic provides devices list available with switchbot_ros server.
+
+#### `~/switch` action ( Type: `switchbot_ros/SwitchBotcommandAction` )
+
+This action provide command interface to switchbot devices.
 
 From command line
 ```bash
@@ -58,13 +72,35 @@ goal:
   command_type: ''"
 ```
 
-From roseus
-```
-(control-device "/eng2/7f/73b2/light/upper/switch" "turnOn")
+Please see [here](https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices) for command details.
+
+### Client libraries
+
+There are rospy/roseus client libraries for `switchbot_ros` server.
+
+#### roseus
+
+```lisp
+(setq msg (get-devices)) ;; get device list
+(dolist (device (send msg :devices)) (format t "name: ~A, type: ~A~%" (send device :name) (send device :type))) ;; print device list
+(control-device "/eng2/7f/73b2/light/upper/switch" "turnOn") ;; control some device
 (control-device "/eng2/7f/73b2/light/lower/switch" "turnOn")
 ```
 
-Please see [here](https://github.com/OpenWonderLabs/SwitchBotAPI#command-set-for-physical-devices) for command details.
+#### rospy
+
+```python
+import rospy
+from switchbot_ros.switchbot_ros_client import SwitchBotROSClient
+
+rospy.init_node('hoge')
+client = SwitchBotROSClient()
+
+devices = client.get_devices()
+print(devices)
+
+client.control_device('/eng2/7f/73b2_bot_kitchen', 'turnOn')
+```
 
 
 ### An example of controlling the elevator at Eng2 building at The University of Tokyo

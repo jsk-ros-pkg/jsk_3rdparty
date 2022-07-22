@@ -64,9 +64,9 @@ Example with google speech recognition. This demo requires [google_cloud_credent
 
 ## Use other chat API
 ### A3RT
-If you want to use [A3RT](https://a3rt.recruit-tech.co.jp/product/talkAPI)
+If you want to use [A3RT](https://a3rt.recruit.co.jp/product/talkAPI)
 1) Get A3RT APIKey
-Please access https://a3rt.recruit-tech.co.jp/product/talkAPI/registered/ and enter your information.
+Please access https://a3rt.recruit.co.jp/product/talkAPI/registered/ and enter your information.
 
 2) Write A3RT API key in json file under `` `rospack find chaplus_ros`/apikey.json ``
 ```
