@@ -12,6 +12,7 @@ except ImportError:
     import queue as Queue
 import os
 import rospy
+import sys
 import threading
 import uuid
 
@@ -267,11 +268,12 @@ class DialogflowAudioClient(DialogflowBase):
             volume=self.volume)
 
         # for japanese or utf-8 languages
-        if self.language == 'ja-JP' and os.environ["ROS_PYTHON_VERSION"] == "2":
+        if self.language == 'ja-JP' and sys.version <= 2:
             msg.arg = result.fulfillment_text.encode('utf-8')
-            msg.arg2 = self.language
         else:
             msg.arg = result.fulfillment_text
+        if self.language == 'ja-JP':
+            msg.arg2 = self.language
 
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
