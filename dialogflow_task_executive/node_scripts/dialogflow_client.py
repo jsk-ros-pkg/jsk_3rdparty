@@ -94,7 +94,7 @@ class DialogflowBase(object):
     def make_dialog_msg(self, result):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
-        if result.action != 'input.unknown':
+        if result.action == 'input.unknown':
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
