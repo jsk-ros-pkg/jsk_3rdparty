@@ -2,14 +2,24 @@
 
 all: installed.viocevox_core
 
-VERSION = 0.11.4
-FILENAME = core.zip
-TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://github.com/VOICEVOX/voicevox_core/releases/download/$(VERSION)/core.zip"
-SOURCE_DIR = build/core
-UNPACK_CMD = unzip
+VERSION = 0.12.4
 MD5SUM_DIR = $(CURDIR)/md5sum
-MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
+ifeq ($(shell uname -m),x86_64)
+	DIRNAME = voicevox_core-linux-x64-cpu-$(VERSION)
+	FILENAME = voicevox_core-linux-x64-cpu-$(VERSION).zip
+	SOURCE_DIR = build/voicevox_core-linux-x64-cpu-$(VERSION)
+	MD5SUM_FILE = $(MD5SUM_DIR)/core-linux-x64-cpu.md5sum
+endif
+ifeq ($(shell uname -m),aarch64)
+	DIRNAME = voicevox_core-linux-arm64-cpu-$(VERSION)
+	FILENAME = voicevox_core-linux-arm64-cpu-$(VERSION).zip
+	SOURCE_DIR = build/voicevox_core-linux-arm64-cpu-$(VERSION)
+	MD5SUM_FILE = $(MD5SUM_DIR)/core-linux-arm64-cpu.md5sum
+endif
+
+TARBALL_URL = "https://github.com/VOICEVOX/voicevox_core/releases/download/$(VERSION)/$(FILENAME)"
+TARBALL = build/$(FILENAME)
+UNPACK_CMD = unzip
 SCRIPT_DIR = $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 include $(shell rospack find mk)/download_unpack_build.mk
 INSTALL_DIR =	'./'
@@ -17,9 +27,7 @@ INSTALL_DIR =	'./'
 
 installed.viocevox_core: $(SOURCE_DIR)/unpacked
 	mkdir -p $(INSTALL_DIR)/lib
-	cp build/core/lib*.so $(INSTALL_DIR)/lib/
-	cp build/core/*.bin $(INSTALL_DIR)/lib/
-	cp build/core/metas.json $(INSTALL_DIR)/lib/metas.json
+	cp build/$(DIRNAME)/lib*.so $(INSTALL_DIR)/lib/
 
 clean:
 	rm -rf $(TARBALL)
