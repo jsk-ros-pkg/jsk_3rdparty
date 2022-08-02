@@ -19,7 +19,9 @@ if($ENV{ROS_DISTRO} STREQUAL "noetic")
     PYTHON_INTERPRETER python3
     )
 else()
-  catkin_generate_virtualenv()
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    )
 endif()
 
 file(GLOB SCRIPT_PROGRAMS scripts/*.py)
