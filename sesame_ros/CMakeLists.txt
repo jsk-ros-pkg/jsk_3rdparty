@@ -20,7 +20,9 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_generate_virtualenv()
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python2
+  )
 
 include_directories()
 
