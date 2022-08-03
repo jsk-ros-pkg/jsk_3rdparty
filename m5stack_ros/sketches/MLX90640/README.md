@@ -31,6 +31,8 @@ Published topics:
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)
 
+- Install [M5Stack THERMAL_MLX90640](https://github.com/m5stack/M5Stack/tree/0.3.6/examples/Unit/THERMAL_MLX90640) 3.6.0 version from Arduino library
+
 - Run
 
   ```bash

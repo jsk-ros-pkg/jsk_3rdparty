@@ -1,37 +1,23 @@
-// Mainly copied from https://github.com/m5stack/M5-ProductExampleCodes/tree/master/Unit/THERMAL/Arduino/MLX90640
+/*
+*******************************************************************************
+* Copyright (c) 2022 by M5Stack
+*                  Equipped with M5Core sample source code
+*                          配套  M5Core 示例源代码
+* Visit for more information: https://docs.m5stack.com/en/unit/thermal
+* 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/thermal
+*
+* Describe: thermal.
+* Date: 2021/8/31
+*******************************************************************************
+  Please connect to Port A, Read the THERMAL Unit (MLX90640 IR array)
+temperature pixels and display it on the screen. 请连接端口A,
+读取热单元(MLX90640红外阵列)温度像素，并显示在屏幕上。
+*/
+
+// Copied from https://github.com/m5stack/M5Stack/blob/0.3.6/examples/Unit/THERMAL_MLX90640/THERMAL_MLX90640.ino
 // Modified based on https://ambidata.io/samples/m5stack/thermalcamera/
 
-// update 3 :mirror image
-// reverseScreen=true/false, turn=front camera, false=Selfie
-/*
-  Read the temperature pixels from the MLX90640 IR array
-  By: Nathan Seidle
-  SparkFun Electronics
-  Date: May 22nd, 2018
-  License: MIT. See license file for more information but you can
-  basically do whatever you want with this code.
-
-  Feel like supporting open source hardware?
-  Buy a board from SparkFun! https://www.sparkfun.com/products/14769
-
-  This example initializes the MLX90640 and outputs the 768 temperature values
-  from the 768 pixels.
-
-  This example will work with a Teensy 3.1 and above. The MLX90640 requires some
-  hefty calculations and larger arrays. You will need a microcontroller with 20,000
-  bytes or more of RAM.
-
-  This relies on the driver written by Melexis and can be found at:
-  https://github.com/melexis/mlx90640-library
-
-  Hardware Connections:
-  Connect the SparkFun Qwiic Breadboard Jumper (https://www.sparkfun.com/products/14425)
-  to the Qwiic board
-  Connect the male pins to the Teensy. The pinouts can be found here: https://www.pjrc.com/teensy/pinout.html
-  Open the serial monitor at 9600 baud to see the output
-*/
 #include <M5Stack.h>
-#include <print.h>
 #include <Wire.h>
 
 #include "MLX90640_API.h"
@@ -447,7 +433,6 @@ void measureMLX90640()
   M5.Lcd.setTextSize(1);
 }
 
-
 /***infodisplay()*****/
 void infodisplay(void) {
   M5.Lcd.fillRect(0, 198, 320, 4, TFT_WHITE);
@@ -456,11 +441,11 @@ void infodisplay(void) {
   M5.Lcd.setTextSize(2);
   M5.Lcd.setCursor(284, 222); //move to bottom right
   M5.Lcd.print(MAXTEMP , 1);  // update MAXTEMP
-  M5.Lcd.printf("C" , 1);
+  M5.Lcd.print("C");
   M5.Lcd.setCursor(0, 222);  // update MINTEMP text
   M5.Lcd.fillRect(0, 222, 36, 16, TFT_BLACK);
   M5.Lcd.print(MINTEMP , 1);
-  M5.Lcd.printf("C" , 1);
+  M5.Lcd.print("C");
   M5.Lcd.setCursor(106, 224);
 }
 
