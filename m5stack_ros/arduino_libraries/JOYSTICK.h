@@ -1,21 +1,29 @@
+/*
+  MIT License
+
+  Copyright (c) 2017 M5Stack
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
 // Copied from
 // https://github.com/m5stack/M5Stack/blob/master/examples/Unit/JOYSTICK/JOYSTICK.ino
-
-/*
-*******************************************************************************
-* Copyright (c) 2021 by M5Stack
-*                  Equipped with M5Core sample source code
-*                          配套  M5Core 示例源代码
-* Visit the website for more
-information: https://docs.m5stack.com/en/unit/joystick
-* 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/joystick
-*
-* describe: JOYSTICK.
-* date: 2021/8/30
-*******************************************************************************
-  Please connect to Port A,Read JOYSTICK Unit X, Y axis offset data and button
-status 请连接端口 A,读取操纵杆单位X, Y轴偏移数据和按钮状态
-*/
 
 #include <M5Stack.h>
 
