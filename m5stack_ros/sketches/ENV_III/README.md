@@ -27,6 +27,11 @@ Published topics:
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)
 
+- Required libraries are
+  - [M5Unit-ENV](https://github.com/m5stack/M5Unit-ENV/tree/0.0.5/src) version 0.0.5 from Arduino library
+    https://github.com/m5stack/M5Unit-ENV
+  - [Adafruit_BMP280](https://github.com/adafruit/Adafruit_BMP280_Library/tree/2.6.3) version 2.6.3 from Arduino library
+
 - Run
 
   ```bash

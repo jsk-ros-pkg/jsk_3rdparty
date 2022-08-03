@@ -1,24 +1,32 @@
+/*
+MIT License
+
+Copyright (c) 2021 M5Stack
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 // Copied from
-// https://github.com/m5stack/M5Unit-ENV/blob/eaa1983195c034b98b03918e4dd3521a894f9daa/src/M5_ENV.h
-
-/*!
- * @brief An environmental sensor From M5Stack
- * @copyright Copyright (c) 2022 by M5Stack[https://m5stack.com]
- *
- * @Links [ENV III](https://docs.m5stack.com/en/unit/envIII)
- * @version  V0.0.4
- * @date  2022-07-07
- */
-#ifndef _M5_ENV_H_
-#define _M5_ENV_H_
-
-#include "DHT12.h"
-#include "QMP6988.h"
-#include "SHT3X.h"
-
-#endif
+// https://github.com/m5stack/M5Unit-ENV/blob/0.0.5/examples/Unit_ENVIII_M5Core/Unit_ENVIII_M5Core.ino
 
 #include <M5Stack.h>
+#include <M5_ENV.h>
 #include <print.h>
 
 SHT3X sht30;
