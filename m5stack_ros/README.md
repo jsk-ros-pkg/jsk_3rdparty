@@ -47,7 +47,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
   - Create Symlink from m5stack_ros library to arduino library
 
     ```bash
-    ln -s $HOME/catkin_ws/src/jsk-ros-pkg/jsk_3rdparty/m5stack_ros/include $HOME/arduino-$ARDUINO_VERSION/libraries/m5stack_ros
+    ln -s $HOME/catkin_ws/src/jsk-ros-pkg/jsk_3rdparty/m5stack_ros/arduino_libraries/ $HOME/arduino-$ARDUINO_VERSION/libraries/m5stack_ros
     ```
 
   - Make rosserial_arduino libraries
@@ -71,7 +71,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
   - Select USB port of M5Stack (Tools -> Port -> /dev/ttyUSB*)
 
-  - Define macro at the beginning of `include/m5stack_ros.h` based on connection type between M5Stack and PC
+  - Define macro at the beginning of `arduino_libraries/m5stack_ros.h` based on connection type between M5Stack and PC
 
     - Bluetooth
 
@@ -91,7 +91,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       // define nothing
       ```
 
-  - If you use Wi-Fi, set SSID and password in `include/wifi.h`. **DO NOT** upload these information to github.
+  - If you use Wi-Fi, set SSID and password in `arduino_libraries/wifi.h`. **DO NOT** upload these information to github.
 
 4.  Start main program
 
