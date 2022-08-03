@@ -7,13 +7,13 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 1. Create ROS workspace
 
     ```bash
-    mkdir ~/catkin_ws/src -p
-    cd ~/catkin_ws/src
+    mkdir ~/m5stack_ros_ws/src -p
+    cd ~/m5stack_ros_ws/src
     wstool init
     wstool merge https://raw.githubusercontent.com/jsk-ros-pkg/jsk_3rdparty/master/m5stack_ros/m5stack_ros.rosinstall
     wstool up
     rosdep install --ignore-src --from-path . -y -r
-    cd ~/catkin_ws
+    cd ~/m5stack_ros_ws
     catkin build m5stack_ros
     ```
 
@@ -47,13 +47,13 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
   - Create Symlink from m5stack_ros library to arduino library
 
     ```bash
-    ln -s $HOME/catkin_ws/src/jsk-ros-pkg/jsk_3rdparty/m5stack_ros/arduino_libraries/ $HOME/arduino-$ARDUINO_VERSION/libraries/m5stack_ros
+    ln -s $HOME/m5stack_ros_ws/src/jsk-ros-pkg/jsk_3rdparty/m5stack_ros/arduino_libraries/ $HOME/arduino-$ARDUINO_VERSION/libraries/m5stack_ros
     ```
 
   - Make rosserial_arduino libraries
 
     ```bash
-    source ~/catkin_ws/devel/setup.bash
+    source ~/m5stack_ros_ws/devel/setup.bash
     cd ~/arduino-$ARDUINO_VERSION/libraries
     rm -rf ros_lib
     rosrun rosserial_arduino make_libraries.py .
@@ -113,7 +113,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
   - source setup.bash
 
     ```bash
-    source ~/catkin_ws/devel/setup.bash
+    source ~/m5stack_ros_ws/devel/setup.bash
     ```
 
   - Launch ROS program. For detail, please see [Devices](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros#devices) section.
