@@ -47,7 +47,8 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
   - Create Symlink from m5stack_ros library to arduino library
 
     ```bash
-    ln -s $HOME/m5stack_ros_ws/src/jsk-ros-pkg/jsk_3rdparty/m5stack_ros/arduino_libraries/ $HOME/arduino-$ARDUINO_VERSION/libraries/m5stack_ros
+    source ~/m5stack_ros_ws/devel/setup.bash
+    rosrun m5stack_ros symlink_libraries.sh $ARDUINO_VERSION
     ```
 
   - Make rosserial_arduino libraries
