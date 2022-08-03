@@ -38,5 +38,3 @@ Published topics:
   ```bash
   roslaunch m5stack_ros m5stack_ros.launch
   ```
-
-- In `MPU9250_with_battery` version, battery infomation (`battery_level` and `is_charging` rostopic) are published in addition to IMU information.

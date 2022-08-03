@@ -25,7 +25,3 @@ Published topics:
   ```
 
 - Note that `M5StickC` and `M5StickC Plus` is tested.
-
-- In the `EARTH_with_email` sample, `/email` topic (`jsk_robot_startup/Email`) is published when the `moisture` is over threshold.
-
-  This is used to report the amount of water in the spot cooler tank.
