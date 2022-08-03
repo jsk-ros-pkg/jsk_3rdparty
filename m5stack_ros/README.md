@@ -143,51 +143,51 @@ With this package, you can use following devices. To use each device, please see
 - [UnitV](https://shop.m5stack.com/products/unitv-ai-camera)
 
     - yolov2 object detection
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/UnitV)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/UnitV)
 
 - [MLX90640](https://www.sparkfun.com/products/14843)
 
     - Thermography camera
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/MLX90640)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/MLX90640)
 
 - [VL53L0X](https://www.adafruit.com/product/3317)
 
     - ToF proximity sensor
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/VL53l0X)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/VL53l0X)
 
 - [VCNL4040](https://www.sparkfun.com/products/15177)
 
     - IR intensity proximity sensor
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/VCNL4040)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/VCNL4040)
 
 - [IP5306](http://www.injoinic.com/wwwroot/uploads/files/20200221/0405f23c247a34d3990ae100c8b20a27.pdf)
 
     - M5Stack's internal battery module
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/IP5306)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/IP5306)
 
 - [MPU9250](https://invensense.tdk.com/download-pdf/mpu-9250-datasheet/)
 
     - M5Stack Gray's internal 9-axis IMU
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/MPU9250)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/MPU9250)
 
 - [TVOC_SGP30](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30)
 
     - TVOC/eCO2 Gas Sensor Unit
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/TVOC_SGP30)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/TVOC_SGP30)
 - [PDM_SPM1423](https://shop.m5stack.com/products/pdm-microphone-unit-spm1423)
 
     - Digital MEMS silicon-based microphone based on PDM (Pulse Density Modulation) signal.
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/PDM_SPM1423)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/PDM_SPM1423)
 
 - [JOYSTICK](https://docs.m5stack.com/en/unit/joystick)
 
     - Joystick control input unit, supports three-axis control signal input (X/Y-axis offset analog input, Z-axis key digital input).
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/JOYSTICK)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/JOYSTICK)
 
 - [EARTH](https://shop.m5stack.com/products/earth-sensor-unit)
 
     - Soil Moisture Sensor for measuring the moisture in soil and similar materials.
-    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/EARTH)
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/EARTH)
 
 ## Tested environment
 

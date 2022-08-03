@@ -104,8 +104,8 @@ If visualization stops or does not start, follow the below instructions:
 Cannot coexist with I2C:
 
 - In this application, Grove connector is used for UART communication.
-- If you connect UnitV to M5Stack Grove connector, you cannot use UART and I2C devices simultaneously. In that case, try `enableI2C` and `disableI2C` functions defined in [yolov2_with_battery.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/UnitV/yolov2/yolov2_with_battery/yolov2_with_battery.ino).
-- The sample program which uses UART UnitV and I2C battery management module is under [yolov2_with_battery](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/src/UnitV/yolov2/yolov2_with_battery)
+- If you connect UnitV to M5Stack Grove connector, you cannot use UART and I2C devices simultaneously. In that case, try `enableI2C` and `disableI2C` functions defined in [yolov2_with_battery.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/UnitV/yolov2/yolov2_with_battery/yolov2_with_battery.ino).
+- The sample program which uses UART UnitV and I2C battery management module is under [yolov2_with_battery](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/UnitV/yolov2/yolov2_with_battery)
   - When acquiring battery information, the connection to the UnitV temporarily stops.
   - Therefore, there are times when the UnitV information is temporarily unavailable
 
