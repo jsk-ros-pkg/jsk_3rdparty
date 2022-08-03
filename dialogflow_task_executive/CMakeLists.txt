@@ -52,6 +52,11 @@ if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   file(COPY requirements.txt.indigo DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo requirements.txt)
   catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
+elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in
+    PYTHON_INTERPRETER python3
+    )
 else()
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
