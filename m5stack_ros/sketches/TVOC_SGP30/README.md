@@ -27,6 +27,8 @@ Published topics:
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)
 
+- Install [Adafruit SGP30](https://github.com/adafruit/Adafruit_SGP30/blob/1.2.2/Adafruit_SGP30.h) 1.2.2 version from Arduino library
+
 - Run
 
   ```bash
