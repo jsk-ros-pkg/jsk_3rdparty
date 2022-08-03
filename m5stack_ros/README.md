@@ -4,13 +4,19 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
 ## Usage
 
-1. Create ROS workspace
+1. Create ROS workspace (Skip if you already have jsk_3rdparty)
 
     ```bash
     mkdir ~/m5stack_ros_ws/src -p
     cd ~/m5stack_ros_ws/src
+    git clone https://github.com/jsk-ros-pkg/jsk_3rdparty.git jsk-ros-pkg/jsk_3rdparty
+    ```
+
+2. Download dependencies
+    ```
+    cd ~/m5stack_ros_ws/src
     wstool init
-    wstool merge https://raw.githubusercontent.com/jsk-ros-pkg/jsk_3rdparty/master/m5stack_ros/m5stack_ros.rosinstall
+    wstool merge ./jsk-ros-pkg/jsk_3rdparty/m5stack_ros/m5stack_ros.rosinstall
     wstool up
     rosdep install --ignore-src --from-path . -y -r
     cd ~/m5stack_ros_ws
