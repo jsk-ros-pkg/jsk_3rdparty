@@ -1,4 +1,4 @@
-# IP5306
+# Joystick
 
 Publish [JOYSTICK](https://docs.m5stack.com/en/unit/joystick) state.
 
