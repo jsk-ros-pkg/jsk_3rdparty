@@ -1,8 +1,8 @@
 <launch>
   <arg name="run_app_manager" default="false" />
   <arg name="applist" default="" />
-  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)" doc="Read credentials JSON from this value when use_yaml is false." />
-  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
   <arg name="enable_hotword" default="true" />
   <arg name="always_publish_result" default="false" doc="Always publish dialog_response topic even the node gets actionlib request." />
 
