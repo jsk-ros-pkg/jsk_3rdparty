@@ -53,7 +53,9 @@ if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo requirements.txt)
   catkin_generate_virtualenv()
 else()
-  catkin_generate_virtualenv(INPUT_REQUIREMENTS requirements.in)
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    INPUT_REQUIREMENTS requirements.in)
 endif()
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
