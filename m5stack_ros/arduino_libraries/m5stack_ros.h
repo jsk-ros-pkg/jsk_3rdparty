@@ -39,6 +39,8 @@
 #include <print.h>
 
 // MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE
+// Each parameter has limitation depending on the microcontroller chip
+// https://wiki.ros.org/rosserial/Overview/Limitations
 ros::NodeHandle_<ArduinoHardware, 25, 25, 8192, 8192> nh;
 
 void setupM5stackROS(char *name) {
