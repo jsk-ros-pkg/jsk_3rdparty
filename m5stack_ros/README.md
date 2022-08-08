@@ -49,6 +49,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
     - Select correct board type (Tools -> Board -> ESP32 Arduino)
       - M5Stack Grey/Base: M5Stack-Core-ESP32
       - M5Stack Fire: M5Stack-Fire
+      - Timer Camera F: M5Stack-Timer-CAM
 
   - Create Symlink from m5stack_ros library to arduino library
 
@@ -195,6 +196,11 @@ With this package, you can use following devices. To use each device, please see
 
     - Soil Moisture Sensor for measuring the moisture in soil and similar materials.
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/EARTH)
+
+- [TimerCam](https://docs.m5stack.com/en/unit/timercam_f)
+
+    - The Timer Camera F is a fisheye camera module based on ESP32-D0WDQ6-V3 with 8M PSRAM and 4M Flash on board.
+    - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/TimerCam)
 
 ## Tested environment
 

@@ -1,0 +1,17 @@
+<launch>
+
+  <arg name="port" default="/dev/rfcomm1" />
+  <arg name="baud" default="115200" />
+  <arg name="image" default="/timer_cam_image" />
+  <arg name="gui" default="true" />
+
+  <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
+    <arg name="port" default="$(arg port)" />
+    <arg name="baud" default="$(arg baud)" />
+  </include>
+
+  <node pkg="image_transport" type="republish" name="republish" args="compressed raw">
+    <remap from="in" to="$(arg image)" />
+    <remap from="out" to="$(arg image)" />
+  </node>
+</launch>
