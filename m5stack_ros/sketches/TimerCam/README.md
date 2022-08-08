@@ -17,6 +17,10 @@ Published topics:
 
   The compressed fisheye image. You can decompress this image by `image_transport/respublish` node. For detail, see [timer_cam.launch](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/launch/timer_cam.launch)
 
+- `/battery_level` (`std_msgs/UInt16`)
+
+  Battery level [mV] of the TimerCam. If TimerCam is fully charged, the value is about 4200. You can use `BASE_VOLATAGE` 3600 (typo in the origin!) as threshold.
+
 ## Usage
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)

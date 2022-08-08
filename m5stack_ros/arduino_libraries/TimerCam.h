@@ -26,12 +26,18 @@
 
 #include "esp_camera.h"
 #include "camera_pins.h"
+#include "battery.h"
 
 // Data structure of camera frame buffer
 // https://github.com/espressif/esp32-camera/blob/7b6f020939be574b1da9d4668327321edefd4e8d/driver/include/esp_camera.h#L146-L156
 camera_fb_t * fb = NULL;
-
 static int64_t last_frame = 0;
+
+uint32_t bat_voltage = 0;
+
+void setupBattery() {
+    bat_init();
+}
 
 void setupTimerCam() {
     Serial.begin(115200);
@@ -85,6 +91,11 @@ void setupTimerCam() {
     // FYI: available formats
     // https://github.com/espressif/esp32-camera/blob/7b6f020939be574b1da9d4668327321edefd4e8d/driver/include/sensor.h#L81-L107
     s->set_framesize(s, FRAMESIZE_HVGA); // 480x320
+}
+
+void readBattery() {
+    // You can use BASE_VOLATAGE 3600 (typo in the origin!) as threshold
+    bat_voltage = bat_get_voltage();
 }
 
 static esp_err_t readTimerCam(){
