@@ -1,0 +1,12 @@
+[Unit]
+Description=Fetch15 influxdb logger
+After=network-online.target influxdb.service
+Wants=network-online.target influxdb.service
+
+[Service]
+User=applications
+Group=applications
+ExecStart=/bin/bash -c "source /home/applications/ros/melodic/devel/setup.bash && rossetip && rossetmaster fetch15 && rosrun jsk_tools roscore_regardless.py --respawn --timeout 3 --ping-trials 1 --sigint-timeout 5 --sigterm-timeout 5 roslaunch influxdb_store fetch_influxdb_logger.launch robot_name:=fetch15"
+
+[Install]
+WantedBy=multi-user.target
