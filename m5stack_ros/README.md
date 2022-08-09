@@ -25,11 +25,12 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
 2. Setup [Arduino IDE](https://www.arduino.cc/en/software/) for M5Stack
 
-  - Download arduino IDE file and install it under home directory like `~/arduino-1.8.16`.
+  - Download arduino IDE file from [this page](https://www.arduino.cc/en/software ) and place the unzipped file under home directory like `~/arduino-1.8.16`.
     ```bash
     ARDUINO_VERSION=1.8.16 # Set your Arduino version to environment variable
     cd ~
     tar xvf ~/Downloads/arduino-$ARDUINO_VERSION-linux64.tar.xz
+    mv ~/Downloads/arduino-$ARDUINO_VERSION-linux64.tar.xz ~/
     ```
 
   - Setup linux system for Arduino IDE
