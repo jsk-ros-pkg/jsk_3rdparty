@@ -1,5 +1,6 @@
 # originally from https://raw.githubusercontent.com/bear/python-twitter/v1.1/twitter.py  # NOQA
 
+import base64
 import json as simplejson
 import requests
 from requests_oauthlib import OAuth1
@@ -9,6 +10,7 @@ try:
 except ImportError:
     from io import StringIO ## for Python 3
 
+import os
 import rospy
 
 
@@ -71,7 +73,16 @@ class Twitter(object):
             status = status[:116]
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
         data = {'status': StringIO(status)}
-        data['media'] = open(str(media), 'rb').read()
+        if os.path.exists(str(media)):
+            data['media'] = open(str(media), 'rb').read()
+        else:
+            try:
+                if base64.b64encode(base64.b64decode(media)) == media:
+                    data['media'] = base64.b64decode(media)
+                else:
+                    raise Exception
+            except:
+                rospy.logwarn('tweet media is neither file nor base64 data')
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
         return data

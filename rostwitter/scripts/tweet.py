@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import base64
 import os
 import re
 import sys
@@ -10,6 +11,13 @@ from std_msgs.msg import String
 from rostwitter.twitter import Twitter
 from rostwitter.util import load_oauth_settings
 
+# https://stackoverflow.com/questions/12315398/check-if-a-string-is-encoded-in-base64-using-python
+def isBase64(s):
+    try:
+        return base64.b64encode(base64.b64decode(s)) == s
+    except Exception as e:
+        print(e)
+        return False
 
 class Tweet(object):
     def __init__(self):
@@ -28,7 +36,7 @@ class Tweet(object):
 
     def tweet_cb(self, msg):
         message = msg.data
-        rospy.loginfo(rospy.get_name() + " sending %s", message)
+        rospy.loginfo(rospy.get_name() + " sending %s", message[0:256])
 
         # search word start from / and end with {.jpeg,.jpg,.png,.gif}
         m = re.search('/\S+\.(jpeg|jpg|png|gif)', message)
@@ -40,17 +48,30 @@ class Tweet(object):
                 rospy.loginfo(
                     rospy.get_name() + " tweet %s with file %s",
                     message, filename)
-                # 140 - len("http://t.co/ssssssssss")
                 ret = self.api.post_media(message[0:116], filename)
-                if 'errors' in ret:
-                    rospy.logerr('Failed to post: {}'.format(ret))
-                # ret = self.api.post_update(message)
             else:
                 rospy.logerr(rospy.get_name() + " %s could not find", filename)
-        else:
+
+        # search base64 encoding string
+        m = re.search('/9j.*$', message)  # jpeg image starts from /9j ????
+        if m:
+            image = m.group(0)
+            message = re.sub("/9j.*$", "", message)
+            if isBase64(image):
+                rospy.loginfo(
+                    rospy.get_name() + " tweet %s with base64 image %s",
+                    message, image[0:128])
+                ret = self.api.post_media(message[0:116], image)
+            else:
+                rospy.logerr(rospy.get_name() + " %s is not base64 string", image)
+
+        # post message if not media found
+        if m == None:
             ret = self.api.post_update(message[0:140])
-            if 'errors' in ret:
-                rospy.logerr('Failed to post: {}'.format(ret))
+
+        # show results
+        if ret and 'errors' in ret:
+            rospy.logerr('Failed to post: {}'.format(ret))
         # seg faults if message is longer than 140 byte ???
         rospy.loginfo(rospy.get_name() + " receiving %s", ret)
 
