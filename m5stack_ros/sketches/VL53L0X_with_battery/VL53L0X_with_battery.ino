@@ -10,7 +10,7 @@ void setup()
   setupM5stackROS("M5Stack ROS VL53L0X");
   setupVL53L0X();
   nh.advertise(tof_pub);
-  afterSetup();
+  setupCharge();
 }
 
 void loop()

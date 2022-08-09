@@ -23,7 +23,7 @@ void setup()
   nh.advertise(imu_pub);
   nh.advertise(temp_pub);
 
-  afterSetup();
+  setupCharge();
 }
 
 void loop()

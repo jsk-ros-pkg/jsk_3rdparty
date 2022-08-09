@@ -87,7 +87,7 @@ void setup()
   nh.advertise(max_pub);
   nh.advertise(center_pub);
   nh.advertise(img_pub);
-  afterSetup();
+  setupCharge();
 }
 
 void loop()

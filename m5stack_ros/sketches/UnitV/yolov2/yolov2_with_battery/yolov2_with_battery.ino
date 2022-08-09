@@ -103,7 +103,7 @@ void setup() {
   // Temporary disable UART and enable I2C. In the meantime, initialize battery module.
   enableI2C();
   M5.Power.begin();
-  afterSetup();
+  setupCharge();
   disableI2C();
 }
 

@@ -83,7 +83,7 @@ void lightChargeIcon(bool read_battery = true) {
 
 // This function is additional setup process for m5stack_ros.
 // this should be called after setup()
-void afterSetup() {
+void setupCharge() {
   setupBatteryPublisher();
   setupSleepSubscriber();
 }

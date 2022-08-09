@@ -42,7 +42,7 @@ void setup() {
   nh.advertise(volume_pub);
   enableI2C();
   measureIP5306();
-  afterSetup();
+  setupCharge();
   disableI2C();
 }
 

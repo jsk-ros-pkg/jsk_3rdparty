@@ -26,7 +26,7 @@ void setup() {
   nh.advertise(eco2_pub);
   nh.advertise(sound_pub);
 
-  afterSetup();
+  setupCharge();
 }
 
 void loop() {

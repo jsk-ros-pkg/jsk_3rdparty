@@ -33,7 +33,7 @@ void setup() {
   nh.advertise(tmp_pub);
   nh.advertise(hum_pub);
   nh.advertise(pressure_pub);
-  afterSetup();
+  setupCharge();
 }
 
 void loop() {
