@@ -111,8 +111,10 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
     - If you use Bluetooth connection, exec following commands. For detail, see [PR](https://github.com/ros-drivers/rosserial/pull/569).
 
       ```bash
+      # Check if your computer has a bluetooth interface
+      hciconfig
+      # Bind bluetooth device and rfcomm devce file
       sudo rfcomm bind 1 <Bluetooth MAC Address of M5Stack>
-      sudo stty -F /dev/rfcomm1 115200 cs8
       ```
 
       - Bluetooth MAC Address is printed on Arduino IDE Serial Monitor when M5Stack is started.
