@@ -1,3 +1,6 @@
+// Define NH_OUTPUT_SIZE before including m5stack_ros
+// Increase NH_OUTPUT_SIZE to publish large size image
+#define NH_OUTPUT_SIZE 32768
 #include <m5stack_ros.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <std_msgs/UInt16.h>
@@ -38,6 +41,8 @@ void loop() {
   publishTimerCam();
   publishBattery();
   nh.spinOnce();
-  float fps = 10.0;
+  // High fps setting will cause CompressedImage topics
+  // to continue to accumulate in publisher queue and increase latency.
+  float fps = 1.0;
   delay(1000.0 / fps);
 }

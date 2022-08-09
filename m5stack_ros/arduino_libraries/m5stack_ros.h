@@ -39,9 +39,26 @@
 #include <print.h>
 
 // MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE
+// If you change these parameters, define these macros before including this file
 // Each parameter has limitation depending on the microcontroller chip
 // https://wiki.ros.org/rosserial/Overview/Limitations
-ros::NodeHandle_<ArduinoHardware, 25, 25, 8192, 8192> nh;
+#ifndef NH_MAX_SUBSCRIBERS
+ #define NH_MAX_SUBSCRIBERS 25
+#endif
+#ifndef NH_MAX_PUBLISHERS
+  #define NH_MAX_PUBLISHERS 25
+#endif
+#ifndef NH_INPUT_SIZE
+  #define NH_INPUT_SIZE 8192
+#endif
+#ifndef NH_OUTPUT_SIZE
+  #define NH_OUTPUT_SIZE 8192
+#endif
+ros::NodeHandle_<ArduinoHardware,
+                 NH_MAX_SUBSCRIBERS,
+                 NH_MAX_PUBLISHERS,
+                 NH_INPUT_SIZE,
+                 NH_OUTPUT_SIZE> nh;
 
 void setupM5stackROS(char *name) {
   M5.begin();

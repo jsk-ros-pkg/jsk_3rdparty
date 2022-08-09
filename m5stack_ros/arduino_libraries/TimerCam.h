@@ -68,7 +68,7 @@ void setupTimerCam() {
     config.xclk_freq_hz = 20000000;
     config.pixel_format = PIXFORMAT_JPEG;
     config.frame_size = FRAMESIZE_UXGA;
-    config.jpeg_quality = 20; //10-63 lower number means higher quality
+    config.jpeg_quality = 10; //10-63 lower number means higher quality
     config.fb_count = 2;
 
     // camera init
@@ -90,7 +90,7 @@ void setupTimerCam() {
     // You can also change config.jpeg_quality
     // FYI: available formats
     // https://github.com/espressif/esp32-camera/blob/7b6f020939be574b1da9d4668327321edefd4e8d/driver/include/sensor.h#L81-L107
-    s->set_framesize(s, FRAMESIZE_HVGA); // 480x320
+    s->set_framesize(s, FRAMESIZE_SVGA); // 800x600
 }
 
 void readBattery() {
