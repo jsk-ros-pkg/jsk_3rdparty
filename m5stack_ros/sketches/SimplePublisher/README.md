@@ -1,19 +1,14 @@
 # SimplePubisher
 
-ROS publisher sample using m5stack_ros
+ROS publisher sample using `m5stack_ros`. With this firmware, you can test the `m5stack_ros` features without additional sensors.
 
 ## Overview
 
-Communication:
-
-- UnitV <-(UART)-> M5Stack <-(Bluetooth/Wi-Fi/USB)-> PC
-- Connect M5Stack and UnitV with Grove cable
-
 Published topics:
 
-- `/unitv_image` (`sensor_msgs/Image`)
+- `/chatter` (`std_msgs/String`)
 
-  UnitV Image compressed to jpg
+  String message containing "hello world"
 
 ## Usage
 
