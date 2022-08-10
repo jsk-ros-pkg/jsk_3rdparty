@@ -69,7 +69,7 @@ class Twitter(object):
     def post_media(self, status, media):
         # 116 = 140 - len("http://t.co/ssssssssss")
         if len(status) > 116:
-            rospy.logwarn('tweet wit media is too longer > 116 characters')
+            rospy.logwarn('tweet with media is too longer > 116 characters')
             status = status[:116]
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
         data = {'status': StringIO(status)}
