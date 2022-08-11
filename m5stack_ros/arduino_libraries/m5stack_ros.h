@@ -45,6 +45,12 @@
 // If you change these parameters, define these macros before including this file
 // Each parameter has limitation depending on the microcontroller chip
 // https://wiki.ros.org/rosserial/Overview/Limitations
+// There is also a size limit due to rosserial protocols. The message length is expressed in 2 bytes.
+// https://wiki.ros.org/rosserial/Overview/Protocol#Packet_Format
+// For melodic or older, the max message length is 32767 because message lengths are expressed in signed short.
+// https://github.com/ros-drivers/rosserial/blob/5ff397fc17b6935ccf90ed840bcb874bfd608fe9/rosserial_python/src/rosserial_python/SerialClient.py#L501-L502
+// For noetic, the max message length is 65535 because message lengths are expressed in unsigned short.
+// https://github.com/ros-drivers/rosserial/blob/c169ae2173dcfda7cee567d64beae45198459400/rosserial_python/src/rosserial_python/SerialClient.py#L506-L507
 #ifndef NH_MAX_SUBSCRIBERS
  #define NH_MAX_SUBSCRIBERS 25
 #endif
