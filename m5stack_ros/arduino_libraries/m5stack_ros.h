@@ -20,7 +20,8 @@
 // If you use Bluetooth, define ROSSERIAL_ARDUINO_BLUETOOTH
 // If you use Wi-Fi, define ROSSERIAL_ARDUINO_TCP
 // If you use USB, do not define anything
-#define ROSSERIAL_ARDUINO_BLUETOOTH
+/* #define ROSSERIAL_ARDUINO_TCP */
+/* #define ROSSERIAL_ARDUINO_BLUETOOTH */
 
 #if defined(ROSSERIAL_ARDUINO_TCP)
   #include <ros.h>
