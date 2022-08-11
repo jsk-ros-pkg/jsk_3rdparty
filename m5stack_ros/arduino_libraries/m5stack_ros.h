@@ -5,8 +5,6 @@
 // If you use M5StickC, define M5STICK_C
 // If you use M5StickC, define M5STICK_C_PLUS
 #define M5STACK
-/* #define ROSSERIAL_ARDUINO_TCP */
-/* #define ROSSERIAL_ARDUINO_BLUETOOTH */
 
 #if defined(M5STACK)
   #include <M5Stack.h>
@@ -22,6 +20,8 @@
 // If you use Bluetooth, define ROSSERIAL_ARDUINO_BLUETOOTH
 // If you use Wi-Fi, define ROSSERIAL_ARDUINO_TCP
 // If you use USB, do not define anything
+/* #define ROSSERIAL_ARDUINO_TCP */
+/* #define ROSSERIAL_ARDUINO_BLUETOOTH */
 
 #if defined(ROSSERIAL_ARDUINO_TCP)
   #include <ros.h>
