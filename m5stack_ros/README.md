@@ -117,7 +117,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       sudo rfcomm bind 1 <Bluetooth MAC Address of M5Stack>
       ```
 
-      - Bluetooth MAC Address is printed on Arduino IDE Serial Monitor when M5Stack is started.
+      - Bluetooth MAC Address is printed on Arduino IDE Serial Monitor when M5Stack is started (Line feed code:only LF, baudrate: 115200bps).
 
       - If you use the same device repeatedly, I recommend you to add these commands to init daemon like upstart or systemd.
 
