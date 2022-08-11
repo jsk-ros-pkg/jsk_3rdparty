@@ -45,8 +45,8 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       - `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
       - `https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json`
     - Install esp32 by Espressif Systems (Tools -> Board -> Boards Manager -> esp32)
-      - Please select correct version (recommed version is 2.0.0). Check [software version](https://github.com/708yamaguchi/jsk_3rdparty/tree/m5stack-ros-/m5stack_ros#software) for more detail
-    - Install M5Stack by M5Stack (Tools -> Manage Libraries -> M5Stack)
+      - Please select version 2.0.0 ~ 2.0.1 (> 2.0.1 has bug). Check [software version](https://github.com/708yamaguchi/jsk_3rdparty/tree/m5stack-ros-/m5stack_ros#software) for more detail
+    - Install M5Stack version 0.3.6 ~ 0.4.0 by [M5Stack](https://github.com/m5stack/M5Stack/tree/0.3.6) (Tools -> Manage Libraries -> M5Stack)
     - Select correct board type (Tools -> Board -> ESP32 Arduino)
       - M5Stack Grey/Base: M5Stack-Core-ESP32
       - M5Stack Fire: M5Stack-Fire
@@ -209,11 +209,14 @@ With this package, you can use following devices. To use each device, please see
 
 ### Hardware
 
-- M5Stack Gray
+- M5Stack Gray (All sketches except EARTH sensor)
+- M5StickC (Only EARTH sensor)
+- M5StickC Plus (Only EARTH sensor)
+- M5Stack Fire (Only SimplePublisher)
+- Timer Camera F (Only TimerCam)
 
 ### Software
 
 - Ubuntu 18.04
-- Arduino 1.8.16
-  - esp32 (Boards Manager): 2.0.0 ~ 2.0.1 (> 2.0.1 has bug)
-  - M5Stack (Library Manager): 0.3.6 ~ 0.4.0
+- Arduino IDE 1.8.16
+- The arduino libraries on which each firmware depends is described in the respective README.

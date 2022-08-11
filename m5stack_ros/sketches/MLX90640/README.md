@@ -2,6 +2,11 @@
 
 Publish [MLX90640](https://www.sparkfun.com/products/14843) thermography data as ROS topic
 
+## Dependencies
+
+Install the following packages from Arduino libraries (Tools -> Manage Libraries)
+- [M5Stack THERMAL_MLX90640](https://github.com/m5stack/M5Stack/tree/0.3.6/examples/Unit/THERMAL_MLX90640) version 3.6.0
+
 ## Overview
 
 Communication:
@@ -30,8 +35,6 @@ Published topics:
 ## Usage
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)
-
-- Install [M5Stack THERMAL_MLX90640](https://github.com/m5stack/M5Stack/tree/0.3.6/examples/Unit/THERMAL_MLX90640) 3.6.0 version from Arduino library
 
 - Run
 

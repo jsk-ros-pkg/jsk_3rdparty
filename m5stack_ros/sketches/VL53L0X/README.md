@@ -2,6 +2,11 @@
 
 Publish [VL53L0X](https://www.adafruit.com/product/3317) ToF data as ROS topic
 
+## Dependencies
+
+Install the following packages from Arduino libraries (Tools -> Manage Libraries)
+- [VL53L0X by Pololu](https://github.com/pololu/vl53l0x-arduino/tree/1.3.0) version 1.3.0
+
 ## Overview
 
 Communication:
@@ -18,10 +23,6 @@ Published topics:
 ## Usage
 
 - Follow [README.md](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros)
-
-- Install VL53L0X library by Pololu (Tools -> Manage Libraries -> VL53L0X by Pololu)
-
-  - Version 1.3.0 works
 
 - Run
 
