@@ -129,6 +129,8 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
   - Launch ROS program. For detail, please see [Devices](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros#devices) section.
 
+    First, it is recommended that you use the `SimplePublisher` firmware. You can verify that the environment has been built correctly without sensors.
+
     - For USB, (USB serial seems to be max 57600 baud rate)
 
       ```bash
