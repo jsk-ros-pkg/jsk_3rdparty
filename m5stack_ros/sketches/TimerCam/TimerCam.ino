@@ -3,12 +3,12 @@
 #define NH_OUTPUT_SIZE 32768
 #include <m5stack_ros.h>
 #include <sensor_msgs/CompressedImage.h>
-#include <std_msgs/UInt16.h>
+#include <std_msgs/Float32.h>
 #include <TimerCam.h>
 
 sensor_msgs::CompressedImage timer_cam_img_msg;
 ros::Publisher timer_cam_img_pub("timer_cam_image/compressed", &timer_cam_img_msg);
-std_msgs::UInt16 level_msg;
+std_msgs::Float32 level_msg;
 ros::Publisher level_pub("battery_level", &level_msg);
 
 void publishTimerCam() {
@@ -23,7 +23,7 @@ void publishTimerCam() {
 }
 
 void publishBattery() {
-  level_msg.data = (uint16_t)bat_voltage;
+  level_msg.data = (float)bat_voltage / 1000.0;
   level_pub.publish( &level_msg );
 }
 
