@@ -10,6 +10,11 @@ Install the following packages from Arduino libraries (Tools -> Manage Libraries
   - Please add `#include "soc/adc_channel.h"` to `$HOME/Arduino/libraries/Timer-CAM/src/battery.c`
   - The current origin/master fixes this problem, so version 0.0.3 will not have this problem.
 
+Install the necessary packages with `apt`
+```
+sudo apt install ros-$ROS_DISTRO-image-transport-plugins
+```
+
 ## Overview
 
 Published topics:
