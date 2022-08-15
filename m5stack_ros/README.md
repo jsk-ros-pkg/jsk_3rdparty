@@ -207,6 +207,52 @@ With this package, you can use following devices. To use each device, please see
     - The Timer Camera F is a fisheye camera module based on ESP32-D0WDQ6-V3 with 8M PSRAM and 4M Flash on board.
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/TimerCam)
 
+## Autostart by Systemd
+
+By using Systemd, the m5stack_ros program can be started automatically.
+
+1. Edit `config/m5stack_ros.service`
+    - Write your main program to `ExecStart` section.
+    - Be careful with the workspace path.
+
+2. Place the service config file to systemd user direcoty and enable the service
+
+    ```
+    rosrun m5stack_ros enable_m5stack_ros_service.sh
+    ```
+
+3. Reboot your computer.
+
+4. Check the log of the service. Like `tail` command, you can use `-f` interactive mode or `-n` last lines mode.
+
+   ```
+   sudo journalctl -u m5stack_ros.service
+   ```
+
+5. If you use bluetooth connection, please run the following additional steps to automatically bind rfcomm devices.
+
+    - Edit `config/rfcomm_bind.service`. Be careful with the workspace path.
+    - Edit `config/rfcomm_devices.yaml`, in which Bluetooth MAC address of the M5 device is set.
+    - Place the service config file to systemd user direcoty and enable the service
+      ```
+      rosrun m5stack_ros enable_rfcomm_bind_service.sh
+      ```
+    - Clone `jsk_robot_startup` to your workspace and catkin build it.
+      ```
+      cd ~/m5stack_ros_ws/src/jsk-ros-pkg
+      git clone https://github.com/jsk-ros-pkg/jsk_robot.git
+      catkin build jsk_robot_startup
+      ```
+    - Reboot your computer
+    - Check the log of the service.
+      ```
+      sudo journalctl -u rfcomm_bind.service
+      ```
+    - Check the rfcomm binded devices
+      ```
+      rfcomm
+      ```
+
 ## Tested environment
 
 ### Hardware
