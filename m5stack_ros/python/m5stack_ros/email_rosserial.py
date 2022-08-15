@@ -30,9 +30,11 @@ class EmailRosserial(object):
         self.low_bat = False
         self.bat_level = None
         # Publish email
+        self.email_duration = rospy.get_param('~email_duration', 24 * 60 * 60)
         self.pub = rospy.Publisher('email', Email, queue_size=1)
         # Check status of M5 device and sensor and send email if needed
-        rospy.Timer(rospy.Duration(0.5 * 60 * 60), self.check_status)
+        self.check_duration = rospy.get_param('~check_duration', 0.5 * 60 * 60)
+        rospy.Timer(rospy.Duration(self.check_duration), self.check_status)
         # Override these variables in child class
         self.device_name = 'M5Stack'
         self.subject = 'Subject'
@@ -122,7 +124,9 @@ class EmailRosserial(object):
         if self.last_send_email is None:
             self.send_email()
             rospy.loginfo('Send email at first time')
-        elif (rospy.Time.now() - self.last_send_email).secs > 24 * 60 * 60:
+            return
+        secs_from_last_email = (rospy.Time.now() - self.last_send_email).secs
+        if secs_from_last_email > self.email_duration:
             self.send_email()
             rospy.loginfo(
                 'Send email because email have not been sent for a day')
