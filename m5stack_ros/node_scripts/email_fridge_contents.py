@@ -24,6 +24,8 @@ class EmailFridgeContents(EmailRosserial):
         # Subscribe image
         rospy.Subscriber('timer_cam_image', Image, self.image_cb)
         self.img_file_path = '/tmp/email_fridge_contents.png'
+        if os.path.exists(self.img_file_path):
+            os.remove(self.img_file_path)
 
     def image_cb(self, msg):
         self.image = msg
