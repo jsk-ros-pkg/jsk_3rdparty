@@ -2,6 +2,14 @@
 
 Publish [UnitV](https://shop.m5stack.com/products/unitv-ai-camera) recognition result as ROS topic via M5Stack
 
+## Dependencies
+
+Install the necessary packages with `apt`
+```
+# To decompress rgb image by image_transport/republish node
+sudo apt install ros-$ROS_DISTRO-image-transport-plugins
+```
+
 ## Overview
 
 Communication:

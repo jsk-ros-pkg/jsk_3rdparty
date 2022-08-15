@@ -12,6 +12,7 @@ Install the following packages from Arduino libraries (Tools -> Manage Libraries
 
 Install the necessary packages with `apt`
 ```
+# To decompress rgb image by image_transport/republish node
 sudo apt install ros-$ROS_DISTRO-image-transport-plugins
 ```
 
