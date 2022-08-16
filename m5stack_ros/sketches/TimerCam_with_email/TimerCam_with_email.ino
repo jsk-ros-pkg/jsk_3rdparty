@@ -47,28 +47,40 @@ void setup() {
 }
 
 void loop() {
-  // Update connection
+  // Update connection. Longer delay is needed for large size topic(?)
+  // We need to publish topics before rosserial timeout (15 seconds) after the connection is created
   nh.spinOnce();
-  delay(3000);
+  delay(8000);
 
-  // Publish before rosserial timeout (15 seconds)
+  // Read image
   #ifdef GROVE_CIRCULAR_LED
     turnOnGroveCircularLED();
-    delay(1000);
+    delay(100);
   #endif
-  readTimerCam();
-  readBattery();
-  publishTimerCam();
-  publishBattery();
-  nh.spinOnce();
+  // Read camera image several times and use the latest image. Early images are darker then normal.
+  for(int i=0; i<3; i++) {
+    readTimerCam();
+    delay(100);
+  }
   #ifdef GROVE_CIRCULAR_LED
     turnOffGroveCircularLED();
-    delay(1000);
   #endif
+  // Read battery data
+  readBattery();
+  Serial.println("Read sensor data");
 
-  // Wait for topics to be published
-  delay(3000);
+  // nh.spinOnce() to update nh.now()
+  nh.spinOnce();
+  // Try to send topics for several times because sometimes package is lost
+  for(int i=0; i<3; i++) {
+    publishTimerCam();
+    publishBattery();
+    nh.spinOnce();
+    Serial.println("Publish topics");
+    delay(1000);
+  }
 
   // Deep sleep for 1 hour and then restart
+  Serial.println("deep sleep");
   esp_deep_sleep((uint64_t)1 * 60 * 60 * 1000 * 1000);
 }
