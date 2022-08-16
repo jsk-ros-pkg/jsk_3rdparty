@@ -1,0 +1,28 @@
+<launch>
+
+  <!-- you can choose chatbot_engine "Chaplus" or "A3RT" or "Mebo" currently-->
+  <arg name="chatbot_engine" default="Mebo" />
+
+  <arg name="use_sample" default="False" />
+
+  <!-- node to convert /speech_to_text (speech_recognition_msgs/SpeechRecognitionCandidates) to /request (std_msgs/String) -->
+  <node pkg="topic_tools" type="relay_field" name="sound_request_to_request"
+        args="--wait-for-start /speech_to_text /request std_msgs/String
+              'data: m.transcript[0]'" />
+
+  <!-- node to convert /response (std_msgs/String) to /robotsound_jp (sound_play/SoundRequest) -->
+  <node pkg="topic_tools" type="relay_field" name="string_to_sound_request"
+        args="--wait-for-start /response /robotsound_jp sound_play/SoundRequest
+              '{sound: -3, command: 1, volume: 1.0, arg: m.data}'" />
+
+  <!-- start chaplus
+       subscribe /request and publish /response -->
+  <node pkg="chaplus_ros" type="chaplus_ros.py" name="chaplus_ros"
+        output="screen" >
+    <rosparam subst_value="true">
+      chatbot_engine: $(arg chatbot_engine)
+      use_sample: $(arg use_sample)
+    </rosparam>
+  </node>
+
+</launch>
