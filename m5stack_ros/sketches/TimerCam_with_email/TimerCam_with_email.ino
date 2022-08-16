@@ -11,6 +11,11 @@ ros::Publisher timer_cam_img_pub("timer_cam_image/compressed", &timer_cam_img_ms
 std_msgs::Float32 level_msg;
 ros::Publisher level_pub("battery_level", &level_msg);
 
+#define GROVE_CIRCULAR_LED
+#ifdef GROVE_CIRCULAR_LED
+  #include <Grove_Circular_LED.h>
+#endif
+
 void publishTimerCam() {
   // Publish ROS image before releasing resources
   ros::Time time_now = nh.now();
@@ -31,6 +36,9 @@ void setup() {
   setupM5stackROS("M5Stack ROS TimerCam");
   setupTimerCam();
   setupBattery();
+  #ifdef GROVE_CIRCULAR_LED
+    setupGroveCircularLED();
+  #endif
 
   // Wait for rosserial node
   delay(3000);
@@ -44,11 +52,19 @@ void loop() {
   delay(3000);
 
   // Publish before rosserial timeout (15 seconds)
+  #ifdef GROVE_CIRCULAR_LED
+    turnOnGroveCircularLED();
+    delay(1000);
+  #endif
   readTimerCam();
   readBattery();
   publishTimerCam();
   publishBattery();
   nh.spinOnce();
+  #ifdef GROVE_CIRCULAR_LED
+    turnOffGroveCircularLED();
+    delay(1000);
+  #endif
 
   // Wait for topics to be published
   delay(3000);
