@@ -73,19 +73,40 @@ class Twitter(object):
                 text = ''
         return text
 
+    def _post_update_with_reply(self, texts, in_reply_to_status_id=None):
+        for text in texts:
+            url = 'https://api.twitter.com/1.1/statuses/update.json'
+            data = {'status': StringIO(text)}
+            if in_reply_to_status_id is not None:
+                data['in_reply_to_status_id'] = in_reply_to_status_id
+            json = self._request_url(url, 'POST', data=data)
+            data = simplejson.loads(json.content)
+            in_reply_to_status_id = data['id']
+        return data
+
     def post_update(self, status):
-        status = self._check_and_split_word(status)
+        texts = split_tweet_text(status)
+        status = texts[0]
         url = 'https://api.twitter.com/1.1/statuses/update.json'
         data = {'status': StringIO(status)}
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
+        if len(texts) > 1:
+            data = self._post_update_with_reply(
+                texts[1:],
+                in_reply_to_status_id=data['id'])
         return data
 
-    def post_media(self, status, media):
-        status = self._check_and_split_word(status)
+    def post_media(self, status, media, in_reply_to_status_id=None):
+        texts = split_tweet_text(status)
+        status = texts[0]
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
         data = {'status': StringIO(status)}
         data['media'] = open(str(media), 'rb').read()
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
+        if len(texts) > 1:
+            data = self._post_update_with_reply(
+                texts[1:],
+                in_reply_to_status_id=data['id'])
         return data
