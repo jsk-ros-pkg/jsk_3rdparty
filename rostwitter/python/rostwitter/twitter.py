@@ -11,6 +11,9 @@ except ImportError:
 
 import rospy
 
+from rostwitter.util import count_tweet_text
+from rostwitter.util import split_tweet_text
+
 
 class Twitter(object):
     def __init__(
@@ -54,10 +57,24 @@ class Twitter(object):
             )
         return 0  # if not a POST or GET request
 
+    def _check_and_split_word(self, text):
+        """Check tweet text length and split it.
+
+        See https://developer.twitter.com/en/docs/counting-characters
+
+        """
+        c = count_tweet_text(text)
+        if c > 280:
+            rospy.logwarn('tweet is too longer > 280 characters.')
+            texts = split_tweet_text(text)
+            if len(texts) > 0:
+                text = texts[0]
+            else:
+                text = ''
+        return text
+
     def post_update(self, status):
-        if len(status) > 140:
-            rospy.logwarn('tweet is too longer > 140 characters')
-            status = status[:140]
+        status = self._check_and_split_word(status)
         url = 'https://api.twitter.com/1.1/statuses/update.json'
         data = {'status': StringIO(status)}
         json = self._request_url(url, 'POST', data=data)
@@ -65,10 +82,7 @@ class Twitter(object):
         return data
 
     def post_media(self, status, media):
-        # 116 = 140 - len("http://t.co/ssssssssss")
-        if len(status) > 116:
-            rospy.logwarn('tweet wit media is too longer > 116 characters')
-            status = status[:116]
+        status = self._check_and_split_word(status)
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
         data = {'status': StringIO(status)}
         data['media'] = open(str(media), 'rb').read()
