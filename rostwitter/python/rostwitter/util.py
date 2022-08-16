@@ -1,4 +1,5 @@
 import os
+import sys
 import unicodedata
 import yaml
 
@@ -27,6 +28,8 @@ def load_oauth_settings(yaml_path):
 
 def count_tweet_text(text):
     count = 0
+    if sys.version_info.major <= 2:
+        text = text.decode('utf-8')
     for c in text:
         if unicodedata.east_asian_width(c) in 'FWA':
             count += 2
@@ -39,6 +42,8 @@ def split_tweet_text(text, length=280):
     texts = []
     split_text = ''
     count = 0
+    if sys.version_info.major <= 2:
+        text = text.decode('utf-8')
     for c in text:
         if count == 281:
             # last word is zenkaku.
