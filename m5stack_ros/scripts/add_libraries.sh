@@ -26,3 +26,9 @@ create_symlink $ORIG_PATH $SYMLINK_PATH
 ORIG_PATH=$HOME/Arduino/libraries/M5Stack/examples/Unit/THERMAL_MLX90640
 SYMLINK_PATH=$ARDUINO_LIBRARY_PATH/THERMAL_MLX90640
 create_symlink $ORIG_PATH $SYMLINK_PATH
+
+# Add Seeed-Studio/Grove_LED_Bar
+git clone https://github.com/Seeed-Studio/Grove_LED_Bar.git $HOME/Arduino/libraries/Grove_LED_Bar
+cd $HOME/Arduino/libraries/Grove_LED_Bar
+git checkout -b b2964c4f9d967a0c891d25432cbc7ce83f3832ed
+cd -

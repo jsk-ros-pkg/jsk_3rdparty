@@ -52,11 +52,11 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       - M5Stack Fire: M5Stack-Fire
       - Timer Camera F: M5Stack-Timer-CAM
 
-  - Create Symlink from m5stack_ros library to arduino library
+  - Add dependent libraries to arduino library
 
     ```bash
     source ~/m5stack_ros_ws/devel/setup.bash
-    rosrun m5stack_ros symlink_libraries.sh $ARDUINO_VERSION
+    rosrun m5stack_ros add_libraries.sh $ARDUINO_VERSION
     ```
 
   - Make rosserial_arduino libraries
