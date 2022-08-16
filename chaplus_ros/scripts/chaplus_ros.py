@@ -52,7 +52,7 @@ class ChaplusROS(object):
 
     def __init__(self):
 
-        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Chaplus")
+        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Mebo")
         self.use_sample = rospy.get_param("~use_sample", True)
         # please write your apikey to chaplus_ros/apikey.json
         r = rospkg.RosPack()
