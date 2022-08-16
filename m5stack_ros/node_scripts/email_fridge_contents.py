@@ -24,6 +24,7 @@ class EmailFridgeContents(EmailRosserial):
         # Subscribe image
         rospy.Subscriber('timer_cam_image', Image, self.image_cb)
         self.img_file_path = '/tmp/email_fridge_contents.png'
+        # Do not send old image
         if os.path.exists(self.img_file_path):
             os.remove(self.img_file_path)
 
@@ -40,10 +41,14 @@ class EmailFridgeContents(EmailRosserial):
     # Check the contents in the fridge
     def fridge_email_body(self):
         email_body = EmailBody()
-        email_body.type = 'img'
-        email_body.message = '冷蔵庫の中身の写真です'
-        email_body.file_path = self.img_file_path
-        email_body.img_size = 100
+        if os.path.exists(self.img_file_path):
+            email_body.type = 'img'
+            email_body.message = '冷蔵庫の中身の写真です'
+            email_body.file_path = self.img_file_path
+            email_body.img_size = 100
+        else:
+            email_body.type = 'text'
+            email_body.message = '冷蔵庫の中身の写真は届いていません'
         return email_body
 
     def create_email_body(self):
@@ -53,6 +58,7 @@ class EmailFridgeContents(EmailRosserial):
 
     def send_email(self):
         super(EmailFridgeContents, self).send_email()
+        # Do not send the same image twice
         if os.path.exists(self.img_file_path):
             os.remove(self.img_file_path)
 
