@@ -2,6 +2,7 @@
 
 import json as simplejson
 import requests
+from itertools import zip_longest
 from requests_oauthlib import OAuth1
 # https://stackoverflow.com/questions/11914472/stringio-in-python3
 try:
@@ -13,6 +14,7 @@ import rospy
 
 from rostwitter.util import count_tweet_text
 from rostwitter.util import split_tweet_text
+from rostwitter.cv_util import extract_media_from_text
 
 
 class Twitter(object):
@@ -57,10 +59,20 @@ class Twitter(object):
             )
         return 0  # if not a POST or GET request
 
-    def _post_update_with_reply(self, texts, in_reply_to_status_id=None):
-        for text in texts:
+    def _post_update_with_reply(self, texts, media_list=None,
+                                in_reply_to_status_id=None):
+        split_media_list = []
+        media_list = media_list or []
+        for i in range(0, len(media_list), 4):
+            split_media_list.append(media_list[i * 4:(i + 1) * 4])
+        for text, media_list in zip_longest(texts, split_media_list):
+            text = text or ''
+            media_list = media_list or []
             url = 'https://api.twitter.com/1.1/statuses/update.json'
             data = {'status': StringIO(text)}
+            media_ids = self._upload_media(media_list)
+            if len(media_ids) > 0:
+                data['media_ids'] = media_ids
             if in_reply_to_status_id is not None:
                 data['in_reply_to_status_id'] = in_reply_to_status_id
             json = self._request_url(url, 'POST', data=data)
@@ -68,16 +80,35 @@ class Twitter(object):
             in_reply_to_status_id = data['id']
         return data
 
+    def _upload_media(self, media_list):
+        url = 'https://upload.twitter.com/1.1/media/upload.json'
+        media_ids = []
+        for media in media_list:
+            data = {'media': media}
+            r = self._request_url(url, 'POST', data=data)
+            if r.status_code == 200:
+                rospy.loginfo('upload media success')
+                media_ids.append(str(r.json()['media_id']))
+            else:
+                rospy.logwarn('upload media failed')
+        media_ids = ','.join(media_ids)
+        return media_ids
+
     def post_update(self, status):
+        media_list, status = extract_media_from_text(status)
+        media_ids = self._upload_media(media_list[:4])
         texts = split_tweet_text(status)
         status = texts[0]
         url = 'https://api.twitter.com/1.1/statuses/update.json'
         data = {'status': StringIO(status)}
+        if len(media_ids) > 0:
+            data['media_ids'] = media_ids
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
-        if len(texts) > 1:
+        if len(texts) > 1 or len(media_list) > 4:
             data = self._post_update_with_reply(
                 texts[1:],
+                media_list=media_list[4:],
                 in_reply_to_status_id=data['id'])
         return data
 
