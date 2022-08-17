@@ -226,7 +226,8 @@ By using Systemd, the m5stack_ros program can be started automatically.
 4. Check the log of the service. Like `tail` command, you can use `-f` interactive mode or `-n` last lines mode.
 
    ```
-   sudo journalctl -u m5stack_ros.service
+   journalctl --user -u m5stack_ros.service
+   sudo -u $USER XDG_RUNTIME_DIR=/run/user/$(id -u $USER) systemctl --user status m5stack_ros.service
    ```
 
 5. If you use bluetooth connection, please run the following additional steps to automatically bind rfcomm devices.
