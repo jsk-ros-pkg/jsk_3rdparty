@@ -17,6 +17,12 @@ git clone https://github.com/jsk-ros-pkg/jsk_robot.git
 catkin build jsk_robot_startup
 ```
 
+Then, install `postfix` mail server
+
+```
+sudo apt install postfix
+```
+
 For more detail, see [jsk_robot_startup/email_topic.py](https://github.com/jsk-ros-pkg/jsk_robot/tree/master/jsk_robot_common/jsk_robot_startup#scriptsemail_topicpy).
 
 Run. In addition to rosserial, an email client node and an email server node are launched.

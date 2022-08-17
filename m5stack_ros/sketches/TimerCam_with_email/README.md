@@ -14,6 +14,12 @@ This firmware is an addition to the [TimerCam](https://github.com/jsk-ros-pkg/js
     catkin build jsk_robot_startup
     ```
 
+    Then, install `postfix` mail server
+
+    ```
+    sudo apt install postfix
+    ```
+
     For more detail, see [jsk_robot_startup/email_topic.py](https://github.com/jsk-ros-pkg/jsk_robot/tree/master/jsk_robot_common/jsk_robot_startup#scriptsemail_topicpy).
 
 - LED feature
