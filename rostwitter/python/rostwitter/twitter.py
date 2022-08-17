@@ -57,22 +57,6 @@ class Twitter(object):
             )
         return 0  # if not a POST or GET request
 
-    def _check_and_split_word(self, text):
-        """Check tweet text length and split it.
-
-        See https://developer.twitter.com/en/docs/counting-characters
-
-        """
-        c = count_tweet_text(text)
-        if c > 280:
-            rospy.logwarn('tweet is too longer > 280 characters.')
-            texts = split_tweet_text(text)
-            if len(texts) > 0:
-                text = texts[0]
-            else:
-                text = ''
-        return text
-
     def _post_update_with_reply(self, texts, in_reply_to_status_id=None):
         for text in texts:
             url = 'https://api.twitter.com/1.1/statuses/update.json'
