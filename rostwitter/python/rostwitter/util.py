@@ -18,7 +18,7 @@ def load_oauth_settings(yaml_path):
         rospy.logerr("EOF")
         return None, None, None, None
     with open(yaml_path, 'r') as f:
-        key = yaml.load(f)
+        key = yaml.load(f, Loader=yaml.SafeLoader)
         ckey = key['CKEY']
         csecret = key['CSECRET']
         akey = key['AKEY']
