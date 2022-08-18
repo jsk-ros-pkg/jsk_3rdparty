@@ -69,15 +69,9 @@ void blinkChargeIcon(bool read_battery = true) {
   M5.Lcd.setBrightness(255);
 }
 
-void lightChargeIcon(bool read_battery = true) {
-  // Currently, SerialClient connection timeout is 5*3=15 seconds
-  // https://github.com/sktometometo/rosserial/blob/7b1bdfe6ee7fd14c0a0685cdbc674275f3aeb53b/rosserial_python/src/rosserial_python/SerialClient.py#L459
-  // To avoid "Lost sync with device" error, check battery and update monitor every 10 (< 15) seconds
-  if (read_battery) {
-    measureIP5306();
-  }
+void lightChargeIcon() {
+  M5.Lcd.setBrightness(255);
   fillChargeIcon();
-  delay(10 * 1000);
   M5.Lcd.setBrightness(255);
 }
 
@@ -91,21 +85,27 @@ void setupCharge() {
 // This function is additional loop process for m5stack_ros.
 // This function should be called after every loop()
 void checkCharge(bool read_battery = true) {
-  // Do not enter main loop when is_sleeping is true
+  // Do not enter main loop when is_sleeping or isCharging is true
+  bool isIconDisplayed = false;
   while (is_sleeping || isCharging) {
     if (is_sleeping) {
       PRINTLN("Sleeping ...");
       delay(1000);
     }
-    if (isCharging) {
-      PRINTLN("Charging ...")
-      M5.Lcd.setBrightness(255);
-      // If we want to blink charge icon, use blinkChargeIcon()
-      // blinkChargeIcon(read_battery);
-      lightChargeIcon(read_battery);
+    if (isCharging == true) {
+      PRINTLN("Charging ...");
+      if (isIconDisplayed == false) {
+        lightChargeIcon();
+        isIconDisplayed = true;
+      }
     }
+    // Currently, SerialClient connection timeout is 5*3=15 seconds
+    // https://github.com/sktometometo/rosserial/blob/7b1bdfe6ee7fd14c0a0685cdbc674275f3aeb53b/rosserial_python/src/rosserial_python/SerialClient.py#L459
+    // To avoid "Lost sync with device" error, check battery and update monitor every 1 (< 15) second
+    delay(1000);
     nh.spinOnce();
     publishBattery(read_battery);
   }
+  isIconDisplayed = false;
   publishBattery(read_battery);
 }
