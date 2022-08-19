@@ -26,19 +26,41 @@ ROS package for mebo: https://mebo.work/
   ```
   The reply from the bot can be checked using `rostopic echo` command.
   ```
-  $ rostopic echo /robotsound_jp
+  $ roopic echo --filter "print(m.arg)" /robotsound_jp
+  or
+  $ rostopic echo /robotsound_jp | ascii2uni -a U -q
   ```
 
-  You can also check the replies from the bot by looking the log of launch file. Here is an example,
+  Here is an example of conversations.
   ```
-  [INFO] [1660883369.681670]: received おはよう
-  [INFO] [1660883370.392226]: mebo: returns best response おはようございます！
-  [INFO] [1660883399.459653]: received お話しよう
-  [INFO] [1660883404.919770]: mebo: returns best response あー、久しぶりにおしゃべりしたいですね。楽しみにしています。
-  [INFO] [1660883419.081326]: received 何色が好き？
-  [INFO] [1660883423.183745]: mebo: returns best response 私の好きな色は緑です。気持ちが落ち着きますよね。
-  [INFO] [1660883440.504536]: received 緑いいですね。私は白が好きです。
-  [INFO] [1660883444.164753]: mebo: returns best response なんだか癒されそうですね。
+  # terminal 1
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'おはよう'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'お話しよう'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - '何色が好き？'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - '良いですね。私は白が好きです。'
+  confidence:
+  - 0"
+  ```
+  ```
+  # termial 2
+  $ roopic echo --filter "print(m.arg)" /robotsound_jp
+  おはようございます！
+  あー、久しぶりにおしゃべりしたいですね。楽しみにしています。
+  私の好きな色は緑です。気持ちが落ち着きますよね。
+  私も好きです。気持ちが落ち着く気がしますから。
   ```
 
 ## Interface
