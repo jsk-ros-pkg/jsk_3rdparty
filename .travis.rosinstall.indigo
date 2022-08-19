@@ -4,3 +4,7 @@
     local-name: audio_common/sound_play
     uri: https://github.com/k-okada/audio_common
     version: indigo_setup
+- git:
+    local-name: catkin_virutalenv
+    uri: https://github.com/knorth55/catkin_virtualenv
+    version: indigo_setup 
