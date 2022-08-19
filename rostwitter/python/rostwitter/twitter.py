@@ -4,11 +4,6 @@ import json as simplejson
 import requests
 from itertools import zip_longest
 from requests_oauthlib import OAuth1
-# https://stackoverflow.com/questions/11914472/stringio-in-python3
-try:
-    from StringIO import StringIO ## for Python 2
-except ImportError:
-    from io import StringIO ## for Python 3
 
 import rospy
 
@@ -69,7 +64,7 @@ class Twitter(object):
             text = text or ''
             media_list = media_list or []
             url = 'https://api.twitter.com/1.1/statuses/update.json'
-            data = {'status': StringIO(text)}
+            data = {'status': text}
             media_ids = self._upload_media(media_list)
             if len(media_ids) > 0:
                 data['media_ids'] = media_ids
@@ -100,7 +95,7 @@ class Twitter(object):
         texts = split_tweet_text(status)
         status = texts[0]
         url = 'https://api.twitter.com/1.1/statuses/update.json'
-        data = {'status': StringIO(status)}
+        data = {'status': status}
         if len(media_ids) > 0:
             data['media_ids'] = media_ids
         json = self._request_url(url, 'POST', data=data)
@@ -116,7 +111,7 @@ class Twitter(object):
         texts = split_tweet_text(status)
         status = texts[0]
         url = 'https://api.twitter.com/1.1/statuses/update_with_media.json'
-        data = {'status': StringIO(status)}
+        data = {'status': status}
         data['media'] = open(str(media), 'rb').read()
         json = self._request_url(url, 'POST', data=data)
         data = simplejson.loads(json.content)
