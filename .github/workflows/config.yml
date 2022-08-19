@@ -20,7 +20,7 @@ jobs:
             ROS_PARALLEL_TEST_JOBS: "-j8"
             CATKIN_PARALLEL_JOBS: "-i"
             NOT_TEST_INSTALL : true
-            BEFORE_SCRIPT : "for name in ros_speech_recognition sesame_ros ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo \\$name; find $GITHUB_WORKSPACE -iname \\$name -exec touch {}/CATKIN_IGNORE \\; ; ls -al \\$(find -iname \\$name)/; done" # Skip large packagses /  Skip packages that could not build on indigo ros_speech_recognition/sesame_ros
+            BEFORE_SCRIPT : "for name in dialogflow_task_executive ros_speech_recognition sesame_ros ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo \\$name; find $GITHUB_WORKSPACE -iname \\$name -exec touch {}/CATKIN_IGNORE \\; ; ls -al \\$(find -iname \\$name)/; done" # Skip large packagses /  Skip packages that could not build on indigo dialogflow_task_executive/ros_speech_recognition/sesame_ros
           - ROS_DISTRO: kinetic
             CONTAINER: ubuntu:16.04
             ROS_PARALLEL_TEST_JOBS: "-j8"
