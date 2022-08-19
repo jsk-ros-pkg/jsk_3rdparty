@@ -5,17 +5,41 @@ ROS package for mebo: https://mebo.work/
 
 ## Tutorials
 
-1. Please Download the [apikey.json](https://drive.google.com/file/d/1tAT_WQqCMqvtbM0-CSTomWjwMP4jcOi9/view?usp=sharing) for JSK users and replace `` `rospack find chaplus_ros`/apikey.json `` with it.
+1. optional) If you want to get new agent, please reference https://qiita.com/maKunugi/items/14f1b82a2c0b6fa5c202
 
-2. You can try the sample launch with the following command.
+2. For JSK Users, please download the [apikey.json](https://drive.google.com/file/d/1tAT_WQqCMqvtbM0-CSTomWjwMP4jcOi9/view?usp=sharing)
+
+3. Please start the sample launch with the following command.
 
   ```
-  $ roslaunch chaplus_ros simple_example.launch
+  $ roslaunch chaplus_ros google_example.launch chaplus_apikey_file:=${HOME}/Downloads/apikey.json
   ```
-
   This sample subscribes `/speech_to_text [speech_recognition_msgs/SpeechRecognitionCandidates]` and publishes `/robotsound_jp [sound_play/SoundRequest]`
 
-3. optional) If you want to get new agent, please reference https://qiita.com/maKunugi/items/14f1b82a2c0b6fa5c202
+4. You can try several conversations using `rostopic pub` command. Here is an example of sending "おはよう".
+
+  ```
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'おはよう'
+  confidence:
+  - 0"
+  ```
+  The reply from the bot can be checked using `rostopic echo` command.
+  ```
+  $ rostopic echo /robotsound_jp
+  ```
+
+  You can also check the replies from the bot by looking the log of launch file. Here is an example,
+  ```
+  [INFO] [1660883369.681670]: received おはよう
+  [INFO] [1660883370.392226]: mebo: returns best response おはようございます！
+  [INFO] [1660883399.459653]: received お話しよう
+  [INFO] [1660883404.919770]: mebo: returns best response あー、久しぶりにおしゃべりしたいですね。楽しみにしています。
+  [INFO] [1660883419.081326]: received 何色が好き？
+  [INFO] [1660883423.183745]: mebo: returns best response 私の好きな色は緑です。気持ちが落ち着きますよね。
+  [INFO] [1660883440.504536]: received 緑いいですね。私は白が好きです。
+  [INFO] [1660883444.164753]: mebo: returns best response なんだか癒されそうですね。
+  ```
 
 ## Interface
 
