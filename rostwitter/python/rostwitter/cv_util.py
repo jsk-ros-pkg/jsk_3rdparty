@@ -8,7 +8,7 @@ import numpy as np
 import rospy
 
 
-base64_and_filepath_image_pattern = re.compile(r'((/9j/)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?|/\S+\.(jpeg|jpg|png|gif))')
+base64_and_filepath_image_pattern = re.compile(r'((?:/9j/)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?|/\S+\.(?:jpeg|jpg|png|gif))')
 
 
 def encode_image_cv2(img, quality=90):
@@ -35,22 +35,51 @@ def is_base64_image(b64encoded):
     return True
 
 
-def extract_media_from_text(text):
-    imgs = []
-    for m in base64_and_filepath_image_pattern.finditer(text):
-        if os.path.exists(m.group()):
-            path = m.group()
+def parse_matched_media(text):
+    media_list = []
+    if base64_and_filepath_image_pattern.match(text) is None:
+        return media_list
+    split_texts = re.split('/9j/', text)
+    split_texts = list(filter(lambda x: x is not None and len(x.strip()) > 0,
+                              split_texts))
+    for text in split_texts:
+        if os.path.exists(text):
+            path = text
             if imghdr.what(path) in ['jpeg', 'png', 'gif']:
                 with open(path, 'rb') as f:
-                    imgs.append(f.read())
+                    media_list.append(f.read())
         else:
-            succ = is_base64_image(m.group())
+            text = '/9j/' + text
+            succ = is_base64_image(text)
             if succ:
-                b64encoded = m.group()
-                bin = b64encoded.split(",")[-1]
+                bin = text.split(",")[-1]
                 bin = base64.b64decode(bin)
                 bin = np.frombuffer(bin, np.uint8)
-                imgs.append(bin)
-    # replace all base64 texts to empty string.
-    text = base64_and_filepath_image_pattern.sub('', text)
-    return imgs, text
+                media_list.append(bin)
+    return media_list
+
+
+def extract_media_from_text(text):
+    texts = base64_and_filepath_image_pattern.split(text)
+    target_texts = list(filter(lambda x: x is not None and len(x.strip()) > 0, texts))
+
+    split_texts = ['']
+    imgs_list = []
+
+    texts = []
+    imgs = []
+    for text in target_texts:
+        media_list = parse_matched_media(text)
+        if len(media_list) == 0:
+            split_texts.append(text)
+            imgs_list.append(imgs)
+            imgs = []
+        else:
+            imgs.extend(media_list)
+    if len(imgs) > 0:
+        imgs_list.append(imgs)
+    if len(split_texts) > 0:
+        if len(split_texts[0]) == 0 and len(imgs_list[0]) == 0:
+            split_texts = split_texts[1:]
+            imgs_list = imgs_list[1:]
+    return imgs_list, split_texts
