@@ -1,5 +1,6 @@
 # originally from https://raw.githubusercontent.com/bear/python-twitter/v1.1/twitter.py  # NOQA
 
+import math
 import json as simplejson
 import requests
 from itertools import zip_longest
@@ -58,7 +59,7 @@ class Twitter(object):
                                 in_reply_to_status_id=None):
         split_media_list = []
         media_list = media_list or []
-        for i in range(0, len(media_list), 4):
+        for i in range(0, int(math.ceil(len(media_list) / 4.0))):
             split_media_list.append(media_list[i * 4:(i + 1) * 4])
         for text, media_list in zip_longest(texts, split_media_list):
             text = text or ''
@@ -89,22 +90,15 @@ class Twitter(object):
         media_ids = ','.join(media_ids)
         return media_ids
 
-    def post_update(self, status):
-        media_list, status = extract_media_from_text(status)
-        media_ids = self._upload_media(media_list[:4])
-        texts = split_tweet_text(status)
-        status = texts[0]
-        url = 'https://api.twitter.com/1.1/statuses/update.json'
-        data = {'status': status}
-        if len(media_ids) > 0:
-            data['media_ids'] = media_ids
-        json = self._request_url(url, 'POST', data=data)
-        data = simplejson.loads(json.content)
-        if len(texts) > 1 or len(media_list) > 4:
+    def post_update(self, status, in_reply_to_status_id=None):
+        media_list, status_list = extract_media_from_text(status)
+        for text, mlist in zip(status_list, media_list):
+            texts = split_tweet_text(text)
             data = self._post_update_with_reply(
-                texts[1:],
-                media_list=media_list[4:],
-                in_reply_to_status_id=data['id'])
+                texts,
+                media_list=mlist,
+                in_reply_to_status_id=in_reply_to_status_id)
+            in_reply_to_status_id = data['id']
         return data
 
     def post_media(self, status, media, in_reply_to_status_id=None):
