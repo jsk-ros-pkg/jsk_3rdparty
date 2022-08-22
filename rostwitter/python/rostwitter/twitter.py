@@ -3,7 +3,10 @@
 import math
 import json as simplejson
 import requests
-from itertools import zip_longest
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 from requests_oauthlib import OAuth1
 
 import rospy
