@@ -87,12 +87,12 @@ void setupTimerCam() {
     s->set_saturation(s, -2);//lower the saturation
 
     //drop down frame size for higher initial frame rate
-    // Note that each image size must be less than publisher output size (8192 byte),
-    // which is defined at m5stack_ros.h
-    // You can also change config.jpeg_quality
-    // FYI: available formats
+    // Note that each image size must be less than publisher output size (32768 byte),
+    // which is maximum size of melodic rosserial protocol (See m5stack_ros.h)
+    // You can also change config.jpeg_quality to reduce each image size
+    // Available formats:
     // https://github.com/espressif/esp32-camera/blob/7b6f020939be574b1da9d4668327321edefd4e8d/driver/include/sensor.h#L81-L107
-    s->set_framesize(s, FRAMESIZE_SVGA); // 800x600
+    s->set_framesize(s, FRAMESIZE_VGA); // 640x480
 }
 
 void readBattery() {
