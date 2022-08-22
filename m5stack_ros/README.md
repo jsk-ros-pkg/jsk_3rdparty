@@ -25,7 +25,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
 2. Setup [Arduino IDE](https://www.arduino.cc/en/software/) for M5Stack
 
-  - Download arduino IDE file from [this page](https://www.arduino.cc/en/software ) and place the unzipped file under home directory like `~/arduino-1.8.16`.
+  - Download arduino IDE file from [this page](https://www.arduino.cc/en/software ) and place the unzipped file under home directory like `~/arduino-1.8.16`. I have tested version 1.8.16 and recommend to [download this version](https://downloads.arduino.cc/arduino-1.8.16-linux64.tar.xz).
     ```bash
     ARDUINO_VERSION=1.8.16 # Set your Arduino version to environment variable
     cd ~
@@ -45,23 +45,27 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       - `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
       - `https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json`
     - Install esp32 by Espressif Systems (Tools -> Board -> Boards Manager -> esp32)
-      - Please select version 2.0.0 ~ 2.0.1 (> 2.0.1 has bug). Check [software version](https://github.com/708yamaguchi/jsk_3rdparty/tree/m5stack-ros-/m5stack_ros#software) for more detail
+      - Please select version 2.0.0 (> 2.0.1 has bug, 2.0.1 does not work with `TimerCam`).
     - Install M5Stack version 0.3.6 ~ 0.4.0 by [M5Stack](https://github.com/m5stack/M5Stack/tree/0.3.6) (Tools -> Manage Libraries -> M5Stack)
     - Select correct board type (Tools -> Board -> ESP32 Arduino)
       - M5Stack Grey/Base: M5Stack-Core-ESP32
       - M5Stack Fire: M5Stack-Fire
       - Timer Camera F: M5Stack-Timer-CAM
 
-  - Add dependent libraries to arduino library
+  - Add dependent libraries to arduino library. This script installs libraries that cannot be installed from the Arduino IDE GUI.
 
     ```bash
     source ~/m5stack_ros_ws/devel/setup.bash
     rosrun m5stack_ros add_libraries.sh $ARDUINO_VERSION
     ```
 
-  - Make rosserial_arduino libraries
+  - Make rosserial_arduino libraries. If you have already installed [Rosserial_Arduino_Libraries](https://github.com/frankjoshua/rosserial_arduino_lib) from Arduino libraries, please remove it. It has old `ros_lib` directory.
 
     ```bash
+    # If you have already installed Rosserial_Arduino_Libraries, remove
+    OLD_ROSSERIAL_DIR=$HOME/Arduino/libraries/Rosserial_Arduino_Library
+    if [ -d $OLD_ROSSERIAL_DIR ]; then rm -r $OLD_ROSSERIAL_DIR; fi
+    # Make ros_lib basd on your workspaces
     source ~/m5stack_ros_ws/devel/setup.bash
     cd ~/arduino-$ARDUINO_VERSION/libraries
     rm -rf ros_lib
@@ -80,7 +84,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
   - Select USB port of M5Stack (Tools -> Port -> /dev/ttyUSB*)
 
-  - Define macro at the beginning of `arduino_libraries/m5stack_ros.h` based on connection type between M5Stack and PC
+  - Define macro at the middle of `m5stack_ros/arduino_libraries/m5stack_ros.h` based on connection type between M5Stack and PC
 
     - Bluetooth
 
@@ -100,7 +104,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       // define nothing
       ```
 
-  - If you use Wi-Fi, set SSID and password in `arduino_libraries/wifi.h`. **DO NOT** upload these information to github.
+  - If you use Wi-Fi, set SSID and password in `m5stack_ros/arduino_libraries/wifi.h`. **DO NOT** upload these information to github.
 
 4.  Start main program
 
@@ -130,6 +134,8 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
   - Launch ROS program. For detail, please see [Devices](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros#devices) section.
 
     First, it is recommended that you use the `SimplePublisher` firmware. You can verify that the environment has been built correctly without sensors.
+
+    You can check if the microcontroller is operating properly from the Serial Monior. As long as the microcontroller is connected to PC via USB, you can use Serial Monitor regardless of the communication type.
 
     - For USB, (USB serial seems to be max 57600 baud rate)
 
@@ -268,4 +274,5 @@ By using Systemd, the m5stack_ros program can be started automatically.
 
 - Ubuntu 18.04
 - Arduino IDE 1.8.16
+  - esp32 by Espressif Systems 2.0.0
 - The arduino libraries on which each firmware depends is described in the respective README.

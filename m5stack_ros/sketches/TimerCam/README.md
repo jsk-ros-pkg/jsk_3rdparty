@@ -10,11 +10,7 @@ Install the following packages from Arduino libraries (Tools -> Manage Libraries
   - Please add `#include "soc/adc_channel.h"` to `$HOME/Arduino/libraries/Timer-CAM/src/battery.c`
   - The current origin/master fixes this problem, so version 0.0.3 will not have this problem.
 
-Install the necessary packages with `apt`
-```
-# To decompress rgb image by image_transport/republish node
-sudo apt install ros-$ROS_DISTRO-image-transport-plugins
-```
+This sketch works with [esp32 by Espressif Systems](https://github.com/espressif/arduino-esp32/tree/2.0.0) == 2.0.0 and does not works with >= 2.0.1. This is because [this directory](https://github.com/espressif/arduino-esp32/tree/2.0.0/tools/sdk/esp32/include/esp-face) is removed in the newer versions.
 
 ## Overview
 
@@ -37,3 +33,7 @@ Published topics:
   ```bash
   roslaunch m5stack_ros timer_cam.launch
   ```
+
+- If you want to tune the camera parameters, use [web_cam](https://github.com/m5stack/TimerCam-arduino/blob/master/examples/web_cam/web_cam.ino) sample.
+  - Burn the firmware
+  - Open web browser and go to `http://(camera IP address)`. For detail, open Serial Monitor and read the log output.

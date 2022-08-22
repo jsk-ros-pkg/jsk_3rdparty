@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script installs libraries that cannot be installed from the Arduino IDE GUI.
+
 # Note that every header files (YYY.h) should be placed XXX directory
 # XXX directory should be placed under $ARDUINO_LIBRARY_PATH
 # For example, $ARDUINO_LIBRARY_PATH/XXX/YYY.h

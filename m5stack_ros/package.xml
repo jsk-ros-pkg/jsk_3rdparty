@@ -12,10 +12,13 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <!-- Only needed for certain sketches -->
   <exec_depend>audio_common_msgs</exec_depend>
   <exec_depend>audio_to_spectrogram</exec_depend>
   <exec_depend>image_transport</exec_depend>
+  <exec_depend>image_transport_plugins</exec_depend>
   <exec_depend>jsk_perception</exec_depend>
+  <!-- Commonly needed for all sketches -->
   <exec_depend>rosserial_arduino</exec_depend>
   <exec_depend>rosserial_client</exec_depend>
   <exec_depend>rosserial_python</exec_depend>
