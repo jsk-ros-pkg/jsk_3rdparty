@@ -1,0 +1,16 @@
+<launch>
+  <arg name="file_name" />
+  <arg name="file_title" />
+  <arg name="parents_path" default="/example_folder" />
+
+  <include file="$(find gdrive_ros)/launch/gdrive_server.launch" />
+
+  <node name="sample_gdrive_roseus_client" pkg="gdrive_ros" type="sample-gdrive-roseus-client.l"
+      output="screen" required="true">
+    <rosparam subst_value="true">
+        file_name: $(arg file_name)
+        file_title: $(arg file_title)
+        parents_path: $(arg parents_path)
+    </rosparam>
+  </node>
+</launch>

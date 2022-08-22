@@ -94,6 +94,13 @@ public:
       }
       return false;
     }
+    VT_GetTTSInfo_JPN(VT_VERIFY_CODE, NULL, &ret, sizeof(int));
+    if (ret != 0) {
+      ROS_FATAL_STREAM("Verification failed (VT_VERIFY_CODE " << ret << ")");
+      return false;
+    }
+
+    // Print voice text info
     char szTmp[PATH_MAX];
     char szTmp2[PATH_MAX];
     VT_GetTTSInfo_JPN(VT_BUILD_DATE, NULL, szTmp, PATH_MAX);

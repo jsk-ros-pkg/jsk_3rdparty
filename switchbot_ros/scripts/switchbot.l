@@ -3,6 +3,11 @@
 (ros::load-ros-manifest "switchbot_ros")
 (ros::roseus "switchboteus_client")
 
+(defun get-devices (&key (topic-name "switchbot_ros/devices"))
+  (let (msg)
+    (setq msg (one-shot-subscribe topic-name switchbot_ros::DeviceArray))
+    msg))
+
 (defun control-device (device_name command &key (parameter "") (command_type "") (topic-name "switchbot_ros/switch") (wait nil))
   "
   Please see the following page for command details.
