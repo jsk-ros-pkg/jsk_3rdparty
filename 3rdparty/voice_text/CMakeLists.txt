@@ -20,9 +20,10 @@ generate_messages()
 
 catkin_package(CATKIN_DEPENDS message_runtime)
 
+# find voice text headers and libraries
 file(GLOB VT_ROOT /usr/vt/*/*)
 if(NOT VT_ROOT)
-  message(WARNING "VoiceText directory should be /usr/vt/*/* (e.g., /usr/vt/sayaka/M16) but is not found")
+  message(WARNING "VoiceText directory should be /usr/vt/*/* (e.g., /usr/vt/sayaka/M16) but it is not found")
   set(VT_ROOT /usr/vt/sayaka/M16)  # default value for following configure_file
 else()
   if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
@@ -63,8 +64,8 @@ elseif(EXISTS ${VT_API_H})
   list(GET _VT_ROOT_SPLIT 4 VT_TYPE)
   set(VT_API_LIB_PATH ${VT_ROOT}/bin/libvtapi.so)
   set(VT_INCLUDE ${VT_API_H})
+  set(VT_BIN ${VT_ROOT}/bin)
 endif()
-configure_file(src/voice_text.cpp.in ${PROJECT_SOURCE_DIR}/src/voice_text.cpp)
 
 include_directories(
   ${Boost_INCLUDE_DIRS}
@@ -74,13 +75,19 @@ add_executable(voice_text src/voice_text.cpp)
 add_dependencies(voice_text ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
 set_target_properties(voice_text PROPERTIES COMPILE_FLAGS -D_REENTRANT)
 
-if(NOT VT_LIB_PATH)
+# build with voice_text engint or dummy
+if(VT_LIB_PATH)
+  message(WARNING "Building with Voice Text library")
+  set(BUILD_FLAGS "-DVT_ROOT=${VT_ROOT} -DVT_INCLUDE=${VT_INCLUDE} -DVT_SPEAKER=${VT_SPEAKER} -DVT_TYPE=${VT_TYPE}")
+  set_target_properties(voice_text PROPERTIES COMPILE_OPTIONS ${BUILD_FLAGS})
+else()
   message(WARNING "Building dummy library")
   add_library(vt_dummy src/dummy/vt_dummy.cpp)
   set_target_properties(vt_dummy PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
   set_target_properties(vt_dummy PROPERTIES LIBRARY_OUTPUT_NAME vt_jpn)
   set_target_properties(voice_text PROPERTIES COMPILE_FLAGS -DUSE_DUMMY_INCLUDE)
   set(VT_LIB_PATH ${PROJECT_BINARY_DIR}/libvt_jpn.so)
+  add_dependencies(voice_text vt_dummy)
 endif()
 
 target_link_libraries(voice_text
@@ -88,9 +95,6 @@ target_link_libraries(voice_text
     ${VT_LIB_PATH} -lm -lpthread
     ${VT_API_LIB_PATH} -lm -lpthread -ldl
 )
-if(NOT EXISTS ${VT_LIB_PATH})
-  add_dependencies(voice_text vt_dummy)
-endif()
 
 install(TARGETS voice_text # do not install vt_dummy target, that should be installed from voice_text library
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

@@ -21,7 +21,7 @@
 #ifdef USE_DUMMY_INCLUDE
 #include "dummy/vt_dummy.h"
 #else
-#include "@VT_INCLUDE@"
+#include VT_INCLUDE
 #endif
 
 #define PATH_MAX 1024
@@ -34,7 +34,11 @@ public:
   typedef voice_text::VoiceTextConfig Config;
 
   VoiceText() : nh_(), pnh_("~"), db_path_(""), license_path_(""), dyn_srv_(pnh_) {
-    pnh_.param<std::string>("db_path", db_path_, "@VT_ROOT@");
+#ifdef USE_DUMMY_INCLUDE
+    pnh_.param<std::string>("db_path", db_path_, "dummy");
+#else
+    pnh_.param<std::string>("db_path", db_path_, VT_ROOT);
+#endif
     pnh_.setParam("db_path", db_path_);  // for backward compatibility (db_path is usually set previously)
     pnh_.param<std::string>("license_path", license_path_, "");
 
@@ -71,7 +75,7 @@ public:
       std::strcpy(license_path_char, license_path_.c_str());
     }
     #ifdef _VTAPI_H_
-    VTAPI_Init("@VT_ROOT@/bin"); // set voice_text binary library path because it loads them dynamically
+    VTAPI_Init(VT_BIN); // set voice_text binary library path because it loads them dynamically
     this->hVTAPI = VTAPI_CreateHandle();
     if (this->hVTAPI == 0) {
       ROS_ERROR("VoiceText API ERROR when creating API handler. : %s\n", VTAPI_GetLastErrorInfo(0)->szMsg);
@@ -79,7 +83,7 @@ public:
     }
     VTAPI_SetLicenseFolder(license_path_char);
     // Load engine
-    this->hEngine = VTAPI_GetEngine("@VT_SPEAKER@", "@VT_TYPE@");
+    this->hEngine = VTAPI_GetEngine(VT_SPEAKER, VT_TYPE);
     ret = VTAPI_SetEngineHandle(this->hVTAPI, this->hEngine);
     if(ret < VTAPI_SUCCESS){
       ROS_ERROR("VoiceText API ERROR when creating engine handler. CODE: %d, MESSAGE: %s \n", ret, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
