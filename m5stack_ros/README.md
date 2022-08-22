@@ -155,6 +155,10 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       roslaunch m5stack_ros [device].launch baud:=115200 port:=tcp
       ```
 
+  - If you want to test the compilation of codes under the `sketches` directory, execute the following steps
+    - Uncomment test section in `m5stack_ros/CMakeLists.txt`
+    - Run `catkin run_tests m5stack_ros --no-deps`
+
 ## Devices
 
 With this package, you can use following devices. To use each device, please see README.md.
@@ -212,6 +216,12 @@ With this package, you can use following devices. To use each device, please see
 
     - The Timer Camera F is a fisheye camera module based on ESP32-D0WDQ6-V3 with 8M PSRAM and 4M Flash on board.
     - [README](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/TimerCam)
+
+If you add a new sketch, please follow these rules. Sketch testing depends on these directory configurations.
+
+- Create the directory with the same name as your sketch under `m5stack_ros/sketches` directory
+- Locate main ino file under the created directory
+
 
 ## Autostart by Systemd
 

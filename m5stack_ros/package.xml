@@ -23,4 +23,6 @@
   <exec_depend>rosserial_client</exec_depend>
   <exec_depend>rosserial_python</exec_depend>
 
+  <test_depend>jsk_tools</test_depend>
+
 </package>
