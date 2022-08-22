@@ -37,3 +37,5 @@ Published topics:
 - If you want to tune the camera parameters, use [web_cam](https://github.com/m5stack/TimerCam-arduino/blob/master/examples/web_cam/web_cam.ino) sample.
   - Burn the firmware
   - Open web browser and go to `http://(camera IP address)`. For detail, open Serial Monitor and read the log output.
+
+- If the focal length is not correct, turn the black part around the lens. See also [m5-docs](https://docs.m5stack.com/en/unit/timercam).
