@@ -4,7 +4,9 @@
 // If you use M5Stack, define M5STACK
 // If you use M5StickC, define M5STICK_C
 // If you use M5StickC, define M5STICK_C_PLUS
-#define M5STACK
+#if !defined(M5STACK) && !defined(M5STICK_C) && !defined(M5STICK_C_PLUS)
+  #define M5STACK
+#endif
 
 #if defined(M5STACK)
   #include <M5Stack.h>

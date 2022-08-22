@@ -1,6 +1,8 @@
 // Reference
 // https://msr-r.net/m5stickc-unit/
 
+// You can use M5STICK_C or M5STICK_C_PLUS (M5Stack is not available)
+#define M5STICK_C
 #include <m5stack_ros.h>
 
 #if defined(M5STACK)
