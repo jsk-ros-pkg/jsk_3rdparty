@@ -40,7 +40,7 @@ else()
   )
 endif()
 
-install(DIRECTORY test
+install(DIRECTORY test launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )
