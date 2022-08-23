@@ -95,7 +95,8 @@ class Twitter(object):
 
     def post_update(self, status, in_reply_to_status_id=None):
         media_list, status_list = extract_media_from_text(status)
-        for text, mlist in zip(status_list, media_list):
+        for text, mlist in zip_longest(status_list, media_list):
+            text = text or ''
             texts = split_tweet_text(text)
             data = self._post_update_with_reply(
                 texts,
