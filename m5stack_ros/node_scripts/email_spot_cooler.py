@@ -31,7 +31,7 @@ class EmailSpotCooler(EmailRosserial):
     # When full water, low battery or next day, send email
     def check_status(self, event):
         # Send email as soon as possible when the water is full
-        if self.moisture < self.moisture_thre:
+        if self.moisture is not None and self.moisture < self.moisture_thre:
             self.send_email()
             rospy.loginfo('Send email because tank water is full')
         # send email when low battery or next day
