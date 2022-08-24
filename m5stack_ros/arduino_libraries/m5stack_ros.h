@@ -84,12 +84,15 @@ void setupM5stackROS(char *name) {
     setupWiFi();
     nh.getHardware()->setConnection(server);
     nh.initNode();
+    Serial.println("Start m5stack_ros with WiFi connection");
   #elif defined(ROSSERIAL_ARDUINO_BLUETOOTH)
     nh.initNode(name);
     SerialBT.begin(name);
+    Serial.println("Start m5stack_ros with Bluetooth connection");
   #else
     nh.getHardware()->setBaud(57600);
     nh.initNode();
+    Serial.println("Start m5stack_ros with USB connection");
   #endif
 }
 
