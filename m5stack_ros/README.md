@@ -270,6 +270,32 @@ By using Systemd, the m5stack_ros program can be started automatically.
       rfcomm
       ```
 
+## Unique device file name by udev rules
+
+When multiple M5 devices are used with USB connections to the same PC, their device files must be distinguished.
+With the following steps, different symbolic links are created for each M5 device. You can use [udev file example](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/config/99-m5stack-ros.rules).
+
+  - Check ATTRS{idVendor} and ATTRS{idProduct} by the following command
+    ```
+    lsusb
+    ```
+
+  - Check ATTRS{serial} by
+    ```
+    # Be sure that your device is /dev/ttyUSB0
+    sudo udevadm info -a -p $(sudo udevadm info -q path -n /dev/ttyUSB0) | grep ATTRS{serial}`
+    ```
+
+  - Place 99-m5stack-ros-rules under `/etc/udev/rules.d/`
+
+  - Restart udev
+    ```
+    sudo udevadm trigger
+    ```
+
+  - Reconnect your M5 device and check if symbolic link (/dev/[Device name]) is created.
+
+
 ## Tested environment
 
 ### Hardware
