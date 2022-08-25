@@ -1,18 +1,26 @@
-int gas_ain=36;
-int analog_value;
-int digital_value;
+#include <AS-MLV-P2_Cal_Gas_Sensor.h>
+#include <m5stack_ros.h>
+#include <std_msgs/UInt16.h>
+
+std_msgs::UInt16 cal_gas_msg;
+ros::Publisher cal_gas_pub("cal_gas", &cal_gas_msg);
+
 void setup()
 {
-  pinMode(gas_din,INPUT);
-  pinMode(gas_ain,INPUT);
-  Serial.begin(115200);
+  setupM5stackROS("M5Stack ROS AS-MLV-P2 Cal Gas");
+  setupCalGas();
+
+  nh.advertise(cal_gas_pub);
 }
 void loop()
 {
-  analog_value=analogRead(gas_ain);
+  measureCalGas();
 
-  Serial.print("analog_value:");
-  Serial.println(analog_value);
+  displayCalGas();
 
-  delay(500);
+  cal_gas_msg.data = analog_value;
+  cal_gas_pub.publish(&cal_gas_msg);
+  nh.spinOnce();
+
+  delay(200); //500
 }

@@ -1,22 +1,31 @@
-int gas_din=26;
-int gas_ain=36;
-int analog_value;
-int digital_value;
+#include <TGS_Gas_Sensors.h>
+#include <m5stack_ros.h>
+#include <std_msgs/UInt16.h>
+
+std_msgs::UInt16 tgs_gas_analog_msg;
+std_msgs::UInt16 tgs_gas_digital_msg;
+ros::Publisher tgs_gas_analog_pub("tgs_gas_analog", &tgs_gas_analog_msg);
+ros::Publisher tgs_gas_digital_pub("tgs_gas_digital", &tgs_gas_digital_msg);
+
 void setup()
 {
-  pinMode(gas_din,INPUT);
-  pinMode(gas_ain,INPUT);
-  Serial.begin(115200);
+  setupM5stackROS("M5Stack ROS TGS_Gas_Sensor");
+  setupTGSSensors();
+
+  nh.advertise(tgs_gas_analog_pub);
+  nh.advertise(tgs_gas_digital_pub);
 }
 void loop()
 {
-  analog_value=analogRead(gas_ain);
-  digital_value=digitalRead(gas_din);
+  measureTGSSensors();
 
-  Serial.print("analog_value:");
-  Serial.print(analog_value);
-  Serial.print(", digital_value:");
-  Serial.println(digital_value);
+  displayTGSSensors();
 
-  delay(500);
+  tgs_gas_analog_msg.data = analog_value;
+  tgs_gas_digital_msg.data = digital_value;
+  tgs_gas_analog_pub.publish(&tgs_gas_analog_msg);
+  tgs_gas_digital_pub.publish(&tgs_gas_digital_msg);
+  nh.spinOnce();
+  
+  delay(200);
 }
