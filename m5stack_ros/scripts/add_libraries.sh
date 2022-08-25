@@ -34,3 +34,6 @@ git clone https://github.com/Seeed-Studio/Grove_LED_Bar.git $HOME/Arduino/librar
 cd $HOME/Arduino/libraries/Grove_LED_Bar
 git checkout -b b2964c4f9d967a0c891d25432cbc7ce83f3832ed
 cd -
+
+# Add Seeed-Studio/Seeed_Arduino_MultiGas
+git clone https://github.com/Seeed-Studio/Seeed_Arduino_MultiGas.git $HOME/Arduino/libraries/Seeed_Arduino_MultiGas
