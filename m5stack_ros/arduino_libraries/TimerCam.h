@@ -27,6 +27,7 @@
 #include "esp_camera.h"
 #include "camera_pins.h"
 #include "battery.h"
+#include "bmm8563.h"
 
 // Data structure of camera frame buffer
 // https://github.com/espressif/esp32-camera/blob/7b6f020939be574b1da9d4668327321edefd4e8d/driver/include/esp_camera.h#L146-L156

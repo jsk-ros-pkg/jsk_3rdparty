@@ -27,6 +27,14 @@ This firmware is an addition to the [TimerCam](https://github.com/jsk-ros-pkg/js
     If you want to brighten the camera's surroundings, you can use [Grove Circular LED](https://wiki.seeedstudio.com/Grove-Circular_LED/).
     Go to [TimerCam_with_email.ino](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/sketches/TimerCam_with_email/TimerCam_with_email.ino) and add `#define GROVE_CIRCULAR_LED`.
 
+- Sleep feature
+
+    In this sketch, you can use two types of sleep
+
+      - Define BMM8563_SLEEP for low energy consumption sleep
+      - Do not define BMM8563_SLEEP if you use normal delay
+
+    You can check TimerCam sleep sample at [wakeup sample](https://github.com/m5stack/TimerCam-arduino/blob/eabb74fb56a87bc1373b1c25bc924560fa6d1e04/examples/wakeup/wakeup.ino)
 
 Run. In addition to rosserial, an email client node and an email server node are launched.
 

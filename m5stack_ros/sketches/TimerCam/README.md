@@ -8,7 +8,8 @@ Install the following packages from Arduino libraries (Tools -> Manage Libraries
 - [Timer-CAM](https://github.com/m5stack/TimerCam-arduino/tree/0.0.2) version 0.0.2
   - NOTE that **compile will fail without [this change](https://github.com/m5stack/TimerCam-arduino/issues/6#issuecomment-899100086).**
   - Please add `#include "soc/adc_channel.h"` to `$HOME/Arduino/libraries/Timer-CAM/src/battery.c`
-  - The current origin/master fixes this problem, so version 0.0.3 will not have this problem.
+    - The current origin/master fixes the above problem, so version 0.0.3 will not have this problem.
+  - Please add `conf.clk_flags = 0;` to `i2c_init()` in `$HOME/Arduino/libraries/Timer-CAM/src/bmm8563.h`. For detail, see https://msr-r.net/timer-camera-lib/
 
 This sketch works with [esp32 by Espressif Systems](https://github.com/espressif/arduino-esp32/tree/2.0.0) == 2.0.0 and does not works with >= 2.0.1. This is because [this directory](https://github.com/espressif/arduino-esp32/tree/2.0.0/tools/sdk/esp32/include/esp-face) is removed in the newer versions.
 
