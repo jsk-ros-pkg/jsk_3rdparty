@@ -5,6 +5,7 @@ find_package(
   catkin REQUIRED COMPONENTS
   message_generation
   actionlib_msgs
+  std_msgs
 )
 
 catkin_python_setup()
@@ -16,14 +17,14 @@ add_message_files(
 )
 
 add_action_files(
-  FILES
-  SwitchBotCommand.action
+  DIRECTORY action
+  FILES SwitchBotCommand.action
 )
 
 generate_messages(
   DEPENDENCIES
-  std_msgs
   actionlib_msgs
+  std_msgs
 )
 
 catkin_package()

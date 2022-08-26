@@ -3,7 +3,7 @@ project(dialogflow_task_executive)
 
 execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("-- gcc dumpmachine returns ${gcc_dump_machine}")
-if(NOT (gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch64-.*"))
+if(NOT gcc_dump_machine MATCHES "x86_64-.*")
   message(WARNING "pip -i requirements.txt work only with i686 ???")
   message(WARNING "`pip install grpcio` fails with
   third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S: Assembler messages:
@@ -52,6 +52,11 @@ if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   file(COPY requirements.txt.indigo DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo requirements.txt)
   catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
+elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in
+    PYTHON_INTERPRETER python3
+    )
 else()
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
@@ -70,3 +75,8 @@ install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS roslaunch)
+  roslaunch_add_file_check(launch)
+endif()

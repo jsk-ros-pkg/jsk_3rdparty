@@ -5,10 +5,10 @@
   <arg name="language" default="ja-JP" />
   <arg name="soundplay_action_name" default="robotsound_jp" />
   <arg name="volume" default="1.0" />
-  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS)" doc="Read credentials JSON from this value when use_yaml is false." />
-  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID)"/>
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
   <arg name="enable_hotword" default="true" />
-  <arg name="always_publish_result" default="true" doc="Always publish dialog_response topic even the node gets actionlib request." />
+  <arg name="always_publish_result" default="false" doc="Always publish dialog_response topic even the node gets actionlib request." />
 
   <node name="dialogflow_client"
         pkg="dialogflow_task_executive" type="dialogflow_client.py"
