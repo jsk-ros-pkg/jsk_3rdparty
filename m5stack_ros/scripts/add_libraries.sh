@@ -16,6 +16,25 @@ create_symlink () {
     fi
 }
 
+# ARG1: github url (https://github.com/xxx/yyy.git)
+# ARG2: Branch, version or commit ID to checkout (optional)
+clone_library () {
+    CLONE_URL=$1
+    PACKAGE_NAME=$(basename $CLONE_URL | cut -f 1 -d '.')
+    CLONE_DIR=$HOME/Arduino/libraries/$PACKAGE_NAME
+    BRANCH=${2:-0}
+    if [ ! -d $CLONE_DIR ]; then
+        git clone $CLONE_URL $CLONE_DIR
+        if [ $BRANCH != 0 ]; then
+            cd $CLONE_DIR
+            git checkout -b $BRANCH
+            cd -
+        fi
+    else
+        echo "$CLONE_DIR already exists"
+    fi
+}
+
 ARDUINO_VERSION=${1:-1.8.16}
 ARDUINO_LIBRARY_PATH=$HOME/arduino-$ARDUINO_VERSION/libraries
 
@@ -30,10 +49,7 @@ SYMLINK_PATH=$ARDUINO_LIBRARY_PATH/THERMAL_MLX90640
 create_symlink $ORIG_PATH $SYMLINK_PATH
 
 # Add Seeed-Studio/Grove_LED_Bar
-git clone https://github.com/Seeed-Studio/Grove_LED_Bar.git $HOME/Arduino/libraries/Grove_LED_Bar
-cd $HOME/Arduino/libraries/Grove_LED_Bar
-git checkout -b b2964c4f9d967a0c891d25432cbc7ce83f3832ed
-cd -
+clone_library https://github.com/Seeed-Studio/Grove_LED_Bar.git b2964c4f9d967a0c891d25432cbc7ce83f3832ed
 
 # Add Seeed-Studio/Seeed_Arduino_MultiGas
-git clone https://github.com/Seeed-Studio/Seeed_Arduino_MultiGas.git $HOME/Arduino/libraries/Seeed_Arduino_MultiGas
+clone_library https://github.com/Seeed-Studio/Seeed_Arduino_MultiGas.git bf6a4e76f01efe1dd63ff171f13d0261feda46df
