@@ -160,7 +160,7 @@ class GoogleChatROS(object):
             result.done = success
             self._as.set_succeeded(result)
 
-    def event_cb(self, event: dict, publish_topic=True):
+    def event_cb(self, event, publish_topic=True):
         """Parse Google Chat API json content and publish as a ROS Message.
         See https://developers.google.com/chat/api/reference/rest 
         to check what contents are included in the json.
