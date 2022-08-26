@@ -282,11 +282,14 @@ With the following steps, different symbolic links are created for each M5 devic
 
   - Check ATTRS{serial} by
     ```
-    # Be sure that your device is /dev/ttyUSB0
-    sudo udevadm info -a -p $(sudo udevadm info -q path -n /dev/ttyUSB0) | grep ATTRS{serial}`
+    M5_DEVICE_FILE=/dev/ttyUSB0
+    sudo udevadm info -a -p $(sudo udevadm info -q path -n $M5_DEVICE_FILE) | grep ATTRS{serial}
     ```
 
-  - Place 99-m5stack-ros-rules under `/etc/udev/rules.d/`
+  - Place your udev files file under `/etc/udev/rules.d/`
+    ```
+    sudo cp $(rospack find m5stack_ros)/config/99-m5stack-ros.rules /etc/udev/rules.d/
+    ```
 
   - Restart udev
     ```
