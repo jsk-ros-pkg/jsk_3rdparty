@@ -23,9 +23,14 @@ class GoogleChatROS(object):
     Send request to Google Chat REST API via ROS
     """
     def __init__(self):
+        # rosparams
         receiving_chat_mode = rospy.get_param('~receiving_mode') # select from 'url', 'pubsub', 'none'
-        self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service')
         google_credentials = rospy.get_param('~google_cloud_credentials_json')
+        self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service', "/gdrive_ros/upload")
+        self.upload_data_timeout = rospy.get_param('~upload_data_timeout', 30)
+        self.download_data = rospy.get_param('~download_data', True)
+        self.download_directory = rospy.get_param('~download_directory', "/tmp")
+        self.download_avatar = rospy.get_param('~download_avatar', False)
 
         # For sending message
         self._client = GoogleChatRESTClient(google_credentials)
@@ -45,11 +50,6 @@ class GoogleChatROS(object):
 
         # For receiving message
         if receiving_chat_mode in ("url", "dialogflow", "pubsub"):
-            # rosparams
-            self.upload_data_timeout = rospy.get_param('~upload_data_timeout')
-            self.download_data = rospy.get_param('~download_data')
-            self.download_directory = rospy.get_param('~download_directory')
-            self.download_avatar = rospy.get_param('~download_avatar')
             # ROS publisher
             self._message_activity_pub = rospy.Publisher("~message_activity", MessageEvent, queue_size=1)
             self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
