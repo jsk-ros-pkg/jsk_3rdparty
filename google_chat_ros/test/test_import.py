@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 PKG = 'google_chat_ros'
 NAME = 'test_import'
@@ -27,4 +28,4 @@ class TestBlock(unittest.TestCase):
 
 if __name__ == "__main__":
     import rostest
-    rostest.rosrun(PKG, NAME, TestBlock)
+    rostest.rosrun(PKG, NAME, TestBlock, sys.argv)

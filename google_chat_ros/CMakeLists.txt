@@ -8,7 +8,6 @@ find_package(
   actionlib_msgs
   std_msgs
   message_generation
-  rostest
   )
 
 catkin_python_setup()
@@ -30,26 +29,14 @@ generate_messages(
 
 catkin_package()
 
-include_directories()
-
 # generate the virtualenv
 catkin_generate_virtualenv(
   PYTHON_INTERPRETER python3
   USE_SYSTEM_PACKAGES FALSE
+  CHECK_VENV FALSE
   EXTRA_PIP_ARGS
     -vvv
   )
-
-# import test
-if(CATKIN_ENABLE_TESTING)
-  catkin_install_python(
-    PROGRAMS test/test_import.py
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-    )
-  add_rostest(test/import.test
-    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
-    )
-endif()
 
 # install
 # euslisp
@@ -73,3 +60,15 @@ install(FILES requirements.txt
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   )
+
+# import test
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS catkin_virtualenv rostest)
+  catkin_install_python(
+    PROGRAMS test/test_import.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    )
+  add_rostest(test/import.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+    )
+endif()
