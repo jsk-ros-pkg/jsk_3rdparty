@@ -50,22 +50,26 @@ class EmailRosserial(object):
             self.low_bat = True
         else:
             self.low_bat = False
-        self.last_communication = rospy.Time.now()
+        self.update_last_communication()
         # Reset rosserial because the connection is terminated by M5StickC
         # after M5StickC sends topic
         rospy.sleep(3)  # Wait for other callback functions to exit
         self.reset_rosserial()
 
+    def update_last_communication(self):
+        self.last_communication = rospy.Time.now()
+
     # Check M5StickC battery
     def battery_message(self):
         message = ''
-        if self.low_bat:
-            message += '{}のバッテリ残量はわずかです。充電してください。\n'.format(
-                self.device_name)
+        if self.bat_level is None:
+            message += 'バッテリ情報は届いていません。\n'
+        elif self.low_bat:
+            message += '{}のバッテリ残量はわずかです({}[V])。充電してください。\n'.format(
+                self.device_name, self.bat_level)
         else:
-            message += '{}のバッテリ残量は十分です。\n'.format(
-                self.device_name)
-        message += 'バッテリ残量 {}[V]'.format(self.bat_level)
+            message += '{}のバッテリ残量は十分です({}[V])。\n'.format(
+                self.device_name, self.bat_level)
         message += '\n'  # end of this section
         return message
 
@@ -107,8 +111,8 @@ class EmailRosserial(object):
         email_body = EmailBody()
         email_body.type = 'text'
         message = ''
-        message += self.battery_message()
         message += self.comm_message()
+        message += self.battery_message()
         email_body.message = message
         return [email_body]
 

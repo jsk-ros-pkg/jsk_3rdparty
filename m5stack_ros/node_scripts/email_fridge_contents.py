@@ -46,14 +46,17 @@ class EmailFridgeContents(EmailRosserial):
         bridge = CvBridge()
         img = bridge.imgmsg_to_cv2(msg)
         cv2.imwrite(self.img_file_path, img)
+        self.update_last_communication()
 
     def gas_cb(self, msg, gas_topic_name):
         for gas_info in self.gas_info:
             if gas_info['Topic'] == gas_topic_name:
                 gas_info['Concentration'] = msg.data
+        self.update_last_communication()
 
     def tof_cb(self, msg):
         self.tof = msg.data
+        self.update_last_communication()
 
     # When door is left open, low battery or next day, send email
     def check_status(self, event):
@@ -73,6 +76,7 @@ class EmailFridgeContents(EmailRosserial):
         else:
             email_body.type = 'text'
             email_body.message = '冷蔵庫の中身の写真は届いていません\n'
+        email_body.message += '\n'  # end of this section
         return email_body
 
     # Check the gas level in the fridge
@@ -86,6 +90,7 @@ class EmailFridgeContents(EmailRosserial):
         else:
             email_body.message = '冷蔵庫の{}の濃度は{}です\n'.format(
                 gas_info['Name'], gas_info['Concentration'])
+        email_body.message += '\n'  # end of this section
         return email_body
 
     # Check the fridge door state by tof
@@ -101,14 +106,15 @@ class EmailFridgeContents(EmailRosserial):
             else:
                 email_body.message += '冷蔵庫の扉は閉じられています。(ToF: {})\n'.format(
                     self.tof)
+        email_body.message += '\n'  # end of this section
         return email_body
 
     def create_email_body(self):
         body = super(EmailFridgeContents, self).create_email_body()
-        body.append(self.email_image_body())
         for i in range(len(self.gas_info)):
             body.append(self.email_gas_body(i))
         body.append(self.email_tof_body())
+        body.append(self.email_image_body())
         return body
 
     def send_email(self):
