@@ -36,6 +36,7 @@ class EmailFridgeContents(EmailRosserial):
                 gas_topic_name, UInt16, self.gas_cb, gas_topic_name)
         rospy.Subscriber('tof', UInt16, self.tof_cb)
         self.tof = None
+        self.tof_threshold = 30
         # Do not send old image
         if os.path.exists(self.img_file_path):
             os.remove(self.img_file_path)
@@ -54,8 +55,11 @@ class EmailFridgeContents(EmailRosserial):
     def tof_cb(self, msg):
         self.tof = msg.data
 
-    # When low battery or next day, send email
+    # When door is left open, low battery or next day, send email
     def check_status(self, event):
+        if self.tof is not None and self.tof > self.tof_threshold:
+            self.send_email()
+            rospy.loginfo('Send email because the fridge door is left open')
         super(EmailFridgeContents, self).check_status(event)
 
     # Check the contents in the fridge by camera
@@ -91,7 +95,7 @@ class EmailFridgeContents(EmailRosserial):
         if self.tof is None:
             email_body.message = '冷蔵庫のToFのデータは届いていません\n'
         else:
-            if self.tof > 30:
+            if self.tof > self.tof_threshold:
                 email_body.message += '冷蔵庫の扉が開いたままです。(ToF: {})\n'.format(
                     self.tof)
             else:
