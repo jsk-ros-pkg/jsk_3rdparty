@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from jsk_robot_startup.msg import Email, EmailBody
 import rosgraph
 import rosnode
@@ -77,8 +78,9 @@ class EmailRosserial(object):
             message += '1日以上、{}と通信が出来ていません。情報が古い可能性があります。\n'.format(
                 self.device_name)
         else:
-            message += '最後に通信した時刻 {} (UNIX time)\n'.format(
-                self.last_communication.secs)
+            unix_time_for_jst = self.last_communication.secs + (9 * 60 * 60)
+            dt = datetime.utcfromtimestamp(unix_time_for_jst)
+            message += '最後に通信した時刻 {} (JST)\n'.format(dt)
         message += '\n'  # end of this section
         return message
 
