@@ -19,7 +19,7 @@ ros::Publisher level_pub("battery_level", &level_msg);
 // Use BMM8563_SLEEP for low energy consumption sleep
 // Do not use BMM8563_SLEEP if you use normal delay
 // For detail, see README
-// #define BMM8563_SLEEP
+#define BMM8563_SLEEP
 
 int interval = 1 * 60 * 60; // seconds
 
@@ -101,10 +101,12 @@ void loop() {
     // Do not use deep sleep because esp32 cannot wakeup by itself without usb charging
     bat_disable_output();
     // if usb not connect, will not in here;
-    esp_deep_sleep((uint64_t)(interval * 1000 * 1000));
+    // Don't forget to cast to uint64_t for long time sleep.
+    esp_deep_sleep(((uint64_t)interval * 1000 * 1000));
     esp_deep_sleep_start();
   #else
-    delay(interval * 1000);
+    // Don't forget to cast to uint64_t for long time sleep.
+    delay((uint64_t)interval * 1000);
   #endif
   Serial.println("Wakeup");
 }
