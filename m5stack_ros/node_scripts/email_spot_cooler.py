@@ -47,6 +47,7 @@ class EmailSpotCooler(EmailRosserial):
         message += '水分量 {} （基準値3000）\n'.format(self.moisture)
         message += '\n'  # end of this section
         email_body = EmailBody()
+        email_body.type = 'text'
         email_body.message = message
         return email_body
 
