@@ -24,6 +24,7 @@ class TestBlock(unittest.TestCase):
             import socket
             import ssl
         except Exception as e:
+            print(str(e))
             assert False
 
 if __name__ == "__main__":

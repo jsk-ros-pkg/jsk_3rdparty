@@ -31,11 +31,10 @@ catkin_package()
 
 # generate the virtualenv
 catkin_generate_virtualenv(
+  INPUT_REQUIREMENTS requirements.in
   PYTHON_INTERPRETER python3
   USE_SYSTEM_PACKAGES FALSE
   CHECK_VENV FALSE
-  EXTRA_PIP_ARGS
-    -vvv
   )
 
 # install
