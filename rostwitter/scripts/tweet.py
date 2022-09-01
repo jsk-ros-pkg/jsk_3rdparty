@@ -28,7 +28,7 @@ class Tweet(object):
 
     def tweet_cb(self, msg):
         message = msg.data
-        rospy.loginfo(rospy.get_name() + " sending %s", message)
+        rospy.logdebug(rospy.get_name() + " sending %s", message)
 
         # search word start from / and end with {.jpeg,.jpg,.png,.gif}
         m = re.search('/\S+\.(jpeg|jpg|png|gif)', message)
