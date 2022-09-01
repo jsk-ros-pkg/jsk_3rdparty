@@ -83,6 +83,9 @@ rostopic pub /tweet std_msgs/String "/tmp/k-okada.png"
 
 You can even tweet the image by encoding in base64. The following example is in python.
 
+Do not concatenate multiple base64 images without spaces.
+
+
 ```python
 import rospy
 import cv2
@@ -106,7 +109,7 @@ for i in range(N):
     color = colormap(1.0 * i / N)[:3]
     img = color * np.ones((10, 10, 3), dtype=np.uint8) * 255
     img = np.array(img, dtype=np.uint8)
-    text += encode_image_cv2(img)
+    text += encode_image_cv2(img) + ' '
 pub.publish(text)
 ```
 
