@@ -1,18 +1,67 @@
 chaplus_ros
 ===========
 
-ROS package for https://www.chaplus.jp/
+ROS package for mebo: https://mebo.work/
 
 ## Tutorials
 
-1) Obtain API keys for chaplus service, go to https://www.chaplus.jp/api
+1. optional) If you want to get new agent, please reference https://qiita.com/maKunugi/items/14f1b82a2c0b6fa5c202
 
-You can also create account via https://chaplus.work and reqeust [beta program](https://forms.gle/DQWXdXzUH4MnE5wv6)
+2. For JSK Users, please download the [apikey.json](https://drive.google.com/file/d/1tAT_WQqCMqvtbM0-CSTomWjwMP4jcOi9/view?usp=sharing)
 
-2) Put API key as json file under `` `rospack find chaplus_ros`/apikey.json ``
-   ```
-   {"apikey": "0123456789"}
-   ```
+3. Please start the sample launch with the following command.
+
+  ```
+  $ roslaunch chaplus_ros google_example.launch chaplus_apikey_file:=${HOME}/Downloads/apikey.json
+  ```
+  This sample subscribes `/speech_to_text [speech_recognition_msgs/SpeechRecognitionCandidates]` and publishes `/robotsound_jp [sound_play/SoundRequest]`
+
+4. You can try several conversations using `rostopic pub` command. Here is an example of sending "おはよう".
+
+  ```
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'おはよう'
+  confidence:
+  - 0"
+  ```
+  The reply from the bot can be checked using `rostopic echo` command.
+  ```
+  $ roopic echo --filter "print(m.arg)" /robotsound_jp
+  or
+  $ rostopic echo /robotsound_jp | ascii2uni -a U -q
+  ```
+
+  Here is an example of conversations.
+  ```
+  # terminal 1
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'おはよう'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - 'お話しよう'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - '何色が好き？'
+  confidence:
+  - 0"
+
+  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
+  - '良いですね。私は白が好きです。'
+  confidence:
+  - 0"
+  ```
+  ```
+  # termial 2
+  $ roopic echo --filter "print(m.arg)" /robotsound_jp
+  おはようございます！
+  あー、久しぶりにおしゃべりしたいですね。楽しみにしています。
+  私の好きな色は緑です。気持ちが落ち着きますよね。
+  私も好きです。気持ちが落ち着く気がしますから。
+  ```
 
 ## Interface
 
@@ -78,3 +127,16 @@ Please access https://a3rt.recruit.co.jp/product/talkAPI/registered/ and enter y
 ```
 roslaunch chaplus_ros google_example.launch chatbot_engine:=A3RT
 ```
+
+### Chaplus
+
+Reference: https://www.chaplus.jp/. Note that support ends on August 31, 2022.
+
+1) Obtain API keys for chaplus service, go to https://www.chaplus.jp/api
+
+You can also create account via https://chaplus.work and reqeust [beta program](https://forms.gle/DQWXdXzUH4MnE5wv6)
+
+2) Put API key as json file under `` `rospack find chaplus_ros`/apikey.json ``
+   ```
+   {"apikey": "0123456789"}
+   ```

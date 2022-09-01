@@ -9,12 +9,17 @@ catkin_package()
 # we use dpkg-architecture command instead of ${CMAKE_SYSTEM_PROCESSOR} to get the architecture.
 # https://stackoverflow.com/a/58222507
 # http://manpages.ubuntu.com/manpages/bionic/man1/dpkg-architecture.1.html
-execute_process(COMMAND dpkg-architecture -qDEB_HOST_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
+execute_process(COMMAND dpkg-architecture -qDEB_TARGET_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
+message(STATUS "DEB_TARGET_GNU_CPU : ${ARCHITECTURE}")
 if("${ARCHITECTURE}" MATCHES x86_64* )
 set(AQTK2_LNX_LIB_DIR "lib64")
-else ()
+elseif("${ARCHITECTURE}" MATCHES i[0-9]86* )
 set(AQTK2_LNX_LIB_DIR "lib")
+else()
+message(WARNING "${ARCHITECTURE} is not supported, do not compile aques_talk")
+return()
 endif ()
+message(STATUS "AQTK2_LNX_LIB_DIR : ${AQTK2_LNX_LIB_DIR}")
 
 #
 include(ExternalProject)
@@ -24,7 +29,7 @@ externalproject_add(aqtk2-lnx-eva
   TIMEOUT 120
   CONFIGURE_COMMAND bash -c "echo configure"
   BUILD_COMMAND bash -c "(cd ${AQTK2_LNX_LIB_DIR} && ln -sf libAquesTalk2Eva.so.2.3 libAquesTalk2.so && ln -sf libAquesTalk2Eva.so.2.3 libAquesTalk2.so.2)"
-  INSTALL_COMMAND bash -c "cp -P ${AQTK2_LNX_LIB_DIR}/libAquesTalk2* ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION} && cp phont/* ${CMAKE_CURRENT_SOURCE_DIR}/phont/"
+  INSTALL_COMMAND bash -c "cp -P ${AQTK2_LNX_LIB_DIR}/libAquesTalk2* ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION} && mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/phont/ && cp phont/* ${CMAKE_CURRENT_SOURCE_DIR}/phont/"
   BUILD_IN_SOURCE 1
 )
 

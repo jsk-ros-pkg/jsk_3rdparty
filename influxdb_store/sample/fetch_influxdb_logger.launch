@@ -1,0 +1,31 @@
+<launch>
+  <arg name="host" default="localhost" />
+  <arg name="port" default="8086" />
+  <arg name="robot_name" default="fetch15" />
+  <arg name="database" default="$(arg robot_name)" />
+  <arg name="joint_states_topic" default="/joint_states" />
+  <arg name="battery_states_topic" default="/battery_state" />
+  <arg name="map_frame_id" default="map" />
+  <arg name="base_frame_id" default="base_link" />
+  <arg name="network_states_transmit_topic" default="/$(arg robot_name)/wlan0/transmit" />
+  <arg name="network_states_receive_topic"  default="/$(arg robot_name)/wlan0/receive" />
+
+  <include file="$(find influxdb_store)/launch/influxdb_logger.launch">
+    <arg name="host" value="$(arg host)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="database" value="$(arg database)" />
+    <arg name="joint_states_topic" value="$(arg joint_states_topic)" />
+    <arg name="map_frame_id" value="$(arg map_frame_id)" />
+    <arg name="base_frame_id" value="$(arg base_frame_id)" />
+    <arg name="network_states_transmit_topic" value="$(arg network_states_transmit_topic)" />
+    <arg name="network_states_receive_topic" value="$(arg network_states_receive_topic)" />
+  </include>
+
+  <include file="$(find influxdb_store)/launch/fetch_battery_logger.launch">
+    <arg name="host" value="$(arg host)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="database" value="$(arg database)" />
+    <arg name="battery_states_topic" value="$(arg battery_states_topic)" />
+  </include>
+
+</launch>

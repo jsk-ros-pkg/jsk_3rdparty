@@ -83,6 +83,10 @@ class DialogflowBase(object):
             )
         if self.project_id is None:
             rospy.logerr('project ID is not set')
+        self.pub_res = rospy.Publisher(
+            "dialog_response", DialogResponse, queue_size=1)
+        self.always_publish_result = rospy.get_param(
+            "~always_publish_result", False)
 
     def detect_intent_text(self, data, session):
         query = df.types.QueryInput(
@@ -94,7 +98,7 @@ class DialogflowBase(object):
     def make_dialog_msg(self, result):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
-        if result.action != 'input.unknown':
+        if result.action == 'input.unknown':
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
@@ -143,6 +147,8 @@ class DialogflowTextClient(DialogflowBase):
             self._as.publish_feedback(feedback)
             result.done = success
             self._as.set_succeeded(result)
+            if df_result and self.always_publish_result:
+                self.pub_res.publish(result.response)
 
 
 class DialogflowAudioClient(DialogflowBase):
@@ -184,9 +190,6 @@ class DialogflowAudioClient(DialogflowBase):
                     rospy.Duration(0.1), self.speech_timer_cb)
         else:
             self.sound_action = None
-
-        self.pub_res = rospy.Publisher(
-            "dialog_response", DialogResponse, queue_size=1)
 
         if self.use_audio:
             self.audio_config = df.types.InputAudioConfig(
