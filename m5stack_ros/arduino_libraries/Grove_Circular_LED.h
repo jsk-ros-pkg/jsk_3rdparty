@@ -61,7 +61,11 @@ void turnOnGroveCircularLED () {
 }
 
 void turnOffGroveCircularLED () {
-  // Turn on all LEDs
-  // 24 bits corresponds to on/off of 24 LED
-  bar.setBits(0x000000);
+  // Try until all LEDs are confirmed to be off
+  while ( 0 != bar.getBits()) {
+    // Turn off all LEDs
+    // 24 bits corresponds to on/off of 24 LED
+    bar.setBits(0x000000);
+    delay(100);
+  }
 }
