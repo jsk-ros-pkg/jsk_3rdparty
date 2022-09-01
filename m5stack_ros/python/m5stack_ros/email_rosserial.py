@@ -151,12 +151,17 @@ class EmailRosserial(object):
         node = ServerProxy(node_api)
         try:
             pid = rosnode._succeed(node.getPid(ID))
+            cmd = subprocess.check_output(
+                ['ps', '-p', str(pid), '-o', 'command'])
+            cmd = cmd.replace('\n', ' ')
         except socket_error as serr:
             rospy.logerr(serr)
             rospy.logerr('Skip killing rosserial')
         else:
             # To kill rosserial completely, call kill twice
-            subprocess.call(['kill', str(pid)])
+            subprocess.call(['kill', '-9', str(pid)])
             rospy.sleep(5)
-            subprocess.call(['kill', str(pid)])
-            rospy.loginfo('Reset rosserial by sending SIGTERM to rosserial')
+            subprocess.call(['kill', '-9', str(pid)])
+            rospy.loginfo('Respawn rosserial by killing the following process')
+            rospy.loginfo('PID {}'.format(pid))
+            rospy.loginfo('CMD {}'.format(cmd))
