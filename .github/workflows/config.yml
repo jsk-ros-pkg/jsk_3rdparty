@@ -15,6 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - ROS_DISTRO: indigo
+            CONTAINER: jskrobotics/ros-ubuntu:14.04
+            ROS_PARALLEL_TEST_JOBS: "-j8"
+            CATKIN_PARALLEL_JOBS: "-i"
+            NOT_TEST_INSTALL : true
+            BEFORE_SCRIPT : "for name in dialogflow_task_executive ros_speech_recognition sesame_ros ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo \\$name; find $GITHUB_WORKSPACE -iname \\$name -exec touch {}/CATKIN_IGNORE \\; ; ls -al \\$(find -iname \\$name)/; done" # Skip large packagses /  Skip packages that could not build on indigo dialogflow_task_executive/ros_speech_recognition/sesame_ros
           - ROS_DISTRO: kinetic
             CONTAINER: ubuntu:16.04
             ROS_PARALLEL_TEST_JOBS: "-j8"
@@ -89,7 +95,6 @@ jobs:
   kinetic_i386:
     runs-on: ubuntu-latest
     name: kinetic_i386
-
     container: i386/ubuntu:16.04
 
     steps:
@@ -112,3 +117,42 @@ jobs:
           ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
           # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/237 : (Note that pip==21.0.1 is incompatible with python 2.x)
           BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0"
+
+  arm:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ROS_DISTRO: kinetic
+            CONTAINER: ubuntu16.04
+            EXTRA_DEB : "python-lxml"
+          # - ROS_DISTRO: melodic
+          #   CONTAINER: ubuntu18.04
+    steps:
+      - uses: actions/checkout@v2.1.0
+        with:
+          submodules: 'true'
+      - name: Skip packagse
+        run: |
+          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        with:
+          arch: aarch64
+          distro: ${{ matrix.CONTAINER }}
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y git sudo wget curl
+          run: |
+            export EXTRA_DEB=${{ matrix.EXTRA_DEB }}
+            export ROS_DISTRO=${{ matrix.ROS_DISTRO }}
+            export ROS_PARALLEL_TEST_JOBS="-j2"
+            export CATKIN_PARALLEL_JOBS="-i"
+            export ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
+            export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0"
+            export USE_TRAVIS=true
+            export USE_DOCKER=false
+            export NOT_TEST_INSTALL=true
+            set +o nounset
+            source .travis/travis.sh

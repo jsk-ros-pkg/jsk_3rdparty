@@ -1,0 +1,17 @@
+<launch>
+  <arg name="host" />
+  <arg name="port" />
+  <arg name="database" />
+  <arg name="battery_states_topic" />
+
+  <node name="battery_states_logger" pkg="influxdb_store" type="fetch_battery_states_logger.py"
+        output="screen" respawn="true" >
+    <remap from="~input" to="$(arg battery_states_topic)" /> 
+    <rosparam subst_value="true">
+      host: $(arg host)
+      port: $(arg port)
+      database: $(arg database)
+    </rosparam>
+  </node>
+
+</launch>

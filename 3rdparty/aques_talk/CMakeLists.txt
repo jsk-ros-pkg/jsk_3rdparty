@@ -9,12 +9,17 @@ catkin_package()
 # we use dpkg-architecture command instead of ${CMAKE_SYSTEM_PROCESSOR} to get the architecture.
 # https://stackoverflow.com/a/58222507
 # http://manpages.ubuntu.com/manpages/bionic/man1/dpkg-architecture.1.html
-execute_process(COMMAND dpkg-architecture -qDEB_HOST_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
+execute_process(COMMAND dpkg-architecture -qDEB_TARGET_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
+message(STATUS "DEB_TARGET_GNU_CPU : ${ARCHITECTURE}")
 if("${ARCHITECTURE}" MATCHES x86_64* )
 set(AQTK2_LNX_LIB_DIR "lib64")
-else ()
+elseif("${ARCHITECTURE}" MATCHES i[0-9]86* )
 set(AQTK2_LNX_LIB_DIR "lib")
+else()
+message(WARNING "${ARCHITECTURE} is not supported, do not compile aques_talk")
+return()
 endif ()
+message(STATUS "AQTK2_LNX_LIB_DIR : ${AQTK2_LNX_LIB_DIR}")
 
 #
 include(ExternalProject)
