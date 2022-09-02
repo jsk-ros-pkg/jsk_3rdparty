@@ -3,7 +3,7 @@ project(dialogflow_task_executive)
 
 execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("-- gcc dumpmachine returns ${gcc_dump_machine}")
-if(NOT gcc_dump_machine MATCHES "x86_64-.*")
+if(NOT (gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch64-.*"))
   message(WARNING "pip -i requirements.txt work only with i686 ???")
   message(WARNING "`pip install grpcio` fails with
   third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S: Assembler messages:
