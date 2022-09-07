@@ -24,8 +24,11 @@
     </rosparam>
   </node>
 
-  <node name="image_proc" pkg="image_proc" type="image_proc" output="screen" >
-	<remap from="image_raw" to="$(arg image)" />
-	<remap from="camera_info" to="/camera_info_publisher_with_yaml/camera_info" />
+  <node pkg="nodelet" type="nodelet" name="rectify_timer_cam"
+        args="standalone image_proc/rectify"
+        respawn="true">
+    <remap from="image_mono" to="$(arg image)" />
+    <remap from="image_rect" to="$(arg image)/image_rect_color" />
+    <remap from="camera_info" to="/camera_info_publisher_with_yaml/camera_info" />
   </node>
 </launch>
