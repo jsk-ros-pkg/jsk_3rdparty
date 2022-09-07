@@ -148,6 +148,16 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
       ```bash
       roslaunch m5stack_ros [device].launch baud:=115200 port:=tcp
       ```
+## Camera calibration
+
+`timer_cam.launch` use camera parameter of a camera.<br>If you want to calibrate camera youself, see [here](http://wiki.ros.org/camera_calibration) and locate yaml file as `/m5stack_ros/config/timer_cam_info.yaml`.
+
+## Published images
+Describe main images here.
+
+`/timer_cam_image` (sensor_msgs/Image)  <br>&emsp;raw color image.
+
+`/timer_cam_image/image_rect_color` (sensor_msgs/Image) <br> &emsp;color image corrected based on camera_info.
 
 ## Devices
 
