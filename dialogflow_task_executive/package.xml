@@ -1,12 +1,15 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package format="1">
   <name>dialogflow_task_executive</name>
   <version>2.1.24</version>
-  <description>A ROS package for Task execution with dialogflow</description>
+  <description>A ROS package for Google Dialogflow and launching apps via Dialogflow</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
 
   <license>BSD</license>
+  <author email="obinata@jsk.imi.i.u-tokyo.ac.jp">Yoshiki Obinata</author>
+  <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
   <url type="website">http://ros.org/wiki/dialogflow_task_executive</url>
   <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
@@ -19,7 +22,9 @@
   <run_depend>app_manager</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>speech_recognition_msgs</run_depend>
+  <run_depend>topic_tools</run_depend>
   <!-- <run_depend>python-dialogflow-pip</run_depend> install via catkin_virtualenv -->
+  <test_depend>roslaunch</test_depend>
 
   <export>
     <pip_requirements>requirements.txt</pip_requirements>

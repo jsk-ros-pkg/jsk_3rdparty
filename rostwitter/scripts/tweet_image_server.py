@@ -40,8 +40,14 @@ class TweetImageServer(object):
             consumer_secret=csecret,
             access_token_key=akey,
             access_token_secret=asecret)
-        self.client = SoundClient(
-            blocking=True, sound_action='robotsound_jp')
+
+        try:  # sound_play version < 0.3.7 does not support 'sound_action' argument
+            self.client = SoundClient(
+                blocking=True, sound_action='robotsound_jp')
+        except:
+            rospy.logwarn("sound_play version < 0.3.7 does not support 'sound_action' argument, so it uses robot_sound, instead of robot_sound_jp")
+            self.client = SoundClient(
+                blocking=True)
         self.server = actionlib.SimpleActionServer(
             '~tweet', TweetAction, self._execute_cb)
 
