@@ -1,34 +1,38 @@
 <launch>
   <arg name="port" default="/dev/rfcomm1" />
   <arg name="baud" default="115200" />
-  <arg name="image" default="/timer_cam_image" />
+  <arg name="image" default="timer_cam_image" />
+  <arg name="namespace" default="/"/>
   <arg name="rosserial_name" default="seiral_node" />
   <arg name="gui" default="true" />
 
   <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
     <arg name="port" value="$(arg port)" />
     <arg name="baud" value="$(arg baud)" />
+    <arg name="namespace" value="$(arg namespace)" /> 
     <arg name="rosserial_name" value="$(arg rosserial_name)" />
   </include>
 
-  <node pkg="image_transport" type="republish" name="republish" args="compressed raw">
-    <remap from="in" to="$(arg image)" />
-    <remap from="out" to="$(arg image)" />
-  </node>
+  <group ns="$(arg namespace)"> 
+    <node pkg="image_transport" type="republish" name="republish" args="compressed raw">
+      <remap from="in" to="$(arg image)" />
+      <remap from="out" to="$(arg image)" />
+    </node>
 
-  <node pkg="jsk_interactive_marker" name="camera_info_publisher_with_yaml" type="camera_info_publisher" output="screen">
-    <remap from="~input" to="$(arg image)"/>
-    <rosparam subst_value="true">
-      yaml_filename: $(find m5stack_ros)/config/timer_cam_info.yaml
-      sync_image: true
-    </rosparam>
-  </node>
+    <node pkg="jsk_interactive_marker" name="camera_info_publisher_with_yaml" type="camera_info_publisher" output="screen">
+      <remap from="~input" to="$(arg image)"/>
+      <rosparam subst_value="true">
+        yaml_filename: $(find m5stack_ros)/config/timer_cam_info.yaml
+        sync_image: true
+      </rosparam>
+    </node>
 
-  <node pkg="nodelet" type="nodelet" name="rectify_timer_cam"
-        args="standalone image_proc/rectify"
-        respawn="true">
-    <remap from="image_mono" to="$(arg image)" />
-    <remap from="image_rect" to="$(arg image)/image_rect_color" />
-    <remap from="camera_info" to="/camera_info_publisher_with_yaml/camera_info" />
-  </node>
+    <node pkg="nodelet" type="nodelet" name="rectify_timer_cam"
+          args="standalone image_proc/rectify"
+          respawn="true">
+      <remap from="image_mono" to="$(arg image)" />
+      <remap from="image_rect" to="$(arg image)/image_rect_color" />
+      <remap from="camera_info" to="camera_info_publisher_with_yaml/camera_info" />
+    </node>
+  </group>
 </launch>
