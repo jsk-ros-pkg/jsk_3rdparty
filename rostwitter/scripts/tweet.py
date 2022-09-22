@@ -33,9 +33,8 @@ class Tweet(object):
                       ''.join([message] if len(message) < 128 else message[0:128]+'......'))
 
         ret = self.api.post_update(message)
-        if 'errors' in ret:
-            rospy.logerr('Failed to post: {}'.format(ret))
-        rospy.loginfo(rospy.get_name() + " receiving %s", ret)
+        if ret is not None:
+            rospy.loginfo(rospy.get_name() + " receiving %s", ret)
 
 
 if __name__ == '__main__':
