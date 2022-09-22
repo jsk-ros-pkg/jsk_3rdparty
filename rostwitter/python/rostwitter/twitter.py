@@ -58,6 +58,22 @@ class Twitter(object):
             )
         return 0  # if not a POST or GET request
 
+    def _check_post_request(self, request):
+        valid = True
+        if request.status_code == 200:
+            data = simplejson.loads(request.content)
+            if 'errors' in data:
+                for error in data['errors']:
+                    rospy.logwarn('Tweet error code: {}, message: {}'
+                                  .format(error['code'], error['message']))
+                valid = False
+        else:
+            rospy.logwarn('post tweet failed. status_code: {}'
+                          .format(request.status_code))
+            valid = False
+        if valid:
+            return data
+
     def _post_update_with_reply(self, texts, media_list=None,
                                 in_reply_to_status_id=None):
         split_media_list = []
@@ -75,13 +91,9 @@ class Twitter(object):
             if in_reply_to_status_id is not None:
                 data['in_reply_to_status_id'] = in_reply_to_status_id
             r = self._request_url(url, 'POST', data=data)
-            data = simplejson.loads(r.content)
-            if r.status_code == 200:
-                rospy.loginfo('post update with reply success')
+            data = self._check_post_request(r)
+            if data is not None:
                 in_reply_to_status_id = data['id']
-            else:
-                rospy.logwarn('post update with reply failed. status_code: {}'
-                              .format(r.status_code))
         return data
 
     def _upload_media(self, media_list):
@@ -94,8 +106,8 @@ class Twitter(object):
                 rospy.loginfo('upload media success')
                 media_ids.append(str(r.json()['media_id']))
             else:
-                rospy.logwarn('upload media failed. status_code: {}'
-                              .format(r.status_code))
+                rospy.logerr('upload media failed. status_code: {}'
+                             .format(r.status_code))
         media_ids = ','.join(media_ids)
         return media_ids
 
@@ -108,7 +120,8 @@ class Twitter(object):
                 texts,
                 media_list=mlist,
                 in_reply_to_status_id=in_reply_to_status_id)
-            in_reply_to_status_id = data['id']
+            if data is not None:
+                in_reply_to_status_id = data['id']
         return data
 
     def post_media(self, status, media, in_reply_to_status_id=None):
@@ -118,12 +131,7 @@ class Twitter(object):
         data = {'status': status}
         data['media'] = open(str(media), 'rb').read()
         r = self._request_url(url, 'POST', data=data)
-        data = simplejson.loads(r.content)
-        if r.status_code == 200:
-            rospy.loginfo('post media success')
-        else:
-            rospy.logwarn('post media failed. status_code: {}'
-                          .format(r.status_code))
+        data = self._check_post_request(r)
         if len(texts) > 1:
             data = self._post_update_with_reply(
                 texts[1:],
