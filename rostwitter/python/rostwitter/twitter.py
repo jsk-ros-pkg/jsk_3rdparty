@@ -60,8 +60,8 @@ class Twitter(object):
 
     def _check_post_request(self, request):
         valid = True
+        data = simplejson.loads(request.content)
         if request.status_code != 200:
-            data = simplejson.loads(request.content)
             rospy.logwarn('post tweet failed. status_code: {}'
                           .format(request.status_code))
             if 'errors' in data:
