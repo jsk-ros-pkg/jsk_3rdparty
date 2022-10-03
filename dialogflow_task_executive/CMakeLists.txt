@@ -54,7 +54,7 @@ if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
 elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
   catkin_generate_virtualenv(
-    INPUT_REQUIREMENTS requirements.in
+    INPUT_REQUIREMENTS requirements.in.noetic
     PYTHON_INTERPRETER python3
     )
 else()
