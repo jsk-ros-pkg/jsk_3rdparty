@@ -1,6 +1,7 @@
 <launch>
 
   <arg name="device" default="" />
+  <arg name="launch_sound_play" default="true" />
   <arg name="sound_play_respawn" default="true"
        doc="Respawn sound_play node or not (default: true)" />
   <arg name="default_speaker" default="2"
@@ -15,7 +16,8 @@
     <param name="cpu_num_threads" value="$(arg cpu_num_threads)" />
   </node>
 
-  <node name="sound_play_jp"
+  <node if="$(arg launch_sound_play)"
+        name="sound_play_jp"
         pkg="sound_play" type="soundplay_node.py"
         respawn="$(arg sound_play_respawn)"
         output="screen" >
