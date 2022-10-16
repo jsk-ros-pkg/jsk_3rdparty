@@ -52,7 +52,7 @@ class ChaplusROS(object):
 
     def __init__(self):
 
-        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Chaplus")
+        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Mebo")
         self.use_sample = rospy.get_param("~use_sample", True)
         # please write your apikey to chaplus_ros/apikey.json
         r = rospkg.RosPack()
@@ -86,6 +86,13 @@ class ChaplusROS(object):
         elif self.chatbot_engine=="A3RT":
             self.apikey = apikey_json['apikey_a3rt']
             self.endpoint = "https://api.a3rt.recruit.co.jp/talk/v1/smalltalk"
+
+        elif self.chatbot_engine=="Mebo":
+            self.headers = {'content-type': 'application/json'}
+            self.url = "https://api-mebo.dev/api"
+            self.apikey = apikey_json['apikey_mebo']
+            self.agentid = apikey_json['agentid_mebo']
+            self.uid = apikey_json['uid_mebo']
 
         else:
             rospy.logerr("please use chatbot_engine Chaplus or A3RT")
@@ -141,8 +148,30 @@ class ChaplusROS(object):
                 best_response = "ごめんなさい、よくわからないです"
             rospy.loginfo("a3rt: returns best response {}".format(best_response))
 
+        #use Mebo
+        elif self.chatbot_engine == "Mebo":
+            try:
+                rospy.loginfo("received {}".format(msg.data))
+                self.data = json.dumps(
+                    {'api_key': self.apikey,
+                     'agent_id': self.agentid,
+                     'utterance': msg.data,
+                     'uid': self.uid
+                    })
+                response = requests.post(self.url, headers=self.headers, data=self.data, timeout=(3.0, 7.5))
+                response_json = response.json()
+                if 'bestResponse' not in response_json:
+                    best_response = "ごめんなさい、よくわからないです"
+                else:
+                    best_response = response_json['bestResponse']['utterance']
+            except Exception as e:
+                rospy.logerr("Failed to reqeust url={}, headers={}, data={}".format(
+                    self.url, self.headers, self.data))
+                rospy.logerr(e)
+                best_response = "ごめんなさい、よくわからないです"
+            rospy.loginfo("mebo: returns best response {}".format(best_response))
         else:
-            rospy.logerr("please use chatbot_engine Chaplus or A3RT")
+            rospy.logerr("please use chatbot_engine Chaplus or A3RT or Mebo")
 
         if response_json is not None:
             # convert to string for print out

@@ -1,0 +1,12 @@
+[Unit]
+Description=PR1012 influxdb logger
+After=network-online.target influxdb.service
+Wants=network-online.target influxdb.service
+
+[Service]
+User=applications
+Group=applications
+ExecStart=/bin/bash -c "source /home/applications/ros/melodic/devel/setup.bash && rossetip && rossetmaster pr1012 && rosrun jsk_tools roscore_regardless.py --respawn --timeout 1 --ping-trials 1 --sigint-timeout 5 --sigterm-timeout 5 roslaunch influxdb_store pr2_influxdb_logger.launch robot_name:=pr1012"
+
+[Install]
+WantedBy=multi-user.target
