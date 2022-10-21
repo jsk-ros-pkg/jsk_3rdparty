@@ -1,0 +1,7 @@
+int32 audio_source_id
+string source_frame_id
+geometry_msgs/Pose source_pose
+string stream_topic_audio
+string stream_topic_info
+bool playing
+bool initialized

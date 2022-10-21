@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>spatial_audio_msgs</name>
+  <version>2.1.24</version>
+  <description>The spatial_audio_msgs package</description>
+
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>message_runtime</build_export_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>message_generation</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+  </export>
+</package>

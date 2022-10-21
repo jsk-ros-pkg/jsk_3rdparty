@@ -1,0 +1,6 @@
+int32 audio_source_id
+spatial_audio_msgs/AudioSource audio_source
+
+---
+bool success
+string message

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>spatial_audio_demo</name>
+  <version>2.1.24</version>
+  <description>The spatial_audio_demo package</description>
+
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>audio_common_msgs</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>interactive_markers</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>spatial_audio_msgs</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+
+  <exec_depend>audio_common_msgs</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>interactive_markers</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>spatial_audio</exec_depend>
+  <exec_depend>spatial_audio_msgs</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+
+  <test_depend>audio_common_msgs</test_depend>
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>interactive_markers</test_depend>
+  <test_depend>roscpp</test_depend>
+  <test_depend>rospy</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rviz</test_depend>
+  <test_depend>spatial_audio</test_depend>
+  <test_depend>spatial_audio_msgs</test_depend>
+  <test_depend>tf2</test_depend>
+  <test_depend>tf2_ros</test_depend>
+  <test_depend>visualization_msgs</test_depend>
+
+  <export></export>
+</package>
