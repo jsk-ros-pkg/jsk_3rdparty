@@ -64,7 +64,7 @@ jobs:
              git config --global --add safe.directory $GITHUB_WORKSPACE
           fi
 
-      - name: Chcekout
+      - name: Checkout
         uses: actions/checkout@v3.0.2
 
       - name: Start X server
@@ -102,7 +102,7 @@ jobs:
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
         run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
-      - name: Chcekout
+      - name: Checkout
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
           git clone --depth=1 $GITHUB_SERVER_URL/$GITHUB_REPOSITORY $GITHUB_WORKSPACE
