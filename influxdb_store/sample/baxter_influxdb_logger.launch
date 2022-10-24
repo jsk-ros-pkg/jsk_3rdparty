@@ -1,0 +1,21 @@
+<launch>
+  <arg name="host" default="localhost" />
+  <arg name="port" default="8086" />
+  <arg name="robot_name" default="baxter" />
+  <arg name="database" default="$(arg robot_name)" />
+  <arg name="joint_states_topic" default="/robot/joint_states" />
+  <arg name="base_frame_id" default="base" />
+
+  <include file="$(find influxdb_store)/launch/influxdb_logger.launch">
+    <arg name="host" value="$(arg host)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="database" value="$(arg database)" />
+    <arg name="joint_states_topic" value="$(arg joint_states_topic)" />
+    <arg name="base_frame_id" value="$(arg base_frame_id)" />
+    <arg name="launch_joint_states_logger" value="true" />
+    <arg name="launch_map_transform_logger" value="false" />
+    <arg name="launch_base_transform_logger" value="true" />
+    <arg name="launch_network_states_logger" value="false" />
+  </include>
+
+</launch>

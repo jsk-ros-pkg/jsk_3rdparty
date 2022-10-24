@@ -5,7 +5,7 @@ all: installed.dict
 VERSION = 4.4
 FILENAME = dictation-kit-v$(VERSION).zip
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://osdn.net/frs/redir.php?m=ymu&f=%2Fjulius%2F66544%2F$(FILENAME)"
+TARBALL_URL = "https://osdn.jp/dl/julius/$(FILENAME)"
 TARBALL_PATCH =
 SOURCE_DIR = build/dictation-kit-v$(VERSION)
 UNPACK_CMD = unzip -qq
@@ -14,6 +14,18 @@ MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
 include $(shell rospack find mk)/download_unpack_build.mk
 
 INSTALL_DIR = `rospack find julius`
+
+$(TARBALL):
+	-mkdir -p build
+	wget $(TARBALL_URL) -O $(TARBALL)
+
+$(SOURCE_DIR)/unpacked: $(TARBALL)
+	if [ ! -f $(MD5SUM_FILE) ]; then echo "Error: Couldn't find md5sum file $(MD5SUM_FILE)" && false; fi
+	export MD5SUM_1=`awk {'print $$1'} $(MD5SUM_FILE)`; export MD5SUM_2=`md5sum $(TARBALL) | awk {'print $$1'}`; 	if [ "$(MD5SUM_1)" != "$(MD5SUM_2)" ]; then echo "ERROR: md5sum mismatch ($(MD5SUM_1) != $(MD5SUM_2)) on $(TARBALL); aborting" && false; fi
+	touch -c $(TARBALL)
+	rm -rf $(SOURCE_DIR) $(INITIAL_DIR)
+	cd build; $(UNPACK_CMD) ../$(TARBALL)
+	touch $(SOURCE_DIR)/unpacked
 
 installed.dict: $(SOURCE_DIR)/unpacked
 	rsync -a $(SOURCE_DIR)/model/ $(INSTALL_DIR)/model

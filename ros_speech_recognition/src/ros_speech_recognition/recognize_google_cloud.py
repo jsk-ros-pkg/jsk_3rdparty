@@ -87,17 +87,17 @@ class RecognizerEx(SR.Recognizer):
         if "results" not in response or len(response["results"]) == 0: raise UnknownValueError()
         transcript = ""
         for result in response["results"]:
-            if speech_config.has_key('diarizationConfig') and \
+            if 'diarizationConfig' in speech_config and \
                speech_config['diarizationConfig']['enableSpeakerDiarization'] == True:
                 # when diariazationConfig is true, use words with speakerTag:
                 speakerTag = None
                 for word in result["alternatives"][0]["words"]:
-                    if word.has_key('speakerTag'):
+                    if 'speakerTag' in word:
                         if speakerTag != word['speakerTag']:
                             speakerTag = word['speakerTag']
                             transcript += "[{}]".format(speakerTag)
                         transcript += ' ' + word['word']
-            elif result["alternatives"][0].has_key("transcript"):
+            elif "transcript" in result["alternatives"][0]:
                 print("trasncript?")
                 transcript += result["alternatives"][0]["transcript"].strip() + " "
 

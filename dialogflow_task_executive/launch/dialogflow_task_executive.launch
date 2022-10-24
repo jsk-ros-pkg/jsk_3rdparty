@@ -1,23 +1,38 @@
 <launch>
   <arg name="run_app_manager" default="false" />
-  <arg name="credential" default="$(env GOOGLE_APPLICATION_CREDENTIALS)"/>
-  <arg name="project_id" default="$(env DIALOGFLOW_PROJECT_ID)"/>
+  <arg name="applist" default="" />
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
+  <arg name="enable_hotword" default="true" />
+  <arg name="always_publish_result" default="false" doc="Always publish dialog_response topic even the node gets actionlib request." />
+
+  <!-- options for dialogflow_client -->
+  <arg name="launch_dialogflow" default="true" />
+  <arg name="use_audio" default="false" />
+  <arg name="use_tts" default="true" />
+  <arg name="language" default="ja-JP" />
+  <arg name="soundplay_action_name" default="robotsound_jp" />
+  <arg name="volume" default="1.0" />
+
 
   <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
         args="/speech_to_text /speech_to_text_google /speech_to_text_julius" >
     <remap from="mux" to="speech_to_text_mux"/>
   </node>
 
-  <node name="dialogflow_client"
-        pkg="dialogflow_task_executive" type="dialogflow_client.py"
-        output="screen">
-    <rosparam subst_value="true">
-      use_audio: false
-      language: ja-JP
-      use_tts: true
-      project_id: $(arg project_id)
-    </rosparam>
-  </node>
+  <group if="$(arg launch_dialogflow)">
+    <include file="$(find dialogflow_task_executive)/launch/dialogflow_ros.launch">
+      <arg name="use_audio" value="$(arg use_audio)" />
+      <arg name="use_tts" value="$(arg use_tts)" />
+      <arg name="language" value="$(arg language)" />
+      <arg name="soundplay_action_name" value="$(arg soundplay_action_name)" />
+      <arg name="volume" value="$(arg volume)" />
+      <arg name="credential" value="$(arg credential)" />
+      <arg name="project_id" value="$(arg project_id)" />
+      <arg name="enable_hotword" value="$(arg enable_hotword)" />
+      <arg name="always_publish_result" value="$(arg always_publish_result)" />
+    </include>
+  </group>
 
   <node name="task_executive"
         pkg="dialogflow_task_executive" type="task_executive.py"

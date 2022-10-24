@@ -14,17 +14,20 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
-if($ENV{ROS_DISTRO} STREQUAL "noetic")
+if($ENV{ROS_DISTRO} STRGREATER "melodic")
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
     )
 else()
-  catkin_generate_virtualenv()
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    )
 endif()
 
+file(GLOB SCRIPT_PROGRAMS scripts/*.py)
 catkin_install_python(
-  PROGRAMS scripts/speech_recognition_node.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  PROGRAMS ${SCRIPT_PROGRAMS}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/
 )
 
 install(DIRECTORY launch
@@ -35,10 +38,6 @@ install(FILES requirements.txt
 
 if(CATKIN_ENABLE_TESTING)
   find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
-  catkin_install_python(
-    PROGRAMS scripts/speech_recognition_node.py
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
   add_rostest(test/sample_ros_speech_recognition.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )

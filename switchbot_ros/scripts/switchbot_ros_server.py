@@ -7,7 +7,10 @@ import rospy
 from switchbot_ros.msg import SwitchBotCommandAction
 from switchbot_ros.msg import SwitchBotCommandFeedback
 from switchbot_ros.msg import SwitchBotCommandResult
+from switchbot_ros.msg import Device
+from switchbot_ros.msg import DeviceArray
 from switchbot_ros.switchbot import SwitchBotAPIClient
+from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
 
 
 class SwitchBotAction:
@@ -23,29 +26,69 @@ class SwitchBotAction:
                 self.token = f.read().replace('\n', '')
         else:
             self.token = token
-        try:
-            self.bots = SwitchBotAPIClient(token=self.token)
-            device_list_str = 'Switchbot device list:\n'
-            for device in self.bots.device_list:
-                device_list_str += 'Name: ' + str(device['deviceName'])
-                device_list_str += ', Type: ' + str(device['deviceType'])
-                device_list_str += '\n'
-            rospy.loginfo(device_list_str)
-        except ConnectionError as e: # If the machine is not connected to the internet
-            self.bots = None
-            rospy.logwarn('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
+        # Initialize switchbot client
+        self.bots = self.get_switchbot_client()
+        self.print_devices()
         # Actionlib
         self._as = actionlib.SimpleActionServer(
             '~switch', SwitchBotCommandAction,
             execute_cb=self.execute_cb, auto_start=False)
         self._as.start()
+        # Topic
+        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latch=True)
+        self.published = False
 
-        
+    def get_switchbot_client(self):
+        try:
+            client = SwitchBotAPIClient(token=self.token)
+            rospy.loginfo('Switchbot API Client initialized.')
+            return client
+        except ConnectionError:  # If the machine is not connected to the internet
+            rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
+            return None
+
+    def spin(self):
+        rate = rospy.Rate(1)
+        while not rospy.is_shutdown():
+            rate.sleep()
+            if self.bots is None:
+                self.bots = self.get_switchbot_client()
+            elif not self.published:
+                self.publish_devices()
+                self.published = True
+
+    def print_devices(self):
+        if self.bots is None:
+            return
+        device_list_str = 'Switchbot device list:\n'
+        device_list = sorted(
+            self.bots.device_list,
+            key=lambda device: str(device['deviceName']))
+        for device in device_list:
+            device_list_str += 'Name: ' + str(device['deviceName'])
+            device_list_str += ', Type: ' + str(device['deviceType'])
+            device_list_str += '\n'
+        rospy.loginfo(device_list_str)
+
+    def publish_devices(self):
+        if self.bots is None:
+            return
+        msg = DeviceArray()
+        device_list = sorted(
+            self.bots.device_list,
+            key=lambda device: str(device['deviceName']))
+        for device in device_list:
+            msg_device = Device()
+            msg_device.name = str(device['deviceName'])
+            msg_device.type = str(device['deviceType'])
+            msg.devices.append(msg_device)
+        self.pub.publish(msg)
+
     def execute_cb(self, goal):
         feedback = SwitchBotCommandFeedback()
         result = SwitchBotCommandResult()
         r = rospy.Rate(1)
-        success = True        
+        success = True
         # start executing the action
         parameter, command_type = goal.parameter, goal.command_type
         if not parameter:
@@ -62,7 +105,7 @@ class SwitchBotAction:
                     command_type=command_type,
                     device_name=goal.device_name
                 ))
-        except Exception as e:
+        except (DeviceError, SwitchBotAPIError, KeyError) as e:
             rospy.logerr(str(e))
             feedback.status = str(e)
             success = False
@@ -76,4 +119,4 @@ class SwitchBotAction:
 if __name__ == '__main__':
     rospy.init_node('switchbot')
     server = SwitchBotAction()
-    rospy.spin()
+    server.spin()
