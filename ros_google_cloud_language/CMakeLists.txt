@@ -19,6 +19,9 @@ find_package(
 add_message_files(
   FILES
   TextEntity.msg
+  TextSyntax.msg
+  PartOfSpeechTag.msg
+  DependencyEdge.msg
 )
 
 add_action_files(
