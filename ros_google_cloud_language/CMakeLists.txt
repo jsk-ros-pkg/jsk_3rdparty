@@ -40,7 +40,12 @@ catkin_package(
   CATKIN_DEPENDS
 )
 
-catkin_generate_virtualenv()
+catkin_generate_virtualenv(
+  # Disable creating a unit test to verify that package requirements are locked.
+  # # commented out for python3, which uses concurrent.futures
+  # # futures==3.3.0
+  CHECK_VENV FALSE  # Default TRUE
+  )
 
 include_directories()
 
