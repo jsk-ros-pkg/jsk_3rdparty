@@ -23,7 +23,7 @@ Do not run `pip install google-cloud-language` manually, it is installed via `ca
 3. Start sample code
 
 ```
-roslaunch demo.launch google_cloud_credentials_json:=${HOME}/Downloads/eternal-byte-236613-4bc6962824d1.json
+roslaunch ros_google_cloud_language demo.launch google_cloud_credentials_json:=${HOME}/Downloads/eternal-byte-236613-4bc6962824d1.json
 ```
 
 Additional Topic: Chat with agent
