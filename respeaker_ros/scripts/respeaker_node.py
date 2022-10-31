@@ -115,7 +115,18 @@ class RespeakerInterface(object):
         if not self.dev:
             raise RuntimeError("Failed to find Respeaker device")
         rospy.loginfo("Initializing Respeaker device")
-        self.dev.reset()
+        try:
+            self.dev.reset()
+        except usb.core.USBError:
+            rospy.logerr(
+                "You may have to give the right permission on respeaker device. "
+                "Please run the command as followings to register udev rules.\n"
+                "$ roscd respeaker_ros \n"
+                "$ sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules \n"
+                "$ sudo systemctl restart udev \n"
+                "You may find further details at https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/respeaker_ros/README.md"
+            ) # NOQA
+            raise
         self.pixel_ring = usb_pixel_ring_v2.PixelRing(self.dev)
         self.set_led_think()
         time.sleep(5)  # it will take 5 seconds to re-recognize as audio device

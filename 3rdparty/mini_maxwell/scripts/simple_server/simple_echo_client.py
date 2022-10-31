@@ -4,6 +4,11 @@ from socket import *
 import sys
 import argparse
 import struct
+
+# use raw_input for python2 c.f. https://stackoverflow.com/questions/5868506/backwards-compatible-input-calls-in-python
+if hasattr(__builtins__, 'raw_input'):
+    input = raw_input
+
 parser = argparse.ArgumentParser(description='Simple socket client')
 parser.add_argument("--port", default=8080, type=int)
 parser.add_argument("--udp", action="store_true")
@@ -18,7 +23,7 @@ if not args.udp:
 else:
     server = socket(AF_INET, SOCK_DGRAM)
     while True:
-        data = raw_input('> ')
+        data = input('> ')
         if not data:
             break
         packer = struct.Struct("!%ds" % len(data))
