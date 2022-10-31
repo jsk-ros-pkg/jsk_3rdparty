@@ -28,7 +28,7 @@
       (ros::ros-info "sentiment")
       (ros::ros-info " score : ~A" (send ret :sentiment_score))
       (ros::ros-info " magnitude : ~A" (send ret :sentiment_magnitude))
-      (ros::ros-info "entiteis")
+      (ros::ros-info "entities")
       (dolist (entity (send ret :entities))
         (ros::ros-info " name : ~A" (send entity :name))
         (ros::ros-info " type : ~A" (type-to-string (send entity :type)))
