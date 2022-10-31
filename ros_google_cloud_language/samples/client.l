@@ -3,10 +3,22 @@
 (ros::roseus-add-msgs "ros_google_cloud_language")
 (ros::roseus "cloud_language_client")
 
-(defun type-to-string (id)
+(defun type-to-string-entity (id)
   (do-symbols (type "ROS_GOOGLE_CLOUD_LANGUAGE::TEXTENTITY")
               (if (= (eval type) id)
-                  (return-from type-to-string (symbol-name type))))
+                  (return-from type-to-string-entity (symbol-name type))))
+  nil)
+
+(defun type-to-string-part-of-speech (id)
+  (do-symbols (type "ROS_GOOGLE_CLOUD_LANGUAGE::PARTOFSPEECHTAG")
+	      (if (= (eval type) id)
+		  (return-from type-to-string-part-of-speech (symbol-name type))))
+  nil)
+
+(defun type-to-string-dependency-edge (id)
+  (do-symbols (type "ROS_GOOGLE_CLOUD_LANGUAGE::DEPENDENCYEDGE")
+	      (if (= (eval type) id)
+		  (return-from type-to-string-dependency-edge (symbol-name type))))
   nil)
 
 ;; check if this retuns correct answer with https://cloud.google.com/natural-language
@@ -28,10 +40,20 @@
       (ros::ros-info " magnitude : ~A" (send ret :sentiment_magnitude))
       (ros::ros-info "entiteis")
       (dolist (entity (send ret :entities))
-        (ros::ros-info " name : ~A" (send entity :name))
-        (ros::ros-info " type : ~A" (type-to-string (send entity :type)))
-        (ros::ros-info " salience : ~A" (send entity :salience))
+        (ros::ros-info " - name : ~A" (send entity :name))
+        (ros::ros-info "   type : ~A" (type-to-string-entity (send entity :type)))
+        (ros::ros-info "   salience : ~A" (send entity :salience))
         )
+      (ros::ros-info "syntaxes")
+      (dolist (syntax (send ret :syntaxes))
+	(ros::ros-info " - name : ~A" (send syntax :name))
+	(ros::ros-info "   lemma : ~A" (send syntax :lemma))
+	(ros::ros-info "   dependency_edge : ~A" (send syntax :dependency_edge))
+	(ros::ros-info "   part_of_speech : ~A"
+		       (type-to-string-part-of-speech (send syntax :part_of_speech)))
+	(ros::ros-info "   parse_label : ~A"
+		       (type-to-string-dependency-edge (send syntax :parse_label)))
+	)
       )))
 
 (ros::roseus "client")

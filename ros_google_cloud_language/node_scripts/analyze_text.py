@@ -13,6 +13,7 @@ from ros_google_cloud_language.msg import AnalyzeTextAction
 from ros_google_cloud_language.msg import AnalyzeTextResult
 from ros_google_cloud_language.msg import AnalyzeTextFeedback
 from ros_google_cloud_language.msg import TextEntity
+from ros_google_cloud_language.msg import TextSyntax
 from diagnostic_msgs.msg import KeyValue
 
 # Imports the Google Cloud client library
@@ -66,13 +67,20 @@ class ROSGoogleCloudLanguage(object):
             result.sentiment_magnitude = sentiment.magnitude
 
             # # Analayze Syntax
-            # syntax = self._client.analyze_syntax(
-            #     document=document,
-            #     encoding_type='UTF32'
-            # )
+            syntax = self._client.analyze_syntax(
+                document=document,
+                encoding_type='UTF32'
+            )
 
-            # for token in syntax.tokens:
-            #     print("{} {}".format(token.part_of_speech.tag, token.text.content.encode('utf-8')))
+            for token in syntax.tokens:
+                # print("{} {} {}".format(token.part_of_speech.tag, token.text.content.encode('utf-8'), token.dependency_edge.head_token_index)
+                result.syntaxes.append(TextSyntax(
+                    name=token.text.content.encode('utf-8'),
+                    lemma=token.lemma.encode('utf-8'),
+                    dependency_edge=token.dependency_edge.head_token_index,
+                    part_of_speech=token.part_of_speech.tag,
+                    parse_label=token.dependency_edge.label
+                ))
 
         except Exception as e:
             rospy.logerr("Fail to analyze syntax ... {}".format(str(e)))
