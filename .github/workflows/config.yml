@@ -94,10 +94,17 @@ jobs:
           BEFORE_SCRIPT : ${{ matrix.BEFORE_SCRIPT }}
           EXTRA_DEB : ${{ matrix.EXTRA_DEB }}
 
-  kinetic_i386:
+  i386:
     runs-on: ubuntu-latest
-    name: kinetic_i386
-    container: i386/ubuntu:16.04
+    container: i386/ubuntu:${{ matrix.DISTRO }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ROS_DISTRO: kinetic
+            DISTRO: 16.04
+          - ROS_DISTRO: melodic
+            DISTRO: 18.04
 
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
@@ -113,7 +120,7 @@ jobs:
         uses: jsk-ros-pkg/jsk_travis@master
         with:
           EXTRA_DEB : "python-lxml"
-          ROS_DISTRO : kinetic
+          ROS_DISTRO : ${{ matrix.ROS_DISTRO }}
           ROS_PARALLEL_TEST_JOBS : "-j8"
           CATKIN_PARALLEL_JOBS: "-i"
           ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
