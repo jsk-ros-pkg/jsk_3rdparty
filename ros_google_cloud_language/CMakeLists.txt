@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_google_cloud_language)
 
-if($ENV{ROS_DISTRO} STREQUAL "indigo")
-  message(WARNING "following requirements.txt syntax is not support on 14.04")
+execute_process(COMMAND dpkg-architecture -qDEB_TARGET_GNU_CPU OUTPUT_VARIABLE ARCHITECTURE)
+message(STATUS "DEB_TARGET_GNU_CPU : ${ARCHITECTURE}")
+if(($ENV{ROS_DISTRO} STREQUAL "indigo") OR
+   ($ENV{ROS_DISTRO} STREQUAL "kinetic" AND "${ARCHITECTURE}" MATCHES "i.*86" ))
+  message(WARNING "following requirements.txt syntax is not support on $ENV{ROS_DISTRO}/${ARCHITECTURE}")
   message(WARNING "google-api-core[grpc]==1.31.5  # via google-cloud-language")
   find_package(catkin)
   catkin_package()
