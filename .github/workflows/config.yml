@@ -80,12 +80,6 @@ jobs:
           xhost +local:root
         shell: bash
 
-      - name: export LANG environment variable # https://stackoverflow.com/questions/36651680/click-will-abort-further-execution-because-python-3-was-configured-to-use-ascii
-        run: |
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-        shell: bash
-
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
@@ -115,11 +109,6 @@ jobs:
           cd $GITHUB_WORKSPACE
           git checkout -qf $GITHUB_SHA || (git fetch -q origin +$GITHUB_REF; git checkout -qf FETCH_HEAD)
           git submodule update --init .travis
-      - name: export LANG environment variable # https://stackoverflow.com/questions/36651680/click-will-abort-further-execution-because-python-3-was-configured-to-use-ascii
-        run: |
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-        shell: bash
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
@@ -149,11 +138,6 @@ jobs:
       - name: Skip packagse
         run: |
           for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
-      - name: export LANG environment variable # https://stackoverflow.com/questions/36651680/click-will-abort-further-execution-because-python-3-was-configured-to-use-ascii
-        run: |
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-        shell: bash
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         with:
