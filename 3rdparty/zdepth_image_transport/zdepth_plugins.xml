@@ -5,11 +5,9 @@
     </description>
   </class>
 
-  <!--
   <class name="image_transport/zdepth_sub" type="zdepth_image_transport::ZDepthSubscriber" base_class_type="image_transport::SubscriberPlugin">
     <description>
       This plugin subscribes a zdepth version of the image.
     </description>
   </class>
-  -->
 </library>
