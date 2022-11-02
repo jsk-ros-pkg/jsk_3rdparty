@@ -43,7 +43,7 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${zdepth_INCLUDE_DIRS})
 
-add_executable(zdepth_test src/zdepth_test.cpp)
+add_executable(zdepth_test src/test/zdepth_test.cpp)
 target_link_libraries(zdepth_test ${catkin_LIBRARIES} ${zdepth_LIBRARIES})
 
 add_library(${PROJECT_NAME} src/manifest.cpp src/zdepth_publisher.cpp src/zdepth_subscriber.cpp)
