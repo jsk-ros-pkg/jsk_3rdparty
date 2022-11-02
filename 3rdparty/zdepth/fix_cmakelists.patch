@@ -1,7 +1,16 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b22b2e7..a589f4d 100644
+index b22b2e7..a4251af 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
+@@ -61,7 +61,7 @@ include_directories(include)
+ 
+ # zdepth library
+ 
+-add_library(zdepth STATIC ${SOURCE_FILES})
++add_library(zdepth SHARED ${SOURCE_FILES})
+ add_library(zdepth::zdepth ALIAS zdepth)
+ 
+ target_link_libraries(zdepth PUBLIC zstd)
 @@ -80,10 +80,13 @@ target_link_libraries(zdepth_test PRIVATE zdepth)
  ################################################################################
  # Install
@@ -21,10 +30,17 @@ index b22b2e7..a589f4d 100644
  ################################################################################
  # Generate zdepthConfig.cmake and zdepthConfigVersion.cmake for cmake projects
 diff --git a/zstd/CMakeLists.txt b/zstd/CMakeLists.txt
-index 5869d4d..c0aa503 100644
+index 5869d4d..f9339a3 100644
 --- a/zstd/CMakeLists.txt
 +++ b/zstd/CMakeLists.txt
-@@ -25,4 +25,6 @@ target_include_directories(zstd PUBLIC
+@@ -19,10 +19,12 @@ include_directories(include src)
+ ################################################################################
+ # Targets
+ 
+-add_library(zstd ${ZSTD_SOURCE_FILES})
++add_library(zstd SHARED ${ZSTD_SOURCE_FILES})
+ target_include_directories(zstd PUBLIC
+     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
      "$<INSTALL_INTERFACE:include>"
  )
  
