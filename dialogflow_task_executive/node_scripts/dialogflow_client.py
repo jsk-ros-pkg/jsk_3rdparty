@@ -6,8 +6,13 @@ import dialogflow as df
 from google.oauth2.service_account import Credentials
 from google.protobuf.json_format import MessageToJson
 import pprint
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
+import os
 import rospy
+import sys
 import threading
 import uuid
 
@@ -102,7 +107,7 @@ class DialogflowBase(object):
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
-        if self.language == 'ja-JP':
+        if self.language == 'ja-JP' and os.environ["ROS_PYTHON_VERSION"] == "2":
             msg.query = result.query_text.encode("utf-8")
             msg.response = result.fulfillment_text.encode("utf-8")
         else:
@@ -172,8 +177,11 @@ class DialogflowAudioClient(DialogflowBase):
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
         hotwords = rospy.get_param("~hotword", [])
-        self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
-                            for hotword in hotwords ]
+        try:
+            self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
+                              for hotword in hotwords ]
+        except NameError:
+            self.hotwords = hotwords
 
         self.state = State()
         self.queue = Queue.Queue()
@@ -260,11 +268,12 @@ class DialogflowAudioClient(DialogflowBase):
             volume=self.volume)
 
         # for japanese or utf-8 languages
-        if self.language == 'ja-JP':
+        if self.language == 'ja-JP' and sys.version <= 2:
             msg.arg = result.fulfillment_text.encode('utf-8')
-            msg.arg2 = self.language
         else:
             msg.arg = result.fulfillment_text
+        if self.language == 'ja-JP':
+            msg.arg2 = self.language
 
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
