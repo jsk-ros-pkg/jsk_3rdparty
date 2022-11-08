@@ -7,7 +7,7 @@ ROS Interface for HOYA VoiceText Speech Synthesis Engine
 
 ### 1. Install VoiceText SDK
 #### If you have voicetext sdk install binary, please follow the official guide and install both engine and SDK
-#### If you don't have the sdk install binary but have voice text API binary, please follow the guide below.
+#### If you don't have the sdk install binary but have ReadSpeaker API binary, please follow the guide below.
 1. Install VoiceText Engine by official guide
 2. Copy VoiceText API binaries to VoiceText binary directory
   VoiceText API package includes binary libraries and header file. You have to copy those of them to specific directory by executing following commands.
@@ -16,9 +16,6 @@ ROS Interface for HOYA VoiceText Speech Synthesis Engine
   cd bin/x64 # You have to cd x86 if your system is x86 architecture
   # Assuming VoiceText engine's talker is hikari, type is D16. If it is different, please set appropriate directory.
   sudo cp -a * /usr/vt/hikari/D16/bin # Don't forget to add -a not to break symbolic link. 
-  cd ../../include/
-  sudo mkdir /usr/vt/hikari/D16/inc # not include, but inc
-  sudo cp vtapi.h /usr/vt/hikari/D16/inc
   ```
 ### 2. Put license file
 ### 3. Build this package
