@@ -16,12 +16,11 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
 #ifdef ENV64
   glob(("/usr/vt/*/*/bin/x86_64/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_old_gbuf_); // e.g., /usr/vt/sayaka/M16/bin/x86_64/RAMIO/libvt_jpn.so
   glob(("/usr/vt/*/*/bin/LINUX64_GLIBC3/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_new_gbuf_); // e.g., /usr/vt/risa/H16/bin/LINUX64_GLIBC3/RAMIO/libvt_jpn.so
-  glob(("/usr/vt/*/*/bin/libvtapi.so"), 0, NULL, &api_gbuf_); // e.g., /usr/vt/hikari/D16/bin/libvtapi.so
 #elif ENV32
   glob(("/usr/vt/*/*/bin/x86_32/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_old_gbuf_); // e.g., /usr/vt/sayaka/M16/bin/x86_32/RAMIO/libvt_jpn.so
   glob(("/usr/vt/*/*/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_new_gbuf_); // e.g., /usr/vt/risa/H16/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so
-  glob(("/usr/vt/*/*/bin/libvtapi.so"), 0, NULL, &api_gbuf_); // e.g., /usr/vt/hikari/D16/bin/libvtapi.so
 #endif
+  glob(("/usr/vt/*/*/bin/libvtapi.so"), 0, NULL, &api_gbuf_); // e.g., /usr/vt/hikari/D16/bin/libvtapi.so
 
   if(sdk_old_gbuf_.gl_pathc > 0){
     this->vt_type = VT_SDK;
@@ -42,7 +41,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
 
   // Load libraries
   if(this->vt_type != NO_VT){
-    ROS_INFO("Opening %s \n", lib_file_);
+    ROS_INFO("Opening %s ", lib_file_);
     this->dl_handle = dlopen(lib_file_, RTLD_NOW);
     if(this->dl_handle == NULL){
       dl_err_ = dlerror();
@@ -51,7 +50,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
       return;
     }
   }else{
-    ROS_FATAL("No Voice Text or Read Speaker libraries have found\n");
+    ROS_FATAL("No VoiceText or ReadSpeaker libraries have found");
     return;
   }
 
@@ -72,7 +71,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
     license_path_char_ = (char*)calloc(std::strlen(license_path.c_str())+1, sizeof(char));
     std::strcpy(license_path_char_, license_path.c_str());
   }else{
-    ROS_FATAL("Please set license file\n");
+    ROS_FATAL("Please set license file");
     return;
   }
 
@@ -80,12 +79,12 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
   if(this->vt_type == VT_SDK){
     ret_ = VT_LOADTTS_JPN((int)NULL, -1, db_path_char_, license_path_char_);
     if(ret_ != VT_LOADTTS_SUCCESS){
-      ROS_FATAL("Failed to load TTS engine (code %d)\n", ret_);
+      ROS_FATAL("[VoiceText SDK] Failed to load TTS engine (code %d)", ret_);
       return;
     }
     VT_GetTTSInfo_JPN(VT_VERIFY_CODE, NULL, &ret_, sizeof(int));
     if (ret_ != 0) {
-      ROS_FATAL_STREAM("Verification failed (VT_VERIFY_CODE " << ret_ << ")");
+      ROS_FATAL_STREAM("[VoiceText SDK] Verification failed (VT_VERIFY_CODE " << ret_ << ")");
       return;
     }
   }else if(this->vt_type == VT_API){
@@ -113,7 +112,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
     VTAPI_Init(lib_path_char_);
     this->hVTAPI = VTAPI_CreateHandle();
     if(this->hVTAPI == 0){
-      ROS_ERROR("VoiceText API ERROR when creating API handler. : %s\n", VTAPI_GetLastErrorInfo(0)->szMsg);
+      ROS_ERROR("[ReadSpeaker API] Failed to create API handler. : %s", VTAPI_GetLastErrorInfo(0)->szMsg);
       return;
     }
     VTAPI_SetLicenseFolder(license_path_char_);
@@ -121,7 +120,8 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
     this->hEngine = VTAPI_GetEngine(speaker_char_, type_char_);
     ret_ = VTAPI_SetEngineHandle(this->hVTAPI, this->hEngine);
     if(ret_ < VTAPI_SUCCESS){
-      ROS_ERROR("VoiceText API ERROR when creating engine handler. CODE: %d, MESSAGE: %s \n", ret_, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
+      ROS_ERROR("[ReadSpeaker API] Failed to create engine handler. CODE: %d, MESSAGE: %s ",
+                ret_, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       return;
     }
 
@@ -145,13 +145,13 @@ VTHandler::~VTHandler(){
 bool VTHandler::LoadSym(){
   const char* dl_err_;
   if(vt_type == VT_SDK){
-    ROS_INFO("Found VoiceText SDK\n");
+    ROS_INFO("Found VoiceText SDK");
     // load symbol
     for(auto& itr: VTSDK_func_){
       VTSDK_s_map_[itr] = dlsym(this->dl_handle, itr);
       dl_err_ = dlerror();
       if(dl_err_ != NULL){
-        ROS_FATAL_STREAM("Error occured when loading ReadSpeaker libraries "
+        ROS_FATAL_STREAM("Error occured when loading VoiceText libraries "
                          << dl_err_);
         dlclose(this->dl_handle);
         return false;
@@ -164,7 +164,7 @@ bool VTHandler::LoadSym(){
     VT_GetTTSInfo_JPN = reinterpret_cast<int(*)(int, char*, void*, int)>(VTSDK_s_map_.at("VT_GetTTSInfo_JPN"));
     VT_TextToFile_JPN = reinterpret_cast<short(*)(int, char*, char*, int, int, int, int, int, int, int)>(VTSDK_s_map_.at("VT_TextToFile_JPN"));
   }else if(vt_type == VT_API){
-    ROS_INFO("Found ReadSpeaker API\n");
+    ROS_INFO("Found ReadSpeaker API");
     // load symbol
     for(auto& itr: VTAPI_func_){
       VTAPI_s_map_[itr] = dlsym(this->dl_handle, itr);
@@ -216,7 +216,7 @@ bool VTHandler::VTH_TextToFile(const int pitch, const int speed, const int volum
                              pause,
                              -1, -1);
     if(ret_ != VT_FILE_API_SUCCESS){
-      ROS_ERROR("[VoiceText SDK] Failed to execute TTS (code %d)\n", ret_);
+      ROS_ERROR("[VoiceText SDK] Failed to execute TTS (code %d)", ret_);
       success_ = false;
     }
   }else if(this->vt_type == VT_API){
@@ -226,13 +226,13 @@ bool VTHandler::VTH_TextToFile(const int pitch, const int speed, const int volum
     VTAPI_SetAttr(this->hVTAPI, ATTR_PAUSE, pause);
     ret_ = VTAPI_SetOutputFile(this->hVTAPI, wave_path_char_, FORMAT_16PCM_WAV);
     if(ret_ != VTAPI_SUCCESS){
-      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_SetOutputFile. STATUS: %s\n",
+      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_SetOutputFile. STATUS: %s",
                 VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       success_ = false;
     }
     ret_ = VTAPI_TextToFile(this->hVTAPI, text_char_, -1, TEXT_FORMAT_DEFAULT);
     if(ret_ != VTAPI_SUCCESS){
-      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_TextToFile. STATUS: %s\n",
+      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_TextToFile. STATUS: %s",
                 VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       success_ = false;
     }
