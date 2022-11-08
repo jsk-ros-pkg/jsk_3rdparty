@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(voice_text)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings")
+
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp

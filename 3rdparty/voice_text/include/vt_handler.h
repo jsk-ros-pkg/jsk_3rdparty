@@ -6,6 +6,7 @@
 #ifndef VT_HANDLER_H_
 #define VT_HANDLER_H_
 
+#include <cstdlib>
 #include <dlfcn.h>
 #include <glob.h>
 #include <string>
@@ -16,9 +17,6 @@
 
 #include "vt_jpn.h"
 #include "vtapi.h"
-
-#define VT_ROOT "/usr/vt/*/*"
-#define PATH_MAX 1024
 
 #if __x86_64__ || __ppc64__
 #define ENV64
