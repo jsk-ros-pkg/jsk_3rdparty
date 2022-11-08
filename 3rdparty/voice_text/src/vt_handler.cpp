@@ -19,6 +19,9 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
 #elif ENV32
   glob(("/usr/vt/*/*/bin/x86_32/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_old_gbuf_); // e.g., /usr/vt/sayaka/M16/bin/x86_32/RAMIO/libvt_jpn.so
   glob(("/usr/vt/*/*/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so"), 0, NULL, &sdk_new_gbuf_); // e.g., /usr/vt/risa/H16/bin/LINUX32_GLIBC3/RAMIO/libvt_jpn.so
+#else
+  ROS_FATAL("Your architecture is not supported");
+  return;
 #endif
   glob(("/usr/vt/*/*/bin/libvtapi.so"), 0, NULL, &api_gbuf_); // e.g., /usr/vt/hikari/D16/bin/libvtapi.so
 
