@@ -4,11 +4,7 @@
  */
 
 #include <fstream>
-#include <cstdlib>
-#include <sstream>
-#include <string>
 
-#include <glob.h>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
