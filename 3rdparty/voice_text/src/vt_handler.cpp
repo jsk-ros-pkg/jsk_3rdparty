@@ -112,7 +112,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
     VTAPI_Init(lib_path_char_);
     this->hVTAPI = VTAPI_CreateHandle();
     if(this->hVTAPI == 0){
-      ROS_ERROR("[ReadSpeaker API] Failed to create API handler. : %s", VTAPI_GetLastErrorInfo(0)->szMsg);
+      ROS_FATAL("[ReadSpeaker API] Failed to create API handler. STATUS: %s", VTAPI_GetLastErrorInfo(0)->szMsg);
       return;
     }
     VTAPI_SetLicenseFolder(license_path_char_);
@@ -120,7 +120,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path){
     this->hEngine = VTAPI_GetEngine(speaker_char_, type_char_);
     ret_ = VTAPI_SetEngineHandle(this->hVTAPI, this->hEngine);
     if(ret_ < VTAPI_SUCCESS){
-      ROS_ERROR("[ReadSpeaker API] Failed to create engine handler. CODE: %d, MESSAGE: %s ",
+      ROS_FATAL("[ReadSpeaker API] Failed to create engine handler. CODE: %d, MESSAGE: %s ",
                 ret_, VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       return;
     }
@@ -151,7 +151,7 @@ bool VTHandler::LoadSym(){
       VTSDK_s_map_[itr] = dlsym(this->dl_handle, itr);
       dl_err_ = dlerror();
       if(dl_err_ != NULL){
-        ROS_FATAL_STREAM("Error occured when loading VoiceText libraries "
+        ROS_FATAL_STREAM("Failed to load VoiceText libraries. STATUS: "
                          << dl_err_);
         dlclose(this->dl_handle);
         return false;
@@ -170,7 +170,7 @@ bool VTHandler::LoadSym(){
       VTAPI_s_map_[itr] = dlsym(this->dl_handle, itr);
       dl_err_ = dlerror();
       if(dl_err_ != NULL){
-        ROS_FATAL_STREAM("Error occured when loading ReadSpeaker libraries "
+        ROS_FATAL_STREAM("Failed to load ReadSpeaker libraries. STATUS: "
                          << dl_err_);
         dlclose(this->dl_handle);
         return false;
@@ -226,13 +226,13 @@ bool VTHandler::VTH_TextToFile(const int pitch, const int speed, const int volum
     VTAPI_SetAttr(this->hVTAPI, ATTR_PAUSE, pause);
     ret_ = VTAPI_SetOutputFile(this->hVTAPI, wave_path_char_, FORMAT_16PCM_WAV);
     if(ret_ != VTAPI_SUCCESS){
-      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_SetOutputFile. STATUS: %s",
+      ROS_ERROR("[ReadSpeaker API] Failed to execute VTAPI_SetOutputFile. STATUS: %s",
                 VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       success_ = false;
     }
     ret_ = VTAPI_TextToFile(this->hVTAPI, text_char_, -1, TEXT_FORMAT_DEFAULT);
     if(ret_ != VTAPI_SUCCESS){
-      ROS_ERROR("[ReadSpeaker API] ERROR when executing VTAPI_TextToFile. STATUS: %s",
+      ROS_ERROR("[ReadSpeaker API] Failed to execute VTAPI_TextToFile. STATUS: %s",
                 VTAPI_GetLastErrorInfo(this->hVTAPI)->szMsg);
       success_ = false;
     }
