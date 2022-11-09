@@ -142,7 +142,7 @@ jobs:
           submodules: 'true'
       - name: Skip packagse
         run: |
-          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         with:
@@ -157,7 +157,7 @@ jobs:
             export ROS_PARALLEL_TEST_JOBS="-j2"
             export CATKIN_PARALLEL_JOBS="-i"
             export ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
-            export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0; sudo add-apt-repository -y ppa:jblgf0/python; sudo apt-get update; sudo apt-get install -y python3.6 python3.6-venv libpython3.6-dev; sudo ln -sf python3.6 /usr/bin/python3"
+            export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0"
             export USE_TRAVIS=true
             export USE_DOCKER=false
             export NOT_TEST_INSTALL=true
