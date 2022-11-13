@@ -74,6 +74,7 @@ class RecognizerEx(SR.Recognizer):
             speech_config["speechContext"] = {"phrases": preferred_phrases}
         if show_all:
             speech_config["enableWordTimeOffsets"] = True  # some useful extra options for when we want all the output
+            speech_config["enable_word_confidence"] = True
         request = speech_service.speech().recognize(body={"audio": {"content": base64.b64encode(flac_data).decode("utf8")}, "config": speech_config})
 
         try:

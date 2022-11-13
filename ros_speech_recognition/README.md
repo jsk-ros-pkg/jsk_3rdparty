@@ -30,6 +30,106 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   print result # => 'Hello, world!'
   ```
   
+If you are using `ros_speech_recognition` with `~continuous` is `True`, you can subscribe `/Tablet/voice` (`speech_recognition_msgs/SpeechRecognitionCandidates`) message.
+
+1. Launch sample launch file.
+
+
+    ```bash
+    roslaunch ros_speech_recognition sample_ros_speech_recognition.launch
+    ```
+
+2. echo the message.
+
+
+    ```bash
+    $ rostopic echo /Tablet/voice
+    transcript:
+      - may I help you
+    confidence: [0.9286448955535889]
+    sentences:
+      -
+        header:
+          seq: 0
+          stamp:
+            secs: 1641425262
+            nsecs: 268165588
+          frame_id: ''
+        words:
+          -
+            start_time: 0.0
+            end_time: 0.2
+            word: "may"
+            confidence: 0.91376436
+            speaker_tag: 0
+          -
+            start_time: 0.2
+            end_time: 0.4
+            word: "I"
+            confidence: 0.9366196
+            speaker_tag: 0
+          -
+            start_time: 0.4
+            end_time: 0.5
+            word: "help"
+            confidence: 0.9531065
+            speaker_tag: 0
+          -
+            start_time: 0.5
+            end_time: 0.8
+            word: "you"
+            confidence: 0.9110889
+            speaker_tag: 0
+    ---
+    transcript:
+      - pick up the red kettle
+    confidence: [0.9499567747116089]
+    sentences:
+      -
+        header:
+          seq: 0
+          stamp:
+            secs: 1641425268
+            nsecs:  58182954
+          frame_id: ''
+        words:
+          -
+            start_time: 0.0
+            end_time: 0.4
+            word: "pick"
+            confidence: 0.953269
+            speaker_tag: 0
+          -
+            start_time: 0.4
+            end_time: 0.6
+            word: "up"
+            confidence: 0.95326656
+            speaker_tag: 0
+          -
+            start_time: 0.6
+            end_time: 0.8
+            word: "the"
+            confidence: 0.96866167
+            speaker_tag: 0
+          -
+            start_time: 0.8
+            end_time: 1.1
+            word: "red"
+            confidence: 0.98762906
+            speaker_tag: 0
+          -
+            start_time: 1.1
+            end_time: 1.5
+            word: "kettle"
+            confidence: 0.8869578
+            speaker_tag: 0
+      ```
+
+The `word` is recognized word and the `confidence` means a higher number indicates an estimated greater likelihood that the recognized words are correct.
+`start_time` indicates time offset relative to the beginning of the audio (timestamp of header), and corresponding to the start of the spoken word.
+`end_time` indicates time offset relative to the beginning of the audio, and corresponding to the end of the spoken word.
+
+
 ## Interface
 
 ### Publishing Topics
@@ -38,6 +138,11 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Action client to play sound on events. If the action server is not available or `~enable_sound_effect` is `False`, no sound is played.
   
+
+* `/Tablet/voice` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
+
+    Publish recognized results when `~continuous` is `True`.
+
 ### Subscribing Topics
 
 * `audio` (`audio_common_msgs/AudioData`)

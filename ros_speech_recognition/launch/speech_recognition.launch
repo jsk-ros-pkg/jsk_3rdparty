@@ -11,6 +11,8 @@
   <arg name="engine" default="Google" doc="Speech to text engine. TTS engine, Google, GoogleCloud, Sphinx, Wit, Bing Houndify, IBM" />
   <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
   <arg name="continuous" default="false" doc="If false, /speech_recognition service is published. If true, /Tablet/voice topic is published." />
+  <arg name="google_cloud_credentials_json" default="''" doc="Credential JSON is only used when the engine is GoogleCloud." />
+  <arg name="enable_speaker_diarization" default="false" doc="Enable speaker diarization option when the engine is GoogleCloud." />
 
   <!-- sound play -->
   <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
@@ -36,6 +38,7 @@
   <node name="speech_recognition"
         pkg="ros_speech_recognition" type="speech_recognition_node.py"
         respawn="true"
+        clear_params="true"
         output="screen">
     <rosparam subst_value="true">
       audio_topic: $(arg audio_topic)
@@ -47,6 +50,9 @@
       language: $(arg language)
       continuous: $(arg continuous)
       enable_sound_effect: $(arg launch_sound_play)
+      google_cloud_credentials_json: $(arg google_cloud_credentials_json)
+      diarizationConfig:
+        enableSpeakerDiarization: $(arg enable_speaker_diarization)
     </rosparam>
   </node>
 
