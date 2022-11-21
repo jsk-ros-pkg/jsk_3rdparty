@@ -1,0 +1,5 @@
+dialogflow_intent_client/IntentInfo intent
+---
+bool done
+---
+string status
