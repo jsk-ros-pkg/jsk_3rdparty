@@ -31,6 +31,8 @@ class GoogleChatROS(object):
         self.download_data = rospy.get_param('~download_data', True)
         self.download_directory = rospy.get_param('~download_directory', "/tmp")
         self.download_avatar = rospy.get_param('~download_avatar', False)
+        self.upload_parents_path = rospy.get_param(
+            '~upload_parents_path', 'chat_notification')
 
         # For sending message
         self._client = GoogleChatRESTClient(google_credentials)
@@ -411,7 +413,11 @@ class GoogleChatROS(object):
             return
         # upload
         try:
-            res = gdrive_upload(file_path=filepath)
+            res = gdrive_upload(
+                file_path=filepath,
+                parents_path=self.upload_parents_path,
+                use_timestamp_folder=True,
+            )
         except rospy.ServiceException as e:
             rospy.logerr("Failed to call Google Drive upload service, status:{}".format(str(e)))
         else:
