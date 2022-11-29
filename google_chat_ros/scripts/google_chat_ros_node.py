@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import datetime
 import gdown
 import json
 import os
@@ -109,6 +110,7 @@ class GoogleChatROS(object):
 
         # Card
         json_body['cards'] = []
+        timestamp = '{0:%Y%m%d%H%M%S}'.format(datetime.datetime.now())
         if goal.cards:
             if goal.update_message:
                 json_body['actionResponse'] = {"type": "UPDATE_MESSAGE"}
@@ -124,10 +126,12 @@ class GoogleChatROS(object):
                     if card.header.image_url:
                         header['imageUrl'] = card.header.image_url
                     elif card.header.image_filepath:
-                        header['imageUrl'] = self._upload_file(card.header.image_filepath)
+                        header['imageUrl'] = self._upload_file(
+                            card.header.image_filepath, timestamp=timestamp)
                 # card/sections
                 sections = []
-                sections = self._make_sections_json(card.sections)
+                sections = self._make_sections_json(
+                    card.sections, timestamp=timestamp)
                 # card/actions
                 card_actions = []
                 for card_action_msg in card.card_actions:
@@ -269,7 +273,7 @@ class GoogleChatROS(object):
 
         return message
 
-    def _make_sections_json(self, sections_msg):
+    def _make_sections_json(self, sections_msg, timestamp=None):
         """
         :type msg: list of google_chat_ros.msgs/Section
         :rtype json_body: list of json
@@ -279,11 +283,12 @@ class GoogleChatROS(object):
             section = {}
             if msg.header:
                 section['header'] = msg.header
-            section['widgets'] = self._make_widget_markups_json(msg.widgets)
+            section['widgets'] = self._make_widget_markups_json(
+                msg.widgets, timestamp=timestamp)
             json_body.append(section)
         return json_body
 
-    def _make_widget_markups_json(self, widgets_msg):
+    def _make_widget_markups_json(self, widgets_msg, timestamp=None):
         """Make widget markup json lists.
         See https://developers.google.com/chat/api/reference/rest/v1/cards#widgetmarkup for details.
         :rtype widgets_msg: list of google_chat_ros.msgs/WidgetMarkup
@@ -298,7 +303,8 @@ class GoogleChatROS(object):
             buttons = []
             buttons_msg = msg.buttons
             for button_msg in buttons_msg:
-                buttons.append(self._make_button_json(button_msg))
+                buttons.append(
+                    self._make_button_json(button_msg, timestamp=timestamp))
             if buttons:
                 json_body.append({'buttons':buttons})
 
@@ -311,7 +317,8 @@ class GoogleChatROS(object):
                 if msg.image.image_url:
                     image_json['imageUrl'] = msg.image.image_url
                 elif msg.image.localpath:
-                    image_json['imageUrl'] = self._upload_file(msg.image.localpath)
+                    image_json['imageUrl'] = self._upload_file(
+                        msg.image.localpath, timestamp=timestamp)
                 if msg.image.on_click.action.action_method_name or msg.image.on_click.open_link_url:
                     image_json['onClick'] = self._make_on_click_json(msg.image.on_click)
                 if msg.image.aspect_ratio:
@@ -330,9 +337,12 @@ class GoogleChatROS(object):
                 elif msg.key_value.original_icon_url:
                     keyval_json['iconUrl'] = msg.key_value.original_icon_url
                 elif msg.key_value.original_icon_localpath:
-                    keyval_json['iconUrl'] = self._upload_file(msg.key_value.original_icon_localpath)
+                    keyval_json['iconUrl'] = self._upload_file(
+                        msg.key_value.original_icon_localpath,
+                        timestamp=timestamp)
                 if msg.key_value.button.text_button_name or msg.key_value.button.image_button_name:
-                    keyval_json['button'] = self._make_button_json(msg.key_value.button)
+                    keyval_json['button'] = self._make_button_json(
+                        msg.key_value.button, timestamp=timestamp)
                 json_body.append({'keyValue':keyval_json})
         return json_body
 
@@ -357,7 +367,7 @@ class GoogleChatROS(object):
             json_body['openLink'] = {'url': on_click_msg.open_link_url}
         return json_body
 
-    def _make_button_json(self, button_msg):
+    def _make_button_json(self, button_msg, timestamp=None):
         """Make button json.
         See https://developers.google.com/chat/api/reference/rest/v1/cards#button for details.
         :rtype button_msg: google_chat_ros.msg/Button.msg
@@ -381,7 +391,8 @@ class GoogleChatROS(object):
             elif button_msg.original_icon_url:
                 image_icon['iconUrl'] = button_msg.original_icon_url
             elif button_msg.original_icon_filepath:
-                image_icon['iconUrl'] = self._upload_file(button_msg.original_icon_filepath)
+                image_icon['iconUrl'] = self._upload_file(
+                    button_msg.original_icon_filepath, timestamp=timestamp)
         return json_body
 
     def _get_user_info(self, item):
@@ -396,7 +407,7 @@ class GoogleChatROS(object):
         user.human = True if item.get('type') == "HUMAN" else False
         return user
 
-    def _upload_file(self, filepath, return_id=False):
+    def _upload_file(self, filepath, return_id=False, timestamp=None):
         """Get local filepath and upload to Google Drive
         :param filepath: local file's path you want to upload
         :type filepath: string
@@ -412,11 +423,16 @@ class GoogleChatROS(object):
             rospy.logerr(e)
             return
         # upload
+        if timestamp is None:
+            parents_path = self.upload_parents_path
+        else:
+            parents_path = '{}/{}'.format(
+                self.upload_parents_path, timestamp)
         try:
             res = gdrive_upload(
                 file_path=filepath,
-                parents_path=self.upload_parents_path,
-                use_timestamp_folder=True,
+                parents_path=parents_path,
+                use_timestamp_folder=False,
             )
         except rospy.ServiceException as e:
             rospy.logerr("Failed to call Google Drive upload service, status:{}".format(str(e)))
