@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(nfc_ros)
+
+find_package(catkin REQUIRED COMPONENTS message_generation)
+
+catkin_python_setup()
+
+add_message_files(
+  FILES
+  Tag.msg
+)
+
+generate_messages()
+
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+)
+
+catkin_install_python(PROGRAMS
+  node_scripts/nfc_ros.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
