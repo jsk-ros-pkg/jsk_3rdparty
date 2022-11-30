@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(nfc_ros)
 
-find_package(catkin REQUIRED COMPONENTS message_generation)
+find_package(catkin REQUIRED COMPONENTS
+    message_generation
+    catkin_virtualenv
+)
+
+catkin_generate_virtualenv()
 
 catkin_python_setup()
 
@@ -17,6 +22,10 @@ catkin_package(
 )
 
 catkin_install_python(PROGRAMS
-  node_scripts/nfc_ros.py
+  node_scripts/nfc_ros_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(FILES requirements
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

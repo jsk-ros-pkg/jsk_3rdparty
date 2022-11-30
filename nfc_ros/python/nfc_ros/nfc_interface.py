@@ -4,8 +4,8 @@ import nfc
 class NFCInterface:
 
     def __init__(self,
-                 path: str = 'usb',
-                 targets: list = ['106A', '106B', '212F']):
+                 path = 'usb',
+                 targets = ['106A', '106B', '212F']):
         """
         Args:
           path(str):

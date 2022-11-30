@@ -1,7 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import rospy
+import nfc_ros
 from nfc_ros.nfc_ros_node import NFCROSNode
+
 
 if __name__ == '__main__':
 
