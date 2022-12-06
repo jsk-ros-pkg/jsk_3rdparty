@@ -11,6 +11,7 @@
     <arg name="language" value="$(arg language)" />
     <arg name="continuous" value="true" />
     <arg name="voice_topic" value="/speech_to_text" />
+    <arg name="tts_action_names" value="['$(arg tts_action_name)']" />
   </include>
 
   <include unless="$(arg use_google)" file="$(find julius_ros)/launch/julius.launch">
