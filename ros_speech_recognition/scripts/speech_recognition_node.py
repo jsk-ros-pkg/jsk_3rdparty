@@ -260,7 +260,10 @@ class ROSSpeechRecognition(object):
             self.play_sound("recognized", 0.05)
             rospy.loginfo("Result: %s" % result.encode('utf-8'))
             self.play_sound("success", 0.1)
-            msg = SpeechRecognitionCandidates(transcript=[result])
+            msg = SpeechRecognitionCandidates(
+                transcript=[result],
+                confidence=[1.0],
+            )
             self.pub.publish(msg)
             return
         except SR.UnknownValueError as e:
@@ -326,7 +329,10 @@ class ROSSpeechRecognition(object):
                     rospy.loginfo("Result: %s" % result.encode('utf-8'))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
-                    res.result = SpeechRecognitionCandidates(transcript=[result])
+                    res.result = SpeechRecognitionCandidates(
+                        transcript=[result],
+                        confidence=[1.0],
+                    )
                     return res
                 except SR.UnknownValueError:
                     if self.dynamic_energy_threshold:
