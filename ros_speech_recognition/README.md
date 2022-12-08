@@ -148,6 +148,24 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Selecting to use topic or service. By default, service is used.
 
+* `~self_cancellation` (`Bool`, default: `True`)
+
+  Whether the node recognize the sound heard when `~tts_action_names` is running or not.
+
+  This options is for ignoring self voice sounds from recognition.
+
+* `~tts_action_names` (`List[String]`, default: `['sound_play']`)
+
+  Text-to-speech action name for self cancellation.
+
+  The node ignores the voice heard when these Text-to-speech action is running.
+
+* `~tts_tolerance` (`Float`, default: `1.0`)
+
+   Tolerance seconds for self cancellation.
+
+   The node ignores the voice with this tolerance seconds after `~tts_action_names` finish running.
+
 * `~google_key` (`String`, default: `None`)
 
   Auth Key for Google API. If `None`, use public key. (No guarantee to be blocked.)  
