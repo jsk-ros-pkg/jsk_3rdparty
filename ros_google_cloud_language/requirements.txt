@@ -1,5 +1,5 @@
 cachetools==3.1.1         # via google-auth
-certifi==2021.10.8        # via requests
+certifi==2022.12.7        # via requests
 chardet==4.0.0            # via requests
 enum34==1.1.10            # via google-cloud-language, grpcio
 # commented out for python3, which uses concurrent.futures
