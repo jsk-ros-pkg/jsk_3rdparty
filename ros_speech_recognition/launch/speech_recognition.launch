@@ -12,6 +12,10 @@
   <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
   <arg name="continuous" default="false" doc="If false, /speech_recognition service is published. If true, /Tablet/voice topic is published." />
 
+  <arg name="self_cancellation" default="true" doc="Do not recognize the audio when robot is speaking or not." />
+  <arg name="tts_tolerance" default="1.0" doc="Tolerance second for recognizing whether robot is speaking or not" />
+  <arg name="tts_action_names" default="['sound_play']" doc="tts action name. these servers outputs are ignored by sound_recognition" />
+
   <!-- sound play -->
   <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
         if="$(arg launch_sound_play)"
@@ -47,6 +51,9 @@
       language: $(arg language)
       continuous: $(arg continuous)
       enable_sound_effect: $(arg launch_sound_play)
+      self_cancellation: $(arg self_cancellation)
+      tts_tolerance: $(arg tts_tolerance)
+      tts_action_names: $(arg tts_action_names)
     </rosparam>
   </node>
 
