@@ -11,6 +11,7 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>message_generation</build_depend>
   <build_depend>catkin_virtualenv</build_depend>
   <build_export_depend>message_generation</build_export_depend>
