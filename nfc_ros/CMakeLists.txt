@@ -29,6 +29,6 @@ catkin_install_python(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(FILES requirements
+install(FILES requirements.txt
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
