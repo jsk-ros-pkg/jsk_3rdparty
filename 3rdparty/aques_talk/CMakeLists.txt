@@ -53,4 +53,5 @@ install(DIRECTORY launch
 if(CATKIN_ENABLE_TESTING)
   find_package(catkin REQUIRED COMPONENTS rostest)
   add_rostest(test/test_aques_talk.test)
+  add_dependencies(tests SampleTalk)  # make sure to build SampleTalk before running tests
 endif()
