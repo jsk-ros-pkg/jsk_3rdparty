@@ -83,7 +83,10 @@ class SpeechToText(object):
             rospy.loginfo("Waiting for result %d" % len(data.get_raw_data()))
             result = self.recognizer.recognize_google(
                 data, language=self.language)
-            msg = SpeechRecognitionCandidates(transcript=[result])
+            msg = SpeechRecognitionCandidates(
+                transcript=[result],
+                confidence=[1.0],
+            )
             self.pub_speech.publish(msg)
         except SR.UnknownValueError as e:
             rospy.logerr("Failed to recognize: %s" % str(e))
