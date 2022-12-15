@@ -107,7 +107,10 @@ class DialogflowBase(object):
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
-        if self.language == 'ja-JP' and os.environ["ROS_PYTHON_VERSION"] == "2":
+        # check if ROS_PYTHON_VERSION exists in indigo
+        if (self.language == 'ja-JP'
+            and ("ROS_PYTHON_VERSION" not in os.environ
+                 or os.environ["ROS_PYTHON_VERSION"] == "2")):
             msg.query = result.query_text.encode("utf-8")
             msg.response = result.fulfillment_text.encode("utf-8")
         else:
