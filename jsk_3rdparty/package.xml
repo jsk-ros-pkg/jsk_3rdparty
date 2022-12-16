@@ -38,6 +38,7 @@
   <run_depend>dialogflow_task_executive</run_depend>
   <run_depend>gdrive_ros</run_depend>
   <run_depend>google_cloud_texttospeech</run_depend>
+  <run_depend>m5stack_ros</run_depend>
 
   <export>
     <metapackage/>
