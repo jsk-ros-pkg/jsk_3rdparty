@@ -8,6 +8,6 @@
 # https://github.com/locusrobotics/catkin_virtualenv/pull/32
 # we need to avoid pip upgrade
 - git:
-    local-name: knorth55/catkin_virtualenv
-    uri: https://github.com/knorth55/catkin_virtualenv
-    version: indigo-no-upgrade-pip
+    local-name: locusrobotics/catkin_virtualenv
+    uri: https://github.com/locusrobotics/catkin_virtualenv
+    version: 0.2.2
