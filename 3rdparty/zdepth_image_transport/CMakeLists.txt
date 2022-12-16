@@ -48,6 +48,7 @@ target_link_libraries(zdepth_test ${catkin_LIBRARIES} ${zdepth_LIBRARIES})
 
 add_library(${PROJECT_NAME} src/manifest.cpp src/zdepth_publisher.cpp src/zdepth_subscriber.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${zdepth_LIBRARIES})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
 
 install(TARGETS zdepth_test
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
