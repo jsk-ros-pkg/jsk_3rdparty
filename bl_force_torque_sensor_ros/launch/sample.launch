@@ -1,0 +1,34 @@
+<launch>
+
+  <arg name="driver_type" default="rosserial" />
+  <arg name="driver_name" default="bl_force_torque_sensor_driver" />
+  <arg name="port" default="/dev/ttyACM0" />
+  <arg name="baud" default="115200" />
+  <arg name="calib_matrix" />
+  <arg name="sensor_type" default="NANO2.5/2-A" />
+  <arg name="amplifier_type" default="RMD" />
+  <arg name="adc_type" default="ADS131M04" />
+  <arg name="sensor_frame_id" default="bl_force_torque_sensor" />
+  <arg name="rate" default="-1" />
+  <arg name="rviz" default="true" />
+
+  <include file="$(find bl_force_torque_sensor_ros)/launch/sensor_driver_$(arg driver_type).launch">
+    <arg name="driver_name" value="$(arg driver_name)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="calib_matrix" value="$(arg calib_matrix)" />
+    <arg name="sensor_type" default="$(arg sensor_type)" />
+    <arg name="amplifier_type" default="$(arg amplifier_type)" />
+    <arg name="adc_type" default="$(arg adc_type)" />
+    <arg name="sensor_frame_id" default="$(arg sensor_frame_id)" />
+    <arg name="rate" value="$(arg rate)" />
+  </include>
+
+  <group if="$(arg rviz)">
+    <node name="rviz"
+          pkg="rviz" type="rviz"
+          args="-d $(find bl_force_torque_sensor_ros)/config/rviz/sample.rviz">
+    </node>
+  </group>
+
+</launch>

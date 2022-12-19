@@ -1,0 +1,39 @@
+<launch>
+
+  <arg name="driver_name" default="bl_force_torque_sensor_driver" />
+  <arg name="rosserial_respawn" default="false" />
+  <arg name="port" default="/dev/ttyACM0" />
+  <arg name="baud" default="115200" />
+  <arg name="calib_matrix" />
+  <arg name="sensor_type" default="NANO2.5/2-A" />
+  <arg name="amplifier_type" default="RMD" />
+  <arg name="adc_type" default="ADS131M04" />
+  <arg name="sensor_frame_id" default="bl_force_torque_sensor" />
+  <arg name="rate" default="-1" />
+
+  <node name="$(arg driver_name)_raw"
+        pkg="rosserial_python" type="serial_node.py"
+        respawn="$(arg rosserial_respawn)"
+        output="screen">
+    <rosparam subst_value="true">
+      port: $(arg port)
+      baud: $(arg baud)
+    </rosparam>
+  </node>
+
+  <node name="$(arg driver_name)"
+        pkg="bl_force_torque_sensor_ros" type="sensor_driver_rosserial.py"
+        output="screen">
+    <remap from="~parameter_setter/loop_duration" to="$(arg driver_name)_raw/parameter_getter/loop_duration" />
+    <remap from="~input" to="$(arg driver_name)_raw/output" />
+    <rosparam subst_value="true">
+      calib_matrix: $(arg calib_matrix)
+      sensor_type: $(arg sensor_type)
+      amplifier_type: $(arg amplifier_type)
+      adc_type: $(arg adc_type)
+      sensor_frame_id: $(arg sensor_frame_id)
+      rate: $(arg rate)
+    </rosparam>
+  </node>
+
+</launch>
