@@ -12,5 +12,6 @@
 
 
   <export>
+    <build_type>cmake</build_type>
   </export>
 </package>
