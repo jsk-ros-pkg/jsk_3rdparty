@@ -1,0 +1,1 @@
+from aques_talk.aques_talk_plugin import AquesTalkPlugin

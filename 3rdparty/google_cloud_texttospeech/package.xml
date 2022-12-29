@@ -17,6 +17,7 @@
   <run_depend>sound_play</run_depend>
 
   <export>
+      <sound_play plugin="${prefix}/google_cloud_texttospeech_plugin.yaml" />
   </export>
 
 </package>

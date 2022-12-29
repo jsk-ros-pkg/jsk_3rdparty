@@ -1,0 +1,2 @@
+- name: aques_talk/aques_talk_plugin
+  module: aques_talk.aques_talk_plugin.AquesTalkPlugin

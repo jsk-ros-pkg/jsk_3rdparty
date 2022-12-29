@@ -14,6 +14,8 @@
   <run_depend>nkf</run_depend>
   <run_depend>sound_play</run_depend>
 
+  <export>
+      <sound_play plugin="${prefix}/aques_talk_plugin.yaml" />
+  </export>
+
 </package>
-
-
