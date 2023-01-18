@@ -28,7 +28,10 @@ ros::Subscriber<std_msgs::Float32> duration_sub("~parameter_getter/loop_duration
 
 void setup()
 {
-  nh.getHardware()->setBaud(115200);
+  nh.getHardware()->setBaud(250000);
+  // cf. https://arduino.stackexchange.com/questions/296/how-high-of-a-baud-rate-can-i-go-without-errors
+  //     http://wormfood.net/avrbaudcalc.php
+  // I'm not sure why, but 500000 causes "Mismatched protocol version" error
   nh.initNode();
   nh.advertise(output_pub);
   nh.subscribe(duration_sub);
@@ -37,10 +40,8 @@ void setup()
     nh.spinOnce();
   }
 
-  adc[0].begin(9, 7, 125000);
-  adc[1].begin(8, 6, 125000);  // I'm not sure why, but using D10 as CS doesn't work. Conflicted with SPI.begin()?
-  // Set SPI speed 125kHz (minimum of Arduino Nano) to allow poor-quality wiring.
-  // Currently, this is no problem because current rate-limiting process is rosserial communication.
+  adc[0].begin(9, 7, 4000000);
+  adc[1].begin(8, 6, 4000000);  // I'm not sure why, but using D10 as CS doesn't work. Conflicted with SPI.begin()?
 }
 
 void loop()

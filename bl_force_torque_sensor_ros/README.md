@@ -31,12 +31,12 @@ You can pass it via command line, but it may be easier to write and run a simple
     <arg name="driver_type" value="rosserial" />  <!-- Specify your driver type (rosserial: you are using Arduino) -->
     <arg name="driver_name" value="bl_force_torque_sensor_driver" />
     <arg name="port" value="/dev/ttyACM0" />  <!-- Specify your circuit's port on your PC -->
-    <arg name="baud" value="115200" />  <!-- This depends on the firmware you uploaded -->
+    <arg name="baud" value="250000" />  <!-- This depends on the firmware you uploaded -->
     <arg name="sensor_type" value="NANO2.5/2-A" />  <!-- Specify your sensor type -->
     <arg name="amplifier_type" value="RMD" />  <!-- Specify your amplifier type -->
     <arg name="adc_type" value="ADS131M04" />  <!-- Specify your ADC type -->
     <arg name="sensor_frame_id" value="bl_force_torque_sensor" />
-    <arg name="rate" value="300" />
+    <arg name="rate" value="500" />
     <arg name="calib_matrix" value="[[-0.018373, -0.001612,  0.027921,  0.701325,  0.011503, -0.695529],
                                      [-0.021972, -0.778745,  0.022058,  0.397533,  0.014968,  0.382496],
                                      [ 1.639594, -0.030488,  1.640720, -0.002827,  1.642459,  0.020087],

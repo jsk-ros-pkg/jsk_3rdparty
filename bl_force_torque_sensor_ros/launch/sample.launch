@@ -3,7 +3,7 @@
   <arg name="driver_type" default="rosserial" />
   <arg name="driver_name" default="bl_force_torque_sensor_driver" />
   <arg name="port" default="/dev/ttyACM0" />
-  <arg name="baud" default="115200" />
+  <arg name="baud" default="250000" />
   <arg name="calib_matrix" />
   <arg name="sensor_type" default="NANO2.5/2-A" />
   <arg name="amplifier_type" default="RMD" />
