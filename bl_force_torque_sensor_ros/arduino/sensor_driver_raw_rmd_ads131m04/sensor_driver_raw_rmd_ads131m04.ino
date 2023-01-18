@@ -48,46 +48,49 @@ void loop()
 {
   start_time = micros();
 
-  bool is_ok = true;
+  // Wait until data is ready
+  bool is_ok = false;
+  while (!is_ok)
+  {
+    is_ok = true;
+    for (int i = 0; i < ADC_NUM; i++)
+    {
+      if (!adc[i].isDataReady())
+      {
+        is_ok = false;
+      }
+    }
+  }
+
+  is_ok = true;
   for (int i = 0; i < ADC_NUM; i++)
   {
-    if (!adc[i].isDataReady())
+    if (!adc[i].readADC(&adc_res[i]))
     {
+      is_ok = false;
+    }
+    delayMicroseconds(1);  // Should be longer than t_w(CSH)?
+  }
+  for (int i = 0; i < ADC_NUM; i++)
+  {
+    if (adc_res[i].status != 0x050F)
+    {
+      // status is value of STATUS register.
+      // By default, if everything is OK, this value is 0000 0101 0000 1111 (0x050F)
       is_ok = false;
     }
   }
   if (is_ok)
   {
-    is_ok = true;
     for (int i = 0; i < ADC_NUM; i++)
     {
-      if (!adc[i].readADC(&adc_res[i]))
-      {
-        is_ok = false;
-      }
-      delayMicroseconds(1);  // Should be longer than t_w(CSH)?
+      output_array[i * VALID_CH_NUM] = adc_res[i].ch0;
+      output_array[i * VALID_CH_NUM + 1] = adc_res[i].ch1;
+      output_array[i * VALID_CH_NUM + 2] = adc_res[i].ch2;
     }
-    for (int i = 0; i < ADC_NUM; i++)
-    {
-      if (adc_res[i].status != 0x050F)
-      {
-        // status is value of STATUS register.
-        // By default, if everything is OK, this value is 0000 0101 0000 1111 (0x050F)
-        is_ok = false;
-      }
-    }
-    if (is_ok)
-    {
-      for (int i = 0; i < ADC_NUM; i++)
-      {
-        output_array[i * VALID_CH_NUM] = adc_res[i].ch0;
-        output_array[i * VALID_CH_NUM + 1] = adc_res[i].ch1;
-        output_array[i * VALID_CH_NUM + 2] = adc_res[i].ch2;
-      }
-      output_msg.array = output_array;
-      output_msg.array_length = ADC_NUM * VALID_CH_NUM;
-      output_pub.publish(&output_msg);
-    }
+    output_msg.array = output_array;
+    output_msg.array_length = ADC_NUM * VALID_CH_NUM;
+    output_pub.publish(&output_msg);
   }
 
   nh.spinOnce();
