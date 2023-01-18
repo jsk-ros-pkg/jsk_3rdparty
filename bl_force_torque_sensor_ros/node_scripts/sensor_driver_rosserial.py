@@ -48,7 +48,7 @@ class SensorDriverRosserial(object):
         self.adc_type = rospy.get_param(
             '~adc_type', 'ADS131M04')
         if self.adc_type == 'ADS131M04':
-            self.voltage_divider = (8.2 + 1.1) / 1.1
+            self.voltage_divider = (10.0 + 1.1) / 1.1
             self.adc_range = 2.4  # From -FSR to +FSR
             self.adc_resolution = 24  # Number of bits
         else:
