@@ -1,0 +1,10 @@
+string name
+string content_name
+string content_type
+string thumnail_uri
+string download_uri
+string localpath
+bool drive_file
+bool uploaded_content
+string attachment_resource_name
+string drive_field_id
