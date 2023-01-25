@@ -42,8 +42,8 @@ namespace zdepth_image_transport
     auto copy_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
     // DEBUG
-    ROS_DEBUG_STREAM("decompress: " << decompress_time - start_time << "ms");
-    ROS_DEBUG_STREAM("copy      : " << copy_time - decompress_time << "ms");
+    // ROS_DEBUG_STREAM("decompress: " << decompress_time - start_time << "ms");
+    // ROS_DEBUG_STREAM("copy      : " << copy_time - decompress_time << "ms");
 
     // callback
     sensor_msgs::Image::Ptr img_msg(new sensor_msgs::Image());
