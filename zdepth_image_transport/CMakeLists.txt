@@ -73,3 +73,15 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES zdepth_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   )
+
+if(CATKIN_ENABLE_TESTING)
+  if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
+    find_package(roslaunch REQUIRED)
+    find_package(roslint REQUIRED)
+    find_package(rostest REQUIRED)
+    add_rostest(test/zdepth_image_transport_16uc1.test)
+    add_rostest(test/zdepth_image_transport_32fc1.test)
+    roslaunch_add_file_check(test/zdepth_image_transport_16uc1.test)
+    roslaunch_add_file_check(test/zdepth_image_transport_32fc1.test)
+  endif()
+endif()
