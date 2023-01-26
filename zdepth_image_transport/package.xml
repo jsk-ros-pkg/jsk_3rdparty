@@ -38,6 +38,11 @@
   <build_export_depend>pluginlib</build_export_depend>
   <build_export_depend>image_transport</build_export_depend>
 
+  <test_depend>depth_image_publisher</test_depend>
+  <test_depend>roslaunch</test_depend>
+  <test_depend>roslint</test_depend>
+  <test_depend>rostest</test_depend>
+
   <export>
     <image_transport plugin="${prefix}/zdepth_plugins.xml"/>
    </export>
