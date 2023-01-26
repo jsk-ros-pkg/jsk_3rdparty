@@ -178,7 +178,7 @@ class ROSSpeechRecognition(object):
         if self.continuous:
             rospy.loginfo("Enabled continuous mode")
             rospy.loginfo("Auto start: {}".format(self.auto_start))
-            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "/Tablet/voice"),
+            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "speech_to_text"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
             self.start_srv = rospy.Service(
