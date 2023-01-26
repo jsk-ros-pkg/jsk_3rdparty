@@ -36,6 +36,7 @@
   <run_depend>sesame_ros</run_depend>
   <run_depend>switchbot_ros</run_depend>
   <run_depend>webrtcvad_ros</run_depend>
+  <run_depend>zdepth_image_transport</run_depend>
 
   <!-- 3rdparty/ dir -->
   <run_depend>aques_talk</run_depend>
@@ -56,6 +57,7 @@
   <run_depend>python_twoauth</run_depend>
   <run_depend>slic</run_depend>
   <run_depend>voice_text</run_depend>
+  <run_depend>zdepth</run_depend>
 
   <!-- jsk_ros_patch/ dir -->
   <run_depend>collada_urdf_jsk_patch</run_depend>
