@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.txt
     PYTHON_INTERPRETER python3
     CHECK_VENV FALSE
 )
