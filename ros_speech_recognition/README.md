@@ -1,5 +1,4 @@
-ros_speech_recognition
-======================
+# ros\_speech\_recognition
 
 A ROS package for speech-to-text services.  
 This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) as a backend.
@@ -18,21 +17,22 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   roslaunch ros_speech_recognition speech_recognition.launch
   ```
   
-3. Use from Python
+3. Echo `/speech_to_text`
 
-  ```python
-  import rospy
-  from ros_speech_recognition import SpeechRecognitionClient
-  
-  rospy.init_node("client")
-  client = SpeechRecognitionClient()
-  result = client.recognize()  # Please say 'Hello, world!' towards microphone
-  print result # => 'Hello, world!'
+  ```bash
+  rostopic echo /speech_to_text
+  # you can get the recognition result
   ```
   
-## Interface
+## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
+
+* `~voice_topic` (`sound_recognition_msgs/SpeechReconitionCandidates`)
+
+  Speech recognition candidates topic name.
+
+  Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
 
 * `sound_play` (`sound_play/SoundRequestAction`)
 
@@ -40,9 +40,11 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   
 ### Subscribing Topics
 
-* `audio` (`audio_common_msgs/AudioData`)
+* `~audio_topic` (`audio_common_msgs/AudioData`)
 
   Audio stream data to be recognized.
+
+  Topis name is set by parameter  `~audio_topic` and default value is `audio`.
 
 ### Advertising Services
 
@@ -50,7 +52,27 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Service for speech recognition
 
+* `speech_recognition/start` (`std_srvs/Empty`)
+
+  Start service for speech recognition
+
+  This service is available when parameter `~contiunous` is `True`.
+
+* `speech_recognition/start` (`std_srvs/Empty`)
+
+  Stop service for speech recognition
+
+  This service is available when parameter `~contiunous` is `True`.
+
 ## Parameters
+
+* `~voice_topic` (`String`, default: `speech_to_text`)
+
+  Publishing voice topic name
+
+* `~audio_topic` (`String`, default: `audio`)
+
+  Subscribing audio topic name
 
 * `~enable_sound_effect` (`Bool`, default: `True`)
 
@@ -108,10 +130,6 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Seconds of waiting for speech
 
-* `~audio_topic` (`String`, default: `audio`)
-
-  Topic name of input audio data
-  
 * `~depth` (`Int`, default: `16`)
 
   Depth of audio signal
@@ -147,6 +165,10 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 * `~continuous` (`Bool`, default: False)
 
   Selecting to use topic or service. By default, service is used.
+
+* `~auto_start` (`Bool`, default: True)
+
+  Starting the speech recognition when launching.
 
 * `~self_cancellation` (`Bool`, default: `True`)
 
