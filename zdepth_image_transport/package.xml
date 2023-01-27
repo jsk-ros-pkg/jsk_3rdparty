@@ -26,7 +26,8 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>zdepth</exec_depend>
 
-  <test_depend>depth_image_publisher</test_depend>
+  <!-- comment out because of circular dependency -->
+  <!-- <test_depend>depth_image_publisher</test_depend> -->
   <test_depend>roslaunch</test_depend>
   <test_depend>roslint</test_depend>
   <test_depend>rostest</test_depend>
