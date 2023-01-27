@@ -27,8 +27,6 @@ catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
     CHECK_VENV FALSE
 )
-endif()
-
 catkin_install_python(PROGRAMS
   node_scripts/nfc_ros_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -37,3 +35,4 @@ catkin_install_python(PROGRAMS
 install(FILES requirements.txt
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+endif()
