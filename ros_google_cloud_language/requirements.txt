@@ -11,7 +11,7 @@ googleapis-common-protos==1.52.0  # via google-api-core
 grpcio==1.41.1            # via google-api-core
 idna==2.10                # via requests
 packaging==20.9           # via google-api-core
-protobuf==3.17.3          # via google-api-core, googleapis-common-protos
+protobuf==3.18.3          # via google-api-core, googleapis-common-protos
 pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
 pyparsing==2.4.7          # via packaging
