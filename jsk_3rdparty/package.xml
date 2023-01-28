@@ -25,6 +25,7 @@
   <run_depend>influxdb_store</run_depend>
   <run_depend>jsk_database_scripts</run_depend>
   <run_depend>julius_ros</run_depend>
+  <run_depend>nfc_ros</run_depend>
   <run_depend>opt_camera</run_depend>
   <run_depend>pgm_learner</run_depend>
   <run_depend>respeaker_ros</run_depend>
