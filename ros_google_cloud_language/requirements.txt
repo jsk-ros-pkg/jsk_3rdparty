@@ -17,7 +17,7 @@ pyasn1==0.4.8             # via pyasn1-modules, rsa
 pyparsing==2.4.7          # via packaging
 pytz==2021.3              # via google-api-core
 requests==2.26.0          # via google-api-core
-rsa==4.5                  # via google-auth
+rsa==4.7                  # via google-auth
 six==1.16.0               # via google-api-core, google-auth, grpcio, protobuf
 urllib3==1.26.7           # via requests
 
