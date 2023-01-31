@@ -23,6 +23,14 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   rostopic echo /speech_to_text
   # you can get the recognition result
   ```
+
+4. Use from Euslisp
+
+  ```lisp
+  (ros::roseus "client")
+  (setq client (instance speech-recognition-client :init))
+  (setq result (send client :recognize)) ;; Please say 'Hello, world!` towards microphone
+  ```
   
 ## `speech_recognition_node.py` Interface
 
