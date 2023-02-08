@@ -41,7 +41,7 @@ def get_image_from_text(text):
 
     if os.path.exists(text):
         path = text
-        if imghdr.what(path) in ['jpeg', 'png', 'gif']:
+        if imghdr.what(path) in ['jpeg', 'jpg', 'png', 'gif']:
             with open(path, 'rb') as f:
                 return f.read()
     else:
