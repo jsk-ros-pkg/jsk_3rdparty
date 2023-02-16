@@ -20,12 +20,13 @@ jobs:
             ROS_PARALLEL_TEST_JOBS: "-j8"
             CATKIN_PARALLEL_JOBS: "-i"
             NOT_TEST_INSTALL : true
-            BEFORE_SCRIPT : "for name in dialogflow_task_executive ros_speech_recognition sesame_ros ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo \\$name; find $GITHUB_WORKSPACE -iname \\$name -exec touch {}/CATKIN_IGNORE \\; ; ls -al \\$(find -iname \\$name)/; done" # Skip large packagses /  Skip packages that could not build on indigo dialogflow_task_executive/ros_speech_recognition/sesame_ros
+            BEFORE_SCRIPT : "for name in dialogflow_task_executive ros_speech_recognition sesame_ros respeaker_ros ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo \\$name; find $GITHUB_WORKSPACE -iname \\$name -exec touch {}/CATKIN_IGNORE \\; ; ls -al \\$(find -iname \\$name)/; done" # Skip large packagses /  Skip packages that could not build on indigo dialogflow_task_executive/ros_speech_recognition/sesame_ros/respeaker_ros
           - ROS_DISTRO: kinetic
             CONTAINER: ubuntu:16.04
             ROS_PARALLEL_TEST_JOBS: "-j8"
             CATKIN_PARALLEL_JOBS: "-i"
             EXTRA_DEB : "python-lxml"
+            BEFORE_SCRIPT : "sudo add-apt-repository -y ppa:jblgf0/python; sudo apt-get update; sudo apt-get install -y python3.6 python3.6-venv libpython3.6-dev; sudo ln -sf python3.6 /usr/bin/python3; ls -al  /usr/bin/python3; python3 --version; python3 -v -m venv /tmp/v"
           - ROS_DISTRO: melodic
             CONTAINER: ubuntu:18.04
             ROS_PARALLEL_TEST_JOBS: "-j8"
@@ -83,7 +84,8 @@ jobs:
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
-          ROS_PARALLEL_JOBS : ${{ matrix.ROS_PARALLEL_JOBS }}
+          # darty hack, jsk_travis runs catkin build --make-args $ROS_PARALLEL_JOBS --
+          ROS_PARALLEL_JOBS : ${{ matrix.ROS_PARALLEL_JOBS }} LANG=C.UTF-8 LC_ALL=C.UTF-8
           CATKIN_PARALLEL_JOBS : ${{ matrix.CATKIN_PARALLEL_JOBS }}
           ROS_PARALLEL_TEST_JOBS : ${{ matrix.ROS_PARALLEL_TEST_JOBS }}
           CATKIN_PARALLEL_TEST_JOBS : ${{ matrix.CATKIN_PARALLEL_TEST_JOBS }}
@@ -93,6 +95,7 @@ jobs:
           TEST_PKGS : ${{ matrix.TEST_PKGS }}
           BEFORE_SCRIPT : ${{ matrix.BEFORE_SCRIPT }}
           EXTRA_DEB : ${{ matrix.EXTRA_DEB }}
+
 
   kinetic_i386:
     runs-on: ubuntu-latest
@@ -114,11 +117,13 @@ jobs:
         with:
           EXTRA_DEB : "python-lxml"
           ROS_DISTRO : kinetic
+          ROS_PARALLEL_JOBS : "LANG=C.UTF-8 LC_ALL=C.UTF-8"
           ROS_PARALLEL_TEST_JOBS : "-j8"
           CATKIN_PARALLEL_JOBS: "-i"
           ROSDEP_ADDITIONAL_OPTIONS : "-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
           # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/237 : (Note that pip==21.0.1 is incompatible with python 2.x)
-          BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0"
+          BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0; sudo add-apt-repository -y ppa:jblgf0/python; sudo apt-get update; sudo apt-get install -y python3.6 python3.6-venv libpython3.6-dev; sudo ln -sf python3.6 /usr/bin/python3"
+
 
   arm:
     runs-on: ubuntu-latest
@@ -137,7 +142,7 @@ jobs:
           submodules: 'true'
       - name: Skip packagse
         run: |
-          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         with:
@@ -156,5 +161,6 @@ jobs:
             export USE_TRAVIS=true
             export USE_DOCKER=false
             export NOT_TEST_INSTALL=true
+            export ROS_PARALLEL_JOBS="--make-args LANG=C.UTF-8 LC_ALL=C.UTF-8"
             set +o nounset
             source .travis/travis.sh

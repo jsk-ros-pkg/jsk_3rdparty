@@ -349,6 +349,7 @@ class RespeakerNode(object):
         self.sub_led = rospy.Subscriber("status_led", ColorRGBA, self.on_status_led)
 
     def on_shutdown(self):
+        self.info_timer.shutdown()
         try:
             self.respeaker.close()
         except:

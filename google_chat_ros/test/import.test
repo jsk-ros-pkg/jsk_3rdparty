@@ -1,0 +1,5 @@
+<launch>
+  <test test-name="test_import"
+        pkg="google_chat_ros"
+        type="test_import.py" />
+</launch>
