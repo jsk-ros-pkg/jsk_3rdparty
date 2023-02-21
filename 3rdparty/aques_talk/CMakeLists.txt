@@ -5,11 +5,6 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(test/test_aques_talk.test)
-endif()
-
 # Considering the use of docker in addition to the usual use,
 # we use dpkg-architecture command instead of ${CMAKE_SYSTEM_PROCESSOR} to get the architecture.
 # https://stackoverflow.com/a/58222507
@@ -58,3 +53,9 @@ install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS rostest)
+  if("${ARCHITECTURE}" MATCHES x86_64* OR "${ARCHITECTURE}" MATCHES i[0-9]86*)
+    add_rostest(test/test_aques_talk.test)
+  endif()
+endif()
