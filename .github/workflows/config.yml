@@ -125,42 +125,58 @@ jobs:
           BEFORE_SCRIPT : "sudo pip install virtualenv==15.1.0; sudo add-apt-repository -y ppa:jblgf0/python; sudo apt-get update; sudo apt-get install -y python3.6 python3.6-venv libpython3.6-dev; sudo ln -sf python3.6 /usr/bin/python3"
 
 
+  ## need to setup runners from https://github.com/jsk-ros-pkg/jsk_3rdparty/settings/actions/runners
   arm:
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted', 'Linux', 'ARM64']
     strategy:
       fail-fast: false
       matrix:
         include:
           - ROS_DISTRO: kinetic
-            CONTAINER: ubuntu16.04
+            CONTAINER: arm64v8/ros:kinetic-perception-xenial
             EXTRA_DEB : "python-lxml"
-          # - ROS_DISTRO: melodic
-          #   CONTAINER: ubuntu18.04
+          - ROS_DISTRO: melodic
+            CONTAINER: arm64v8/ros:melodic-perception-bionic
     steps:
       - uses: actions/checkout@v2.1.0
         with:
           submodules: 'true'
+          path: ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
       - name: Skip packagse
         run: |
-          for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
-      - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        with:
-          arch: aarch64
-          distro: ${{ matrix.CONTAINER }}
-          install: |
-            apt-get update -q -y
-            apt-get install -q -y git sudo wget curl
-          run: |
-            export EXTRA_DEB=${{ matrix.EXTRA_DEB }}
-            export ROS_DISTRO=${{ matrix.ROS_DISTRO }}
-            export ROS_PARALLEL_TEST_JOBS="-j2"
-            export CATKIN_PARALLEL_JOBS="-i"
-            export ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
-            export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0"
-            export USE_TRAVIS=true
-            export USE_DOCKER=false
-            export NOT_TEST_INSTALL=true
-            export ROS_PARALLEL_JOBS="--make-args LANG=C.UTF-8 LC_ALL=C.UTF-8"
-            set +o nounset
-            source .travis/travis.sh
+          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+      - name: Run commands
+        run: |
+          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
+          export EXTRA_DEB=${{ matrix.EXTRA_DEB }}
+          export ROS_DISTRO=${{ matrix.ROS_DISTRO }}
+          export ROS_PARALLEL_TEST_JOBS="-j2"
+          export CATKIN_PARALLEL_JOBS="-i"
+          export ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
+          export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0"
+          export USE_TRAVIS=true
+          export USE_DOCKER=false
+          export DOCKER_IMAGE=${{ matrix.CONTAINER }}
+          export NOT_TEST_INSTALL=true
+          export ROS_PARALLEL_JOBS="--make-args LANG=C.UTF-8 LC_ALL=C.UTF-8"
+          set +o nounset
+
+          export CI_SOURCE_PATH=$(pwd)
+          export REPOSITORY_NAME=${PWD##*/}
+
+          docker pull $DOCKER_IMAGE || true
+          docker run --rm -v $HOME:$HOME -v $HOME/.ccache:$HOME/.ccache/ -v $HOME/.cache/pip:$HOME/.cache/pip/ \
+                $DOCKER_XSERVER_OPTIONS \
+                -e TRAVIS_BRANCH -e TRAVIS_COMMIT -e TRAVIS_JOB_ID -e TRAVIS_OS_NAME -e TRAVIS_PULL_REQUEST -e TRAVIS_REPO_SLUG \
+                -e GITHUB_RUN_ID \
+                -e CI_SOURCE_PATH -e HOME -e REPOSITORY_NAME \
+                -e BUILD_PKGS -e TARGET_PKGS -e TEST_PKGS \
+                -e BEFORE_SCRIPT -e BUILDER -e EXTRA_DEB -e USE_DEB \
+                -e ROS_DISTRO -e ROS_LOG_DIR -e ROS_REPOSITORY_PATH -e ROSWS \
+                -e CATKIN_TOOLS_BUILD_OPTIONS -e CATKIN_TOOLS_CONFIG_OPTIONS \
+                -e CATKIN_PARALLEL_JOBS -e CATKIN_PARALLEL_TEST_JOBS \
+                -e ROS_PARALLEL_JOBS -e ROS_PARALLEL_TEST_JOBS -e ROS_PYTHON_VERSION \
+                -e ROSDEP_ADDITIONAL_OPTIONS -e ROSDEP_UPDATE_QUIET \
+                -e SUDO_PIP -e USE_PYTHON_VIRTUALENV \
+                -e NOT_TEST_INSTALL -e DEBUG_TRAVIS_PYTHON \
+                -t $DOCKER_IMAGE bash -c 'sudo apt-get update -y && sudo apt-get install -q -y git sudo wget curl && cd $CI_SOURCE_PATH/ && .travis/travis.sh'
