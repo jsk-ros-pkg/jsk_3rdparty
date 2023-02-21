@@ -1,0 +1,11 @@
+# Define the goal
+string text
+---
+# Define the result
+ros_google_cloud_language/TextEntity[] entities
+ros_google_cloud_language/TextSyntax[] syntaxes
+float32 sentiment_score
+float32 sentiment_magnitude
+---
+# Define a feedback message
+string status
