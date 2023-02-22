@@ -144,7 +144,7 @@ jobs:
           path: ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
       - name: Skip packagse
         run: |
-          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && for name in ffha libsiftfast nlopt julius julius_ros downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && for name in ffha libsiftfast nlopt downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
       - name: Run commands
         run: |
           cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
