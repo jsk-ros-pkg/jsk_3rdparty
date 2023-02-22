@@ -180,3 +180,8 @@ jobs:
                 -e SUDO_PIP -e USE_PYTHON_VIRTUALENV \
                 -e NOT_TEST_INSTALL -e DEBUG_TRAVIS_PYTHON \
                 -t $DOCKER_IMAGE bash -c 'sudo apt-get update -y && sudo apt-get install -q -y git sudo wget curl && cd $CI_SOURCE_PATH/ && .travis/travis.sh'
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          rm -fr ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} || echo "OK"
