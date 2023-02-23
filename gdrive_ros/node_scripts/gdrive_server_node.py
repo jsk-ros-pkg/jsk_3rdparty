@@ -21,7 +21,7 @@ from gdrive_ros.srv import Upload
 from gdrive_ros.srv import UploadResponse
 
 
-if sys.version_info < 3 and \
+if sys.version_info.major < 3 and \
         LooseVersion(pkg_resources.get_distribution("rsa").version) \
         >= LooseVersion('4.6.0'):
     print('''rsa < 4.6.0 is required:
