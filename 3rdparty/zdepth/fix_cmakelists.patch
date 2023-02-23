@@ -1,0 +1,50 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b22b2e7..a4251af 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,7 +61,7 @@ include_directories(include)
+ 
+ # zdepth library
+ 
+-add_library(zdepth STATIC ${SOURCE_FILES})
++add_library(zdepth SHARED ${SOURCE_FILES})
+ add_library(zdepth::zdepth ALIAS zdepth)
+ 
+ target_link_libraries(zdepth PUBLIC zstd)
+@@ -80,10 +80,13 @@ target_link_libraries(zdepth_test PRIVATE zdepth)
+ ################################################################################
+ # Install
+ 
+-install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX})
+-install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
+-install(DIRECTORY cmake include DESTINATION ${CMAKE_INSTALL_PREFIX})
+-install(TARGETS zdepth EXPORT zdepth LIBRARY DESTINATION lib)
++# install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX})
++# install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
++install(FILES include/zdepth.hpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/zdepth)
++install(FILES tests/test_vectors.inl DESTINATION ${CMAKE_INSTALL_PREFIX}/include/zdepth/tests)
++install(TARGETS zdepth EXPORT zdepth
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib)
+ 
+ ################################################################################
+ # Generate zdepthConfig.cmake and zdepthConfigVersion.cmake for cmake projects
+diff --git a/zstd/CMakeLists.txt b/zstd/CMakeLists.txt
+index 5869d4d..f9339a3 100644
+--- a/zstd/CMakeLists.txt
++++ b/zstd/CMakeLists.txt
+@@ -19,10 +19,12 @@ include_directories(include src)
+ ################################################################################
+ # Targets
+ 
+-add_library(zstd ${ZSTD_SOURCE_FILES})
++add_library(zstd SHARED ${ZSTD_SOURCE_FILES})
+ target_include_directories(zstd PUBLIC
+     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+     "$<INSTALL_INTERFACE:include>"
+ )
+ 
+-install(TARGETS zstd EXPORT zdepth LIBRARY DESTINATION lib)
++install(TARGETS zstd EXPORT zdepth
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib)
