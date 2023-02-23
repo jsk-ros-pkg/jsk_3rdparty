@@ -13,6 +13,7 @@
     <arg name="audio_topic" value="/speech_audio" />
     <arg name="language" value="ja" />
     <arg name="continuous" value="true" />
+    <arg name="voice_topic" value="/Tablet/voice" />
   </include>
 
   <!-- launch bag file -->
