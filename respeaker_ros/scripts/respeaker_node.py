@@ -21,7 +21,7 @@ from std_msgs.msg import Bool, Int32, ColorRGBA
 from dynamic_reconfigure.server import Server
 try:
     from pixel_ring import usb_pixel_ring_v2
-except IOError as e:
+except (IOError, FileNotFoundError) as e:
     rospy.logerr(e)
     raise RuntimeError("Check the device is connected and recognized")
 
@@ -349,6 +349,7 @@ class RespeakerNode(object):
         self.sub_led = rospy.Subscriber("status_led", ColorRGBA, self.on_status_led)
 
     def on_shutdown(self):
+        self.info_timer.shutdown()
         try:
             self.respeaker.close()
         except:
