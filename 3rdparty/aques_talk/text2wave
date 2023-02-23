@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # For detail, please see README.md of aques_talk
     # sed command for Japanese
     # https://ja.stackoverflow.com/questions/29179/sed-%E3%81%A7-%E3%81%82-%E3%82%9E-%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E6%96%87%E5%AD%97%E7%AF%84%E5%9B%B2%E3%82%92%E4%BD%BF%E3%81%84%E3%81%9F%E3%81%84
-    os.system("unset LC_ALL && unset LC_CTYPE && export LC_COLLATE=C.UTF-8 && \
+    os.system("unset LC_ALL && unset LC_CTYPE && export LC_ALL=C.UTF-8 && \
                nkf -j %s | kakasi -JH | nkf -w | \
                sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
                sed -e 's/．/。/g' | sed -e 's/\./。/g' | \
