@@ -19,11 +19,9 @@
   <run_depend>bayesian_belief_networks</run_depend>
   <run_depend>chaplus_ros</run_depend>
   <run_depend>dialogflow_task_executive</run_depend>
-  <run_depend>gdrive_ros</run_depend>
   <run_depend>google_chat_ros</run_depend>
   <run_depend>hark_jsk_plugins</run_depend>
   <run_depend>influxdb_store</run_depend>
-  <run_depend>jsk_database_scripts</run_depend>
   <run_depend>julius_ros</run_depend>
   <run_depend>nfc_ros</run_depend>
   <run_depend>opt_camera</run_depend>
@@ -63,7 +61,7 @@
   <!-- jsk_ros_patch/ dir -->
   <run_depend>collada_urdf_jsk_patch</run_depend>
   <!-- <run_depend>depth_image_proc_jsk_patch</run_depend> -->
-  <run_depend>eecart_imped_jsk_patch</run_depend>
+  <!-- <run_depend>eecart_imped_jsk_patch</run_depend> -->
   <run_depend>laser_filters_jsk_patch</run_depend>
   <!-- <run_depend>openni_tracker_jsk_patch</run_depend> -->
 
