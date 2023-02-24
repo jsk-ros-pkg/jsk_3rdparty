@@ -1,0 +1,9 @@
+<launch>
+    <node
+        pkg="nfc_ros"
+        type="nfc_ros_node.py"
+        name="nfc_ros_node"
+        output="screen"
+        required="true"
+        />
+</launch>

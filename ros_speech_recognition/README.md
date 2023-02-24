@@ -5,6 +5,8 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
 ## Tutorials
 
+### Normal tutorial
+
 1. Install this package and SpeechReconition
 
   ```bash
@@ -23,7 +25,18 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   rostopic echo /speech_to_text
   # you can get the recognition result
   ```
-  
+
+### Parrotry tutorial
+
+Parrotry mean オウム返し in Japanese
+
+```bash
+# english
+roslaunch ros_speech_recognition parrotry.launch
+# japanese
+roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
+```
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics

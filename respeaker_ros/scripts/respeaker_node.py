@@ -21,7 +21,7 @@ from std_msgs.msg import Bool, Int32, ColorRGBA
 from dynamic_reconfigure.server import Server
 try:
     from pixel_ring import usb_pixel_ring_v2
-except IOError as e:
+except (IOError, FileNotFoundError) as e:
     rospy.logerr(e)
     raise RuntimeError("Check the device is connected and recognized")
 
