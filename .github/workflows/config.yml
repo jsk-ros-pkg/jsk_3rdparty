@@ -35,11 +35,6 @@ jobs:
             CONTAINER: ubuntu:20.04
             ROS_PARALLEL_TEST_JOBS: "-j8"
             CATKIN_PARALLEL_JOBS: "-i"
-          - ROS_DISTRO: noetic
-            CONTAINER: ubuntu:20.04
-            ROS_PARALLEL_TEST_JOBS: "-j8"
-            CATKIN_PARALLEL_JOBS: "-i"
-            USE_DEB : false
 
 
     container: ${{ matrix.CONTAINER }}
