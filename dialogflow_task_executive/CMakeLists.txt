@@ -50,7 +50,12 @@ if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   message(WARNING "sed -i 's/upgrade_pip=True/upgrade_pip=False/' /opt/ros/indigo/share/catkin_virtualenv/cmake/build_venv.py")
   message(WARNING "to prevent upgrading to latest pip, which is not Python2 compatible")
   file(COPY requirements.txt.indigo DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo requirements.txt)
+  # github build failed with invalid device link
+  # file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo requirements.txt)
+  execute_process(
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
   catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
 elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
   catkin_generate_virtualenv(
