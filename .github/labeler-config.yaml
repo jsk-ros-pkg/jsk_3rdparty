@@ -1,0 +1,81 @@
+# find . -name package.xml | xargs -n1 dirname | xargs -n1 -I {} sh -c 'echo "$(basename {}):\n  - {}/*"' {} > .github/labeler-config.yaml
+zdepth_image_transport:
+  - ./zdepth_image_transport/*
+chaplus_ros:
+  - ./chaplus_ros/*
+respeaker_ros:
+  - ./respeaker_ros/*
+google_chat_ros:
+  - ./google_chat_ros/*
+ros_google_cloud_language:
+  - ./ros_google_cloud_language/*
+sesame_ros:
+  - ./sesame_ros/*
+julius_ros:
+  - ./julius_ros/*
+openni_tracker_jsk_patch:
+  - ./jsk_ros_patch/openni_tracker_jsk_patch/*
+depth_image_proc_jsk_patch:
+  - ./jsk_ros_patch/depth_image_proc_jsk_patch/*
+laser_filters_jsk_patch:
+  - ./jsk_ros_patch/laser_filters_jsk_patch/*
+collada_urdf_jsk_patch:
+  - ./jsk_ros_patch/collada_urdf_jsk_patch/*
+nlopt:
+  - ./3rdparty/nlopt/*
+julius:
+  - ./3rdparty/julius/*
+assimp_devel:
+  - ./3rdparty/assimp_devel/*
+aques_talk:
+  - ./3rdparty/aques_talk/*
+downward:
+  - ./3rdparty/downward/*
+ff:
+  - ./3rdparty/ff/*
+zdepth:
+  - ./3rdparty/zdepth/*
+libsiftfast:
+  - ./3rdparty/libsiftfast/*
+libcmt:
+  - ./3rdparty/libcmt/*
+voice_text:
+  - ./3rdparty/voice_text/*
+mini_maxwell:
+  - ./3rdparty/mini_maxwell/*
+google_cloud_texttospeech:
+  - ./3rdparty/google_cloud_texttospeech/*
+lpg_planner:
+  - ./3rdparty/lpg_planner/*
+slic:
+  - ./3rdparty/slic/*
+ffha:
+  - ./3rdparty/ffha/*
+opt_camera:
+  - ./opt_camera/*
+ros_speech_recognition:
+  - ./ros_speech_recognition/*
+webrtcvad_ros:
+  - ./webrtcvad_ros/*
+influxdb_store:
+  - ./influxdb_store/*
+pgm_learner:
+  - ./pgm_learner/*
+dialogflow_task_executive:
+  - ./dialogflow_task_executive/*
+rosping:
+  - ./rosping/*
+bayesian_belief_networks:
+  - ./bayesian_belief_networks/*
+switchbot_ros:
+  - ./switchbot_ros/*
+nfc_ros:
+  - ./nfc_ros/*
+rospatlite:
+  - ./rospatlite/*
+gdrive_ros:
+  - ./gdrive_ros/*
+jsk_3rdparty:
+  - ./jsk_3rdparty/*
+rostwitter:
+  - ./rostwitter/*
