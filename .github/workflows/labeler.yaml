@@ -1,4 +1,8 @@
 name: "Pull Request Labeler"
+on: push
+
+permissions:
+  contents: read
 
 jobs:
   triage:
@@ -7,7 +11,7 @@ jobs:
       pull-requests: write  # for actions/labeler to add labels to PRs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v4
+    - uses: actions/labeler@v3
       with:
         repo-token: "${{ secrets.ACTION_LABELER_TOKEN }}"
         configuration-path: ".github/labeler-config.yaml"
