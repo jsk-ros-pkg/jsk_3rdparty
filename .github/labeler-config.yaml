@@ -1,4 +1,6 @@
 # find * -name package.xml | xargs -n1 dirname | xargs -n1 -I {} sh -c 'echo "$(basename {}):\n  - {}/**/*"' {}  > .github/labeler-config.yaml
+github-action:
+  - .github/**/*
 nlopt:
   - 3rdparty/nlopt/**/*
 julius:
