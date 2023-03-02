@@ -8,6 +8,7 @@ import time
 import actionlib
 import cv2
 import cv_bridge
+from dynamic_reconfigure.server import Server
 import rospkg
 import rospy
 from sound_play.libsoundplay import SoundClient
@@ -15,6 +16,7 @@ from sound_play.libsoundplay import SoundClient
 from rostwitter.twitter import Twitter
 from rostwitter.util import load_oauth_settings
 
+from rostwitter.cfg import TweetImageServerConfig
 from rostwitter.msg import TweetAction
 from rostwitter.msg import TweetFeedback
 from rostwitter.msg import TweetResult
@@ -48,6 +50,8 @@ class TweetImageServer(object):
             rospy.logwarn("sound_play version < 0.3.7 does not support 'sound_action' argument, so it uses robot_sound, instead of robot_sound_jp")
             self.client = SoundClient(
                 blocking=True)
+        self.config_server = Server(
+            TweetImageServerConfig, self._config_cb)
         self.server = actionlib.SimpleActionServer(
             '~tweet', TweetAction, self._execute_cb)
 
@@ -89,13 +93,13 @@ class TweetImageServer(object):
                 warning_text = 'さん'
                 goal.warning_time = 3
             warning_text = warning_text + 'びょうまえ'
-            self.client.say(warning_text)
+            self.client.say(warning_text, volume=self.volume)
             if goal.warning_time > 0:
                 time.sleep(goal.warning_time)
             wave_path = os.path.join(
                 self.pack.get_path('rostwitter'),
                 'resource/camera.wav')
-            self.client.playWave(wave_path)
+            self.client.playWave(wave_path, volume=self.volume)
 
         if goal.image:
             now = rospy.Time.now()
@@ -126,7 +130,7 @@ class TweetImageServer(object):
         res = TweetResult(success=success)
         if success:
             if goal.speak:
-                self.client.say('ついーとしました')
+                self.client.say('ついーとしました', volume=self.volume)
             self.server.set_succeeded(res)
         else:
             self.server.set_aborted(res)
@@ -134,6 +138,10 @@ class TweetImageServer(object):
     def _image_cb(self, msg):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         cv2.imwrite(self.image_path, img)
+
+    def _config_cb(self, config, level):
+        self.volume = config.volume
+        return config
 
 
 if __name__ == '__main__':
