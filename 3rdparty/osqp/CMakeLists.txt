@@ -5,9 +5,8 @@ include(ExternalProject)
 
 ExternalProject_Add(
   osqp
-  GIT_REPOSITORY https://github.com/oxfordcontrol/osqp
-  GIT_TAG v0.6.0
-  GIT_SHALLOW     TRUE
+  URL https://github.com/osqp/osqp/releases/download/v0.6.2/complete_sources.tar.gz
+  URL_HASH MD5=66738e622174eb506e0cee106891397e
   CMAKE_ARGS  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
   INSTALL_COMMAND echo "install"
   )
