@@ -3,7 +3,7 @@ project(osqp)
 
 include(ExternalProject)
 
-if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
+if("$ENV{ROS_DISTRO}" STRGREATER "indigo")
   ExternalProject_Add(
     osqp
     URL https://github.com/osqp/osqp/releases/download/v0.6.2/complete_sources.tar.gz
