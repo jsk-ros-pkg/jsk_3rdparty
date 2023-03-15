@@ -288,7 +288,7 @@ class ROSSpeechRecognition(object):
             rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
             confidence = 1.0
-            if result == []: return
+            if len(result) == 0: return
             if self.engine == Config.SpeechRecognition_Google:
                 confidence = result['alternative'][0]['confidence']
                 result = result['alternative'][0]['transcript']
