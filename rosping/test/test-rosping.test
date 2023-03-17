@@ -7,5 +7,6 @@
   <param name="ping_delay/hz" value="2.0" />
   <param name="ping_delay/hzerror" value="1.9" />
   <param name="ping_delay/test_duration" value="5.0" />
+  <param name="ping_delay/wait_time" value="5.0" />
   <test test-name="hztest_test" pkg="rostest" type="hztest" name="ping_delay" />
 </launch>

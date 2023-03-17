@@ -20,7 +20,6 @@
   <run_depend>audio_common_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>flac</run_depend>
-  <run_depend>python-speechrecognition-pip</run_depend>
   <run_depend>sound_play</run_depend>
   <run_depend>speech_recognition_msgs</run_depend>
 

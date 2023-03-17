@@ -14,12 +14,14 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
-if($ENV{ROS_DISTRO} STREQUAL "noetic")
+if($ENV{ROS_DISTRO} STRGREATER "melodic")
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
     )
 else()
-  catkin_generate_virtualenv()
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    )
 endif()
 
 file(GLOB SCRIPT_PROGRAMS scripts/*.py)
