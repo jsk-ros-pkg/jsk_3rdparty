@@ -82,8 +82,7 @@ class AppManager(object):
 
     @property
     def running_apps(self):
-        return map(lambda a: a.name,
-                   self._latest_msg.running_apps)
+        return [a.name for a in self._latest_msg.running_apps]
 
     @property
     def available_apps(self):
