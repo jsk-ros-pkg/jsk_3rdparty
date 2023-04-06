@@ -1,6 +1,6 @@
 <launch>
   <arg name="run_app_manager" default="false" />
-  <arg name="applist" default="" />
+  <arg name="applist" default="$(find dialogflow_task_executive)/apps"/>
   <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
   <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
   <arg name="enable_hotword" default="true" />
@@ -16,7 +16,7 @@
 
 
   <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
-        args="/speech_to_text /speech_to_text_google /speech_to_text_julius" >
+        args="/speech_to_text /speech_to_text_google /speech_to_text_julius /speech_to_text_other" >
     <remap from="mux" to="speech_to_text_mux"/>
   </node>
 
@@ -42,6 +42,10 @@
   </node>
   
   <group if="$(arg run_app_manager)">
+    <rosparam>
+      /robot/type: dummy
+      /robot/name: test
+    </rosparam>
     <node pkg="app_manager" type="appmaster" name="appmaster"
           args="-p 11313"/>
     <node pkg="app_manager" type="app_manager" name="app_manager"

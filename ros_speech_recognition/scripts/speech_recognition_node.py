@@ -178,7 +178,7 @@ class ROSSpeechRecognition(object):
         if self.continuous:
             rospy.loginfo("Enabled continuous mode")
             rospy.loginfo("Auto start: {}".format(self.auto_start))
-            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "/Tablet/voice"),
+            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "speech_to_text"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
             self.start_srv = rospy.Service(
@@ -247,7 +247,8 @@ class ROSSpeechRecognition(object):
         recog_func = None
         if self.engine == Config.SpeechRecognition_Google:
             if not self.args:
-                self.args = {'key': rospy.get_param("~google_key", None)}
+                self.args = {'key': rospy.get_param("~google_key", None),
+                             'show_all': True}
             recog_func = self.recognizer.recognize_google
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
@@ -286,10 +287,18 @@ class ROSSpeechRecognition(object):
         try:
             rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
+            confidence = 1.0
+            if len(result) == 0: return
+            if self.engine == Config.SpeechRecognition_Google:
+                confidence = result['alternative'][0]['confidence']
+                result = result['alternative'][0]['transcript']
             self.play_sound("recognized", 0.05)
             rospy.loginfo("Result: %s" % result.encode('utf-8'))
             self.play_sound("success", 0.1)
-            msg = SpeechRecognitionCandidates(transcript=[result])
+            msg = SpeechRecognitionCandidates(
+                transcript=[result],
+                confidence=[confidence],
+            )
             self.pub.publish(msg)
             return
         except SR.UnknownValueError as e:
@@ -355,7 +364,10 @@ class ROSSpeechRecognition(object):
                     rospy.loginfo("Result: %s" % result.encode('utf-8'))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
-                    res.result = SpeechRecognitionCandidates(transcript=[result])
+                    res.result = SpeechRecognitionCandidates(
+                        transcript=[result],
+                        confidence=[1.0],
+                    )
                     return res
                 except SR.UnknownValueError:
                     if self.dynamic_energy_threshold:
