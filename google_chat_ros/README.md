@@ -307,3 +307,31 @@ rostopic pub -1 /google_chat_ros/send/goal google_chat_ros/SendMessageActionGoal
 ```
 ### 5.2 Receiving a message with images or gdrive file
 You have to set rosparam `~download_data` True, `~download_directory`. If the node recieved the message with image or google drive file, it automatically downloads to `~donwload_directory` path.
+
+
+### Troubleshoot
+
+#### google.api_core.exceptions.NotFound: 404 Resource not found (resource=chat-sub).
+
+If you encounter `404 Resource not found (resource=chat-sub).` error on your screen as shown in below.
+
+```
+[INFO] [1680417167.337634]: [/google_chat_ros] Expected to use Google Cloud Pub Sub service
+Traceback (most recent call last):
+  File "/home/k-okada/catkin_ws/ws_3rdparty/src/jsk_3rdparty/google_chat_ros/scripts/google_chat_ros_node.py", line 473, in <module>
+    node = GoogleChatROS()
+  File "/home/k-okada/catkin_ws/ws_3rdparty/src/jsk_3rdparty/google_chat_ros/scripts/google_chat_ros_node.py", line 80,
+in __init__
+    self._pubsub_client.run()
+  File "/home/k-okada/catkin_ws/ws_3rdparty/src/jsk_3rdparty/google_chat_ros/src/google_chat_ros/google_chat.py", line 135, in run
+    self._streaming_pull_future.result()
+  File "/usr/lib/python3.6/concurrent/futures/_base.py", line 432, in result
+    return self.__get_result()
+  File "/usr/lib/python3.6/concurrent/futures/_base.py", line 384, in __get_result
+    raise self._exception
+google.api_core.exceptions.NotFound: 404 Resource not found (resource=chat-sub).
+```
+
+Please make sure that you have enabled subscription service, as a default it expires in 7 days. We recommend you to set no expiration date.
+
+![google_chat_ros_404_error](https://user-images.githubusercontent.com/493276/230245558-f85dbde8-c774-4932-ba52-cebf6848bb5a.png)
