@@ -1,0 +1,14 @@
+# Define the goal
+string text
+google_chat_ros/Card[] cards
+bool update_message # Not creating new message, but rewrite existing message
+string thread_name
+string space
+---
+# Define the result
+google_chat_ros/Message message_result
+google_chat_ros/Card[] cards_result
+bool done
+---
+# Define a feedback message
+string status
