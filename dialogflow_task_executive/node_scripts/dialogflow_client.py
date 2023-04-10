@@ -104,7 +104,7 @@ class DialogflowBase(object):
         msg = DialogResponse()
         msg.header.stamp = rospy.Time.now()
         if result.action == 'input.unknown':
-            rospy.logwarn("Unknown action")
+            rospy.logwarn("Unknown action '{}'".format(result.action))
         msg.action = result.action
 
         # check if ROS_PYTHON_VERSION exists in indigo
@@ -134,7 +134,9 @@ class DialogflowTextClient(DialogflowBase):
     def cb(self, goal):
         feedback = DialogTextFeedback()
         result = DialogTextResult()
+        df_result = None
         success = False
+        rospy.loginfo("goal = {}".format(goal))
         try:
             if self.session_id is None:
                 self.session_id = str(uuid.uuid1())
@@ -154,7 +156,10 @@ class DialogflowTextClient(DialogflowBase):
         finally:
             self._as.publish_feedback(feedback)
             result.done = success
-            self._as.set_succeeded(result)
+            if success:
+                self._as.set_succeeded(result)
+            else:
+                self._as.set_preempted()
             if df_result and self.always_publish_result:
                 self.pub_res.publish(result.response)
 
