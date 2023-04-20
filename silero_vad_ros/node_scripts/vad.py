@@ -18,21 +18,18 @@ class SileroVADROS(VADBaseNode):
                                   force_reload=True)
     self.model_vad = model_vad
 
-    super(SileroVADROS, self).__init__()
+    super(SileroVADROS, self).__init__(chunk_size=1536)
 
     rospy.loginfo('Initialized.')
 
   def _get_vad_confidence(self, chunk, sampling_rate):
-    print('chunk: {}'.format(chunk))
-    nparray = self._convert_bytearray_to_numpy_array(chunk)
-    print('nparray: {}'.format(nparray))
-    return self.model_vad(torch.from_numpy(nparray), sampling_rate).item()
-
-  def _convert_bytearray_to_numpy_array(self, data):
-    if self._audio_info.sample_format == 'S16LE':
-      return np.array(struct.unpack("{}h".format(int(len(data) / 2)), data))
-    else:
-      raise ValueError()
+    audio_chunk = np.frombuffer(chunk, np.int16)
+    abs_max = np.abs(audio_chunk).max()
+    audio_chunk = audio_chunk.astype('float32')
+    if abs_max > 0:
+      audio_chunk *= 1 / 32768
+    audio_chunk = audio_chunk.squeeze()
+    return self.model_vad(torch.from_numpy(audio_chunk), sampling_rate).item()
 
 
 def main():

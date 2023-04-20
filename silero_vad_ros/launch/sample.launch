@@ -22,7 +22,7 @@
         type="speech_to_text.py"
         output="log"
     >
-        <remap from="audio" to="/webrtcvad_ros/speech_audio"/>
+        <remap from="audio" to="/silero_vad_ros/speech_audio"/>
         <rosparam subst_value="true">
             language: ja-JP
             self_cancellation: false
