@@ -52,12 +52,13 @@ class VADBaseNode(object):
 
     confidence = self._get_vad_confidence(audio_data,
                                           self._audio_info.sample_rate)
+    rospy.loginfo('confidence: {}'.format(confidence))
     is_speech = True if confidence > self._threshold else False
     self._pub_is_speech.publish(Bool(is_speech))
     if self._current_speaking == True and is_speech == True:
       self._speech_audio_buffer = self._speech_audio_buffer + audio_data
     elif self._current_speaking == False and is_speech == True:
-      self._speech_audio_buffer = audio_data
+      self._speech_audio_buffer = self._speech_audio_buffer + audio_data
       self._current_speaking = True
     elif self._current_speaking == True and is_speech == False:
       self._speech_audio_buffer = self._speech_audio_buffer + audio_data
@@ -68,7 +69,9 @@ class VADBaseNode(object):
       else:
         rospy.logwarn('speech duration: {} dropped'.format(speech_duration))
       self._current_speaking = False
-      self._speech_audio_buffer = ''
+      self._speech_audio_buffer = audio_data
+    else:
+      self._speech_audio_buffer = audio_data
 
 
 def main():
