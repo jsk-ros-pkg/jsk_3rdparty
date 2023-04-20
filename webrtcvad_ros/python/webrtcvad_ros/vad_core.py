@@ -69,6 +69,7 @@ class VADBaseNode(object):
       else:
         if len(self._speech_audio_buffer) > len(audio_data):
           self._speech_audio_buffer = self._speech_audio_buffer + audio_data
+          # speech_duration = speech_audio_buffer duration - pre buffer duration - timeout buffer duration
           speech_duration = (len(self._speech_audio_buffer) / 2.0) / self._audio_info.sample_rate \
             - self.chunk_size / self._audio_info.sample_rate \
             - self._audio_timeout_duration
