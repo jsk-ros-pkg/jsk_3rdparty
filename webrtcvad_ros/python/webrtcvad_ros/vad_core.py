@@ -11,12 +11,14 @@ class VADBaseNode(object):
 
   def __init__(self, chunk_size=None):
 
-    self._current_speaking = False
+    self._last_speaking_time = rospy.Time()
     self._speech_audio_buffer = b''
     self._audio_buffer = b''
 
-    self._threshold = rospy.get_param('~threshold', 0.5)
+    self._threshold = rospy.get_param('~threshold', 0.1)
     self._minimum_duration = rospy.get_param('~minimum_duration', 0.4)
+    self._audio_timeout_duration = rospy.get_param('~audio_timeout_duration',
+                                                   0.5)
 
     self._pub_is_speech = rospy.Publisher('~is_speeching', Bool, queue_size=1)
     self._pub_speech_audio = rospy.Publisher('~speech_audio',
@@ -52,26 +54,30 @@ class VADBaseNode(object):
 
     confidence = self._get_vad_confidence(audio_data,
                                           self._audio_info.sample_rate)
-    rospy.loginfo('confidence: {}'.format(confidence))
+    rospy.logdebug('confidence: {}'.format(confidence))
     is_speech = True if confidence > self._threshold else False
     self._pub_is_speech.publish(Bool(is_speech))
-    if self._current_speaking == True and is_speech == True:
+
+    if is_speech:
       self._speech_audio_buffer = self._speech_audio_buffer + audio_data
-    elif self._current_speaking == False and is_speech == True:
-      self._speech_audio_buffer = self._speech_audio_buffer + audio_data
-      self._current_speaking = True
-    elif self._current_speaking == True and is_speech == False:
-      self._speech_audio_buffer = self._speech_audio_buffer + audio_data
-      speech_duration = (len(self._speech_audio_buffer) /
-                         2.0) / self._audio_info.sample_rate
-      if speech_duration > self._minimum_duration:
-        self._pub_speech_audio.publish(AudioData(self._speech_audio_buffer))
-      else:
-        rospy.logwarn('speech duration: {} dropped'.format(speech_duration))
-      self._current_speaking = False
-      self._speech_audio_buffer = audio_data
+      self._last_speaking_time = rospy.Time.now()
     else:
-      self._speech_audio_buffer = audio_data
+      if rospy.Time.now() < self._last_speaking_time + rospy.Duration(
+          self._audio_timeout_duration):
+        self._speech_audio_buffer = self._speech_audio_buffer + audio_data
+        rospy.logdebug('continuing...')
+      else:
+        if len(self._speech_audio_buffer) > len(audio_data):
+          self._speech_audio_buffer = self._speech_audio_buffer + audio_data
+          speech_duration = (len(self._speech_audio_buffer) / 2.0) / self._audio_info.sample_rate \
+            - self.chunk_size / self._audio_info.sample_rate \
+            - self._audio_timeout_duration
+          if speech_duration > self._minimum_duration:
+            self._pub_speech_audio.publish(AudioData(self._speech_audio_buffer))
+            rospy.loginfo('published duration: {}'.format(speech_duration))
+          else:
+            rospy.logwarn('speech duration: {} dropped'.format(speech_duration))
+        self._speech_audio_buffer = audio_data
 
 
 def main():
