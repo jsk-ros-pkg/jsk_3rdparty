@@ -10,10 +10,10 @@ class WebRTCVADROS(VADBaseNode):
 
   def __init__(self):
 
-    super(WebRTCVADROS, self).__init__()
-
     aggressiveness = rospy.get_param('~aggressiveness', 1)
     self._vad = webrtcvad.Vad(int(aggressiveness))
+
+    super(WebRTCVADROS, self).__init__(chunk_size=480)
 
   def _get_vad_confidence(self, chunk, sampling_rate):
     return 1.0 if self._vad.is_speech(chunk, sampling_rate) else 0.0
