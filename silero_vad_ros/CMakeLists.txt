@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.8.3)
 project(silero_vad_ros)
+
+find_program(EXIST_PYTHON3 "python3.8")
+if(NOT EXIST_PYTHON3)
+    message(WARNING "python3.8 command not found. exit without building")
+    return()
+else()
+    message(STATUS "python3.8 command found. continue building...")
+endif()
 
 find_package(catkin REQUIRED COMPONENTS catkin_virtualenv)
 
