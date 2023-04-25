@@ -77,6 +77,8 @@ class GoogleChatROS(object):
                 rospy.loginfo("Expected to use Google Cloud Pub Sub service")
                 self.project_id = rospy.get_param("~project_id")
                 self.subscription_id = rospy.get_param("~subscription_id")
+                rospy.loginfo("      project_id : {}".format(self.project_id))
+                rospy.loginfo(" subscription_id : {}".format(self.subscription_id ))
                 self._pubsub_client = GoogleChatPubSubClient(
                     self.project_id, self.subscription_id, self.event_cb, google_credentials)
                 rospy.on_shutdown(self.killpubsub)
