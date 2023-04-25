@@ -83,11 +83,18 @@ class DialogflowBase(object):
                 credentials_json
             )
             self.project_id = credentials.project_id
+            if rospy.has_param("~project_id"):
+                self.project_id = rospy.get_param("~project_id")
+                rospy.logwarn("overridd project_id")
+                rospy.logwarn("   from : project_id in a credential file {}".format(credentials.project_id))
+                rospy.logwarn("     to : project_id stored in rosparam   {}".format(self.project_id))
             self.session_client = df.SessionsClient(
                 credentials=credentials
             )
         if self.project_id is None:
             rospy.logerr('project ID is not set')
+        else:
+            rospy.loginfo('project ID is "{}"'.format(self.project_id))
         self.pub_res = rospy.Publisher(
             "dialog_response", DialogResponse, queue_size=1)
         self.always_publish_result = rospy.get_param(
@@ -139,7 +146,7 @@ class DialogflowTextClient(DialogflowBase):
             if self.session_id is None:
                 self.session_id = str(uuid.uuid1())
                 rospy.loginfo(
-                    "Created new session: {}".format(self.session_id))
+                    "DialogflowTextClient: Created new session: {}".format(self.session_id))
             session = self.session_client.session_path(
                 self.project_id, self.session_id
             )
@@ -292,7 +299,7 @@ class DialogflowAudioClient(DialogflowBase):
                 if self.session_id is None:
                     self.session_id = str(uuid.uuid1())
                     rospy.loginfo(
-                        "Created new session: {}".format(self.session_id))
+                        "DialogflowAudioClient: Created new session: {}".format(self.session_id))
                 session = self.session_client.session_path(
                     self.project_id, self.session_id)
 
