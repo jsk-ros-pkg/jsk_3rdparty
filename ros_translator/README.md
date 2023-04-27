@@ -12,11 +12,11 @@ roslaunch ros_translator demo
 And then, please input any text to `xterm` prompt. You will get a translated text.
 
 ```bash
-Input any text >いづれの御時にか、女御、更衣あまた候ひ給ひける中に、いとやむごとなき際にはあらぬが、すぐれて時めき給ふありけり。
+Input any text >沙羅双樹の花の色、盛者必衰の理をあらはす
 ```
 
 ```bash
-[INFO] [WallTime: 1682560250.555090] [node:/demo_output_node] [func:DEMO.callback]: Translated text: On some occasion, while the nyogo is wearing a lot of clothes, it's not an unavoidable moment, but the excitement is excellent.
+[INFO] [WallTime: 1682560820.715069] [node:/demo_output_node] [func:DEMO.callback]: Translated text: The color of the flowers of the sal tree reveals the reason why prosperity must decline
 ```
 
 ## `ros_translator_node.py` Interface
