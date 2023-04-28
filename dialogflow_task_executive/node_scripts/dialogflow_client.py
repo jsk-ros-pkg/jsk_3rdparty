@@ -83,9 +83,9 @@ class DialogflowBase(object):
                 credentials_json
             )
             self.project_id = credentials.project_id
-            if rospy.has_param("~project_id"):
+            if rospy.has_param("~project_id") and rospy.get_param("~override_project_id", False):
                 self.project_id = rospy.get_param("~project_id")
-                rospy.logwarn("overridd project_id")
+                rospy.logwarn("override project_id")
                 rospy.logwarn("   from : project_id in a credential file {}".format(credentials.project_id))
                 rospy.logwarn("     to : project_id stored in rosparam   {}".format(self.project_id))
             self.session_client = df.SessionsClient(
