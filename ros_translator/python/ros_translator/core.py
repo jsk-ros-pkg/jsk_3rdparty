@@ -60,18 +60,18 @@ class ROSTranslator(object):
 
   def translate(self, text):
 
-    if self.engine is not None:
-      if self.translator == 'yandex':
-        return self.engine.translate(source=self.from_language,
-                                     target=self.to_language,
-                                     text=text)
-      elif self.translator == 'microsoft':
-        return self.engine.translate(text)
-      else:
-        return self.engine.translate(text)
-    else:
+    if self.engine is None:
       rospy.logwarn('Engine not loaded.')
       return ''
+
+    if self.translator == 'yandex':
+      return self.engine.translate(source=self.from_language,
+                                   target=self.to_language,
+                                   text=text)
+    elif self.translator == 'microsoft':
+      return self.engine.translate(text)
+    else:
+      return self.engine.translate(text)
 
   def callback(self, msg):
 
