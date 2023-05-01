@@ -1,1 +1,1 @@
-deep_translator
+deep_translator==1.5.0
