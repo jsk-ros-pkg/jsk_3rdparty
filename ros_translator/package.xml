@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>ros_translator</name>
-  <version>0.0.0</version>
+  <version>2.1.24</version>
   <description>The ros_translator package</description>
 
-  <maintainer email="sktometometo@todo.todo">sktometometo</maintainer>
+  <maintainer email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</author>
 
-  <license>TODO</license>
+  <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
