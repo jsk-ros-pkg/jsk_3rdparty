@@ -3,6 +3,12 @@ project(ros_translator)
 
 find_package(catkin REQUIRED COMPONENTS dynamic_reconfigure catkin_virtualenv)
 
+if(NOT (("$ENV{ROS_DISTRO}" STREQUAL "noetic") OR
+        ("$ENV{ROS_DISTRO}" STREQUAL "melodic")))
+    message(WARNINIG "ros_translator can only be built for melodic and noetic")
+    return()
+endif()
+
 catkin_python_setup()
 
 catkin_generate_virtualenv(
