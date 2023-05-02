@@ -27,6 +27,7 @@ catkin_package(
 )
 
 catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
   CHECK_VENV FALSE
   )
 
