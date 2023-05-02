@@ -20,6 +20,7 @@ class ParrotNode(object):
             blocking=True,
             sound_action=tts_action_name,
         )
+        self.conf_thresh = rospy.get_param('~confidence_threshold',0.8)
 
     def _sub_cb(self, msg):
         if len(msg.confidence) > 0:
