@@ -271,7 +271,7 @@ class DialogflowAudioClient(DialogflowBase):
             volume=self.volume)
 
         # for japanese or utf-8 languages
-        if self.language == 'ja-JP' and sys.version <= 2:
+        if self.language == 'ja-JP' and sys.version_info.major <= 2:
             msg.arg = result.fulfillment_text.encode('utf-8')
         else:
             msg.arg = result.fulfillment_text

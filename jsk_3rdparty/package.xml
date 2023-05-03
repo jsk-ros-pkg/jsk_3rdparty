@@ -52,6 +52,7 @@
   <run_depend>lpg_planner</run_depend>
   <run_depend>mini_maxwell</run_depend>
   <run_depend>nlopt</run_depend>
+  <run_depend>osqp</run_depend>
   <run_depend>python_twitter</run_depend>
   <run_depend>python_twoauth</run_depend>
   <run_depend>slic</run_depend>

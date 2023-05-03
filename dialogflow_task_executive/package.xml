@@ -28,6 +28,7 @@
 
   <export>
     <pip_requirements>requirements.txt</pip_requirements>
+    <app_manager app_dir="${prefix}/apps"/>
   </export>
 
 </package>

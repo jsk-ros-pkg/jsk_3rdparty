@@ -1,0 +1,12 @@
+<launch>
+
+  <arg name="account_info" />
+  <arg name="output" default="screen"/>
+
+  <param name="account_info" value="$(arg account_info)" />
+  <node name="tweet"
+        pkg="rostwitter" type="tweet.py"
+        output="$(arg output)" respawn="true" >
+  </node>
+
+</launch>
