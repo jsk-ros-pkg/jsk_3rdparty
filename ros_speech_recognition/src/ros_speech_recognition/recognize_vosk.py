@@ -4,6 +4,7 @@
 from speech_recognition import *
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 from vosk import Model, KaldiRecognizer
+import json
 
 def recognize_vosk(self, audio_data, model_path=None, language='en'):
 
@@ -20,7 +21,7 @@ def recognize_vosk(self, audio_data, model_path=None, language='en'):
 
     rec.AcceptWaveform(audio_data.get_raw_data(convert_rate=16000, convert_width=2));
     finalRecognition = rec.FinalResult()
-
-    return finalRecognition
+    text = json.loads(finalRecognition)['text']
+    return text
 
 RecognizerEx.recognize_vosk = recognize_vosk
