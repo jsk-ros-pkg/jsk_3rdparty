@@ -14,15 +14,10 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
-if($ENV{ROS_DISTRO} STRGREATER "melodic")
-  catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
+  CHECK_VENV FALSE
     )
-else()
-  catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python2
-    )
-endif()
 
 file(GLOB PYTHON_SCRIPT_FILES scripts/*.py test/*.py)
 catkin_install_python(
