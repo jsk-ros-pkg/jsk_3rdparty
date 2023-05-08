@@ -5,6 +5,7 @@
   <arg name="namespace" default="/"/>
   <arg name="rosserial_name" default="seiral_node" />
   <arg name="gui" default="true" />
+  <arg name="camera_info" default="timer_cam_info.yaml"/>
 
   <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
     <arg name="port" value="$(arg port)" />
@@ -23,7 +24,7 @@
       <remap from="~input" to="$(arg image)"/>
       <remap from="~camera_info" to="timer_cam_image/camera_info"/>
       <rosparam subst_value="true">
-        yaml_filename: $(find m5stack_ros)/config/timer_cam_info.yaml
+        yaml_filename: $(find m5stack_ros)/config/$(arg camera_info)
         sync_image: true
       </rosparam>
     </node>
