@@ -1,22 +1,32 @@
 # file to override recognize_vosk
 # we need this to use vosk model anywhere
 
-from speech_recognition import *
+from speech_recognition import AudioData
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 from vosk import Model, KaldiRecognizer
 import json
+import os.path as osp
+import rospkg
+import rospy
 
-def recognize_vosk(self, audio_data, model_path=None, language='en'):
+def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
 
     assert isinstance(audio_data, AudioData), "Data must be audio data"
 
     if not hasattr(self, 'vosk_model'):
-        if model_path is not None:
-            self.vosk_model = Model(model_path)
-        else:
-            print("Please download the model from https://alphacephei.com/vosk/models and specify its path as 'vosk_model_path'.")
-            exit (1)
-
+        if model_path is None:
+            PKG = 'ros_speech_recognition'
+            rp = rospkg.RosPack()
+            data_path = osp.join(rp.get_path(PKG), 'trained_data')
+            if language == 'en-US':
+                model_path = osp.join(data_path, 'vosk-model-small-en-us-0.15')
+            elif language == 'ja':
+                model_path = osp.join(data_path, 'vosk-model-small-ja-0.22')
+            else:
+                rospy.logerr("Unsupported language: {0}.\n Please download the model from https://alphacephei.com/vosk/models and specify its path as 'vosk_model_path'.".format(language))
+                exit (1)
+        rospy.loginfo("Loading model from {}".format(model_path))
+        self.vosk_model = Model(model_path)
     rec = KaldiRecognizer(self.vosk_model, 16000);
 
     rec.AcceptWaveform(audio_data.get_raw_data(convert_rate=16000, convert_width=2));
