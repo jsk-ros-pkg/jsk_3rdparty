@@ -223,8 +223,11 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
 * `~vosk_model_path` (`String`, default: `None`)
 
-  Path to model for Vosk API that can be downloaded from [Model list](https://alphacephei.com/vosk/models).
+  Path to trainded model for Vosk API.
   This is valid only if `~engine` is `Vosk`.
+
+  If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
+  To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
   
 ## Author
 
