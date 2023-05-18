@@ -19,6 +19,12 @@ from audio_common_msgs.msg import AudioData
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool, Int32, ColorRGBA
 from dynamic_reconfigure.server import Server
+
+# https://stackoverflow.com/questions/21367320/searching-for-equivalent-of-filenotfounderror-in-python-2
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 try:
     from pixel_ring import usb_pixel_ring_v2
 except (IOError, FileNotFoundError) as e:
