@@ -17,10 +17,12 @@ catkin_package()
 if($ENV{ROS_DISTRO} STRGREATER "melodic")
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
+    CHECK_VENV FALSE
     )
 else()
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python2
+    CHECK_VENV FALSE
     )
 endif()
 
