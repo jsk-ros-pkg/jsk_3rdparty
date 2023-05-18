@@ -41,15 +41,17 @@ catkin_generate_virtualenv(
 # euslisp
 file(GLOB EUSLISP_SCRIPTS scripts/*.l)
 install(FILES ${EUSLISP_SCRIPTS}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/)
 
 # python
 file(GLOB PYTHON_SCRIPTS scripts/*.py)
 catkin_install_python(
   PROGRAMS ${PYTHON_SCRIPTS}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/)
+file(GLOB PYTHON_TEST_SCRIPTS test/*.py)
+catkin_install_python(PROGRAMS ${PYTHON_TEST_SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test/)
+
 # python requirements
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
@@ -70,4 +72,7 @@ if(CATKIN_ENABLE_TESTING)
   add_rostest(test/import.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
     )
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
 endif()

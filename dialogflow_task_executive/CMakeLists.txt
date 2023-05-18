@@ -70,11 +70,12 @@ else()
 endif()
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
-
 catkin_install_python(
   PROGRAMS ${NODE_SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
+file(GLOB PYTHON_TEST_SCRIPTS test/*.py)
+catkin_install_python(PROGRAMS ${PYTHON_TEST_SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test/)
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
@@ -82,6 +83,9 @@ install(DIRECTORY launch
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS roslaunch)
+  find_package(catkin REQUIRED COMPONENTS roslaunch rostest)
   roslaunch_add_file_check(launch)
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
 endif()

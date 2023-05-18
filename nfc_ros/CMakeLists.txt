@@ -27,12 +27,22 @@ catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
     CHECK_VENV FALSE
 )
-catkin_install_python(PROGRAMS
-  node_scripts/nfc_ros_node.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
+catkin_install_python(
+  PROGRAMS ${NODE_SCRIPTS_FILES}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
+file(GLOB PYTHON_TEST_SCRIPTS test/*.py)
+catkin_install_python(PROGRAMS ${PYTHON_TEST_SCRIPTS}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test/)
 
 install(FILES requirements.txt
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
+endif()
 endif()
