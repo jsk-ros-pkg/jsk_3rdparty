@@ -28,6 +28,9 @@ class TestRospyNode(unittest.TestCase):
             if not os.path.exists(full_scripts_dir):
                 continue
             for filename in [f for f in map(lambda x: os.path.join(full_scripts_dir, x), os.listdir(full_scripts_dir)) if os.path.isfile(f) and f.endswith('.py')]:
+                if filename.endswith('/helper.py'):
+                    print("{} depends on dialogflow_task_executive. However, when we add this to the <depend> of package.xml, it appempts to build venv using 'dialogflow_task_executive/requirements.txt'. This requires having the same PYTHON_INTERPRETER for both dialogflow and chat ros package. The issue is that dialogflow_task_executive heavily relies on system Python modules, including ROS, making it difficult to use dialogflow with Python3 on Melodic".format(filename))
+                    continue
                 print("Check if {} is loadable".format(filename))
                 # https://stackoverflow.com/questions/4484872/why-doesnt-exec-work-in-a-function-with-a-subfunction
                 exec(open(filename, encoding='utf-8').read()) in globals(), locals()
