@@ -86,6 +86,6 @@ if(CATKIN_ENABLE_TESTING)
   find_package(catkin REQUIRED COMPONENTS roslaunch rostest)
   roslaunch_add_file_check(launch)
   add_rostest(test/test_rospy_node.test
-    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv ${PROJECT_NAME}_generate_messages
   )
 endif()
