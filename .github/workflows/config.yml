@@ -133,6 +133,8 @@ jobs:
             EXTRA_DEB : "python-lxml"
           - ROS_DISTRO: melodic
             CONTAINER: arm64v8/ros:melodic-perception-bionic
+          - ROS_DISTRO: noetic
+            CONTAINER: arm64v8/ros:noetic-perception-focal
     steps:
       - uses: actions/checkout@v2.1.0
         with:
