@@ -44,6 +44,9 @@ catkin_package(
 )
 
 catkin_generate_virtualenv(
+  # specify python version
+  # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/367/files
+  PYTHON_INTERPRETER "python$ENV{ROS_PYTHON_VERSION}"
   # Disable creating a unit test to verify that package requirements are locked.
   # # commented out for python3, which uses concurrent.futures
   # # futures==3.3.0
