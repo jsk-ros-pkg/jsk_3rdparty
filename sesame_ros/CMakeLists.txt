@@ -32,17 +32,10 @@ endif()
 
 include_directories()
 
-file(GLOB NODE_SCRIPTS_FILES node_scripts/*)
+file(GLOB PYTHON_SCRIPT_FILES node_scripts/* scripts/* test/*.py)
 catkin_install_python(
-  PROGRAMS ${NODE_SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
-file(GLOB SCRIPTS_FILES scripts/*)
-catkin_install_python(
-  PROGRAMS ${SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/)
-file(GLOB PYTHON_TEST_SCRIPTS test/*.py)
-catkin_install_python(PROGRAMS ${PYTHON_TEST_SCRIPTS}
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test/)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
