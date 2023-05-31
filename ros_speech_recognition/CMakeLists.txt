@@ -24,11 +24,10 @@ else()
     )
 endif()
 
-file(GLOB SCRIPT_PROGRAMS scripts/*.py)
+file(GLOB PYTHON_SCRIPT_FILES scripts/*.py test/*.py)
 catkin_install_python(
-  PROGRAMS ${SCRIPT_PROGRAMS}
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/
-)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
@@ -42,4 +41,7 @@ if(CATKIN_ENABLE_TESTING)
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
   roslaunch_add_file_check(launch/speech_recognition.launch)
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
 endif()
