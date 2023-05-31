@@ -10,9 +10,6 @@ if(NOT (gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch6
   third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:306: Error: bad register name `%rbp'
   third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:308: Error: bad register expression
   third_party/boringssl-with-bazel/src/crypto/hrss/asm/poly_rq_mul.S:309: Error: bad register name `%rsp'")
-  find_package(catkin)
-  catkin_package()
-  return()
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
@@ -42,7 +39,11 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+if(NOT(gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch64-.*"))
+  message(WARNING "pip -i requirements.txt with grpcio works only with i686, so create dummy requirements.txt and run 'catkin_generate_virtualenv' for ${gcc_dump_machine}")
+  file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt "")
+  catkin_generate_virtualenv(CHECK_VENV FALSE)
+elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   message(WARNING "following requirements.txt syntax is not support on 14.04")
   message(WARNING "google-api-core[grpc]==1.31.5  # via google-cloud-language")
   message(WARNING "so we intentionally use requirements.txt")
@@ -69,12 +70,10 @@ else()
     )
 endif()
 
-file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
-
+file(GLOB PYTHON_SCRIPT_FILES node_scripts/*.py test/*.py)
 catkin_install_python(
-  PROGRAMS ${NODE_SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
@@ -82,6 +81,13 @@ install(DIRECTORY launch
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS roslaunch)
+  find_package(catkin REQUIRED COMPONENTS roslaunch rostest)
   roslaunch_add_file_check(launch)
+  if(NOT (gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch64-.*"))
+    message(WARNING "pip -i requirements.txt work only with i686, so skipping test for ${gcc_dump_machine}")
+  else()
+    add_rostest(test/test_rospy_node.test
+      DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv ${PROJECT_NAME}_generate_messages
+    )
+  endif()
 endif()
