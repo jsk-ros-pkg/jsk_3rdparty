@@ -15,6 +15,17 @@ Before using this package, you have to prepare a circuit connecting your sensor 
 - Install dependency of `bl_force_torque_sensor_ros` (e.g., by `rosdep install`) and build `bl_force_torque_sensor_ros` (e.g., by `catkin build`)
   - See http://wiki.ros.org/rosdep#Install_dependency_of_all_packages_in_the_workspace for `rosdep` usage
 
+  For example:
+  ```bash
+  mkdir -p ~/ws_bl_force_torque_sensor_ros/src
+  cd ~/ws_bl_force_torque_sensor_ros/src
+  git clone https://github.com/pazeshun/jsk_3rdparty.git -b bl_force_torque_sensor_ros
+  rosdep install -y -r --ignore-src --from-paths jsk_3rdparty/bl_force_torque_sensor_ros
+  cd ..
+  catkin build bl_force_torque_sensor_ros
+  source ~/ws_bl_force_torque_sensor_ros/devel/setup.bash  # Do this every time you open a new terminal
+  ```
+
 - If you prepare a circuit using Arduino,
   - [Setup Arduino IDE for rosserial](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup#Install_ros_lib_into_the_Arduino_Environment). Note that you must do it after sourcing `setup.bash` of the workspace including `bl_force_torque_sensor_ros`. If you did it without sourcing correctly, do it again
   - Upload corresponding firmware to your Arduino. E.g., upload `arduino/sensor_driver_raw_rmd_ads131m04/sensor_driver_raw_rmd_ads131m04.ino` when your circuit uses ADS131M04 for RMD amplifier
