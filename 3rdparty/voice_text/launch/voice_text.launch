@@ -14,7 +14,8 @@
         machine="$(arg voice_text_machine)">
     <remap from="text_to_speech" to="voice_text/text_to_speech" />
     <rosparam>
-      # db_path: /usr/vt/sayaka/M16  # Commented out to support other speakers than SAYAKA
+      db_path: /usr/vt/sayaka/M16  # Commented out to support other speakers than SAYAKA
+      license_path: /usr/vt/sayaka/M16/data-common/verify/verification.txt
       pitch: 100
       speed: 100
       volume: 100
