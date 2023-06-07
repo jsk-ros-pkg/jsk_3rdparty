@@ -135,13 +135,13 @@ class ROSSpeechRecognition(object):
             self.act_sound = None
         self.signals = {
             "start": rospy.get_param("~start_signal",
-                                     "/usr/share/sounds/ubuntu/stereo/bell.ogg"),
+                                     "/usr/share/sounds/freedesktop/stereo/bell.ogg"),
             "recognized": rospy.get_param("~recognized_signal",
-                                          "/usr/share/sounds/ubuntu/stereo/button-toggle-on.ogg"),
+                                          "/usr/share/sounds/freedesktop/stereo/message.ogg"),
             "success": rospy.get_param("~success_signal",
-                                       "/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg"),
+                                       "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"),
             "timeout": rospy.get_param("~timeout_signal",
-                                       "/usr/share/sounds/ubuntu/stereo/window-slide.ogg"),
+                                       "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
         }
 
 
