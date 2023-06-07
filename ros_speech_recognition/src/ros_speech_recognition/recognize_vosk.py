@@ -3,7 +3,12 @@
 
 from speech_recognition import AudioData
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
-from vosk import Model, KaldiRecognizer
+try:
+    from vosk import Model, KaldiRecognizer
+except ImportError as e:
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    print(bold_red + str(e)+'\nvsok is not installed try "pip install vosk"' + reset)
 import json
 import os.path as osp
 import rospkg

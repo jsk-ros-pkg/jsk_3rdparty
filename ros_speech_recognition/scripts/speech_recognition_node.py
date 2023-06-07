@@ -189,6 +189,7 @@ class ROSSpeechRecognition(object):
                 "speech_recognition/stop",
                 Empty, self.speech_recogniton_stop_srv_cb)
         else:
+            rospy.loginfo("Disabled continuous mode, waiting for speech_recognition service")
             self.srv = rospy.Service("speech_recognition",
                                      SpeechRecognition,
                                      self.speech_recognition_srv_cb)
