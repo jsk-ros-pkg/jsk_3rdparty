@@ -16,10 +16,21 @@ add_custom_target(${PROJECT_NAME}_install_trained_data ALL COMMAND python$ENV{RO
 
 catkin_package()
 
+if($ENV{ROS_DISTRO} STREQUAL "indigo")
+  message(WARNING "SpeechRecognition==3.9.0 and vosk do not work on Python 3.4, which available on Indigo")
+  message(WARNING "so we only use old SpeechRecognition without vosk")
+  file(COPY requirements.txt.indigo DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
+else()
 catkin_generate_virtualenv(
   PYTHON_INTERPRETER python3
   CHECK_VENV FALSE
     )
+endif()
 
 file(GLOB PYTHON_SCRIPT_FILES scripts/*.py test/*.py)
 catkin_install_python(
