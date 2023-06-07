@@ -25,6 +25,8 @@
   <run_depend>sound_play</run_depend>
   <run_depend>sound-theme-freedesktop</run_depend>
   <run_depend>speech_recognition_msgs</run_depend>
+  <run_depend>python3-pycryptodome</run_depend> <!-- melodic requries to install python3-pycryptodome for rosbag with python3 -->
+  <run_depend>python3-gnupg</run_depend>
 
   <test_depend>rostest</test_depend>
   <test_depend>roslaunch</test_depend>
