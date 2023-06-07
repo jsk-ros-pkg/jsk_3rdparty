@@ -1,4 +1,4 @@
-# file to override recognize_vosk
+# file to override recognize_vosk ( https://github.com/Uberi/speech_recognition/blob/3.9.0/speech_recognition/__init__.py#L1711 )
 # we need this to use vosk model anywhere
 
 from speech_recognition import AudioData
