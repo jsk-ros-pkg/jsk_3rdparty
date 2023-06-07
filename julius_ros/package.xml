@@ -19,6 +19,7 @@
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-rospkg</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>sound_play</exec_depend>
+  <exec_depend>sound-theme-freedesktop</exec_depend>
   <exec_depend>speech_recognition_msgs</exec_depend>
   <exec_depend>std_srvs</exec_depend>
 

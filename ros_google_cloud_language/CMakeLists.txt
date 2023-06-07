@@ -44,6 +44,9 @@ catkin_package(
 )
 
 catkin_generate_virtualenv(
+  # specify python version
+  # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/367/files
+  PYTHON_INTERPRETER "python$ENV{ROS_PYTHON_VERSION}"
   # Disable creating a unit test to verify that package requirements are locked.
   # # commented out for python3, which uses concurrent.futures
   # # futures==3.3.0
@@ -52,12 +55,10 @@ catkin_generate_virtualenv(
 
 include_directories()
 
-file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
-file(GLOB SCRIPTS_FILES scripts/*.py)
+file(GLOB PYTHON_SCRIPT_FILES node_scripts/*.py test/*.py)
 catkin_install_python(
-  PROGRAMS ${NODE_SCRIPTS_FILES} ${SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch samples
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
@@ -68,3 +69,7 @@ install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_rospy_node.test)
+endif()
