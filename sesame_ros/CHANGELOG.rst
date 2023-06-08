@@ -2,6 +2,12 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
+* Explicit python interpreter in catkin_virtualenv (`#367 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/367>`_)
+* Contributors: Kei Okada, Shingo Kitagawa, Yoshiki Obinata
+
 2.1.24 (2021-07-26)
 -------------------
 

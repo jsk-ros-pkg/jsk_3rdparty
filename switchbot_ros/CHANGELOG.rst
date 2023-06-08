@@ -2,6 +2,21 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [switchbot_ros] add actionlib_msgs and std_msgs as build_depend (`#357 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/357>`_)
+* [switchbot_ros] add obinata as maintainer for switchbot_ros (`#358 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/358>`_)
+* Pr/add switchbot device list publisher (`#344 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/344>`_)
+* [switchbot_ros] update switchbot_ros client (`#345 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/345>`_)
+* [chaplus_ros][switchbot_ros]fix exec_depend in ros noetic (`#332 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/332>`_)
+* [switchbot_ros] update ReadMe.md (`#324 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/324>`_)
+* [switchbot_ros] Sort device_list (`#331 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/331>`_)
+* [switchbot_ros] remove catching base exception and output more specific key error when the switchbot id not exists on the server (`#321 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/321>`_)
+* add install section to switchbot_ros/CMakeLists.txt (`#294 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/294>`_)
+* [switchbot_ros] use python setup to avoid relative import in switchbot_ros (`#278 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/278>`_)
+* [switchbot_ros] catch the exception when init the node (`#279 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/279>`_)
+* Contributors: Kei Okada, Koki Shinjo, Naoya Yamaguchi, Shingo Kitagawa, Yoshiki Obinata, Iory Yanokura
+
 2.1.24 (2021-07-26)
 -------------------
 

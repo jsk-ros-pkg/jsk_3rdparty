@@ -2,6 +2,12 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Pr/use sound themes freedesktop (`#472 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/472>`_)
+* add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
+* Contributors: Kei Okada, Koki Shinjo
+
 2.1.24 (2021-07-26)
 -------------------
 

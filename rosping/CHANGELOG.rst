@@ -2,6 +2,14 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
+
+  * pgm_learner/respeaker_ros/ros_speech_recognition/rosping: increase time-limit/wait-time
+
+* Contributors: Kei Okada, Shingo Kitagawa, Yoshiki Obinata
+
 2.1.24 (2021-07-26)
 -------------------
 

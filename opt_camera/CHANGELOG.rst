@@ -2,6 +2,11 @@
 Changelog for package opt_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [opt_camera] remove compile warning (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

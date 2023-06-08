@@ -2,6 +2,14 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+
+  * [libcmt] remove compile warning
+
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

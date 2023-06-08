@@ -2,6 +2,33 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ros_speech_recognition] Add vosk engine (`#474 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/474>`_)
+* Pr/use sound themes freedesktop (`#472 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/472>`_)
+* add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
+* add self.conf_thresh in __init_\_ function (`#457 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/457>`_)
+* [ros_speech_recognition] add ubuntu-sounds dependency (`#453 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/453>`_)
+* [ros_speech_recognition] Return if result is empty (`#443 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/443>`_)
+* [ros_speece_recognition] Set confidence value of google (`#434 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/434>`_)
+* [ros_speech_recognition] add parrotry.launch (`#414 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/414>`_)
+* [ros\_ speech_recognition] update default arg for speech_recognition.launch (`#412 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/412>`_)
+* [ros_speech_recogniton, respeaker_ros] add confidence field (`#411 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/411>`_)
+* [ros_speech_recognition] add self cancellation for speech recogntion (`#413 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/413>`_)
+* [`#405 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/405>`_ and `#410 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/410>`_] Fix CI (`#415 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/415>`_)
+* add ROS interface for https://cloud.google.com/natural-language (`#304 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/304>`_)
+* GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
+
+  * pgm_learner/respeaker_ros/ros_speech_recognition/rosping: increase time-limit/wait-time
+
+* Explicit python interpreter in catkin_virtualenv (`#367 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/367>`_)
+* .github/workflow:  integrate all yaml to one (`#338 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/338>`_)
+* [ros_speech_recognition] Fixed the behavior of launch file (`#336 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/336>`_)
+* [ros_speech_recognition] add auto_start in speech_recognition_node.py (`#301 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/301>`_)
+* [ros_speech_recognition] add SpeechRecognitionCandidatesToString node (`#303 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/303>`_)
+* Enable sound play flag (`#315 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/315>`_)
+* Contributors: Aiko Ichikura, Aoi Nakane, Kei Okada, Koki Shinjo, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa, Yoshiki Obinata, Iory Yanokura
+
 2.1.24 (2021-07-26)
 -------------------
 

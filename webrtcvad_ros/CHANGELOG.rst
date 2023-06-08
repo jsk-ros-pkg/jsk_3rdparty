@@ -1,14 +1,15 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package ffha
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package webrtcvad_ros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Forthcoming
 -----------
-* fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+* webrtcvad_ros: fix release version in package.xml (`#348 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/348>`_)
+* [webrtcvad_ros] update CMakeLists.txt and package.xml (`#282 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/282>`_)
+* webrtcvad_ros: fix release version in package.xml (`#348 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/348>`_)
+* [webrtcvad_ros] add webrtcvad_ros package (`#282 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/282>`_)
 
-  * [ffha] remove compile warning
-
-* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+* Contributors: Kei Okada, Koki Shinjo, Shingo Kitagawa
 
 2.1.24 (2021-07-26)
 -------------------
@@ -31,19 +32,17 @@ Forthcoming
 2.1.18 (2020-07-20)
 -------------------
 
-2.1.17 (2020-04-16)
--------------------
+2.1.17 (2020-04-16 21:51)
+-------------------------
 
-2.1.16 (2020-04-16)
--------------------
+2.1.16 (2020-04-16 15:21)
+-------------------------
 
 2.1.15 (2019-12-12)
 -------------------
 
 2.1.14 (2019-11-21)
 -------------------
-* add website to package.xml (`#175 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/175>`_), closes `#174 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/174>`_
-* Contributors: Kei Okada
 
 2.1.13 (2019-07-10)
 -------------------
@@ -110,20 +109,15 @@ Forthcoming
 
 2.0.13 (2015-12-15)
 -------------------
-* [ffha] Use http instead of https
-  closes https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/45
-  Modified:
-  3rdparty/ffha/Makefile
-* Contributors: Ryohei Ueda
 
 2.0.12 (2015-11-26)
 -------------------
 
-2.0.11 (2015-10-07)
--------------------
+2.0.11 (2015-10-07 14:16)
+-------------------------
 
-2.0.10 (2015-10-07)
--------------------
+2.0.10 (2015-10-07 12:47)
+-------------------------
 
 2.0.9 (2015-09-26)
 ------------------
@@ -149,15 +143,11 @@ Forthcoming
 2.0.2 (2015-06-29)
 ------------------
 
-2.0.1 (2015-06-19)
-------------------
+2.0.1 (2015-06-19 21:21)
+------------------------
 
-2.0.0 (2015-06-19)
-------------------
-* move from jsk_common to jsk_3rdparty
-
-1.0.72 (2015-06-07)
--------------------
+2.0.0 (2015-06-19 10:41)
+------------------------
 
 1.0.71 (2015-05-17)
 -------------------
@@ -165,11 +155,11 @@ Forthcoming
 1.0.70 (2015-05-08)
 -------------------
 
-1.0.69 (2015-05-05)
--------------------
+1.0.69 (2015-05-05 12:28)
+-------------------------
 
-1.0.68 (2015-05-05)
--------------------
+1.0.68 (2015-05-05 09:49)
+-------------------------
 
 1.0.67 (2015-05-03)
 -------------------
@@ -182,8 +172,6 @@ Forthcoming
 
 1.0.64 (2015-03-29)
 -------------------
-* use jsk-ros-pkg/archives for downloading ffha source
-* Contributors: Yuki Furuta
 
 1.0.63 (2015-02-19)
 -------------------
@@ -194,13 +182,11 @@ Forthcoming
 1.0.61 (2015-02-11)
 -------------------
 
-1.0.60 (2015-02-03)
--------------------
+1.0.60 (2015-02-03 10:12)
+-------------------------
 
-1.0.59 (2015-02-03)
--------------------
-* Remove rosbuild files
-* Contributors: Ryohei Ueda
+1.0.59 (2015-02-03 04:05)
+-------------------------
 
 1.0.58 (2015-01-07)
 -------------------
@@ -223,11 +209,11 @@ Forthcoming
 1.0.52 (2014-10-23)
 -------------------
 
-1.0.51 (2014-10-20)
--------------------
+1.0.51 (2014-10-20 16:01)
+-------------------------
 
-1.0.50 (2014-10-20)
--------------------
+1.0.50 (2014-10-20 01:50)
+-------------------------
 
 1.0.49 (2014-10-13)
 -------------------
@@ -244,11 +230,11 @@ Forthcoming
 1.0.45 (2014-09-29)
 -------------------
 
-1.0.44 (2014-09-26)
--------------------
+1.0.44 (2014-09-26 09:17)
+-------------------------
 
-1.0.43 (2014-09-26)
--------------------
+1.0.43 (2014-09-26 01:08)
+-------------------------
 
 1.0.42 (2014-09-25)
 -------------------
@@ -263,6 +249,9 @@ Forthcoming
 -------------------
 
 1.0.38 (2014-09-13)
+-------------------
+
+1.0.37 (2014-09-08)
 -------------------
 
 1.0.36 (2014-09-01)
@@ -291,8 +280,6 @@ Forthcoming
 
 1.0.28 (2014-06-24)
 -------------------
-* (ffha) use -n (--forward) to ignore patches that seem to be already applied
-* Contributors: Kei Okada
 
 1.0.27 (2014-06-10)
 -------------------
@@ -320,15 +307,9 @@ Forthcoming
 
 1.0.19 (2014-05-06)
 -------------------
-* add find_package(catkin)
-* Add several missing build deps
-* ff, ffha: add CHANGELOG.rst
-* Contributors: Scott K Logan, Kei Okada
 
 1.0.18 (2014-05-04)
 -------------------
-* catkinize ffha
-* Contributors: Kei Okada
 
 1.0.17 (2014-04-20)
 -------------------
@@ -383,8 +364,3 @@ Forthcoming
 
 1.0.0 (2014-03-05)
 ------------------
-* add dependencies of ffha
-* add patch for parse.c, segv if last condition of inititial state is 'not-condition' in problem
-* remove strange exit(-1) for use non DNF preconditions
-* put jsk tools in jsk_common stack
-* Contributors: Yuki Furuta, rosen, Manabu Saito

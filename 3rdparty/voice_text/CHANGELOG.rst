@@ -2,6 +2,13 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
+* Restart voice text if verification fails (`#300 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/300>`_)
+* Add verification check rosinfo (`#298 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/298>`_)
+* Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa, Yoshiki Obinata
+
 2.1.24 (2021-07-26)
 -------------------
 

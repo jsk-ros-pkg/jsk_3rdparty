@@ -2,6 +2,32 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* gdrive_ros: use virtualenv (`#458 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/458>`_)
+
+  * use python3 for pydrive_ros
+    latest pydrive requires newer rsa??
+  * gdrive_ros: catkin_virtualenv changes mode to 100644
+  * gdrive_ros: enable to use relative path for settings_yaml
+  * gdrive_ros: use catkin_virtualenv
+
+* [gdrive_ros] fix sys.version error (`#429 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/429>`_)
+* [gdrive_ros] Add ros client library and examples ( for roseus and rospy) (`#295 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/295>`_)
+
+  * euslisp directory is installed via 'install(DIRECTORY euslisp', so we can remove 'install(PROGRAMS euslisp/sample-gdrive-ros-client.l'
+  * [gdrive_ros] fix module import
+  * [gdrive_ros] add rospy client and update examples
+  * [gdrive_ros] update CMakeLists.txt to add installation of euslisp and sample
+  * [gdrive_ros] Add a roseus client library and sample
+  * [gdrive_ros] add gdrive_ros client
+
+* [gdrive_ros] add machine arg in gdrive_server.launch (`#288 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/288>`_)
+
+  * add machine arg in gdrive_server.launch
+
+* Contributors: Aoi Nakane, Kei Okada, Koki Shinjo, Naoto Tsukamoto, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

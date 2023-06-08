@@ -2,6 +2,11 @@
 Changelog for package google_cloud_texttospeech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [google_cloud_texttospeech] Add cache option (`#267 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/267>`_)
+* Contributors: Kei Okada, Iory Yanokura
+
 2.1.24 (2021-07-26)
 -------------------
 
