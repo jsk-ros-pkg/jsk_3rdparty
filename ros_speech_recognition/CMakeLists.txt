@@ -12,15 +12,28 @@ generate_dynamic_reconfigure_options(
   cfg/SpeechRecognition.cfg
 )
 
+add_custom_target(${PROJECT_NAME}_install_trained_data ALL COMMAND python$ENV{ROS_PYTHON_VERSION} ${PROJECT_SOURCE_DIR}/scripts/install_trained_data.py)
+
 catkin_package()
 
-if($ENV{ROS_DISTRO} STRGREATER "melodic")
-  catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3
-    )
+execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
+message("-- gcc dumpmachine returns ${gcc_dump_machine}")
+if($ENV{ROS_DISTRO} STREQUAL "indigo" OR
+    (($ENV{ROS_DISTRO} STREQUAL "kinetic") AND (NOT(gcc_dump_machine MATCHES "x86_64-.*"))) OR
+    (($ENV{ROS_DISTRO} STREQUAL "melodic") AND (NOT(gcc_dump_machine MATCHES "x86_64-.*"))))
+  message(WARNING "SpeechRecognition==3.9.0 and vosk does not work on Python 3.4, which available on Indigo")
+  message(WARNING "SpeechRecognition==3.9.0 and vosk does not work on Arm nor i386")
+  message(WARNING "so we only use old SpeechRecognition without vosk")
+  file(COPY requirements.txt.indigo DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
 else()
-  catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python2
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
+  CHECK_VENV FALSE
     )
 endif()
 

@@ -220,6 +220,14 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Auth key for Bing API.  
   This is valid only if `~engine` is `bing`.
+
+* `~vosk_model_path` (`String`, default: `None`)
+
+  Path to trainded model for Vosk API.
+  This is valid only if `~engine` is `Vosk`.
+
+  If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
+  To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
   
 ## Author
 
