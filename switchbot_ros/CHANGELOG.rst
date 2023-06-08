@@ -2,8 +2,8 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [switchbot_ros] add actionlib_msgs and std_msgs as build_depend (`#357 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/357>`_)
 * [switchbot_ros] add obinata as maintainer for switchbot_ros (`#358 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/358>`_)
 * Pr/add switchbot device list publisher (`#344 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/344>`_)

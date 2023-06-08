@@ -2,8 +2,8 @@
 Changelog for package pgm_learner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
 
   * pgm_learner/respeaker_ros/ros_speech_recognition/rosping: increase time-limit/wait-time

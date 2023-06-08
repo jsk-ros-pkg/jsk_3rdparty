@@ -2,8 +2,8 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [rostwitter] use sub and not delete (`#446 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/446>`_)
 * [rostwitter] reduce save file io (`#441 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/441>`_)
 * [rostwitter] Support extracting base64 images and tweet them from text. with jpeg suffix support (`#437 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/437>`_)

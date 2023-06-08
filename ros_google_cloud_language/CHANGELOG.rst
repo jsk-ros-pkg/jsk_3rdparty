@@ -2,8 +2,8 @@
 Changelog for package ros_google_cloud_language
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
 * add ROS interface for https://cloud.google.com/natural-language (`#304 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/304>`_)
   * [ros_google_cloud_language] add syntax result

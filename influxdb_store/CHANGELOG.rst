@@ -2,8 +2,8 @@
 Changelog for package influxdb_store
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [influxdb_store] fix package deps for python3 (`#455 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/455>`_)
 * [influxdb_store] add stop_all_services.bash (`#379 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/379>`_)
 * add influxdb_store package (`#354 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/354>`_)

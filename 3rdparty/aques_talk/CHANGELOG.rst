@@ -2,8 +2,8 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [aques_talk] build as x86 when dpkg cpu check fails (`#387 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/387>`_)
 * GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
 * Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Shingo Kitagawa, Yoshiki Obinata

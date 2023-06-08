@@ -2,8 +2,8 @@
 Changelog for package zdepth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [zdepth, zdepth_image_transport] fix zdepth package version to 2.1.24 (`#427 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/427>`_)
 * add zdepth and zdepth_image_transport package (`#389 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/389>`_)
 * Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Shingo Kitagawa

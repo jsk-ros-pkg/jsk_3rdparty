@@ -2,8 +2,8 @@
 Changelog for package osqp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [OSQP] add a wrapper package for OSQP, which is a library to solve QP (`#442 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/442>`_)
 * Contributors: Kei Okada, Moju Zhao, Naoki Hiraoka, Naoto Tsukamoto
 

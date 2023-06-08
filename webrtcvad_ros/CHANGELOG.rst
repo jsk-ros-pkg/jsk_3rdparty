@@ -2,8 +2,8 @@
 Changelog for package webrtcvad_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * webrtcvad_ros: fix release version in package.xml (`#348 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/348>`_)
 * [webrtcvad_ros] update CMakeLists.txt and package.xml (`#282 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/282>`_)
 * webrtcvad_ros: fix release version in package.xml (`#348 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/348>`_)

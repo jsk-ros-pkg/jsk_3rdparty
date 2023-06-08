@@ -2,8 +2,8 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [OSQP] add a wrapper package for OSQP, which is a library to solve QP (`#442 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/442>`_)
 * [jsk_3rdparty] fix typo in package.xml (`#426 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/426>`_)
 * Add nfc_ros (`#406 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/406>`_)

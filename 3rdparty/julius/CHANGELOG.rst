@@ -2,8 +2,8 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * julius: Use DEB_TARGET_GNU_TYPE to fix https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/467 (`#470 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/470>`_)
 * GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
 * fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)

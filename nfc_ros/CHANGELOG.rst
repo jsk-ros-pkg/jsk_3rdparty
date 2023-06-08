@@ -2,8 +2,8 @@
 Changelog for package nfc_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
 * Add nfc_ros (`#406 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/406>`_)
 * Contributors: Aoi Nakane, Kei Okada, Koki Shinjo, Naoto Tsukamoto, Shingo Kitagawa

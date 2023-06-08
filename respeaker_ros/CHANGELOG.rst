@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
 * [respeaker_ros] add FileNotFoundError in respeaker for python3 (`#428 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/428>`_)
 * [respeaker_ros] Stop timer on shutdown (`#385 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/385>`_)

@@ -2,8 +2,8 @@
 Changelog for package dialogflow_task_executive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * Add option to use project_id from json, instead of credentials (`#460 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/460>`_)
 * add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
 

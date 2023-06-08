@@ -2,8 +2,8 @@
 Changelog for package lpg_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [lpg_planner] install lpg_planner from jsk-ros-pkg/archieve (`#280 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/280>`_)
 * Contributors: Kei Okada, Shingo Kitagawa
 

@@ -2,8 +2,8 @@
 Changelog for package assimp_devel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
 * [assimp_devel] remove compile warning
 * Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa

@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
 * Restart voice text if verification fails (`#300 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/300>`_)
 * Add verification check rosinfo (`#298 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/298>`_)

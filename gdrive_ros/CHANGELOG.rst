@@ -2,8 +2,8 @@
 Changelog for package gdrive_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * gdrive_ros: use virtualenv (`#458 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/458>`_)
 
   * use python3 for pydrive_ros

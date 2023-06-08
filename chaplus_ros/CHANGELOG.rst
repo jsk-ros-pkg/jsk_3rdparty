@@ -2,8 +2,8 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.25 (2023-06-08)
+-------------------
 * [chaplus_ros] support mebo (`#374 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/374>`_)
 * [chaplus_ros] change a3rt urls (`#360 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/360>`_)
 * .github/workflow:  integrate all yaml to one (`#338 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/338>`_)
