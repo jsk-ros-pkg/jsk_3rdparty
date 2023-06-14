@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.26 (2023-06-14)
+-------------------
 * [respeaker_ros] importing does not succeed (`#477 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/477>`_)
 * respeaker_ros: Fix test. we use rosrun .... to run scripts (`#478 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/478>`_)
 * Contributors: Kei Okada, Soonhyo Kim

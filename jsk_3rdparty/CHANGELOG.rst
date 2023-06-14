@@ -2,8 +2,8 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.26 (2023-06-14)
+-------------------
 * add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
 * remove rosbuild packages from jsk_3rdparty/package.xml (`#475 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/475>`_)
 * Contributors: Kei Okada
