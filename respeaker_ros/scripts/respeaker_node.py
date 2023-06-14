@@ -2,65 +2,7 @@
 # -*- coding: utf-8 -*-
 # Author: furushchev <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
-import angles
-from contextlib import contextmanager
-import usb.core
-import usb.util
-import pyaudio
-import math
-import numpy as np
-import tf.transformations as T
-import os
-import rospy
-import struct
-import sys
-import time
-from audio_common_msgs.msg import AudioData
-from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import Bool, Int32, ColorRGBA
-from dynamic_reconfigure.server import Server
-
-# https://stackoverflow.com/questions/21367320/searching-for-equivalent-of-filenotfounderror-in-python-2
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
-try:
-    from pixel_ring import usb_pixel_ring_v2
-except (IOError, FileNotFoundError) as e:
-    rospy.logerr(e)
-    raise RuntimeError("Check the device is connected and recognized")
-
-try:
-    from respeaker_ros.cfg import RespeakerConfig
-except Exception as e:
-    rospy.logerr(e)
-    raise RuntimeError("Need to run respeaker_gencfg.py first")
-
 from respeaker_ros import *
-
-# suppress error messages from ALSA
-# https://stackoverflow.com/questions/7088672/pyaudio-working-but-spits-out-error-messages-each-time
-# https://stackoverflow.com/questions/36956083/how-can-the-terminal-output-of-executables-run-by-python-functions-be-silenced-i
-@contextmanager
-def ignore_stderr(enable=True):
-    if enable:
-        devnull = None
-        try:
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            stderr = os.dup(2)
-            sys.stderr.flush()
-            os.dup2(devnull, 2)
-            try:
-                yield
-            finally:
-                os.dup2(stderr, 2)
-                os.close(stderr)
-        finally:
-            if devnull is not None:
-                os.close(devnull)
-    else:
-        yield
 
 
 class RespeakerNode(object):
