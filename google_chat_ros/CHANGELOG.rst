@@ -2,6 +2,11 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * google_chat_ros_node.py: display project_id, subscription_id (`#459 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/459>`_)

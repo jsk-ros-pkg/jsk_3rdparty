@@ -2,6 +2,11 @@
 Changelog for package osqp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * [OSQP] add a wrapper package for OSQP, which is a library to solve QP (`#442 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/442>`_)

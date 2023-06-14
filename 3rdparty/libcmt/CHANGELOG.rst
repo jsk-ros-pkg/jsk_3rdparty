@@ -2,6 +2,9 @@
 Changelog for package libcmt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.25 (2023-06-08)
 -------------------
 * fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)

@@ -2,6 +2,12 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [respeaker_ros] importing does not succeed (`#477 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/477>`_)
+* respeaker_ros: Fix test. we use rosrun .... to run scripts (`#478 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/478>`_)
+* Contributors: Kei Okada, Soonhyo Kim
+
 2.1.25 (2023-06-08)
 -------------------
 * add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)

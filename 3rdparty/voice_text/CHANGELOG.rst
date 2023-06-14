@@ -2,6 +2,9 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.25 (2023-06-08)
 -------------------
 * GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)

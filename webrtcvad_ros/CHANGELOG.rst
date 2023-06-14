@@ -2,6 +2,11 @@
 Changelog for package webrtcvad_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * webrtcvad_ros: fix release version in package.xml (`#348 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/348>`_)

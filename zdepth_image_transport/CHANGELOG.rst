@@ -2,6 +2,11 @@
 Changelog for package zdepth_image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * [zdepth_image_transport] add readme for zdepth_image_transport (`#430 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/430>`_)

@@ -2,6 +2,11 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * [switchbot_ros] add actionlib_msgs and std_msgs as build_depend (`#357 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/357>`_)

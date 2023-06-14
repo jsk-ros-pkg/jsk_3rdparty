@@ -2,6 +2,11 @@
 Changelog for package zdepth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
 2.1.25 (2023-06-08)
 -------------------
 * [zdepth, zdepth_image_transport] fix zdepth package version to 2.1.24 (`#427 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/427>`_)
