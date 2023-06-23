@@ -36,7 +36,6 @@ generate_messages(
   DEPENDENCIES
   actionlib_msgs
   diagnostic_msgs
-  std_msgs
 )
 
 catkin_package(

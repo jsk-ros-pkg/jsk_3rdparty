@@ -3,8 +3,7 @@ project(google_chat_ros)
 
 find_package(
   catkin REQUIRED COMPONENTS
-  catkin_virtualenv REQUIRED
-  rospy
+  catkin_virtualenv
   actionlib_msgs
   std_msgs
   message_generation
@@ -27,7 +26,9 @@ generate_messages(
   actionlib_msgs
   )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+  )
 
 # generate the virtualenv
 catkin_generate_virtualenv(
@@ -49,11 +50,6 @@ catkin_install_python(
   PROGRAMS ${PYTHON_SCRIPT_FILES}
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# python requirements
-install(FILES requirements.txt
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  )
-
 # launch
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
@@ -61,7 +57,8 @@ install(DIRECTORY launch
 
 # import test
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS catkin_virtualenv rostest)
+  find_package(catkin_virtualenv REQUIRED)
+  find_package(rostest REQUIRED)
   catkin_install_python(
     PROGRAMS test/test_import.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

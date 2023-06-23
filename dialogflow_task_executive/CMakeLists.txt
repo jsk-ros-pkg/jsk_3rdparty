@@ -14,7 +14,6 @@ endif()
 
 find_package(catkin REQUIRED COMPONENTS
     message_generation
-    std_msgs
     actionlib_msgs
     catkin_virtualenv
 )
@@ -31,7 +30,6 @@ add_action_files(
 
 generate_messages(
   DEPENDENCIES
-  std_msgs
   actionlib_msgs
 )
 
@@ -81,7 +79,8 @@ install(DIRECTORY launch
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS roslaunch rostest)
+  find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   roslaunch_add_file_check(launch)
   if(NOT (gcc_dump_machine MATCHES "x86_64-.*" OR gcc_dump_machine MATCHES "aarch64-.*"))
     message(WARNING "pip -i requirements.txt work only with i686, so skipping test for ${gcc_dump_machine}")

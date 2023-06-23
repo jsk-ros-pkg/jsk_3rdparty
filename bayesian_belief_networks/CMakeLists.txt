@@ -7,6 +7,7 @@ set(CATKIN_VERSION ${catkin_VERSION}) #this is used in setup.py
 # Use configure_file because when installing package, this CATKIN_VERSION
 # environmental variable is not available
 configure_file(${PROJECT_SOURCE_DIR}/setup.py.in ${PROJECT_SOURCE_DIR}/setup.py)
+#catkin_lint: ignore missing_file
 catkin_python_setup()
 
 add_message_files(DIRECTORY msg FILES Result.msg Observation.msg)

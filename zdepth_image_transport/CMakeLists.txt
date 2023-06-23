@@ -12,12 +12,12 @@ find_package(catkin REQUIRED
 )
 
 if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
-  find_library(zdepth_LIB zdepth PATH_SUFFIXES zdepth)
-  find_library(zstd_LIB zstd PATH_SUFFIXES zdepth)
-  set(zdepth_LIBRARIES ${zdepth_LIB} ${zstd_LIB})
-  find_file(zdepth_INCLUDE zdepth.hpp PATH_SUFFIXES zdepth)
-  get_filename_component(zdepth_PATH ${zdepth_INCLUDE} DIRECTORY)
-  get_filename_component(zdepth_INCLUDE_DIRS ${zdepth_PATH} DIRECTORY)
+  find_library(${PROJECT_NAME}_zdepth_LIB zdepth PATH_SUFFIXES zdepth)
+  find_library(${PROJECT_NAME}_zstd_LIB zstd PATH_SUFFIXES zdepth)
+  set(${PROJECT_NAME}_zdepth_LIBRARIES ${${PROJECT_NAME}_zdepth_LIB} ${${PROJECT_NAME}_zstd_LIB})
+  find_file(${PROJECT_NAME}_zdepth_INCLUDE zdepth.hpp PATH_SUFFIXES zdepth)
+  get_filename_component(${PROJECT_NAME}_zdepth_PATH ${${PROJECT_NAME}_zdepth_INCLUDE} DIRECTORY)
+  get_filename_component(${PROJECT_NAME}_zdepth_INCLUDE_DIRS ${${PROJECT_NAME}_zdepth_PATH} DIRECTORY)
 endif()
 
 add_message_files(
@@ -40,17 +40,17 @@ catkin_package(
   sensor_msgs
   std_msgs
   DEPENDS
-  zdepth
+  ${PROJECT_NAME}_zdepth
 )
 
 if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
-  include_directories(include ${catkin_INCLUDE_DIRS} ${zdepth_INCLUDE_DIRS})
+  include_directories(include ${catkin_INCLUDE_DIRS} ${${PROJECT_NAME}_zdepth_INCLUDE_DIRS})
 
   add_executable(zdepth_test src/test/zdepth_test.cpp)
-  target_link_libraries(zdepth_test ${catkin_LIBRARIES} ${zdepth_LIBRARIES})
+  target_link_libraries(zdepth_test ${catkin_LIBRARIES} ${${PROJECT_NAME}_zdepth_LIBRARIES})
 
   add_library(${PROJECT_NAME} src/manifest.cpp src/zdepth_publisher.cpp src/zdepth_subscriber.cpp)
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${zdepth_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${${PROJECT_NAME}_zdepth_LIBRARIES})
   add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
 
   install(TARGETS zdepth_test
