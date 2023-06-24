@@ -2,8 +2,8 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.27 (2023-06-24)
+-------------------
 * fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
 * Contributors: Kei Okada
 

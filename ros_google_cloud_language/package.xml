@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>ros_google_cloud_language</name>
-  <version>2.1.26</version>
+  <version>2.1.27</version>
   <description>ros clinet library for google cloud language</description>
 
   <author email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</author>
