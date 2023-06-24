@@ -2,6 +2,11 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
 2.1.26 (2023-06-14)
 -------------------
 * [respeaker_ros] importing does not succeed (`#477 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/477>`_)
