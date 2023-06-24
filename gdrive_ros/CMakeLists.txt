@@ -4,7 +4,6 @@ project(gdrive_ros)
 find_package(catkin REQUIRED COMPONENTS
   catkin_virtualenv REQUIRED
   rospy
-  std_msgs
   message_generation
 )
 
@@ -17,8 +16,6 @@ add_service_files(
 )
 
 generate_messages(
-  DEPENDENCIES
-  std_msgs
 )
 
 catkin_package(
@@ -55,6 +52,7 @@ install(FILES requirements.txt
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   roslaunch_add_file_check(launch/gdrive_server.launch)
 endif()

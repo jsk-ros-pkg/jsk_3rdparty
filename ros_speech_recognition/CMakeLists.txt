@@ -49,7 +49,8 @@ install(FILES requirements.txt
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   add_rostest(test/sample_ros_speech_recognition.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )

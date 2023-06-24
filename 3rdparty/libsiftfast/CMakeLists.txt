@@ -23,7 +23,6 @@ else()
     INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
     LIBRARIES    siftfast
     EXPORTED_TARGETS libsiftfast
-    SKIP_CMAKE_CONFIG_GENERATION
     )
 endif()
 

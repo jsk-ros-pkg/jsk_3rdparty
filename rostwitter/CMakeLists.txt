@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   message_generation
   rospy
-  std_msgs
   mk
 )
 
@@ -20,7 +19,7 @@ add_action_files(
 
 
 generate_messages(
-  DEPENDENCIES actionlib_msgs std_msgs)
+  DEPENDENCIES actionlib_msgs)
 
 generate_dynamic_reconfigure_options(
   cfg/TweetImageServer.cfg

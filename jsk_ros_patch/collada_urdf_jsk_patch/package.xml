@@ -40,7 +40,9 @@
   <build_depend>git</build_depend>
   <build_depend condition="$ROS_PYTHON_VERSION == 2">python-catkin-tools</build_depend>
   <build_depend condition="$ROS_PYTHON_VERSION == 3">python3-catkin-tools</build_depend>
-  
+
+  <build_export_depend>collada_urdf</build_export_depend>
+
   <exec_depend>collada_parser</exec_depend>
   <exec_depend>collada_urdf</exec_depend>
   <exec_depend>urdf</exec_depend>
