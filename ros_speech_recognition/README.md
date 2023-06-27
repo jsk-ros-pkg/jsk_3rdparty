@@ -159,19 +159,19 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Maximum buffer size to store audio data for speech recognition
   
-* `~start_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/bell.ogg`)
+* `~start_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/bell.ogg`)
 
   Path to sound file for bell on the start of audio caption
   
-* `~recognized_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/button-toggle-on.ogg`)
+* `~recognized_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message.ogg`)
 
   Path to sound file for bell on the end of audio caption
   
-* `~success_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg`)
+* `~success_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg`)
 
   Path to sound file for bell on getting successful recognition result
   
-* `~timeout_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/window-slide.ogg`)
+* `~timeout_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg`)
 
   Path to sound file for bell on timeout for recognition
   
@@ -220,6 +220,14 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Auth key for Bing API.  
   This is valid only if `~engine` is `bing`.
+
+* `~vosk_model_path` (`String`, default: `None`)
+
+  Path to trainded model for Vosk API.
+  This is valid only if `~engine` is `Vosk`.
+
+  If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
+  To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
   
 ## Author
 

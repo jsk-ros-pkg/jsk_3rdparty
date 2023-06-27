@@ -2,6 +2,25 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* julius: Use DEB_TARGET_GNU_TYPE to fix https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/467 (`#470 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/470>`_)
+* GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
+* fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+
+  * use wget to download from osdn, to use mirror site
+  * download .zip file from https://osdn.net/dl/julius/
+
+* Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 * use latest config.guess.patch for https://github.com/ros/rosdistro/pull/30279 (`#275 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/275>`_)

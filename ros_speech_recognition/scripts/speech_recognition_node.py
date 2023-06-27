@@ -6,6 +6,7 @@ import actionlib
 import rospy
 import speech_recognition as SR
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
+import ros_speech_recognition.recognize_vosk
 import json
 import array
 import sys
@@ -135,13 +136,13 @@ class ROSSpeechRecognition(object):
             self.act_sound = None
         self.signals = {
             "start": rospy.get_param("~start_signal",
-                                     "/usr/share/sounds/ubuntu/stereo/bell.ogg"),
+                                     "/usr/share/sounds/freedesktop/stereo/bell.ogg"),
             "recognized": rospy.get_param("~recognized_signal",
-                                          "/usr/share/sounds/ubuntu/stereo/button-toggle-on.ogg"),
+                                          "/usr/share/sounds/freedesktop/stereo/message.ogg"),
             "success": rospy.get_param("~success_signal",
-                                       "/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg"),
+                                       "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"),
             "timeout": rospy.get_param("~timeout_signal",
-                                       "/usr/share/sounds/ubuntu/stereo/window-slide.ogg"),
+                                       "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
         }
 
 
@@ -188,6 +189,7 @@ class ROSSpeechRecognition(object):
                 "speech_recognition/stop",
                 Empty, self.speech_recogniton_stop_srv_cb)
         else:
+            rospy.loginfo("Disabled continuous mode, waiting for speech_recognition service")
             self.srv = rospy.Service("speech_recognition",
                                      SpeechRecognition,
                                      self.speech_recognition_srv_cb)
@@ -275,6 +277,10 @@ class ROSSpeechRecognition(object):
             recog_func = self.recognizer.recognize_houndify
         elif self.engine == Config.SpeechRecognition_IBM:
             recog_func = self.recognizer.recognize_ibm
+        elif self.engine == Config.SpeechRecognition_Vosk:
+            if not self.args:
+                self.args = {'model_path': rospy.get_param('~vosk_model_path', None)}
+            recog_func = self.recognizer.recognize_vosk
 
         return recog_func(audio_data=audio, language=self.language, **self.args)
 

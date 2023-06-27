@@ -2,6 +2,34 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* [respeaker_ros] importing does not succeed (`#477 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/477>`_)
+* respeaker_ros: Fix test. we use rosrun .... to run scripts (`#478 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/478>`_)
+* Contributors: Kei Okada, Soonhyo Kim
+
+2.1.25 (2023-06-08)
+-------------------
+* add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
+* [respeaker_ros] add FileNotFoundError in respeaker for python3 (`#428 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/428>`_)
+* [respeaker_ros] Stop timer on shutdown (`#385 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/385>`_)
+* [ros_speech_recogniton, respeaker_ros] add confidence field (`#411 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/411>`_)
+* [`#405 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/405>`_ and `#410 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/410>`_] Fix CI (`#415 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/415>`_)
+* GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
+
+  * pgm_learner/respeaker_ros/ros_speech_recognition/rosping: increase time-limit/wait-time
+
+* [respeaker_ros] Add documentation for displaying Japanese `/speech_to_text` (`#352 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/352>`_)
+* [respeaker_ros] Display helpful setting command when udev rule is not set (`#351 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/351>`_)
+* Using RespeakerInterface instead of init_respeaker (`#305 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/305>`_)
+* respeaker_ros for Python 2.x and 3.x (`#284 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/284>`_)
+* Contributors: Aoi Nakane, Dirk Gorissen, Kei Okada, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa, Yoshiki Obinata
+
 2.1.24 (2021-07-26)
 -------------------
 

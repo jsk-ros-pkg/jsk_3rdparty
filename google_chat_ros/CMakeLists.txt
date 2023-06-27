@@ -3,8 +3,7 @@ project(google_chat_ros)
 
 find_package(
   catkin REQUIRED COMPONENTS
-  catkin_virtualenv REQUIRED
-  rospy
+  catkin_virtualenv
   actionlib_msgs
   std_msgs
   message_generation
@@ -27,7 +26,9 @@ generate_messages(
   actionlib_msgs
   )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+  )
 
 # generate the virtualenv
 catkin_generate_virtualenv(
@@ -41,19 +42,13 @@ catkin_generate_virtualenv(
 # euslisp
 file(GLOB EUSLISP_SCRIPTS scripts/*.l)
 install(FILES ${EUSLISP_SCRIPTS}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/)
 
 # python
-file(GLOB PYTHON_SCRIPTS scripts/*.py)
+file(GLOB PYTHON_SCRIPT_FILES scripts/*.py  test/*.py)
 catkin_install_python(
-  PROGRAMS ${PYTHON_SCRIPTS}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-# python requirements
-install(FILES requirements.txt
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  )
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # launch
 install(DIRECTORY launch
@@ -62,7 +57,8 @@ install(DIRECTORY launch
 
 # import test
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS catkin_virtualenv rostest)
+  find_package(catkin_virtualenv REQUIRED)
+  find_package(rostest REQUIRED)
   catkin_install_python(
     PROGRAMS test/test_import.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -70,4 +66,7 @@ if(CATKIN_ENABLE_TESTING)
   add_rostest(test/import.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
     )
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
 endif()
