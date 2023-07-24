@@ -2,8 +2,8 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.28 (2023-07-24)
+-------------------
 * fix build farm (`#487 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/487>`_)
   * julius: fix location URLs, because osdn is too slow
 

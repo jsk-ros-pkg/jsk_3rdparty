@@ -2,8 +2,8 @@
 Changelog for package zdepth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.28 (2023-07-24)
+-------------------
 * fix build farm : ROS_DISTRO needs ros_environment (`#487 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/487>`_)
 * Contributors: Kei Okada
 
