@@ -2,6 +2,9 @@
 Changelog for package google_cloud_texttospeech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.27 (2023-06-24)
 -------------------
 
