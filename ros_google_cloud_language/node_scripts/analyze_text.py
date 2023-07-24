@@ -9,7 +9,10 @@ import actionlib
 import rospy
 import os
 import sys
-from unidecode import unidecode
+try:
+    from unidecode import unidecode
+except ImportError:
+    pass
 
 from ros_google_cloud_language.msg import AnalyzeTextAction
 from ros_google_cloud_language.msg import AnalyzeTextResult
