@@ -15,6 +15,7 @@
 
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>rospy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-unidecode</exec_depend>
 
   <depend>actionlib_msgs</depend>
   <depend>diagnostic_msgs</depend>
