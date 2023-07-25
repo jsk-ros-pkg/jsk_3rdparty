@@ -252,15 +252,8 @@ class GDriveServerNode(object):
 
         folder_title = parents_path[0]
         parent = parents_id if parents_id else 'root'
-        gfiles = self.gdrive.ListFile(
-            {'q': "'{}' in parents and trashed=false".format(parent)})
-        gfiles = gfiles.GetList()
-        gfolders = []
-        for gf in gfiles:
-            if (gf['mimeType'] == self.folder_mime_type
-                    and gf['title'] == folder_title):
-                gfolders.append(gf)
-
+        gfolders = self.gdrive.ListFile(
+            {'q': "'{}' in parents and mimeType = '{}' and title = '{}' and trashed=false".format(parent, self.folder_mime_type, folder_title)}).GetList()
         if len(parents_path) == 1:
             if len(gfolders) > 0:
                 return gfolders[0]['id']
