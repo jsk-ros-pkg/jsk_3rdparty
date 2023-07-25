@@ -26,6 +26,15 @@ class SwitchBotAction:
                 self.token = f.read().replace('\n', '')
         else:
             self.token = token
+
+        # Switchbot API v1.1 needs secret key
+        secret = rospy.get_param('~secret')
+        if os.path.exists(secret):
+            with open(secret) as f:
+                self.secret = f.read().replace('\n', '')
+        else:
+            self.secret = secret
+
         # Initialize switchbot client
         self.bots = self.get_switchbot_client()
         self.print_devices()
@@ -40,7 +49,7 @@ class SwitchBotAction:
 
     def get_switchbot_client(self):
         try:
-            client = SwitchBotAPIClient(token=self.token)
+            client = SwitchBotAPIClient(token=self.token, secret=self.secret)
             rospy.loginfo('Switchbot API Client initialized.')
             return client
         except ConnectionError:  # If the machine is not connected to the internet
@@ -60,20 +69,36 @@ class SwitchBotAction:
     def print_devices(self):
         if self.bots is None:
             return
-        device_list_str = 'Switchbot device list:\n'
+        
+        device_list_str = 'Switchbot Device List:\n'
         device_list = sorted(
             self.bots.device_list,
             key=lambda device: str(device['deviceName']))
         for device in device_list:
-            device_list_str += 'Name: ' + str(device['deviceName'])
-            device_list_str += ', Type: ' + str(device['deviceType'])
+            device_list_str += 'deviceName: ' + str(device['deviceName'])
+            device_list_str += ', deviceID: ' + str(device['deviceId'])
+            device_list_str += ', deviceType: ' + str(device['deviceType'])
             device_list_str += '\n'
         rospy.loginfo(device_list_str)
+        
+        remote_list_str = 'Switchbot Remote List:\n'
+        infrared_remote_list = sorted(
+            self.bots.infrared_remote_list,
+            key=lambda infrared_remote: str(infrared_remote['deviceName']))
+        for infrared_remote in infrared_remote_list:
+            remote_list_str += 'deviceName: ' + str(infrared_remote['deviceName'])
+            remote_list_str += ', deviceID: ' + str(infrared_remote['deviceId'])
+            remote_list_str += ', remoteType: ' + str(infrared_remote['remoteType'])
+            remote_list_str += '\n'
+        rospy.loginfo(remote_list_str)
+        
 
     def publish_devices(self):
         if self.bots is None:
             return
+        
         msg = DeviceArray()
+        
         device_list = sorted(
             self.bots.device_list,
             key=lambda device: str(device['deviceName']))
@@ -82,6 +107,16 @@ class SwitchBotAction:
             msg_device.name = str(device['deviceName'])
             msg_device.type = str(device['deviceType'])
             msg.devices.append(msg_device)
+        
+        infrared_remote_list = sorted(
+            self.bots.infrared_remote_list,
+            key=lambda infrared_remote: str(infrared_remote['deviceName']))
+        for infrared_remote in infrared_remote_list:
+            msg_device = Device()
+            msg_device.name = str(infrared_remote['deviceName'])
+            msg_device.type = str(infrared_remote['remoteType'])
+            msg.devices.append(msg_device)
+        
         self.pub.publish(msg)
 
     def execute_cb(self, goal):
@@ -97,7 +132,7 @@ class SwitchBotAction:
             command_type = 'command'
         try:
             if not self.bots:
-                self.bots = SwitchBotAPIClient(token=self.token)
+                self.bots = SwitchBotAPIClient(token=self.token,secret=self.secret)
             feedback.status = str(
                 self.bots.control_device(
                     command=goal.command,

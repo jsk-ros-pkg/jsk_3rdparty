@@ -4,15 +4,23 @@ import json
 import os.path
 import requests
 
+import os
+import time
+import hashlib
+import hmac
+import base64
+import uuid
+
 
 class SwitchBotAPIClient(object):
     """
     For Using SwitchBot via official API.
     Please see https://github.com/OpenWonderLabs/SwitchBotAPI for details.
     """
-    def __init__(self, token):
-        self._host_domain = "https://api.switch-bot.com/v1.0/"
+    def __init__(self, token, secret):
+        self._host_domain = "https://api.switch-bot.com/v1.1/"
         self.token = token
+        self.secret = secret # SwitchBot API v1.1
         self.device_list = None
         self.infrared_remote_list = None
         self.scene_list = None
@@ -21,6 +29,28 @@ class SwitchBotAPIClient(object):
         self.update_device_list()
         self.update_scene_list()
 
+    def make_sign(self, token: str, secret: str):
+        
+        nonce = uuid.uuid4()
+        t = int(round(time.time() * 1000))
+        string_to_sign = '{}{}{}'.format(token, t, nonce)
+        
+        string_to_sign = bytes(string_to_sign, 'utf-8')
+        secret = bytes(secret, 'utf-8')
+        
+        sign = base64.b64encode(hmac.new(secret, msg=string_to_sign, digestmod=hashlib.sha256).digest())
+                
+        return sign, str(t), nonce
+
+    def make_request_header(self, token: str, secret: str):
+        sign,t,nonce = self.make_sign(token, secret)
+        headers={
+                "Authorization": token,
+                "sign": str(sign, 'utf-8'),
+                "t": str(t),
+                "nonce": str(nonce)
+                }
+        return headers
 
     def request(self, method='GET', devices_or_scenes='devices', service_id='', service='', json_body=None):
         """
@@ -30,20 +60,20 @@ class SwitchBotAPIClient(object):
             raise ValueError('Please set devices_or_scenes variable devices or scenes')
 
         url = os.path.join(self._host_domain, devices_or_scenes, service_id, service)
+        
+        headers = self.make_request_header(self.token, self.secret)
 
         if method == 'GET':
             response = requests.get(
                 url,
-                headers={'Authorization': self.token}
+                headers=headers
             )
         elif method == 'POST':
             response = requests.post(
                 url,
-                json_body,
-                headers={
-                    'Content-Type': 'application/json; charset=utf8',
-                    'Authorization': self.token
-            })
+                json=json_body,
+                headers=headers
+            )
         else:
             raise ValueError('Got unexpected http request method. Please use GET or POST.')
 
@@ -87,8 +117,8 @@ class SwitchBotAPIClient(object):
         self.infrared_remote_list = res['body']['infraredRemoteList']
         for device in self.device_list:
             self.device_name_id[device['deviceName']] = device['deviceId']
-        for infrated_remote in self.infrared_remote_list:
-            self.device_name_id[device['deviceName']] = device['deviceId']
+        for infrared_remote in self.infrared_remote_list:
+            self.device_name_id[infrared_remote['deviceName']] = infrared_remote['deviceId']
 
         return self.device_list, self.infrared_remote_list
 
@@ -125,11 +155,11 @@ class SwitchBotAPIClient(object):
         """
         Send Command to the device. Please see https://github.com/OpenWonderLabs/SwitchBotAPI#send-device-control-commands for command options.
         """
-        json_body = json.dumps({
-            "command": command,
-            "parameter": parameter,
-            "commandType": command_type
-        })
+        json_body = {
+                    "command": str(command),
+                    "parameter": str(parameter),
+                    "commandType": str(command_type)
+                    }
         if device_id:
             pass
         elif device_name:

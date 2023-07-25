@@ -1,11 +1,13 @@
 <launch>
   <arg name="token" />
+  <arg name="secret" />
   <arg name="respawn" default="true" />
 
   <node name="switchbot_ros" pkg="switchbot_ros" type="switchbot_ros_server.py"
         respawn="$(arg respawn)" output="screen">
     <rosparam subst_value="true">
       token: $(arg token)
+      secret: $(arg secret)
     </rosparam>
   </node>
 </launch>
