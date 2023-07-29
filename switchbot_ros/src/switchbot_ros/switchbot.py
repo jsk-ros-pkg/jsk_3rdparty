@@ -32,7 +32,7 @@ class SwitchBotAPIClient(object):
         self.update_device_list()
         self.update_scene_list()
 
-    def make_sign(self, token: str, secret: str):
+    def make_sign(self, token, secret):
         
         nonce = uuid.uuid4()
         t = int(round(time.time() * 1000))
@@ -45,7 +45,7 @@ class SwitchBotAPIClient(object):
                 
         return sign, str(t), nonce
 
-    def make_request_header(self, token: str, secret: str):
+    def make_request_header(self, token, secret):
         sign,t,nonce = self.make_sign(token, secret)
         headers={
                 "Authorization": token,
