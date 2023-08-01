@@ -37,7 +37,7 @@ class SwitchBotAction:
 
         # Initialize switchbot client
         self.bots = self.get_switchbot_client()
-        self.print_baseurl()
+        self.print_apiversion()
         self.print_devices()
         self.print_scenes()
         # Actionlib
@@ -69,12 +69,12 @@ class SwitchBotAction:
                 self.publish_devices()
                 self.published = True
 
-    def print_baseurl(self):
+    def print_apiversion(self):
         if self.bots is None:
             return
         
-        base_url_str = 'SwitchBot API Base URL: ';
-        base_url_str += self.bots.host_domain;
+        base_url_str = 'Using SwitchBot API ';
+        base_url_str += self.bots.api_version;
         rospy.loginfo(base_url_str)        
         
 

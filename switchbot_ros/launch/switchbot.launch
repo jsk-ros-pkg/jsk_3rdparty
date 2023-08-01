@@ -1,6 +1,6 @@
 <launch>
   <arg name="token" />
-  <arg name="secret" default="secret_none" />
+  <arg name="secret" default="''" />
   <arg name="respawn" default="true" />
 
   <node name="switchbot_ros" pkg="switchbot_ros" type="switchbot_ros_server.py"

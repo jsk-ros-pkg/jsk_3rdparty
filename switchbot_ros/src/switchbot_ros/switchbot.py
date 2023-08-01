@@ -17,11 +17,12 @@ class SwitchBotAPIClient(object):
     For Using SwitchBot via official API.
     Please see https://github.com/OpenWonderLabs/SwitchBotAPI for details.
     """
-    def __init__(self, token, secret="secret_none"):
-        if secret=="secret_none":
-          self.host_domain = "https://api.switch-bot.com/v1.0/"
+    def __init__(self, token, secret=""):
+        if not secret:
+          self.api_version = "v1.0"
         else:
-          self.host_domain = "https://api.switch-bot.com/v1.1/"
+          self.api_version = "v1.1"
+        self._host_domain = "https://api.switch-bot.com/" + self.api_version + "/"
         self.token = token
         self.secret = secret # SwitchBot API v1.1
         self.device_list = None
@@ -33,7 +34,9 @@ class SwitchBotAPIClient(object):
         self.update_scene_list()
 
     def make_sign(self, token, secret):
-        
+        """
+        Make Sign from token and secret
+        """
         nonce = uuid.uuid4()
         t = int(round(time.time() * 1000))
         string_to_sign = '{}{}{}'.format(token, t, nonce)
@@ -46,7 +49,10 @@ class SwitchBotAPIClient(object):
         return sign, str(t), nonce
 
     def make_request_header(self, token, secret):
-        sign,t,nonce = self.make_sign(token, secret)
+        """
+        Make Request Header
+        """
+        sign, t, nonce = self.make_sign(token, secret)
         headers={
                 "Authorization": token,
                 "sign": str(sign, 'utf-8'),
@@ -63,7 +69,7 @@ class SwitchBotAPIClient(object):
         if devices_or_scenes not in ['devices', 'scenes']:
             raise ValueError('Please set devices_or_scenes variable devices or scenes')
 
-        url = os.path.join(self.host_domain, devices_or_scenes, service_id, service)
+        url = os.path.join(self._host_domain, devices_or_scenes, service_id, service)
         
         headers = self.make_request_header(self.token, self.secret)
 
