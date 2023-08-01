@@ -73,9 +73,9 @@ class SwitchBotAction:
         if self.bots is None:
             return
         
-        base_url_str = 'Using SwitchBot API ';
-        base_url_str += self.bots.api_version;
-        rospy.loginfo(base_url_str)        
+        apiversion_str = 'Using SwitchBot API ';
+        apiversion_str += self.bots.api_version;
+        rospy.loginfo(apiversion_str)        
         
 
     def print_devices(self):
