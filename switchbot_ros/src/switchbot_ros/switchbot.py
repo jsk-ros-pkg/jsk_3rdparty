@@ -4,6 +4,7 @@ import json
 import os.path
 import requests
 
+import sys
 import os
 import time
 import hashlib
@@ -41,11 +42,18 @@ class SwitchBotAPIClient(object):
         t = int(round(time.time() * 1000))
         string_to_sign = '{}{}{}'.format(token, t, nonce)
         
-        string_to_sign = bytes(string_to_sign, 'utf-8')
-        secret = bytes(secret, 'utf-8')
+        if sys.version_info[0] > 2:
+            string_to_sign = bytes(string_to_sign, 'utf-8')
+            secret = bytes(secret, 'utf-8')
+        else:
+            string_to_sign = bytes(string_to_sign)
+            secret = bytes(secret)
         
         sign = base64.b64encode(hmac.new(secret, msg=string_to_sign, digestmod=hashlib.sha256).digest())
-                
+        
+        if sys.version_info[0] > 2:
+            sign = sign.decode('utf-8')
+        
         return sign, str(t), nonce
 
     def make_request_header(self, token, secret):
@@ -55,7 +63,7 @@ class SwitchBotAPIClient(object):
         sign, t, nonce = self.make_sign(token, secret)
         headers={
                 "Authorization": token,
-                "sign": str(sign, 'utf-8'),
+                "sign": str(sign),
                 "t": str(t),
                 "nonce": str(nonce),
                 "Content-Type": "application/json; charset=utf8"

@@ -28,9 +28,9 @@ class SwitchBotAction:
             self.token = token
 
         # Switchbot API v1.1 needs secret key
-        secret = rospy.get_param('~secret')
-        if os.path.exists(secret):
-            with open(secret) as f:
+        secret = rospy.get_param('~secret', None )
+        if secret is not None and os.path.exists(secret):
+            with open(secret, 'r', encoding='utf-8') as f:
                 self.secret = f.read().replace('\n', '')
         else:
             self.secret = secret
@@ -162,7 +162,7 @@ class SwitchBotAction:
             command_type = 'command'
         try:
             if not self.bots:
-                self.bots = SwitchBotAPIClient(token=self.token,secret=self.secret)
+                self.bots = SwitchBotAPIClient(token=self.token, secret=self.secret)
             feedback.status = str(
                 self.bots.control_device(
                     command=goal.command,
