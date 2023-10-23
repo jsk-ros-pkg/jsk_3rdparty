@@ -5,6 +5,7 @@ find_package(
   catkin REQUIRED COMPONENTS
   message_generation
   actionlib_msgs
+  catkin_virtualenv
 )
 
 catkin_python_setup()
@@ -26,6 +27,11 @@ generate_messages(
 )
 
 catkin_package()
+
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
+  CHECK_VENV FALSE
+)
 
 include_directories()
 
