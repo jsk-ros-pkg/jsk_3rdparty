@@ -19,7 +19,7 @@
             (send goal :goal :text content)
             (send ac :send-goal goal)
             (if wait
-                (return-from send-google-chat-text (send ac :wait-for-result :timeout 5))
+                (return-from send-google-chat-text (if (send ac :wait-for-result :timeout 5) (send ac :get-result) nil))
                 (return-from send-google-chat-text t))))))
 
 (defun send-google-chat-image
