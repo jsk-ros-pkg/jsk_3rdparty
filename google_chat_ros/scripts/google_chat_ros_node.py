@@ -88,7 +88,7 @@ class GoogleChatROS(object):
             rospy.logwarn("You cannot recieve Google Chat event because HTTPS server or Google Cloud Pub/Sub is not running.")
 
         else:
-            rospy.logerr("Please choose receiving_mode param from dialogflow, https, pubsub, none.")
+            rospy.logerr("Please choose receiving_mode param from dialogflow, url, pubsub, none.")
 
     def killhttpd(self):
         self._server.kill()
