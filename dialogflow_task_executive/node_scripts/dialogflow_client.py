@@ -6,8 +6,13 @@ import dialogflow as df
 from google.oauth2.service_account import Credentials
 from google.protobuf.json_format import MessageToJson
 import pprint
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
+import os
 import rospy
+import sys
 import threading
 import uuid
 
@@ -78,11 +83,18 @@ class DialogflowBase(object):
                 credentials_json
             )
             self.project_id = credentials.project_id
+            if rospy.has_param("~project_id") and rospy.get_param("~override_project_id", False):
+                self.project_id = rospy.get_param("~project_id")
+                rospy.logwarn("override project_id")
+                rospy.logwarn("   from : project_id in a credential file {}".format(credentials.project_id))
+                rospy.logwarn("     to : project_id stored in rosparam   {}".format(self.project_id))
             self.session_client = df.SessionsClient(
                 credentials=credentials
             )
         if self.project_id is None:
             rospy.logerr('project ID is not set')
+        else:
+            rospy.loginfo('project ID is "{}"'.format(self.project_id))
         self.pub_res = rospy.Publisher(
             "dialog_response", DialogResponse, queue_size=1)
         self.always_publish_result = rospy.get_param(
@@ -102,7 +114,10 @@ class DialogflowBase(object):
             rospy.logwarn("Unknown action")
         msg.action = result.action
 
-        if self.language == 'ja-JP':
+        # check if ROS_PYTHON_VERSION exists in indigo
+        if (self.language == 'ja-JP'
+            and ("ROS_PYTHON_VERSION" not in os.environ
+                 or os.environ["ROS_PYTHON_VERSION"] == "2")):
             msg.query = result.query_text.encode("utf-8")
             msg.response = result.fulfillment_text.encode("utf-8")
         else:
@@ -131,7 +146,7 @@ class DialogflowTextClient(DialogflowBase):
             if self.session_id is None:
                 self.session_id = str(uuid.uuid1())
                 rospy.loginfo(
-                    "Created new session: {}".format(self.session_id))
+                    "DialogflowTextClient: Created new session: {}".format(self.session_id))
             session = self.session_client.session_path(
                 self.project_id, self.session_id
             )
@@ -172,8 +187,11 @@ class DialogflowAudioClient(DialogflowBase):
         # hotwords
         self.enable_hotword = rospy.get_param("~enable_hotword", True)
         hotwords = rospy.get_param("~hotword", [])
-        self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
-                            for hotword in hotwords ]
+        try:
+            self.hotwords = [ hotword.encode('utf-8') if isinstance(hotword, unicode ) else hotword
+                              for hotword in hotwords ]
+        except NameError:
+            self.hotwords = hotwords
 
         self.state = State()
         self.queue = Queue.Queue()
@@ -260,11 +278,12 @@ class DialogflowAudioClient(DialogflowBase):
             volume=self.volume)
 
         # for japanese or utf-8 languages
-        if self.language == 'ja-JP':
+        if self.language == 'ja-JP' and sys.version_info.major <= 2:
             msg.arg = result.fulfillment_text.encode('utf-8')
-            msg.arg2 = self.language
         else:
             msg.arg = result.fulfillment_text
+        if self.language == 'ja-JP':
+            msg.arg2 = self.language
 
         self.sound_action.send_goal_and_wait(
             SoundRequestGoal(sound_request=msg),
@@ -280,7 +299,7 @@ class DialogflowAudioClient(DialogflowBase):
                 if self.session_id is None:
                     self.session_id = str(uuid.uuid1())
                     rospy.loginfo(
-                        "Created new session: {}".format(self.session_id))
+                        "DialogflowAudioClient: Created new session: {}".format(self.session_id))
                 session = self.session_client.session_path(
                     self.project_id, self.session_id)
 

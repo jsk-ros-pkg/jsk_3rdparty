@@ -1,0 +1,3 @@
+apps:
+- app: dialogflow_task_executive/sample_app
+  display: sample dialogflow app

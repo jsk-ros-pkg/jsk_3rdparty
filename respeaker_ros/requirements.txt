@@ -1,0 +1,5 @@
+SpeechRecognition==3.8.1
+# see https://github.com/jsk-ros-pkg/jsk_robot/pull/1797
+pyusb==1.1.1
+spidev==3.5  # pixel-ring requires spidev and spidev >=3.6 requires setuptools>=61.0. same as https://github.com/jsk-ros-pkg/jsk_robot/pull/1794
+pixel-ring==0.1.0
