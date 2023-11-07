@@ -27,11 +27,15 @@ class TestRospyNode(unittest.TestCase):
             full_scripts_dir = os.path.join(pkg_dir, scripts_dir)
             if not os.path.exists(full_scripts_dir):
                 continue
-            for filename in [f for f in map(lambda x: os.path.join(full_scripts_dir, x), os.listdir(full_scripts_dir)) if os.path.isfile(f) and f.endswith('.py')]:
+            for filename in [f for f in map(lambda x: x, os.listdir(full_scripts_dir)) if os.path.isfile(f) and f.endswith('.py')]:
                 print("Check if {} is loadable".format(filename))
-                # https://stackoverflow.com/questions/4484872/why-doesnt-exec-work-in-a-function-with-a-subfunction
-                exec(open(filename, encoding='utf-8').read()) in globals(), locals()
-                self.assertTrue(True)
+                import subprocess
+                try:
+                    ret = subprocess.check_output(['rosrun', pkg_name, filename], stderr=subprocess.STDOUT)
+                except subprocess.CalledProcessError as e:
+                    print("Catch runtime error ({}), check if this is expect".format(e.output))
+                    self.assertTrue('Check the device is connected and recognized' in e.output)
+
 
 if __name__ == '__main__':
     rostest.rosrun('test_rospy_node', pkg_name, TestRospyNode, sys.argv)
