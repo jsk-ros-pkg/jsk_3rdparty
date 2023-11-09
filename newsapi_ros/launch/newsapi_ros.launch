@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="api_key" />
+  <arg name="country" default="jp" />
+  <arg name="respawn" default="true" />
+
+  <node name="newsapi_ros" pkg="newsapi_ros" type="newsapi_node.py"
+        respawn="$(arg respawn)" output="screen">
+    <rosparam subst_value="true">
+      api_key: $(arg api_key)
+      country: $(arg country)
+    </rosparam>
+  </node>
+
+</launch>
