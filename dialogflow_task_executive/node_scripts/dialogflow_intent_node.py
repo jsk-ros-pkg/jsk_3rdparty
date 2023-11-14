@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import actionlib
-from dialogflow_intent_client.msg import RegisterIntentAction, RegisterIntentGoal, RegisterIntentResult, RegisterIntentFeedback
-from dialogflow_intent_client.msg import ListIntentAction, ListIntentGoal, ListIntentResult, ListIntentFeedback
-from dialogflow_intent_client.msg import IntentInfo
+from dialogflow_task_executive.msg import RegisterIntentAction, RegisterIntentGoal, RegisterIntentResult, RegisterIntentFeedback
+from dialogflow_task_executive.msg import ListIntentAction, ListIntentGoal, ListIntentResult, ListIntentFeedback
+from dialogflow_task_executive.msg import IntentInfo
 import google.cloud.dialogflow as df
 from google.oauth2.service_account import Credentials
 import rospy
