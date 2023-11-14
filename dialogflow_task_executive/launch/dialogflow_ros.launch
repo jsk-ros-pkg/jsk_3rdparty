@@ -32,7 +32,7 @@
   </node>
 
   <group if="$(arg launch_intent_client)">
-    <include file="$(find dialogflow_intent_client)/launch/dialogflow_intent_client.launch">
+    <include file="$(find dialogflow_task_executive)/launch/dialogflow_intent_client.launch">
       <arg name="credential" value="$(arg credential)" />
     </include>
   </group>
