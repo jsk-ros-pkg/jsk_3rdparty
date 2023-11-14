@@ -68,7 +68,7 @@ elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
 else()
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
-    PYTHON_INTERPRETER python2
+    PYTHON_INTERPRETER python3
     )
 endif()
 
