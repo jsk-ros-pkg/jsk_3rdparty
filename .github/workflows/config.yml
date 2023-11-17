@@ -135,6 +135,9 @@ jobs:
             CONTAINER: arm64v8/ros:melodic-perception-bionic
           - ROS_DISTRO: noetic
             CONTAINER: arm64v8/ros:noetic-perception-focal
+          - ROS_DISTRO: noetic
+            CONTAINER: osrf/ubuntu_armhf:focal
+            BEFORE_SCRIPT: "sudo pip uninstall -y pip"  # to catch buildfirm error, we need to remove pip<10
     steps:
       - uses: actions/checkout@v2.1.0
         with:
