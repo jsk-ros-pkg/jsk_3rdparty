@@ -222,13 +222,11 @@ class GoogleChatROS(object):
                 action = event.get('action')
                 msg.action.action_method_name = action.get('actionMethodName')
                 if action.get('parameters'):
-                    parameters = []
                     for param in action.get('parameters'):
                         action_parameter = ActionParameter()
-                        action_parameter.key = param.get('key')
-                        action_parameter.value = param.get('value')
-                        parameters.append(action_parameter)
-                msg.action.parameters = parameters
+                        action_parameter.key = param.get("key") if param.get("key") else ""
+                        action_parameter.value = param.get("value") if param.get("value") else ""
+                        msg.action.parameters.append(action_parameter)
             if publish_topic:
                 self._card_activity_pub.publish(msg)
             return msg

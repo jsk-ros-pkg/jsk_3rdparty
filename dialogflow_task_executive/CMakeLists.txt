@@ -21,15 +21,19 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   DialogResponse.msg
+  IntentInfo.msg
 )
 
 add_action_files(
   FILES
   DialogText.action
+  RegisterIntent.action
+  ListIntent.action
 )
 
 generate_messages(
   DEPENDENCIES
+  std_msgs
   actionlib_msgs
 )
 
@@ -64,7 +68,7 @@ elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
 else()
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
-    PYTHON_INTERPRETER python2
+    PYTHON_INTERPRETER python3
     )
 endif()
 
