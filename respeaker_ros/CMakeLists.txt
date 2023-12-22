@@ -39,10 +39,12 @@ catkin_install_python(PROGRAMS ${PYTHON_SCRIPT_FILES}
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   add_rostest(test/sample_respeaker.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
   add_rostest(test/test_rospy_node.test
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
+  roslaunch_add_file_check(launch/sample_respeaker.launch)
 endif()
