@@ -1,0 +1,6 @@
+{
+    "device_name": "Person CAM",
+    "uwb_id": -1,
+    "threshold": 0.5,
+    "target_class": "person"
+}
