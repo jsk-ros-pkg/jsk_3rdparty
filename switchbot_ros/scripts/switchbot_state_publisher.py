@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
-# import actionlib
 import os.path
 from requests import ConnectionError
 import rospy
-# from switchbot_ros.msg import SwitchBotCommandAction
-# from switchbot_ros.msg import SwitchBotCommandFeedback
-# from switchbot_ros.msg import SwitchBotCommandResult
-from switchbot_ros.msg import Device
-from switchbot_ros.msg import DeviceArray
 from switchbot_ros.switchbot import SwitchBotAPIClient
 from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
+from switchbot_ros.msg import Meter, PlugMini, Hub2, Bot, StripLight
 
 
 class SwitchBotStatePublisher:
@@ -38,21 +33,65 @@ class SwitchBotStatePublisher:
         # Initialize switchbot client
         self.bots = self.get_switchbot_client()
         self.print_apiversion()
-        self.print_devices()
-        self.print_scenes()
-#         # Actionlib
-#         self._as = actionlib.SimpleActionServer(
-#             '~switch', SwitchBotCommandAction,
-#             execute_cb=self.execute_cb, auto_start=False)
-#         self._as.start()
-        # Topic
-        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latch=True)
-        self.published = False
         
-#        self.status_publisher_list = [][]
-        self.status_pub = rospy.Publisher('~device_name/temperature', Temperature, queue_size=1, latch=True)
+        # Get parameters for publishing
+        self.rate = rospy.get_param('~rate', 0.1)
+        rospy.loginfo('Rate: ' + str(self.rate))
         
-        rospy.loginfo('Ready.')
+        device_name = rospy.get_param('~device_name')
+        if device_name:
+            self.device_name = device_name
+        else:
+            rospy.logerr('None Device Name')
+            return
+        
+        self.device_type = None        
+        self.device_list = sorted(
+            self.bots.device_list,
+            key=lambda device: str(device.get('deviceName')))        
+        for device in self.device_list:
+            device_name = str(device.get('deviceName'))
+            if self.device_name == device_name:
+                self.device_type = str(device.get('deviceType'))
+
+        if self.device_type:
+            rospy.loginfo('deviceName: ' + self.device_name + ' / deviceType: ' + self.device_type)
+        else:
+            rospy.logerr('Invalid Device Name: ' + self.device_name)
+            return
+        
+        topic_name = '~' + self.device_name
+        topic_name = topic_name.replace('-', '_')
+        
+        # Publisher for each device type
+        if self.device_type == 'Remote':
+            rospy.logerr('Device Type: "' + self.device_type + '" has no status.')
+            return
+        else:
+            if self.device_type == 'Meter':
+                self.msg_class = Meter
+            elif self.device_type == 'MeterPlus':
+                self.msg_class = Meter
+            elif self.device_type == 'WoIOSensor':
+                self.msg_class = Meter
+            elif self.device_type == 'Hub 2':
+                self.msg_class = Hub2
+            elif self.device_type == 'Plug Mini (JP)':
+                self.msg_class = PlugMini
+            elif self.device_type == 'Plug Mini (US)':
+                self.msg_class = PlugMini
+            elif self.device_type == 'Bot':
+                self.msg_class = Bot
+            elif self.device_type == 'Strip Light':
+                self.msg_class = StripLight
+            else:
+                rospy.logerr('No publisher process for "' + self.device_type + '" in switchbot_state_publisher.py')
+                return
+            
+            self.status_pub = rospy.Publisher(topic_name, self.msg_class, queue_size=1, latch=True)
+        
+        rospy.loginfo('Ready: SwitchBot Status Publisher for ' + self.device_name)
+
 
     def get_switchbot_client(self):
         try:
@@ -63,23 +102,66 @@ class SwitchBotStatePublisher:
             rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
             return None
 
+
     def spin(self):
-        rate = rospy.Rate(1)
+        rate = rospy.Rate(self.rate)
         while not rospy.is_shutdown():
             rate.sleep()
             if self.bots is None:
                 self.bots = self.get_switchbot_client()
-            elif not self.published:
-                self.publish_devices()
-                self.published = True
-            self.get_status()
+            
+            if not self.device_type == 'Remote':
+                status = self.get_device_status(device_name=self.device_name)
+                
+                if status:
+                    time = rospy.get_rostime()
+                    if self.msg_class == Meter:
+                        msg = Meter()
+                        msg.header.stamp = time
+                        msg.temperature  = status['temperature']
+                        msg.humidity     = status['humidity']
+                        msg.battery      = status['battery']
+                    elif self.msg_class == Hub2:
+                        msg = Hub2()
+                        msg.header.stamp = time
+                        msg.temperature  = status['temperature']
+                        msg.humidity     = status['humidity']
+                        msg.light_level  = status['lightLevel']
+                    elif self.msg_class == PlugMini:
+                        msg = PlugMini()
+                        msg.header.stamp = time
+                        msg.voltage      = status['voltage']
+                        msg.weight       = status['weight']
+                        msg.current      = status['electricCurrent']
+                        msg.minutes_day  = status['electricityOfDay']
+                    elif self.msg_class == Bot:
+                        msg = Bot()
+                        msg.header.stamp = time
+                        msg.battery      = status['battery']
+                        msg.power        = status['power']
+                        msg.device_mode  = status['deviceMode']
+                    elif self.msg_class == StripLight:
+                        msg = StripLight()
+                        msg.header.stamp = time
+                        msg.power        = status['power']
+                        msg.color        = status['color']
+                        msg.brightness   = status['brightness']
+                    else:
+                        return
+                    
+                    if msg:
+                        self.status_pub.publish(msg)
+                    
 
-    def get_status(self):
+    def get_device_status(self, device_name=None):
         if self.bots is None:
             return
-        
-        
-    
+        elif device_name:
+            status = self.bots.device_status(device_name=device_name)
+            return status
+        else:
+            return
+
 
     def print_apiversion(self):
         if self.bots is None:
@@ -88,115 +170,12 @@ class SwitchBotStatePublisher:
         apiversion_str = 'Using SwitchBot API ';
         apiversion_str += self.bots.api_version;
         rospy.loginfo(apiversion_str)
-        
-
-    def print_devices(self):
-        if self.bots is None:
-            return
-        
-        device_list_str = 'Switchbot Device List:\n'
-        device_list = sorted(
-            self.bots.device_list,
-            key=lambda device: str(device.get('deviceName')))
-        device_list_str += str(len(device_list)) + ' Item(s)\n'
-        for device in device_list:
-            device_list_str += 'deviceName: ' + str(device.get('deviceName'))
-            device_list_str += ', deviceID: ' + str(device.get('deviceId'))
-            device_list_str += ', deviceType: ' + str(device.get('deviceType'))
-            device_list_str += '\n'
-        rospy.loginfo(device_list_str)
-        
-        remote_list_str = 'Switchbot Remote List:\n'
-        infrared_remote_list = sorted(
-            self.bots.infrared_remote_list,
-            key=lambda infrared_remote: str(infrared_remote.get('deviceName')))
-        remote_list_str += str(len(infrared_remote_list)) + ' Item(s)\n'
-        for infrared_remote in infrared_remote_list:
-            remote_list_str += 'deviceName: ' + str(infrared_remote.get('deviceName'))
-            remote_list_str += ', deviceID: ' + str(infrared_remote.get('deviceId'))
-            remote_list_str += ', remoteType: ' + str(infrared_remote.get('remoteType'))
-            remote_list_str += '\n'
-        rospy.loginfo(remote_list_str)
-        
-
-    def print_scenes(self):
-        if self.bots is None:
-            return
-        
-        scene_list_str = 'Switchbot Scene List:\n'
-        scene_list = sorted(
-            self.bots.scene_list,
-            key=lambda scene: str(scene.get('sceneName')))
-        scene_list_str += str(len(scene_list)) + ' Item(s)\n'
-        for scene in scene_list:
-            scene_list_str += 'sceneName: ' + str(scene.get('sceneName'))
-            scene_list_str += ', sceneID: ' + str(scene.get('sceneId'))
-            scene_list_str += '\n'
-        rospy.loginfo(scene_list_str)
-        
-
-    def publish_devices(self):
-        if self.bots is None:
-            return
-        
-        msg = DeviceArray()
-        
-        device_list = sorted(
-            self.bots.device_list,
-            key=lambda device: str(device.get('deviceName')))
-        for device in device_list:
-            msg_device = Device()
-            msg_device.name = str(device.get('deviceName'))
-            msg_device.type = str(device.get('deviceType'))
-            msg.devices.append(msg_device)
-        
-        infrared_remote_list = sorted(
-            self.bots.infrared_remote_list,
-            key=lambda infrared_remote: str(infrared_remote.get('deviceName')))
-        for infrared_remote in infrared_remote_list:
-            msg_device = Device()
-            msg_device.name = str(infrared_remote.get('deviceName'))
-            msg_device.type = str(infrared_remote.get('remoteType'))
-            msg.devices.append(msg_device)
-        
-        self.pub.publish(msg)
-
-    def execute_cb(self, goal):
-        feedback = SwitchBotCommandFeedback()
-        result = SwitchBotCommandResult()
-        r = rospy.Rate(1)
-        success = True
-        # start executing the action
-        parameter, command_type = goal.parameter, goal.command_type
-        if not parameter:
-            parameter = 'default'
-        if not command_type:
-            command_type = 'command'
-        try:
-            if not self.bots:
-                self.bots = SwitchBotAPIClient(token=self.token, secret=self.secret)
-            feedback.status = str(
-                self.bots.control_device(
-                    command=goal.command,
-                    parameter=parameter,
-                    command_type=command_type,
-                    device_name=goal.device_name
-                ))
-        except (DeviceError, SwitchBotAPIError, KeyError) as e:
-            rospy.logerr(str(e))
-            feedback.status = str(e)
-            success = False
-        finally:
-            self._as.publish_feedback(feedback)
-            r.sleep()
-            result.done = success
-            self._as.set_succeeded(result)
 
 
 if __name__ == '__main__':
     try:
         rospy.init_node('switchbot_state_publisher')
-        ssp = SwitchBotAction()
+        ssp = SwitchBotStatePublisher()
         ssp.spin()
     except rospy.ROSInterruptException:
         pass

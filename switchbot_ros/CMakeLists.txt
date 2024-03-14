@@ -14,6 +14,11 @@ add_message_files(
   FILES
   Device.msg
   DeviceArray.msg
+  Meter.msg
+  PlugMini.msg
+  Hub2.msg
+  Bot.msg
+  StripLight.msg
 )
 
 add_action_files(
