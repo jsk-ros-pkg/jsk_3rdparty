@@ -23,7 +23,7 @@ class SwitchBotStatePublisher:
             self.token = token
 
         # Switchbot API v1.1 needs secret key
-        secret = rospy.get_param('~secret', None )
+        secret = rospy.get_param('~secret', None)
         if secret is not None and os.path.exists(secret):
             with open(secret, 'r', encoding='utf-8') as f:
                 self.secret = f.read().replace('\n', '')
@@ -42,13 +42,13 @@ class SwitchBotStatePublisher:
         if device_name:
             self.device_name = device_name
         else:
-            rospy.logerr('None Device Name')
+            rospy.logerr('No Device Name')
             return
         
-        self.device_type = None        
+        self.device_type = None
         self.device_list = sorted(
             self.bots.device_list,
-            key=lambda device: str(device.get('deviceName')))        
+            key=lambda device: str(device.get('deviceName')))
         for device in self.device_list:
             device_name = str(device.get('deviceName'))
             if self.device_name == device_name:
@@ -63,9 +63,9 @@ class SwitchBotStatePublisher:
         topic_name = '~' + self.device_name
         topic_name = topic_name.replace('-', '_')
         
-        # Publisher for each device type
+        # Publisher Message Class for each device type
         if self.device_type == 'Remote':
-            rospy.logerr('Device Type: "' + self.device_type + '" has no status.')
+            rospy.logerr('Device Type: "' + self.device_type + '" has no status in specifications.')
             return
         else:
             if self.device_type == 'Meter':
@@ -110,7 +110,9 @@ class SwitchBotStatePublisher:
             if self.bots is None:
                 self.bots = self.get_switchbot_client()
             
-            if not self.device_type == 'Remote':
+            if self.device_type == 'Remote':
+                return
+            else:
                 status = self.get_device_status(device_name=self.device_name)
                 
                 if status:
@@ -151,7 +153,7 @@ class SwitchBotStatePublisher:
                     
                     if msg:
                         self.status_pub.publish(msg)
-                    
+
 
     def get_device_status(self, device_name=None):
         if self.bots is None:
