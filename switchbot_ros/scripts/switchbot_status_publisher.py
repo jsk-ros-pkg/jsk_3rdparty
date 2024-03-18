@@ -8,7 +8,7 @@ from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
 from switchbot_ros.msg import Meter, PlugMini, Hub2, Bot, StripLight
 
 
-class SwitchBotStatePublisher:
+class SwitchBotStatusPublisher:
     """
     Publissh your switchbot status with ROS and SwitchBot API
     """
@@ -85,7 +85,7 @@ class SwitchBotStatePublisher:
             elif self.device_type == 'Strip Light':
                 self.msg_class = StripLight
             else:
-                rospy.logerr('No publisher process for "' + self.device_type + '" in switchbot_state_publisher.py')
+                rospy.logerr('No publisher process for "' + self.device_type + '" in switchbot_status_publisher.py')
                 return
             
             self.status_pub = rospy.Publisher(topic_name, self.msg_class, queue_size=1, latch=True)
@@ -176,8 +176,8 @@ class SwitchBotStatePublisher:
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('switchbot_state_publisher')
-        ssp = SwitchBotStatePublisher()
+        rospy.init_node('switchbot_status_publisher')
+        ssp = SwitchBotStatusPublisher()
         ssp.spin()
     except rospy.ROSInterruptException:
         pass

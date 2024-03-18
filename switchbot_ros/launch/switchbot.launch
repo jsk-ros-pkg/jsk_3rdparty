@@ -15,7 +15,7 @@
   </node>
 
   <node if="$(arg pub_status)"
-        name="switchbot_state_publisher" pkg="switchbot_ros" type="switchbot_state_publisher.py"
+        name="switchbot_status_publisher" pkg="switchbot_ros" type="switchbot_status_publisher.py"
         respawn="$(arg respawn)" output="screen">
     <rosparam subst_value="true">
       token: $(arg token)
