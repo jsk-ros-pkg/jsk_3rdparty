@@ -2,7 +2,7 @@
   <arg name="token" />
   <arg name="secret" default="''" />
   <arg name="respawn" default="true" />
-  <arg name="pub_status" default="true" />
+  <arg name="pub_status" default="false" />
   <arg name="pub_status_rate" default="0.1" />
   <arg name="pub_device_name" default="bot74a" />
 
