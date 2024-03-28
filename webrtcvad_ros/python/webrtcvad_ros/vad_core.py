@@ -56,7 +56,9 @@ class VADBaseNode(object):
         is_speech = True if confidence > self._threshold else False
         self._pub_is_speech.publish(Bool(is_speech))
 
-        if not is_speech and len(self._speech_audio_buffer) == 0:
+        if not is_speech and len(self._speech_audio_buffer) <= len(audio_data):
+            # Store audio_data into speech_audio_buffer everytime so that catch 's' or 'th' type sound
+            self._speech_audio_buffer = audio_data
             return
 
         self._speech_audio_buffer = self._speech_audio_buffer + audio_data
@@ -82,4 +84,4 @@ class VADBaseNode(object):
                     rospy.logwarn(
                         "speech duration: {} dropped".format(speech_duration)
                     )
-                self._speech_audio_buffer = b''
+                self._speech_audio_buffer = audio_data
