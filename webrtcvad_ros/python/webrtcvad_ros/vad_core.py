@@ -56,14 +56,15 @@ class VADBaseNode(object):
         is_speech = True if confidence > self._threshold else False
         self._pub_is_speech.publish(Bool(is_speech))
 
+        if not is_speech and len(self._speech_audio_buffer) == 0:
+            return
+
         self._speech_audio_buffer = self._speech_audio_buffer + audio_data
-        speech_buffer_size: int = len(self._speech_audio_buffer)
         speech_duration: float = (
-            (speech_buffer_size / 2.0) / self._audio_info.sample_rate
+            (len(self._speech_audio_buffer) / 2.0) / self._audio_info.sample_rate
             - self.chunk_size / self._audio_info.sample_rate
             - self._audio_timeout_duration
         )
-
         if is_speech and speech_duration < self._maximum_duration:
             self._last_speaking_time = rospy.Time.now()
         else:
@@ -72,15 +73,13 @@ class VADBaseNode(object):
             ):
                 rospy.logdebug("continuing...")
             else:
-                if len(self._speech_audio_buffer) > len(audio_data):
-                    # speech_duration = speech_audio_buffer duration - pre buffer duration - timeout buffer duration
-                    if speech_duration > self._minimum_duration:
-                        self._pub_speech_audio.publish(
-                            AudioData(self._speech_audio_buffer)
-                        )
-                        rospy.loginfo("published duration: {}".format(speech_duration))
-                    else:
-                        rospy.logwarn(
-                            "speech duration: {} dropped".format(speech_duration)
-                        )
-                self._speech_audio_buffer = audio_data
+                if speech_duration > self._minimum_duration:
+                    self._pub_speech_audio.publish(
+                        AudioData(self._speech_audio_buffer)
+                    )
+                    rospy.loginfo("published duration: {}".format(speech_duration))
+                else:
+                    rospy.logwarn(
+                        "speech duration: {} dropped".format(speech_duration)
+                    )
+                self._speech_audio_buffer = b''
