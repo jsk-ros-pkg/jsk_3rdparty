@@ -16,9 +16,9 @@ class VADBaseNode(object):
         self._audio_buffer = b""
 
         self._threshold = rospy.get_param("~threshold", 0.1)
-        self._minimum_duration = rospy.get_param("~minimum_duration", 1.0)
+        self._minimum_duration = rospy.get_param("~minimum_duration", 0.6)
         self._maximum_duration = rospy.get_param("~maximum_duration", 10.0)
-        self._audio_timeout_duration = rospy.get_param("~audio_timeout_duration", 0.3)
+        self._audio_timeout_duration = rospy.get_param("~audio_timeout_duration", 0.5)
 
         self._pub_is_speech = rospy.Publisher("~is_speeching", Bool, queue_size=1)
         self._pub_speech_audio = rospy.Publisher(

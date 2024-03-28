@@ -1,8 +1,8 @@
 <launch>
     <arg name="vad_threshold" default="0.5" />
-    <arg name="vad_minimum_duration" default="1.0" />
+    <arg name="vad_minimum_duration" default="0.6" />
     <arg name="vad_maximum_duration" default="10.0" />
-    <arg name="vad_audio_timeout_duration" default="0.3" />
+    <arg name="vad_audio_timeout_duration" default="0.5" />
 
     <include file="$(find audio_capture)/launch/capture.launch">
         <arg name="format" value="wave" />
