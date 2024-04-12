@@ -2,7 +2,7 @@ PyYAML
 aiofiles
 appdirs
 fastapi
-git+https://github.com/VOICEVOX/pyopenjtalk@a85521a0a0f298f08d9e9b24987b3c77eb4aaff5#egg=pyopenjtalk
+git+https://github.com/VOICEVOX/pyopenjtalk@b35fc89fe42948a28e33aed886ea145a51113f88#egg=pyopenjtalk
 numpy
 python-multipart
 pyworld
