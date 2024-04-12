@@ -13,7 +13,7 @@ set(INSTALL_DIR ${PROJECT_SOURCE_DIR})
 catkin_package()
 
 catkin_generate_virtualenv(
-  INPUT_REQUIREMENTS requirements.in
+  INPUT_REQUIREMENTS requirements_$ENV{ROS_DISTRO}.txt
   PYTHON_INTERPRETER python3
   USE_SYSTEM_PACKAGES FALSE
 )
