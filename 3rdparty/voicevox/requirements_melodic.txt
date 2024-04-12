@@ -17,7 +17,7 @@ importlib-resources==5.4.0  # via tqdm
 numpy==1.19.5             # via -r requirements.in, pyopenjtalk, pyworld, scipy
 pycparser==2.21           # via cffi
 pydantic==1.9.2           # via fastapi
-git+https://github.com/VOICEVOX/pyopenjtalk@b35fc89fe42948a28e33aed886ea145a51113f88#egg=pyopenjtalk  # via -r requirements.in
+git+https://github.com/mqcmd196/pyopenjtalk@4f6e725bb03af721413d9966d361e6384b6fde47#egg=pyopenjtalk
 python-multipart==0.0.5   # via -r requirements.in
 pyworld==0.3.0            # via -r requirements.in
 pyyaml==6.0               # via -r requirements.in
