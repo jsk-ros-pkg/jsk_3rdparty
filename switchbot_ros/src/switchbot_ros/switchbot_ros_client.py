@@ -18,7 +18,7 @@ class SwitchBotROSClient(object):
                 actionname,
                 SwitchBotCommandAction
                 )
-        rospy.loginfo("Waiting " + str(timeout) + "[sec] for action server to start .")
+        rospy.loginfo("Waiting for action server to start. (timeout: " + str(timeout) + "[sec])")
         self.action_client.wait_for_server(timeout=rospy.Duration(timeout,0))
 
     def get_devices(self, timeout=None):
