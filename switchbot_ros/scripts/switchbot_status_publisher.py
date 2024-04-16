@@ -140,14 +140,24 @@ class SwitchBotStatusPublisher:
                         msg = Bot()
                         msg.header.stamp = time
                         msg.battery      = status['battery']
-                        msg.power        = status['power']
+                        if status['power'] == 'on':
+                            msg.power    = True
+                        else:
+                            msg.power    = False
                         msg.device_mode  = status['deviceMode']
                     elif self.msg_class == StripLight:
                         msg = StripLight()
                         msg.header.stamp = time
-                        msg.power        = status['power']
-                        msg.color        = status['color']
+                        if status['power'] == 'on':
+                            msg.power    = True
+                        else:
+                            msg.power    = False
                         msg.brightness   = status['brightness']
+                        rgb_string       = status['color']
+                        r, g, b = map(int, rgb_string.split(':'))
+                        msg.color_r      = r
+                        msg.color_g      = g
+                        msg.color_b      = b
                     else:
                         return
                     

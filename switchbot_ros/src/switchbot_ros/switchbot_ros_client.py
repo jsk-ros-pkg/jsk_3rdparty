@@ -9,7 +9,8 @@ class SwitchBotROSClient(object):
 
     def __init__(self,
                  actionname='switchbot_ros/switch',
-                 topicname='switchbot_ros/devices'):
+                 topicname='switchbot_ros/devices',
+                 timeout=5):
 
         self.actionname = actionname
         self.topicname = topicname
@@ -17,8 +18,8 @@ class SwitchBotROSClient(object):
                 actionname,
                 SwitchBotCommandAction
                 )
-        rospy.loginfo("Waiting for action server to start.")
-        self.action_client.wait_for_server()
+        rospy.loginfo("Waiting " + str(timeout) + "[sec] for action server to start .")
+        self.action_client.wait_for_server(timeout=rospy.Duration(timeout,0))
 
     def get_devices(self, timeout=None):
 
