@@ -19,6 +19,7 @@ from typing import List
 from typing import Optional
 import zipfile
 
+import numpy as np
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,6 +54,7 @@ from voicevox_engine.model import ParseKanaError
 from voicevox_engine.model import Speaker
 from voicevox_engine.model import SpeakerInfo
 from voicevox_engine.model import SupportedDevicesInfo
+from voicevox_engine.model import Mora
 from voicevox_engine.morphing import \
     synthesis_morphing_parameter as _synthesis_morphing_parameter
 from voicevox_engine.morphing import synthesis_morphing
@@ -65,6 +67,21 @@ from voicevox_engine.utility import connect_base64_waves
 from voicevox_engine.utility import ConnectBase64WavesException
 from voicevox_engine.utility import engine_root
 
+
+def convert_to_float(obj):
+    """
+    Recursively converts numpy.float32 values to Python float in an object's attributes.
+    """
+    if isinstance(obj, list):
+        return [convert_to_float(item) for item in obj]
+    elif isinstance(obj, AccentPhrase) or isinstance(obj, Mora):
+        for attr, value in obj.__dict__.items():
+            setattr(obj, attr, convert_to_float(value))
+        return obj
+    elif isinstance(obj, np.float32):
+        return float(obj)
+    else:
+        return obj
 
 def b64encode_str(s):
     return base64.b64encode(s).decode("utf-8")
@@ -129,6 +146,7 @@ def generate_app(
         """
         engine = get_engine(core_version)
         accent_phrases = engine.create_accent_phrases(text, speaker_id=speaker)
+        accent_phrases = [convert_to_float(ac) for ac in accent_phrases]
         return AudioQuery(
             accent_phrases=accent_phrases,
             speedScale=1,
