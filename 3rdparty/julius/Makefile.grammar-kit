@@ -5,7 +5,7 @@ all: installed.grammar-kit
 VERSION = 4.3.1
 FILENAME = grammar-kit-v$(VERSION).tar.gz
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://github.com/julius-speech/grammar-kit/archive/v$(VERSION).tar.gz"
+TARBALL_URL = "https://github.com/jsk-ros-pkg/archives/raw/master/$(FILENAME)"
 TARBALL_PATCH =
 SOURCE_DIR = build/grammar-kit-$(VERSION)
 UNPACK_CMD = tar xf

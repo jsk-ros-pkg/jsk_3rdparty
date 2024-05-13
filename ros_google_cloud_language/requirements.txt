@@ -1,0 +1,25 @@
+cachetools==3.1.1         # via google-auth
+certifi==2021.10.8        # via requests
+chardet==4.0.0            # via requests
+enum34==1.1.10            # via google-cloud-language, grpcio
+# commented out for python3, which uses concurrent.futures
+# futures==3.3.0            # via google-api-core, grpcio
+google-api-core[grpc]==1.31.5  # via google-cloud-language
+google-auth==1.35.0       # via google-api-core
+google-cloud-language==1.3.0  # via -r requirements.in
+googleapis-common-protos==1.52.0  # via google-api-core
+grpcio==1.41.1            # via google-api-core
+idna==2.10                # via requests
+packaging==20.9           # via google-api-core
+protobuf==3.17.3          # via google-api-core, googleapis-common-protos
+pyasn1-modules==0.2.8     # via google-auth
+pyasn1==0.4.8             # via pyasn1-modules, rsa
+pyparsing==2.4.7          # via packaging
+pytz==2021.3              # via google-api-core
+requests==2.26.0          # via google-api-core
+rsa==4.5                  # via google-auth
+six==1.16.0               # via google-api-core, google-auth, grpcio, protobuf
+urllib3==1.26.7           # via requests
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

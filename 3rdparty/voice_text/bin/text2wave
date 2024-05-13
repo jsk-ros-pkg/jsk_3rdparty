@@ -14,7 +14,7 @@ def text_to_speech_client(text_path, wave_path):
         # print("Requesting %s -> %s"%(text_path, wave_path))
         res = text_to_speech(text_path, wave_path)
         return res.ok
-    except rospy.ServiceException, e:
+    except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
 
 

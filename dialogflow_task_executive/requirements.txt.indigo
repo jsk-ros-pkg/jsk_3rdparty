@@ -15,6 +15,7 @@ google-api-core==1.12.0
 google-auth==1.6.3
 google-auth-httplib2==0.0.3
 googleapis-common-protos==1.6.0
+grpcio==1.24.0
 httplib2==0.14.0
 idna==2.6
 protobuf==3.12.2

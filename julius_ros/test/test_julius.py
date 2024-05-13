@@ -25,7 +25,7 @@ class TestJulius(unittest.TestCase):
         start_time = rospy.Time.now()
         while len(self.transcripts) < len(expected_sentences):
             rospy.sleep(1)
-            if (rospy.Time.now() - start_time).to_sec() > 20:
+            if (rospy.Time.now() - start_time).to_sec() > 60:
                 self.fail("Timeout.")
 
         for s in expected_sentences:

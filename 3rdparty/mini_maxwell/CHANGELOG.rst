@@ -2,6 +2,22 @@
 Changelog for package mini_maxwell
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* .github/workflow:  integrate all yaml to one (`#338 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/338>`_)
+* Contributors: Kei Okada, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

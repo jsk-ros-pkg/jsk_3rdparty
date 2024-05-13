@@ -2,6 +2,25 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+
+  * [ff] remove compile warning
+
+* Contributors: Kei Okada, Naoya Yamaguchi, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

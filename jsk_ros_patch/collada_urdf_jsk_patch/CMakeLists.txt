@@ -25,6 +25,7 @@ find_package(catkin REQUIRED)
 catkin_package(CATKIN_DEPENDS collada_urdf)
 
 
+#catkin_lint: ignore immutable_var
 set(ENV{PKG_CONFIG_PATH} ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH})
 add_custom_target(urdf_to_collada ALL DEPENDS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/urdf_to_collada)
 add_custom_command(OUTPUT ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/urdf_to_collada

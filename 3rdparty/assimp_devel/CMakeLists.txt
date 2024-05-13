@@ -23,7 +23,6 @@ else()
     INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/assimp_devel
     LIBRARIES    assimp_devel
     EXPORTED_TARGETS libassimp_devel
-    SKIP_CMAKE_CONFIG_GENERATION
     )
 endif()
 execute_process(COMMAND sed -i s@${${PROJECT_NAME}_VERSION}@3.0.1@ ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig/assimp_devel.pc)

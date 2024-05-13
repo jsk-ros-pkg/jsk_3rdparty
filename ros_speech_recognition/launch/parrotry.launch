@@ -1,0 +1,33 @@
+<launch>
+  <arg name="use_google" default="true" />
+  <arg name="language" default="en-US" />
+  <arg name="confidence_threshold" default="0.8" />
+
+  <arg name="tts_action_name" value="sound_play" if="$(eval arg('language') != 'ja-JP')" />
+  <arg name="tts_action_name" value="robotsound_jp" if="$(eval arg('language') == 'ja-JP')" />
+
+  <include if="$(arg use_google)" file="$(find ros_speech_recognition)/launch/speech_recognition.launch">
+    <arg name="launch_sound_play" value="false" />
+    <arg name="language" value="$(arg language)" />
+    <arg name="continuous" value="true" />
+    <arg name="voice_topic" value="/speech_to_text" />
+    <arg name="tts_action_names" value="['$(arg tts_action_name)']" />
+  </include>
+
+  <include unless="$(arg use_google)" file="$(find julius_ros)/launch/julius.launch">
+    <arg name="julius_output" value="screen"/>
+  </include>
+
+  <node name="parrot_node" pkg="ros_speech_recognition" type="parrot_node.py"
+        output="screen">
+    <remap from="~input" to="/speech_to_text" />
+    <rosparam subst_value="true">
+      tts_action_name: $(arg tts_action_name)
+      confidence_threshold: $(arg confidence_threshold)
+    </rosparam>
+  </node>
+
+  <include if="$(eval arg('language') != 'ja-JP')" file="$(find sound_play)/soundplay_node.launch" />
+  <include if="$(eval arg('language') == 'ja-JP')" file="$(find aques_talk)/launch/aques_talk.launch" />
+
+</launch>

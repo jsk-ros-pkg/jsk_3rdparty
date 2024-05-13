@@ -52,6 +52,8 @@ Or we can use `credential` and `project_id` arguments of ` dialogflow_task_execu
 roslaunch dialogflow_task_executive dialogflow_task_executive.launch credential:=/etc/ros/hogehoge.json project_id:=pr2-hogehoge
 ```
 
+If you have `project_id` in both your credential file and rospram (or argument of `dialogflow_task_executive.launch`), the `project_id` in both your credential file becomes effective. To use `project_id` in rosparam, use `~override_project_id` option.
+
 ## How to register new task in Dialogflow
 
 ### Create new `app_manager` app

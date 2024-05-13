@@ -21,7 +21,7 @@ from gdrive_ros.srv import Upload
 from gdrive_ros.srv import UploadResponse
 
 
-if sys.version_info < 3 and \
+if sys.version_info.major < 3 and \
         LooseVersion(pkg_resources.get_distribution("rsa").version) \
         >= LooseVersion('4.6.0'):
     print('''rsa < 4.6.0 is required:
@@ -47,6 +47,12 @@ class GDriveServerNode(object):
         auth_wait_seconds = rospy.get_param('~auth_wait_seconds', 10.0)
         if settings_yaml is not None:
             self.gauth = GoogleAuth(settings_yaml)
+            # if client_config_file, save_credentials_file is not found, try to find relative to setting_yaml
+            dir_path = os.path.dirname(os.path.realpath(settings_yaml))
+            for file in ['client_config_file', 'save_credentials_file']:
+                if not os.path.isfile(self.gauth.settings[file]):
+                    rospy.logwarn("{}:{} is not found, try to use {}".format(file, self.gauth.settings[file], os.path.join(dir_path, self.gauth.settings[file])))
+                    self.gauth.settings[file] = os.path.join(dir_path, self.gauth.settings[file])
         else:
             rospy.logerr('param: ~settings_yaml is not correctly set.')
             sys.exit(1)
@@ -246,15 +252,8 @@ class GDriveServerNode(object):
 
         folder_title = parents_path[0]
         parent = parents_id if parents_id else 'root'
-        gfiles = self.gdrive.ListFile(
-            {'q': "'{}' in parents and trashed=false".format(parent)})
-        gfiles = gfiles.GetList()
-        gfolders = []
-        for gf in gfiles:
-            if (gf['mimeType'] == self.folder_mime_type
-                    and gf['title'] == folder_title):
-                gfolders.append(gf)
-
+        gfolders = self.gdrive.ListFile(
+            {'q': "'{}' in parents and mimeType = '{}' and title = '{}' and trashed=false".format(parent, self.folder_mime_type, folder_title)}).GetList()
         if len(parents_path) == 1:
             if len(gfolders) > 0:
                 return gfolders[0]['id']

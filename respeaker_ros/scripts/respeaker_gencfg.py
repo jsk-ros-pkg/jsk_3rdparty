@@ -4,7 +4,7 @@
 
 import os
 import sys
-from respeaker_node import PARAMETERS, RespeakerInterface
+from respeaker_ros import PARAMETERS, RespeakerInterface
 
 
 def main(out):

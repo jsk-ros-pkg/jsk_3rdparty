@@ -1,0 +1,9 @@
+<launch>
+  <arg name="google_cloud_credentials_json"
+       default="" />
+  <node pkg="ros_google_cloud_language" type="analyze_text.py"
+        name="analyze_text" output="screen" >
+    <param name="google_cloud_credentials_json"
+           value="$(arg google_cloud_credentials_json)" />
+  </node>
+</launch>

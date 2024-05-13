@@ -4,9 +4,9 @@ project(rostwitter)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
+  dynamic_reconfigure
   message_generation
   rospy
-  std_msgs
   mk
 )
 
@@ -19,7 +19,11 @@ add_action_files(
 
 
 generate_messages(
-  DEPENDENCIES actionlib_msgs std_msgs)
+  DEPENDENCIES actionlib_msgs)
+
+generate_dynamic_reconfigure_options(
+  cfg/TweetImageServer.cfg
+)
 
 catkin_package(
   CATKIN_DEPENDS message_runtime
@@ -40,7 +44,7 @@ else()
   )
 endif()
 
-install(DIRECTORY test
+install(DIRECTORY test resource launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )

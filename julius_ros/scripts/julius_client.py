@@ -24,9 +24,9 @@ import lxml.etree
 
 
 class JuliusClient(object):
-    start_signal = "/usr/share/sounds/ubuntu/stereo/bell.ogg"
-    success_signal = "/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg"
-    timeout_signal = "/usr/share/sounds/ubuntu/stereo/window-slide.ogg"
+    start_signal = "/usr/share/sounds/freedesktop/stereo/bell.ogg"
+    success_signal = "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"
+    timeout_signal = "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"
 
     def __init__(self):
         # load parameters

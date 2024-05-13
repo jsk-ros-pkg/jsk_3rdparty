@@ -1,0 +1,55 @@
+<launch>
+  <arg name="receiving_mode" default="url" doc="Google Chat API settings. Choose from url, dialogflow, pubsub, none."/>
+  <arg name="gdrive_upload_service" default="/gdrive_ros/upload" doc="The ROS service name of gdrive_ros upload"/>
+  <arg name="upload_data_timeout" default="20" />
+  <arg name="download_data" default="true" />
+  <arg name="download_data_timeout" default="10" />
+  <arg name="download_directory" default="/tmp" />
+  <arg name="download_avatar" default="false" />
+  <arg name="google_cloud_credentials_json" default="" />
+  <arg name="use_yaml" default="false" doc="Whether you use yaml file or not."/>
+  <arg name="yaml_file" default="" doc="Yaml file of web settings."/>
+  <arg name="respawn" default="true" />
+  <!-- For https mode -->
+  <arg name="host" default="localhost" />
+  <arg name="port" default="443" />
+  <arg name="ssl_certfile" default="default" />
+  <arg name="ssl_keyfile" default="default" />
+  <!-- For pubsub mode -->
+  <arg name="project_id" default="default" />
+  <arg name="subscription_id" default="default" />
+
+  <!-- params for helper -->
+  <arg name="use_helper" default="true" />
+  <arg name="to_dialogflow_client" default="false" />
+  <arg name="debug_sound" default="false" />
+
+  <node name="google_chat_ros" pkg="google_chat_ros" type="google_chat_ros_node.py"
+        respawn="$(arg respawn)" output="screen">
+    <rosparam subst_value="true">
+      receiving_mode: $(arg receiving_mode)
+      gdrive_upload_service: $(arg gdrive_upload_service)
+      upload_data_timeout: $(arg upload_data_timeout)
+      download_data_timeout: $(arg download_data_timeout)
+      download_data: $(arg download_data)
+      download_directory: $(arg download_directory)
+      download_avatar: $(arg download_avatar)
+      google_cloud_credentials_json: $(arg google_cloud_credentials_json)
+      host: $(arg host)
+      port: $(arg port)
+      ssl_certfile: $(arg ssl_certfile)
+      ssl_keyfile: $(arg ssl_keyfile)
+      project_id: $(arg project_id)
+      subscription_id: $(arg subscription_id)
+    </rosparam>
+    <rosparam command="load" file="$(arg yaml_file)" if="$(arg use_yaml)"/>
+  </node>
+
+  <node name="google_chat_ros_helper" pkg="google_chat_ros" type="helper.py"
+        respawn="$(arg respawn)" output="screen" if="$(arg use_helper)">
+    <rosparam subst_value="true">
+      to_dialogflow_client: $(arg to_dialogflow_client)
+      debug_sound: $(arg debug_sound)
+    </rosparam>
+  </node>
+</launch>

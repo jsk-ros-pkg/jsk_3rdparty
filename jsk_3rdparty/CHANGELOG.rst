@@ -2,6 +2,27 @@
 Changelog for package jsk_3rdparty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* remove rosbuild packages from jsk_3rdparty/package.xml (`#475 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/475>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* [OSQP] add a wrapper package for OSQP, which is a library to solve QP (`#442 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/442>`_)
+* [jsk_3rdparty] fix typo in package.xml (`#426 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/426>`_)
+* Add nfc_ros (`#406 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/406>`_)
+* add zdepth and zdepth_image_transport package (`#389 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/389>`_)
+* [jsk_3rdparty] list all packages in jsk_3rdparty (`#424 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/424>`_)
+* Contributors: Aoi Nakane, Kei Okada, Koki Shinjo, Moju Zhao, Naoto Tsukamoto, Shingo Kitagawa
+
 2.1.24 (2021-07-26)
 -------------------
 

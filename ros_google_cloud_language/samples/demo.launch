@@ -1,0 +1,8 @@
+<launch>
+  <arg name="google_cloud_credentials_json" default="" />
+  <include file="$(find ros_google_cloud_language)/launch/analyze_text.launch" >
+    <arg name="google_cloud_credentials_json" value="$(arg google_cloud_credentials_json)" />
+  </include>
+  <node pkg="ros_google_cloud_language" type="client.l"
+        name="client" output="screen" />
+</launch>

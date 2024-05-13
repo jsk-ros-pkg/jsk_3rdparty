@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>influxdb_store</name>
-  <version>2.1.24</version>
+  <version>2.1.28</version>
   <description>The influxdb_store package</description>
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
   <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>
@@ -15,9 +15,11 @@
   <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
 
   <exec_depend>pr2_msgs</exec_depend>
-  <exec_depend>python-influxdb</exec_depend>
-  <exec_depend>python-tz</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-influxdb</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-influxdb</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-tz</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-tz</exec_depend>
 
   <export>
   </export>

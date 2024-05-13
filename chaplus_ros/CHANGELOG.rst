@@ -2,6 +2,29 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* [chaplus_ros] support mebo (`#374 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/374>`_)
+* [chaplus_ros] change a3rt urls (`#360 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/360>`_)
+* .github/workflow:  integrate all yaml to one (`#338 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/338>`_)
+* Fix for noetic (`#332 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/332>`_)
+
+  * [chaplus_ros][switchbot_ros]fix exec_depend in ros noetic
+  * [chaplus_ros]support installation of python3-requests
+
+* Contributors: Kei Okada, Miyabi Tanemoto, Shingo Kitagawa, Yoshiki Obinata, Ayaka Fujii
+
 2.1.24 (2021-07-26)
 -------------------
 

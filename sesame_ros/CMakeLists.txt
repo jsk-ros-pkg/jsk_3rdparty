@@ -32,13 +32,18 @@ endif()
 
 include_directories()
 
-file(GLOB NODE_SCRIPTS_FILES node_scripts/*)
-file(GLOB SCRIPTS_FILES scripts/*)
+file(GLOB PYTHON_SCRIPT_FILES node_scripts/* scripts/* test/*.py)
 catkin_install_python(
-  PROGRAMS ${NODE_SCRIPTS_FILES} ${SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
+endif()
