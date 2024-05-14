@@ -57,9 +57,25 @@ catkin build voicevox
 
 ### Optional (Using docker with GPU)
 
+First, install the NVIDIA Container Toolkit.
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+After that,
+
 ```
 docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+
+You should start Docker as follows.
+
+```
 docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+```
+roslaunch voicevox voicevox_texttospeech.launch ip:=<Docker PC IP>
 ```
 
 
