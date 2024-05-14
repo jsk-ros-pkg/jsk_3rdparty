@@ -55,6 +55,14 @@ cd /path/to/catkin_workspace
 catkin build voicevox
 ```
 
+### Optional (Using docker with GPU)
+
+```
+docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+
 ## Usage
 
 ### Launch sound_play with VOICEVOX Text-to-Speech
