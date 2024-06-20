@@ -1,0 +1,11 @@
+PyYAML
+aiofiles
+appdirs
+fastapi
+git+https://github.com/VOICEVOX/pyopenjtalk@a85521a0a0f298f08d9e9b24987b3c77eb4aaff5#egg=pyopenjtalk
+numpy
+python-multipart
+pyworld
+scipy
+soundfile
+uvicorn
