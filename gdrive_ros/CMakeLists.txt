@@ -23,10 +23,20 @@ catkin_package(
   message_runtime
 )
 
+if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
+catkin_generate_virtualenv(
+  PYTHON_INTERPRETER python3
+  CHECK_VENV FALSE
+  # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
+  EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem
+  )
+else()
 catkin_generate_virtualenv(
   PYTHON_INTERPRETER python3
   CHECK_VENV FALSE
   )
+endif()
 
 
 catkin_install_python(PROGRAMS node_scripts/gdrive_server_node.py node_scripts/sample_gdrive_rospy_client.py
