@@ -9,7 +9,7 @@ client = SwitchBotROSClient()
 devices = client.get_devices()
 print(devices)
 
-client.control_device('pendant-light', 'turnOff')
+client.control_device('pendant-light', 'turnOn', wait=True)
 
-client.control_device('bot74a', 'turnOn')
+client.control_device('bot74a', 'turnOn', wait=True)
 
