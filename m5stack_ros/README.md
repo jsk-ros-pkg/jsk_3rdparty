@@ -23,7 +23,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
     catkin build m5stack_ros
     ```
 
-2. Setup [Arduino IDE](https://www.arduino.cc/en/software/) for M5Stack
+3. Setup [Arduino IDE](https://www.arduino.cc/en/software/) for M5Stack
 
   - Download arduino IDE file from [this page](https://www.arduino.cc/en/software ) and place the unzipped file under home directory like `~/arduino-1.8.16`. I have tested version 1.8.16 and recommend to [download this version](https://downloads.arduino.cc/arduino-1.8.16-linux64.tar.xz).
     ```bash
@@ -74,7 +74,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
     See also [rosserial_arduino](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup)
 
-3. Burn firmware for each device. Available devices are listed in [Devices](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros#devices) section.
+4. Burn firmware for each device. Available devices are listed in [Devices](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros#devices) section.
 
   - Launch Arduino IDE
 
@@ -106,7 +106,7 @@ Connect the devices to ROS via [M5Stack](https://m5stack.com/) and [rosserial](h
 
   - If you use Wi-Fi, set SSID and password in `m5stack_ros/arduino_libraries/wifi.h`. **DO NOT** upload these information to github.
 
-4.  Start main program
+5.  Start main program
 
   - Connect M5Stack and the device with cable.
 
