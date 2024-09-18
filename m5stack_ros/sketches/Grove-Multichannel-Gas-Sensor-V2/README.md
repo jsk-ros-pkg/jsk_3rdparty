@@ -1,4 +1,4 @@
-# EARTH
+# Grove-Multichannel-Gas-Sensor-V2
 
 Publish [Grove - Gas Sensor V2(Multichannel)](https://wiki.seeedstudio.com/Grove-Multichannel-Gas-Sensor-V2/)
 
