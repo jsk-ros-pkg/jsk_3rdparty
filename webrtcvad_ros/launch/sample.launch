@@ -1,4 +1,6 @@
 <launch>
+    <arg name="aggressiveness" default="1" />
+
     <include file="$(find audio_capture)/launch/capture.launch">
         <arg name="format" value="wave"/>
     </include>
@@ -9,8 +11,8 @@
         type="vad.py"
         output="screen"
     >
-        <rosparam>
-            aggressiveness: 1
+        <rosparam subst_value="true">
+            aggressiveness: $(arg aggressiveness)
         </rosparam>
         <remap from="audio_data" to="/audio/audio"/>
         <remap from="audio_info" to="/audio/audio_info"/>
@@ -25,7 +27,12 @@
         <remap from="audio" to="/webrtcvad_ros/speech_audio"/>
         <rosparam subst_value="true">
             language: ja-JP
-            self_cancellation: false
+            self_cancellation: true
+            tts_actions_names:
+            - sound_play
+            - speed_play_jp
+            - robotsound
+            - robotsound_jp
             tts_tolerance: 1.0
         </rosparam>
     </node>
