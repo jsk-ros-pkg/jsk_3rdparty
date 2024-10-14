@@ -14,11 +14,11 @@ class SileroVADROS(VADBaseNode):
     def __init__(self):
 
         model_vad, _ = torch.hub.load(
-            repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=True
+                repo_or_dir="snakers4/silero-vad:v5.0", model="silero_vad", force_reload=True
         )
         self.model_vad = model_vad
 
-        super(SileroVADROS, self).__init__(chunk_size=1536)
+        super(SileroVADROS, self).__init__(chunk_size=512)
 
         rospy.loginfo("Initialized.")
 
