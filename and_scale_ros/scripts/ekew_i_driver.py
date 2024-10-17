@@ -64,7 +64,7 @@ class EkEwIDriver(object):
             return
 
         try:
-            self.ser.write('Q\r\n')
+            self.ser.write(b'Q\r\n')
         except SerialTimeoutException:
             rospy.logerr('Serial write timeout')
             rospy.signal_shutdown('Serial write timeout')
@@ -82,18 +82,18 @@ class EkEwIDriver(object):
         header = data[:2]
         msg.weight.value = float(data[3:12])
         unit = data[12:15]
-        if unit == '  g':
-            if header == 'ST':
+        if unit == b'  g':
+            if header == b'ST':
                 # stable
                 msg.weight.stable = True
-            elif header == 'US':
+            elif header == b'US':
                 # unstable
                 msg.weight.stable = False
-            elif header == 'OL':
+            elif header == b'OL':
                 # scale over
                 rospy.logerr('Scale data is over its range')
                 return
-            elif header == 'QT':
+            elif header == b'QT':
                 # number mode
                 rospy.logerr('Scale is in number mode')
                 return
