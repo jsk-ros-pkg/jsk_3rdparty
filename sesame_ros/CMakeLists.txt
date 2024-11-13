@@ -23,6 +23,7 @@ catkin_package(
 if($ENV{ROS_DISTRO} STRGREATER "melodic")
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3
+    CHECK_VENV FALSE
     )
 elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
@@ -34,6 +35,7 @@ elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
 else()
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python2
+    CHECK_VENV FALSE
     )
 endif()
 
