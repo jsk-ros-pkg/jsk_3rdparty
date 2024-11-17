@@ -9,7 +9,7 @@ if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
     GIT_REPOSITORY  https://github.com/catid/Zdepth.git
     GIT_TAG         ac7c6d8e944d07be2404e5a1eaa04562595f3756
     GIT_SHALLOW     TRUE
-    PATCH_COMMAND   cat ${PROJECT_SOURCE_DIR}/fix_cmakelists.patch | patch -p1 --forward || true
+    PATCH_COMMAND   cat ${PROJECT_SOURCE_DIR}/fix_cmakelists.patch | patch -p1 --forward || true # If there is no --forward, the build process hangs because the patch command waits interactively for input on whether a file that has already been patched can be patched again. If there is no || true , the patch command returns non-zero status if you try to use it on the patched file, then catkin build failes
     CMAKE_ARGS      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     INSTALL_COMMAND echo "install"
    )
