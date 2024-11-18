@@ -5,7 +5,7 @@ from requests import ConnectionError
 import rospy
 from switchbot_ros.switchbot import SwitchBotAPIClient
 from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
-from switchbot_ros.msg import Meter, PlugMini, Hub2, Bot, StripLight
+from switchbot_ros.msg import Meter, PlugMini, Hub2, Bot, StripLight, MeterProCO2
 
 
 class SwitchBotStatusPublisher:
@@ -84,6 +84,8 @@ class SwitchBotStatusPublisher:
                 self.msg_class = Bot
             elif self.device_type == 'Strip Light':
                 self.msg_class = StripLight
+            elif self.device_type == 'MeterPro(CO2)':
+                self.msg_class = MeterProCO2
             else:
                 rospy.logerr('No publisher process for "' + self.device_type + '" in switchbot_status_publisher.py')
                 return
@@ -158,6 +160,13 @@ class SwitchBotStatusPublisher:
                         msg.color_r      = r
                         msg.color_g      = g
                         msg.color_b      = b
+                    elif self.msg_class == MeterProCO2:
+                        msg = MeterProCO2()
+                        msg.header.stamp = time
+                        msg.temperature  = status['temperature']
+                        msg.humidity     = status['humidity']
+                        msg.battery      = status['battery']
+                        msg.co2ppm       = status['CO2']
                     else:
                         return
                     

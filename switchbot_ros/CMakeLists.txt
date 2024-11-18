@@ -15,6 +15,7 @@ add_message_files(
   Device.msg
   DeviceArray.msg
   Meter.msg
+  MeterProCO2.msg
   PlugMini.msg
   Hub2.msg
   Bot.msg
