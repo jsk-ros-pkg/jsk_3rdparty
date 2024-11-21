@@ -1,0 +1,5 @@
+bayesian_network/DiscreteNode[] discrete_nodes
+bayesian_network/LinearGaussianNode[] linear_gaussian_nodes
+uint32 sample_num # request sampling number
+---
+bayesian_network/Evidence[] evidences # size = sample_num
