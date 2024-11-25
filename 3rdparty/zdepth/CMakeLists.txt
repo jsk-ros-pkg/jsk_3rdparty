@@ -3,7 +3,7 @@ project(zdepth)
 
 include(ExternalProject)
 
-if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
+if(NOT "$ENV{ROS_DISTRO}" STREQUAL "indigo" OR NOT "$ENV{ROS_DISTRO}" STREQUAL "kinetic")
   ExternalProject_Add(
     zdepth
     GIT_REPOSITORY  https://github.com/catid/Zdepth.git
