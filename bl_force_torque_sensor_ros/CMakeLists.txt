@@ -5,8 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-catkin_python_setup()
-
 add_message_files(
   FILES
   AmplifierOutputRawArray.msg
