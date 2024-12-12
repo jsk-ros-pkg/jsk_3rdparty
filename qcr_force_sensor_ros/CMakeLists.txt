@@ -3,8 +3,6 @@ project(qcr_force_sensor_ros)
 
 find_package(catkin REQUIRED)
 
-catkin_python_setup()
-
 catkin_package(
 )
 
