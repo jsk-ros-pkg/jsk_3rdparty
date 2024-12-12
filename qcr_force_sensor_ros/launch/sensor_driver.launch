@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="driver_name" default="qcr_force_sensor_driver" />
+  <arg name="port" default="/dev/ttyUSB0" />
+  <arg name="baud" default="115200" />
+  <arg name="n_per_hz" default="0.0000286" />
+  <arg name="offset_calib_sample_number" default="300" />
+  <arg name="sensor_frame_id" default="qcr_force_sensor" />
+
+  <node name="$(arg driver_name)"
+        pkg="qcr_force_sensor_ros" type="sensor_driver.py"
+        output="screen">
+    <rosparam subst_value="true">
+      port: $(arg port)
+      baud: $(arg baud)
+      n_per_hz: $(arg n_per_hz)
+      offset_calib_sample_number: $(arg offset_calib_sample_number)
+      sensor_frame_id: $(arg sensor_frame_id)
+    </rosparam>
+  </node>
+
+</launch>
