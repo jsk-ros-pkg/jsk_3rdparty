@@ -8,6 +8,8 @@ add_custom_target(libnlopt_cxx ALL
   DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/libnlopt_cxx.so)
 add_custom_command(OUTPUT
   ${CATKIN_DEVEL_PREFIX}/lib/libnlopt_cxx.so
+  COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build
+  COMMAND cp ${PROJECT_SOURCE_DIR}/build/nlopt-2.3.tar.gz ${CMAKE_CURRENT_BINARY_DIR}/build
   COMMAND cp ${PROJECT_SOURCE_DIR}/nlopt-2.3.tar.gz.md5sum ${CMAKE_CURRENT_BINARY_DIR}
   COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/tmp
   COMMAND cmake -E chdir ${CMAKE_CURRENT_BINARY_DIR} make -f ${PROJECT_SOURCE_DIR}/Makefile DSTDIR=${CMAKE_CURRENT_BINARY_DIR}/tmp MK_DIR=${mk_PREFIX}/share/mk
