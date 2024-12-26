@@ -14,9 +14,9 @@ generate_dynamic_reconfigure_options(
 
 catkin_package()
 
-if($ENV{ROS_DISTRO} STRGREATER "melodic")
+if("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STREQUAL "melodic")
   catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3
+    PYTHON_INTERPRETER python2
     CHECK_VENV FALSE
     )
 elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
@@ -28,7 +28,7 @@ elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   )
 else()
   catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python2
+    PYTHON_INTERPRETER python3
     CHECK_VENV FALSE
     )
 endif()
