@@ -3,7 +3,9 @@ project(zdepth)
 
 include(ExternalProject)
 
-if(NOT "$ENV{ROS_DISTRO}" STREQUAL "indigo" OR NOT "$ENV{ROS_DISTRO}" STREQUAL "kinetic")
+if(("$ENV{ROS_DISTRO}" STREQUAL "indigo") OR ("$ENV{ROS_DISTRO}" STREQUAL "kinetic"))
+  install(CODE "message(WARNING \"Skipping zdepth install because ROS is too old\")")
+else()
   ExternalProject_Add(
     zdepth
     GIT_REPOSITORY  https://github.com/catid/Zdepth.git
@@ -15,6 +17,4 @@ if(NOT "$ENV{ROS_DISTRO}" STREQUAL "indigo" OR NOT "$ENV{ROS_DISTRO}" STREQUAL "
    )
 
   install(CODE "execute_process(COMMAND make install WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zdepth-prefix/src/zdepth-build)")
-else()
-  install(CODE "message(WARNING \"Skipping zdepth install because ROS is too old\")")
 endif()
