@@ -1,0 +1,10 @@
+--- src/downward/src/search/landmarks/landmark_factory_zhu_givan.h.bak	2024-11-13 13:20:10.508657847 +0900
++++ src/downward/src/search/landmarks/landmark_factory_zhu_givan.h	2024-11-13 13:20:12.591485789 +0900
+@@ -7,6 +7,7 @@
+ #include "../globals.h"
+ 
+ using namespace __gnu_cxx;
++using std::vector;
+ 
+ class LandmarkFactoryZhuGivan : public LandmarkFactory {
+ private:
