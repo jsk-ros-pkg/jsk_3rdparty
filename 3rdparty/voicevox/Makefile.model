@@ -1,0 +1,33 @@
+# -*- makefile -*-
+
+all: installed.voicevox_model
+
+VERSION = 1.10.0
+ifeq ($(shell uname -m),x86_64)
+	DIRNAME = onnxruntime-linux-x64-$(VERSION)
+endif
+ifeq ($(shell uname -m),aarch64)
+	DIRNAME = onnxruntime-linux-aarch64-$(VERSION)
+endif
+
+SOURCE_DIR = build/$(DIRNAME)
+FILENAME = $(DIRNAME).tgz
+TARBALL = build/$(FILENAME)
+TARBALL_URL = "https://github.com/microsoft/onnxruntime/releases/download/v$(VERSION)/$(FILENAME)"
+UNPACK_CMD = tar xvzf
+MD5SUM_DIR = $(CURDIR)/md5sum
+MD5SUM_FILE = $(MD5SUM_DIR)/$(FILENAME).md5sum
+SCRIPT_DIR = $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+include $(shell rospack find mk)/download_unpack_build.mk
+INSTALL_DIR =	'./'
+
+
+installed.voicevox_model: $(SOURCE_DIR)/unpacked
+	mkdir -p $(INSTALL_DIR)/lib
+	cp build/$(DIRNAME)/lib/* $(INSTALL_DIR)/lib
+
+clean:
+	rm -rf $(TARBALL)
+	rm -rf $(SOURCE_DIR)
+	rm -rf $(INSTALL_DIR)/lib
+	rm -rf build
