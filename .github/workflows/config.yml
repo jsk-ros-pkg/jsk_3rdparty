@@ -234,6 +234,8 @@ jobs:
           apt install -qq -y python3-rosdep2
           echo "yaml ${{ matrix.ROS_REPOSITORY_URL }}/local.yaml debian" | tee /etc/ros/rosdep/sources.list.d/1-ros-o-builder.list
           rosdep update
+          # disable installing recommends as ros-o-builder do
+          echo 'APT::Install-Recommends "false";' | tee /etc/apt/apt.conf.d/99norecommends
 
       - name: Setup catkin-tools
         run: |
