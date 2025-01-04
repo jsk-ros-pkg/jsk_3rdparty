@@ -22,7 +22,7 @@ $(SOURCE_DIR)/patched:$(SOURCE_DIR)/unpacked
 	touch $(SOURCE_DIR)/patched
 
 installed:$(SOURCE_DIR)/patched
-	(cd $(SOURCE_DIR) && $(MAKE) clean && $(MAKE) CFLAGS='-O6 -g -ansi -Wno-array-bounds -Wno-endif-labels -Wno-format-overflow -Wno-implicit-function-declaration -Wno-int-in-bool-context -Wno-unused-function -Wno-unused-variable -fno-builtin-strncpy -fno-builtin-strcpy  -fno-builtin-strlen -fno-builtin-strcat -fno-builtin-memset ' $(MAKE_ARGS))
+	(cd $(SOURCE_DIR) && $(MAKE) clean && $(MAKE) CFLAGS='-O6 -g -ansi -Wno-array-bounds -Wno-endif-labels -Wno-format-overflow -Wno-implicit-function-declaration -Wno-int-in-bool-context -Wno-unused-function -Wno-unused-variable -fno-builtin-strncpy -fno-builtin-strcpy  -fno-builtin-strlen -fno-builtin-strcat -fno-builtin-memset -fcommon ' $(MAKE_ARGS))
 	mkdir -p bin
 	cp $(SOURCE_DIR)/ffha bin/
 	touch installed
