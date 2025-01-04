@@ -59,15 +59,15 @@ elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
   catkin_generate_virtualenv(PYTHON_INTERPRETER python2
     # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
     EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem)
-elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
-  catkin_generate_virtualenv(
-    INPUT_REQUIREMENTS requirements.in.noetic
-    PYTHON_INTERPRETER python3
-    )
-else()
+elseif("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STREQUAL "melodic")
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
     PYTHON_INTERPRETER python2
+    )
+else()
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in.noetic
+    PYTHON_INTERPRETER python3
     )
 endif()
 
