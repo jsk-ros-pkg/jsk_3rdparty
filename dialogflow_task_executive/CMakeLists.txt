@@ -55,16 +55,19 @@ elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
-  catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
-elseif("$ENV{ROS_DISTRO}" STRGREATER "melodic")
-  catkin_generate_virtualenv(
-    INPUT_REQUIREMENTS requirements.in.noetic
-    PYTHON_INTERPRETER python3
-    )
-else()
+  file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
+  catkin_generate_virtualenv(PYTHON_INTERPRETER python2
+    # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
+    EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem)
+elseif("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STREQUAL "melodic")
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in
     PYTHON_INTERPRETER python2
+    )
+else()
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in.noetic
+    PYTHON_INTERPRETER python3
     )
 endif()
 
@@ -73,7 +76,7 @@ catkin_install_python(
   PROGRAMS ${PYTHON_SCRIPT_FILES}
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(DIRECTORY launch
+install(DIRECTORY launch apps samples config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )

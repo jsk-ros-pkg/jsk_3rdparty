@@ -41,7 +41,7 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
 ### Publishing Topics
 
-* `~voice_topic` (`sound_recognition_msgs/SpeechReconitionCandidates`)
+* `~voice_topic` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
 
   Speech recognition candidates topic name.
 

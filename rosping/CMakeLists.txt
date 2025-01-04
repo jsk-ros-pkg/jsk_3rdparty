@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rosping)
 
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs rostest)
 
 # Set the build type.  Options are:
