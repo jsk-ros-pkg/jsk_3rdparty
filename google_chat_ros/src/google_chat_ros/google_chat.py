@@ -125,7 +125,7 @@ class GoogleChatPubSubClient():
         except Exception as e:
             rospy.logerr("Failed to handle the request from Cloud PubSub.")
             rospy.logerr("It might be caused because of invalid type message from GCP")
-            rospy.logerr("{}".str(e))
+            rospy.logerr(e)
         finally:
             message.ack()
 

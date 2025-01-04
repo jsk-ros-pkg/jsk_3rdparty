@@ -6,6 +6,8 @@ on:
 
 env:
   DISPLAY: ':0.0'
+  # workaround required for checkout@v3, https://github.com/actions/checkout/issues/1590
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
   ros:
@@ -38,7 +40,11 @@ jobs:
             CATKIN_PARALLEL_JOBS: "-i"
 
 
-    container: ${{ matrix.CONTAINER }}
+    container:
+      image: ${{ matrix.CONTAINER }}
+      volumes:
+        - /tmp/node20:/__e/node20
+
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
         run: |
@@ -60,6 +66,21 @@ jobs:
           else
              git config --global --add safe.directory $GITHUB_WORKSPACE
           fi
+
+      - name: Try to replace `node` with an glibc 2.17
+        shell: bash
+        run: |
+          if [ "${{ matrix.CONTAINER }}" = "jskrobotics/ros-ubuntu:14.04" ]; then
+             export USER=$(whoami)
+             sudo chmod 777 -R /__e/node20
+             sudo chown -R $USER /__e/node20
+          fi
+          ls -lar /__e/node20 &&
+          sudo apt-get install -y curl &&
+          curl -Lo /tmp/node.tar.gz https://unofficial-builds.nodejs.org/download/release/v20.17.0/node-v20.17.0-linux-x64-glibc-217.tar.gz &&
+          cd /__e/node20 &&
+          tar -x --strip-components=1 -f /tmp/node.tar.gz &&
+          ls -lar /__e/node20/bin/
 
       - name: Checkout
         uses: actions/checkout@v3.0.2
@@ -149,14 +170,14 @@ jobs:
           export EXTRA_DEB=${{ matrix.EXTRA_DEB }}
           export ROS_DISTRO=${{ matrix.ROS_DISTRO }}
           export ROS_PARALLEL_TEST_JOBS="-j2"
-          export CATKIN_PARALLEL_JOBS="-i"
+          export CATKIN_PARALLEL_JOBS="-i -j2"
           export ROSDEP_ADDITIONAL_OPTIONS="-n -q -r --ignore-src --skip-keys=python-google-cloud-texttospeech-pip --skip-keys=python-dialogflow-pip"  # Skip installation of grpcio by pip because it causes error
           export BEFORE_SCRIPT="sudo pip install virtualenv==15.1.0"
           export USE_TRAVIS=true
           export USE_DOCKER=false
           export DOCKER_IMAGE=${{ matrix.CONTAINER }}
           export NOT_TEST_INSTALL=true
-          export ROS_PARALLEL_JOBS="--make-args LANG=C.UTF-8 LC_ALL=C.UTF-8"
+          export ROS_PARALLEL_JOBS="-j8 --make-args LANG=C.UTF-8 LC_ALL=C.UTF-8"
           set +o nounset
 
           export CI_SOURCE_PATH=$(pwd)
@@ -183,3 +204,64 @@ jobs:
         if: always()
         run: |
           rm -fr ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} || echo "OK"
+
+# ROS-O setup https://github.com/v4hn/ros-o-builder/blob/jammy-one/README.md#install-instructions
+  ros-o:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - DISTRO: ubuntu:22.04
+            ROS_REPOSITORY_URL: https://raw.githubusercontent.com/v4hn/ros-o-builder/jammy-one/repository
+
+    container: ${{ matrix.DISTRO }}
+
+    env:
+      DEBIAN_FRONTEND : noninteractive
+
+    steps:
+      - name: Chcekout Source
+        uses: actions/checkout@v3.0.2
+
+      - name: Setup ROS-O deb repository
+        run: |
+          set -x
+          apt update && apt install -qq -y ca-certificates
+          echo "deb [trusted=yes] ${{ matrix.ROS_REPOSITORY_URL }}/ ./" | tee /etc/apt/sources.list.d/ros-o-builder.list
+          apt update
+          apt install -qq -y python3-rosdep2
+          echo "yaml ${{ matrix.ROS_REPOSITORY_URL }}/local.yaml debian" | tee /etc/ros/rosdep/sources.list.d/1-ros-o-builder.list
+          rosdep update
+          # disable installing recommends as ros-o-builder do
+          echo 'APT::Install-Recommends "false";' | tee /etc/apt/apt.conf.d/99norecommends
+
+      - name: Setup catkin-tools
+        run: |
+          set -x
+          # setup catkin tools
+          apt install -qq -y python3-pip
+          pip3 install catkin-tools
+          # setup build tools
+          apt install -qq -y cmake build-essential catkin ros-one-rosbash
+
+      - name: Setup Workspace
+        run: |
+          source /opt/ros/one/setup.bash
+          set -x
+          # setup workspace
+          mkdir -p ~/ws/src
+          cd ~/ws/src
+          ln -sf $GITHUB_WORKSPACE .
+          rosdep install -qq -r -y --from-path . --ignore-src || echo "OK"
+        shell: bash
+
+      - name: Compile Packages
+        run: |
+          source /opt/ros/one/setup.bash
+          set -x
+          cd ~/ws/
+          catkin build --no-status -sv ${{ matrix.CATKIN_OPTIONS }} --cmake-args -DCATKIN_ENABLE_TESTING=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ${{ matrix.CMAKE_OPTIONS }}
+        shell: bash
+

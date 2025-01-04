@@ -2,12 +2,14 @@ Index: CMakeLists.txt
 ===================================================================
 --- CMakeLists.txt	(revision 54)
 +++ CMakeLists.txt	(working copy)
-@@ -155,7 +155,8 @@
+@@ -155,7 +155,10 @@
  if( NOT $ENV{BOOST_LIBRARYDIR} STREQUAL "" )
    set(Boost_LIBRARY_DIRS $ENV{BOOST_LIBRARYDIR})
  endif()
 -find_package(Boost COMPONENTS python)
-+find_package(Boost REQUIRED COMPONENTS system python38)
++set(Python3_FIND_STRATEGY VERSION)
++find_package(Python3 COMPONENTS Interpreter Development)
++find_package(Boost REQUIRED COMPONENTS system python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
 +add_definitions("-Wno-narrowing")
  
  if( Boost_FOUND )
@@ -17,7 +19,7 @@ Index: CMakeLists.txt
  #
  set(BUILD_SIFTFASTPY)
 -if( Boost_PYTHON_FOUND )
-+if( Boost_PYTHON38_FOUND )
++if( Boost_PYTHON${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}_FOUND )
    find_package(PythonLibs)
  
    if( PYTHONLIBS_FOUND OR PYTHON_LIBRARIES )

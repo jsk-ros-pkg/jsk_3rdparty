@@ -29,7 +29,16 @@ if($ENV{ROS_DISTRO} STREQUAL "indigo" OR
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/requirements.txt.indigo ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
-  catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
+  if("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+    file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
+    catkin_generate_virtualenv(
+      PYTHON_INTERPRETER python2
+      # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
+      EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem
+    )
+  else()
+    catkin_generate_virtualenv(PYTHON_INTERPRETER python2)
+  endif()
 else()
 catkin_generate_virtualenv(
   PYTHON_INTERPRETER python3

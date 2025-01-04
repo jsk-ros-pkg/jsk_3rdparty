@@ -20,13 +20,22 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-if($ENV{ROS_DISTRO} STRGREATER "melodic")
-  catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3
-    )
-else()
+if($ENV{ROS_DISTRO} STREQUAL "kinetic" OR $ENV{ROS_DISTRO} STREQUAL "melodic")
   catkin_generate_virtualenv(
     PYTHON_INTERPRETER python2
+    CHECK_VENV FALSE
+    )
+elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+  file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
+    EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem
+  )
+else()
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python3
+    CHECK_VENV FALSE
     )
 endif()
 

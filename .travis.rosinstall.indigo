@@ -9,5 +9,5 @@
 # we need to avoid pip upgrade
 - git:
     local-name: locusrobotics/catkin_virtualenv
-    uri: https://github.com/locusrobotics/catkin_virtualenv
-    version: 0.2.2
+    uri: https://github.com/locusrobotics/catkin_virtualenv-release
+    version: release/melodic/catkin_virtualenv/0.2.2-0
