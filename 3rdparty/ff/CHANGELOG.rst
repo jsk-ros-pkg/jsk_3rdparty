@@ -2,6 +2,14 @@
 Changelog for package ff
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [ff] relax linker. allow function duplication
+
+* Contributors: Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 

@@ -2,6 +2,18 @@
 Changelog for package ros_google_cloud_language
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ros_google_cloud_language] chmod -x test_rospy_node for catkin_virtualenv (`#506 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/506>`_)
+* [ros_google_cloud_language] Fix for python3; Avoid attribute error (`#488 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/488>`_)
+
+  * [ros_google_cloud_language] Fix importing unidecode in python2
+  * [ros_google_cloud_language] Change permission of test_rospy_node.py
+  * [ros_google_cloud_language] Add python3-unidecode to dependency
+  * [ros_google_cloud_language] Fix for python3; Avoid attribute error
+
+* Contributors: Naoto Tsukamoto, Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 

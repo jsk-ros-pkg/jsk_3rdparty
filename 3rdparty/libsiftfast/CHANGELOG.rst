@@ -2,6 +2,15 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [libsiftfast] [ros-o] only use != to compare ROS_DISTRO in Makefile
+  * [libsiftfast] support multiple python3 version
+
+* Contributors: Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 

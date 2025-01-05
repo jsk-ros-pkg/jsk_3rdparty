@@ -2,6 +2,12 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [google_chat_ros] check whether google_chat_button's parameters include NoneType object for avoiding rospy serialization error (`#501 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/501>`_)
+* [google_chat_ros] Fix an error message typo; https ==> url (`#492 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/492>`_)
+* Contributors: Kei Okada, Naoto Tsukamoto
+
 2.1.28 (2023-07-24)
 -------------------
 

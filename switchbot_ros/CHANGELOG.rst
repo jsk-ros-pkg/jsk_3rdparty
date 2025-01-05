@@ -2,6 +2,15 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add codes for publishing switchbot CO2 meter status. (`#513 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/513>`_)
+* switchbot_ros: use --cert for catkin_virtualenv for indigo (`#507 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/507>`_)
+* Add switchbot status publisher. (`#505 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/505>`_)
+* Mod for switchbot api 1.1 (`#491 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/491>`_)
+* [switchbot_ros] force to use python3 for lambda string sort (`#495 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/495>`_)
+* Contributors: Yoshiki Obinata, Yosuke Yamamoto
+
 2.1.28 (2023-07-24)
 -------------------
 

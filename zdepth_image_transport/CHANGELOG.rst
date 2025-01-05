@@ -2,6 +2,9 @@
 Changelog for package zdepth_image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.28 (2023-07-24)
 -------------------
 

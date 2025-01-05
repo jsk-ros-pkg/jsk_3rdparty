@@ -2,6 +2,16 @@
 Changelog for package dialogflow_task_executive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [respeaker_ros][diamondback] [ros-o] only use STREQUAL to compare ROS_DISTRO in cmake
+
+* fix CMake: install apps/samples/config (`#504 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/504>`_)
+* GA: relax failed test dialogflow_task_executive, julius_ros (`#497 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/497>`_)
+* Contributors: Kei Okada
+
 2.1.28 (2023-07-24)
 -------------------
 

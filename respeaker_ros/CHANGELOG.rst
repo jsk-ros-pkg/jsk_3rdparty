@@ -2,6 +2,14 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [respeaker_ros][diamondback] [ros-o] only use STREQUAL to compare ROS_DISTRO in cmake
+
+* Contributors: Kei Okada
+
 2.1.28 (2023-07-24)
 -------------------
 

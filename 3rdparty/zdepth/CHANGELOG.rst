@@ -2,6 +2,17 @@
 Changelog for package zdepth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [zdepth] [ros-o] only use STREQUAL to compare ROS_DISTRO in cmake
+  * [zdepth][sesame_ros] specify ROS_DISTRO for ros-obese
+  * [zdepth] add comment
+  * [zdepth] fix build hunging issue 2nd+ time
+
+* Contributors: Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 * fix build farm : ROS_DISTRO needs ros_environment (`#487 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/487>`_)

@@ -2,6 +2,11 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [doc] fix typo in jsk_3rdparty/ros_speech_recognition/README.md (`#499 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/499>`_)
+* Contributors: Yukina Iwata
+
 2.1.28 (2023-07-24)
 -------------------
 

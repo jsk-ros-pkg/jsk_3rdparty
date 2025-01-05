@@ -2,6 +2,20 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for ROS-O (`#515 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/515>`_)
+
+  * [.github/workflows/config.yml: disable installing recommends in apt-get install
+  * [3rdparty/downward/package.xml: add linbfl-dev for FlexLexer.h
+
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [downward] [ros-o] add -Wno-maybe-uninitialized
+  * [downward] patching to fix std::vector namespace
+
+* Contributors: Kei Okada, Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 

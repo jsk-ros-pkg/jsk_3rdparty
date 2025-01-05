@@ -2,6 +2,11 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding CMAKE_EXE_LINKER_FLAGS in CMakeLists.txt to fix missing library issue while executing rosping. (`#380 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/380>`_)
+* Contributors: Jules Berhault
+
 2.1.28 (2023-07-24)
 -------------------
 

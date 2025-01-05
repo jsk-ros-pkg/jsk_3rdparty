@@ -2,6 +2,15 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [collada_urdf_jsk_patch] [ros-o] add CATKIN_IGNORE only when ROS-O, use STREQUAL to compare ROS_DISTRO in cmake
+  * [collada_urdf_jsk_patch] [ros-o] ignore it because no longer needed
+
+* Contributors: Yoshiki Obinata
+
 2.1.28 (2023-07-24)
 -------------------
 
