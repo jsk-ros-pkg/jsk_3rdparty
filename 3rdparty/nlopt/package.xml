@@ -4,7 +4,7 @@
   <description>
     nlopt
   </description>
-  <version>2.1.28</version>
+  <version>2.1.29</version>
   <maintainer email="s-noda@jsk.t.u-tokyo.ac.jp">Noda Shintaro</maintainer>
   <license>MIT</license>
   <url type="website">http://ros.org/wiki/nlopt</url>

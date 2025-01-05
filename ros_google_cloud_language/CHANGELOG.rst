@@ -2,8 +2,8 @@
 Changelog for package ros_google_cloud_language
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.29 (2025-01-05)
+-------------------
 * [ros_google_cloud_language] chmod -x test_rospy_node for catkin_virtualenv (`#506 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/506>`_)
 * [ros_google_cloud_language] Fix for python3; Avoid attribute error (`#488 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/488>`_)
 
