@@ -13,7 +13,9 @@ elseif (("$ENV{ROS_DISTRO}" STREQUAL "melodic") OR ("$ENV{ROS_DISTRO}" STREQUAL 
   set(GIT_REPO collada_urdf)
 else()
   find_package(catkin REQUIRED)
-  catkin_package(CATKIN_DEPENDS)
+  catkin_package(CATKIN_DEPENDS
+    SKIP_CMAKE_CONFIG_GENERATION
+    SKIP_PKG_CONFIG_GENERATION)
   file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/CATKIN_IGNORE)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CATKIN_IGNORE  #catkin_lint: ignore_once missing_file
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
