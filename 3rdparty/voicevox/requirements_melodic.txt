@@ -1,0 +1,32 @@
+cython==0.29.32           # via pyopenjtalk, pyworld
+aiofiles==0.8.0           # via -r requirements.in
+anyio==3.6.1              # via starlette
+appdirs==1.4.4            # via -r requirements.in
+asgiref==3.4.1            # via uvicorn
+cffi==1.15.1              # via soundfile
+click==8.0.4              # via uvicorn
+contextlib2==21.6.0       # via starlette
+contextvars==2.4          # via anyio, sniffio
+dataclasses==0.8          # via anyio, h11, pydantic
+fastapi==0.83.0           # via -r requirements.in
+h11==0.13.0               # via uvicorn
+idna==3.4                 # via anyio
+immutables==0.19          # via contextvars
+importlib-metadata==4.8.3  # via click
+importlib-resources==5.4.0  # via tqdm
+numpy==1.19.5             # via -r requirements.in, pyopenjtalk, pyworld, scipy
+pycparser==2.21           # via cffi
+pydantic==1.9.2           # via fastapi
+git+https://github.com/mqcmd196/pyopenjtalk@4f6e725bb03af721413d9966d361e6384b6fde47#egg=pyopenjtalk
+python-multipart==0.0.5   # via -r requirements.in
+pyworld==0.3.0            # via -r requirements.in
+pyyaml==6.0               # via -r requirements.in
+scipy==1.5.4              # via -r requirements.in
+six==1.16.0               # via pyopenjtalk, python-multipart
+sniffio==1.2.0            # via anyio
+soundfile==0.11.0         # via -r requirements.in
+starlette==0.19.1         # via fastapi
+tqdm==4.64.1              # via pyopenjtalk
+typing-extensions==4.1.1  # via anyio, asgiref, h11, importlib-metadata, pydantic, starlette, uvicorn
+uvicorn==0.16.0           # via -r requirements.in
+zipp==3.6.0               # via importlib-metadata, importlib-resources
