@@ -1,10 +1,11 @@
-ros_speech_recognition
-======================
+# ros\_speech\_recognition
 
 A ROS package for speech-to-text services.  
 This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) as a backend.
 
 ## Tutorials
+
+### Normal tutorial
 
 1. Install this package and SpeechReconition
 
@@ -18,31 +19,45 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   roslaunch ros_speech_recognition speech_recognition.launch
   ```
   
-3. Use from Python
+3. Echo `/speech_to_text`
 
-  ```python
-  import rospy
-  from ros_speech_recognition import SpeechRecognitionClient
-  
-  rospy.init_node("client")
-  client = SpeechRecognitionClient()
-  result = client.recognize()  # Please say 'Hello, world!' towards microphone
-  print result # => 'Hello, world!'
+  ```bash
+  rostopic echo /speech_to_text
+  # you can get the recognition result
   ```
-  
-## Interface
+
+### Parrotry tutorial
+
+Parrotry mean オウム返し in Japanese
+
+```bash
+# english
+roslaunch ros_speech_recognition parrotry.launch
+# japanese
+roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
+```
+
+## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
 
+* `~voice_topic` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
+
+  Speech recognition candidates topic name.
+
+  Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
+
 * `sound_play` (`sound_play/SoundRequestAction`)
 
-  Action client to play sound on events. If the action server is not available, no sound is played.
+  Action client to play sound on events. If the action server is not available or `~enable_sound_effect` is `False`, no sound is played.
   
 ### Subscribing Topics
 
-* `audio` (`audio_common_msgs/AudioData`)
+* `~audio_topic` (`audio_common_msgs/AudioData`)
 
   Audio stream data to be recognized.
+
+  Topis name is set by parameter  `~audio_topic` and default value is `audio`.
 
 ### Advertising Services
 
@@ -50,7 +65,31 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Service for speech recognition
 
+* `speech_recognition/start` (`std_srvs/Empty`)
+
+  Start service for speech recognition
+
+  This service is available when parameter `~contiunous` is `True`.
+
+* `speech_recognition/start` (`std_srvs/Empty`)
+
+  Stop service for speech recognition
+
+  This service is available when parameter `~contiunous` is `True`.
+
 ## Parameters
+
+* `~voice_topic` (`String`, default: `speech_to_text`)
+
+  Publishing voice topic name
+
+* `~audio_topic` (`String`, default: `audio`)
+
+  Subscribing audio topic name
+
+* `~enable_sound_effect` (`Bool`, default: `True`)
+
+    Flag to enable or disable sound to play sound on recognition.
 
 * `~language` (`String`, default: `en-US`)
 
@@ -104,10 +143,6 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Seconds of waiting for speech
 
-* `~audio_topic` (`String`, default: `audio`)
-
-  Topic name of input audio data
-  
 * `~depth` (`Int`, default: `16`)
 
   Depth of audio signal
@@ -124,25 +159,47 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Maximum buffer size to store audio data for speech recognition
   
-* `~start_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/bell.ogg`)
+* `~start_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/bell.ogg`)
 
   Path to sound file for bell on the start of audio caption
   
-* `~recognized_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/button-toggle-on.ogg`)
+* `~recognized_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message.ogg`)
 
   Path to sound file for bell on the end of audio caption
   
-* `~success_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg`)
+* `~success_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg`)
 
   Path to sound file for bell on getting successful recognition result
   
-* `~timeout_signal` (`String`, default: `/usr/share/sounds/ubuntu/stereo/window-slide.ogg`)
+* `~timeout_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg`)
 
   Path to sound file for bell on timeout for recognition
   
 * `~continuous` (`Bool`, default: False)
 
   Selecting to use topic or service. By default, service is used.
+
+* `~auto_start` (`Bool`, default: True)
+
+  Starting the speech recognition when launching.
+
+* `~self_cancellation` (`Bool`, default: `True`)
+
+  Whether the node recognize the sound heard when `~tts_action_names` is running or not.
+
+  This options is for ignoring self voice sounds from recognition.
+
+* `~tts_action_names` (`List[String]`, default: `['sound_play']`)
+
+  Text-to-speech action name for self cancellation.
+
+  The node ignores the voice heard when these Text-to-speech action is running.
+
+* `~tts_tolerance` (`Float`, default: `1.0`)
+
+   Tolerance seconds for self cancellation.
+
+   The node ignores the voice with this tolerance seconds after `~tts_action_names` finish running.
 
 * `~google_key` (`String`, default: `None`)
 
@@ -151,7 +208,7 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   
 * `~google_cloud_credentials_json` (`String`, default: `None`)
 
-  Path to credential json file.
+  Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
   This is valid only if `~engine` is `GoogleCloud`.
   
 * `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
@@ -163,6 +220,14 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
 
   Auth key for Bing API.  
   This is valid only if `~engine` is `bing`.
+
+* `~vosk_model_path` (`String`, default: `None`)
+
+  Path to trainded model for Vosk API.
+  This is valid only if `~engine` is `Vosk`.
+
+  If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
+  To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
   
 ## Author
 

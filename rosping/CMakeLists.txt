@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rosping)
 
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs rostest)
 
 # Set the build type.  Options are:
@@ -44,6 +46,6 @@ install(DIRECTORY test
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
   )
-if (NOT $ENV{ROS_DISTRO} STREQUAL "indigo")
+if (CATKIN_ENABLE_TESTING AND (NOT $ENV{ROS_DISTRO} STREQUAL "indigo"))
   add_rostest(test/test-rosping.test)
-endif(NOT $ENV{ROS_DISTRO} STREQUAL "indigo")
+endif(CATKIN_ENABLE_TESTING AND (NOT $ENV{ROS_DISTRO} STREQUAL "indigo"))

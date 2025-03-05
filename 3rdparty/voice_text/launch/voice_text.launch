@@ -10,6 +10,7 @@
   <arg name="sound_play_respawn" default="true" />
 
   <node name="voice_text" pkg="voice_text" type="voice_text"
+        output="screen" respawn="true" respawn_delay="10"
         machine="$(arg voice_text_machine)">
     <remap from="text_to_speech" to="voice_text/text_to_speech" />
     <rosparam>

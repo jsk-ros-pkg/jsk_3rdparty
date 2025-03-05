@@ -4,12 +4,13 @@
 
 import os
 import sys
-from respeaker_node import PARAMETERS, init_respeaker
+from respeaker_ros import PARAMETERS, RespeakerInterface
 
 
 def main(out):
-    dev = init_respeaker()
-    if not dev:
+    try:
+        dev = RespeakerInterface()
+    except RuntimeError as e:
         print('No device found. Please connect a device.')
         return
     with open(out, "w") as f:

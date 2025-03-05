@@ -4,15 +4,28 @@ import json
 import os.path
 import requests
 
+import sys
+import os
+import time
+import hashlib
+import hmac
+import base64
+import uuid
+
 
 class SwitchBotAPIClient(object):
     """
     For Using SwitchBot via official API.
     Please see https://github.com/OpenWonderLabs/SwitchBotAPI for details.
     """
-    def __init__(self, token):
-        self._host_domain = "https://api.switch-bot.com/v1.0/"
+    def __init__(self, token, secret=""):
+        if not secret:
+          self.api_version = "v1.0"
+        else:
+          self.api_version = "v1.1"
+        self._host_domain = "https://api.switch-bot.com/" + self.api_version + "/"
         self.token = token
+        self.secret = secret # SwitchBot API v1.1
         self.device_list = None
         self.infrared_remote_list = None
         self.scene_list = None
@@ -21,6 +34,41 @@ class SwitchBotAPIClient(object):
         self.update_device_list()
         self.update_scene_list()
 
+    def make_sign(self, token, secret):
+        """
+        Make Sign from token and secret
+        """
+        nonce = uuid.uuid4()
+        t = int(round(time.time() * 1000))
+        string_to_sign = '{}{}{}'.format(token, t, nonce)
+        
+        if sys.version_info[0] > 2:
+            string_to_sign = bytes(string_to_sign, 'utf-8')
+            secret = bytes(secret, 'utf-8')
+        else:
+            string_to_sign = bytes(string_to_sign)
+            secret = bytes(secret)
+        
+        sign = base64.b64encode(hmac.new(secret, msg=string_to_sign, digestmod=hashlib.sha256).digest())
+        
+        if sys.version_info[0] > 2:
+            sign = sign.decode('utf-8')
+        
+        return sign, str(t), nonce
+
+    def make_request_header(self, token, secret):
+        """
+        Make Request Header
+        """
+        sign, t, nonce = self.make_sign(token, secret)
+        headers={
+                "Authorization": token,
+                "sign": str(sign),
+                "t": str(t),
+                "nonce": str(nonce),
+                "Content-Type": "application/json; charset=utf8"
+                }
+        return headers
 
     def request(self, method='GET', devices_or_scenes='devices', service_id='', service='', json_body=None):
         """
@@ -30,20 +78,20 @@ class SwitchBotAPIClient(object):
             raise ValueError('Please set devices_or_scenes variable devices or scenes')
 
         url = os.path.join(self._host_domain, devices_or_scenes, service_id, service)
+        
+        headers = self.make_request_header(self.token, self.secret)
 
         if method == 'GET':
             response = requests.get(
                 url,
-                headers={'Authorization': self.token}
+                headers=headers
             )
         elif method == 'POST':
             response = requests.post(
                 url,
-                json_body,
-                headers={
-                    'Content-Type': 'application/json; charset=utf8',
-                    'Authorization': self.token
-            })
+                json=json_body,
+                headers=headers
+            )
         else:
             raise ValueError('Got unexpected http request method. Please use GET or POST.')
 
@@ -87,8 +135,8 @@ class SwitchBotAPIClient(object):
         self.infrared_remote_list = res['body']['infraredRemoteList']
         for device in self.device_list:
             self.device_name_id[device['deviceName']] = device['deviceId']
-        for infrated_remote in self.infrared_remote_list:
-            self.device_name_id[device['deviceName']] = device['deviceId']
+        for infrared_remote in self.infrared_remote_list:
+            self.device_name_id[infrared_remote['deviceName']] = infrared_remote['deviceId']
 
         return self.device_list, self.infrared_remote_list
 
@@ -99,7 +147,7 @@ class SwitchBotAPIClient(object):
         """
         self.scene_list = self.request(devices_or_scenes='scenes')['body']
         for scene in self.scene_list:
-            self.scene_name_id[scene['sceneName']] = device['sceneId']
+            self.scene_name_id[scene['sceneName']] = scene['sceneId']
 
         return self.scene_list
 
@@ -111,7 +159,10 @@ class SwitchBotAPIClient(object):
         if device_id:
             pass
         elif device_name:
-            device_id = self.device_name_id[device_name]
+            try:
+                device_id = self.device_name_id[device_name]
+            except KeyError as e:
+                raise KeyError("Device name:{} is not registered at switchbot server. Please check the setting.".format(device_name))
         else:
             raise ValueError("Please set device_id or device_name.")
 
@@ -122,15 +173,18 @@ class SwitchBotAPIClient(object):
         """
         Send Command to the device. Please see https://github.com/OpenWonderLabs/SwitchBotAPI#send-device-control-commands for command options.
         """
-        json_body = json.dumps({
-            "command": command,
-            "parameter": parameter,
-            "commandType": command_type
-        })
+        json_body = {
+                    "command": str(command),
+                    "parameter": str(parameter),
+                    "commandType": str(command_type)
+                    }
         if device_id:
             pass
         elif device_name:
-            device_id = self.device_name_id[device_name]
+            try:
+                device_id = self.device_name_id[device_name]
+            except KeyError as e:
+                raise KeyError("Device name:{} is not registered at switchbot server. Please check the setting.".format(device_name))
         else:
             raise ValueError("Please set device_id or device_name.")
         
@@ -144,7 +198,10 @@ class SwitchBotAPIClient(object):
         if scene_id:
             pass
         elif scene_name:
-            scene_id = self.scene_name_id[scene_name]
+            try:
+                scene_id = self.scene_name_id[scene_name]
+            except KeyError as e:
+                raise KeyError("Scene name:{} is not registered at switchbot server. Please check the setting.".format(scene_name))
         else:
             raise ValueError("Please set scene_id or scene_name.")
 

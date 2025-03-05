@@ -2,6 +2,28 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.29 (2025-01-05)
+-------------------
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* [aques_talk] build as x86 when dpkg cpu check fails (`#387 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/387>`_)
+* GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
+* Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Shingo Kitagawa, Yoshiki Obinata
+
 2.1.24 (2021-07-26)
 -------------------
 

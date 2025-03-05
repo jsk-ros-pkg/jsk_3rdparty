@@ -1,0 +1,30 @@
+#
+# this is only used for indigo (pr2)
+#
+# kinetic+ users will use requirements.in
+#
+pyparsing==2.2.0
+#
+dialogflow==0.3.0
+#
+cachetools==0.2.0
+certifi==2017.7.27.1
+chardet==3.0.4
+futures==3.2.0
+google-api-core==1.12.0
+google-auth==1.6.3
+google-auth-httplib2==0.0.3
+googleapis-common-protos==1.6.0
+grpcio==1.24.0
+httplib2==0.14.0
+idna==2.6
+protobuf==3.12.2
+pyasn1==0.4.3
+pyasn1-modules
+pytz==2017.2
+requests==2.18.4
+rsa==3.4.2
+setuptools==40.3.0
+six==1.11.0
+urllib3==1.22
+

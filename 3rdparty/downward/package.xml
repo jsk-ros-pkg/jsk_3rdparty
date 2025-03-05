@@ -1,6 +1,6 @@
 <package format="3">
   <name>downward</name>
-  <version>2.1.24</version>
+  <version>2.1.29</version>
   <description>fast downward: PDDL Planner (http://www.fast-downward.org)</description>
   <maintainer email="youhei@jsk.t.u-tokyo.ac.jp">Yohei Kakiuchi</maintainer>
 
@@ -17,6 +17,7 @@
   <build_depend condition="$ROS_PYTHON_VERSION == 2">python</build_depend>
   <build_depend condition="$ROS_PYTHON_VERSION == 3">python3</build_depend>
   <build_depend>flex</build_depend>
+  <build_depend>libfl-dev</build_depend>
   <build_depend>bison</build_depend>
   <build_depend>gawk</build_depend>
   <build_depend>rostest</build_depend>

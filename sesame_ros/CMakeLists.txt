@@ -20,17 +20,39 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_generate_virtualenv()
+if($ENV{ROS_DISTRO} STREQUAL "kinetic" OR $ENV{ROS_DISTRO} STREQUAL "melodic")
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    CHECK_VENV FALSE
+    )
+elseif("$ENV{ROS_DISTRO}" STREQUAL "indigo")
+  file(DOWNLOAD http://curl.haxx.se/ca/cacert.pem ${CMAKE_BINARY_DIR}/cacert.pem)
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python2
+    # https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed
+    EXTRA_PIP_ARGS -vvv --cert=${CMAKE_BINARY_DIR}/cacert.pem
+  )
+else()
+  catkin_generate_virtualenv(
+    PYTHON_INTERPRETER python3
+    CHECK_VENV FALSE
+    )
+endif()
 
 include_directories()
 
-file(GLOB NODE_SCRIPTS_FILES node_scripts/*)
-file(GLOB SCRIPTS_FILES scripts/*)
+file(GLOB PYTHON_SCRIPT_FILES node_scripts/* scripts/* test/*.py)
 catkin_install_python(
-  PROGRAMS ${NODE_SCRIPTS_FILES} ${SCRIPTS_FILES}
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  PROGRAMS ${PYTHON_SCRIPT_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_rospy_node.test
+    DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
+  )
+endif()
