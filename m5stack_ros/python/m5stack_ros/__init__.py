@@ -1,1 +1,1 @@
-from email_rosserial import EmailRosserial
+from .email_rosserial import EmailRosserial
