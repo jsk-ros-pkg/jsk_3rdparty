@@ -1,0 +1,32 @@
+<launch>
+
+  <arg name="port" default="/dev/rfcomm1" />
+  <arg name="baud" default="115200" />
+  <arg name="unitv_image" default="/unitv_image" />
+  <arg name="gui" default="true" />
+
+  <include file="$(find m5stack_ros)/launch/m5stack_ros.launch">
+    <arg name="port" default="$(arg port)" />
+    <arg name="baud" default="$(arg baud)" />
+  </include>
+
+  <node pkg="image_transport" type="republish" name="republish" args="compressed raw">
+    <remap from="in" to="/unitv_image" />
+    <remap from="out" to="/unitv_image" />
+  </node>
+
+  <node name="draw_rects" pkg="jsk_perception" type="draw_rects">
+    <remap from="~input" to="$(arg unitv_image)" />
+    <remap from="~input/rects" to="$(arg unitv_image)/rects" />
+    <remap from="~input/class" to="$(arg unitv_image)/class" />
+    <rosparam>
+      use_classification_result: true
+      label_size: 0.3
+      resolution_factor: 2.0
+    </rosparam>
+  </node>
+
+  <node if="$(arg gui)" name="image_view_unitv" pkg="image_view" type="image_view">
+    <remap from="image" to="draw_rects/output"/>
+  </node>
+</launch>
