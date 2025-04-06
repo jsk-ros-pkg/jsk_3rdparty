@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 from catkin_pkg.python_setup import generate_distutils_setup, get_global_python_destination
 import sys
 import os.path
-from distutils.version import StrictVersion
+from packaging.version import Version
 sys_version=""
 if sys.version_info.major == 2:
     sys_version = "2.7"
@@ -16,7 +16,7 @@ if os.path.isfile("/etc/debian_version"):
 else:
     target_dir = 'lib/python'+ sys_version +'/site-package'
 
-if StrictVersion("@CATKIN_VERSION@") >= StrictVersion("0.6.15"):
+if Version("@CATKIN_VERSION@") >= Version("0.6.15"):
     d = generate_distutils_setup(
         packages=['bayesian','bayesian_belief_networks'],
         package_dir={'bayesian': target_dir+'/bayesian','bayesian_belief_networks':'src/bayesian_belief_networks'}
