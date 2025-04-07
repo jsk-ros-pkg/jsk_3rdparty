@@ -35,7 +35,8 @@ installed: $(DIST_DIR) # examples
 
 $(DIST_DIR): $(SOURCE_DIR)/unpacked
 	mkdir -p $(DIST_DIR)
-	cd $(SOURCE_DIR) && $(PYTHONBIN) ./setup.py build && PYTHONPATH=$(DIST_DIR) $(PYTHONBIN) ./setup.py install --prefix=$(INSTALL_DIR) $(SETUPTOOLS_ARG_EXTRA) --single-version-externally-managed --record installed_files.txt
+	python3 -c "from setuptools import setup; setup(name='dummy', version='0.0.1')" install --single-version-externally-managed --record=record.txt --dry-run > /dev/null && $(PYTHONVIN)export SETUPTOOLS_ARG_EXTRA="$(SETUPTOOLS_ARG_EXTRA) -single-version-externally-managed"
+	cd $(SOURCE_DIR) && $(PYTHONBIN) ./setup.py build && PYTHONPATH=$(DIST_DIR) $(PYTHONBIN) ./setup.py install --prefix=$(INSTALL_DIR) $(SETUPTOOLS_ARG_EXTRA) --record installed_files.txt
 
 
 clean:
