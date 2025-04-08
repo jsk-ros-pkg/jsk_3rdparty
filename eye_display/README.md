@@ -31,11 +31,13 @@ mkdir ~/catkin_ws/src
 cd ~/catkin_ws
 catkin init
 cd ~/catkin_ws/src
-git clone https://github.com/sktometometo/eye_display.git
+git clone https://github.com/jsk-ros-pkg/jsk_3rdparty.git
+cd eye_display
 rosdep install --from-paths . --ignore-src -y -r
 catkin build eye_display
 source ~/catkin_ws/devel/setup.bash
 ```
+If you do not want to download all jsk_3rdparty files, pleasea check `How to clone only this package` section.
 
 ### Simple demo
 
