@@ -1,29 +1,16 @@
 <launch>
-    <arg name="port" />
-    <arg name="baud" default="57600" />
-    <arg name="mode_right" default="true" />
-    <arg name="direction" default="1" />
+  <arg name="port" />
+  <arg name="baud" default="57600" />
+  <arg name="mode_right" default="true" />
+  <arg name="direction" default="1" />
+  <arg name="debug" default="false"/>
 
-    <node
-        pkg="rosserial_python"
-        type="serial_node.py"
-        name="eye_display"
-        output="screen"
-        >
-        <rosparam subst_value="true">
-            port: $(arg port)
-            baud: $(arg baud)
-            mode_right: $(arg mode_right)
-            direction: $(arg direction)
-            eye_asset_names: [normal, blink, surprised, sleepy, angry, sad, heart]
-            normal_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [9]}'
-            blink_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [9, 9, 130, 130, 9, 9]}'
-            surprised_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [9, 9, 9, 9, 130, 130, 9, 9, 9, 9, 130, 9, 9, 130, 9, 9]}'
-            sleepy_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]}'
-            angry_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [120]}'
-            sad_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [130]}'
-            happy_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [130]}'     
-            heart_eye_asset: '{path_iris: "", path_pupil:"", path_reflex: "", path_upperlid: "", upperlid_position: [130]}'
-        </rosparam>
-    </node>
+  <include file="$(find eye_display)/launch/demo.launch" >
+    <arg name="eye_asset_file" value="$(find eye_display)/launch/denden.yaml" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="mode_right" value="$(arg mode_right)" />
+    <arg name="direction" value="$(arg direction)" />
+    <arg name="debug" value="$(arg debug)" />
+  </include>
 </launch>

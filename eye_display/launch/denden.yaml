@@ -1,0 +1,55 @@
+names: [normal, blink, surprised, sleepy, angry, sad, happy, heart]
+neutral:
+  path_iris: "/white.jpg"
+  path_pupil: "/denden_pupil.png"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/normal_kxr_upperlid.jpg"
+  upperlid_position: [9]
+blink:
+  path_iris: "/white.jpg"
+  path_pupil: "/denden_pupil.png"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/normal_kxr_upperlid.jpg"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+surprised:
+  path_iris: "/white.jpg"
+  path_pupil: "/denden_pupil_surprised.png"
+  path_reflex: "/denden_reflex_surprised.png"
+  path_upperlid: "/normal_kxr_upperlid.jpg"
+  upperlid_position: [9, 9, 9, 9, 130, 130, 9, 9, 9, 9, 130, 9, 9, 130, 9, 9]
+tired:
+  path_iris: "/white.jpg"
+  path_pupil: "/denden_pupil.png"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/normal_kxr_upperlid.jpg"
+  upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]
+angry:
+  path_iris: "/white.jpg"
+  path_pupil: "/denden_pupil.png"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_position: [0]
+  upperlid_default_pos_x: 50
+  upperlid_default_pos_y: 40
+  upperlid_default_theta: -30
+sad:
+  path_iris: "/denden_tear.jpeg"
+  path_pupil: "/denden_pupil.png"
+  path_reflex: "/denden_reflex_sad.png"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_position: [0]
+  upperlid_default_pos_x: 100
+  upperlid_default_pos_y: 40
+  upperlid_default_theta: 30
+star:
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/denden_upperlid_star.jpeg"
+  upperlid_position: [130, 131, 132, 133, 134, 135]
+heart:
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/denden_upperlid_heart.jpeg"
+  upperlid_position: [130, 131, 132, 133, 134, 135]
