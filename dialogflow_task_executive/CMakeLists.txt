@@ -64,9 +64,14 @@ elseif("$ENV{ROS_DISTRO}" STREQUAL "kinetic" OR "$ENV{ROS_DISTRO}" STREQUAL "mel
     INPUT_REQUIREMENTS requirements.in
     PYTHON_INTERPRETER python2
     )
-else()
+elseif("$ENV{ROS_DISTRO}" STREQUAL "noetic")
   catkin_generate_virtualenv(
     INPUT_REQUIREMENTS requirements.in.noetic
+    PYTHON_INTERPRETER python3
+    )
+else()
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in.python3.12
     PYTHON_INTERPRETER python3
     )
 endif()
