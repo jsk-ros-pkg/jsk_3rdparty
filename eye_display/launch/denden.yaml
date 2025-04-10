@@ -1,29 +1,46 @@
 names: [neutral, blink, surprised, tired, angry, sad, star, heart]
 neutral:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil.png"
   path_reflex: "/white.jpg"
   path_upperlid: "/normal_kxr_upperlid.jpg"
   upperlid_position: [9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
 blink:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil.png"
   path_reflex: "/white.jpg"
   path_upperlid: "/normal_kxr_upperlid.jpg"
   upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
 surprised:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil_surprised.png"
   path_reflex: "/denden_reflex_surprised.png"
   path_upperlid: "/normal_kxr_upperlid.jpg"
   upperlid_position: [9, 9, 9, 9, 130, 130, 9, 9, 9, 9, 130, 9, 9, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
 tired:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil.png"
   path_reflex: "/white.jpg"
   path_upperlid: "/normal_kxr_upperlid.jpg"
   upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
 angry:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil.png"
   path_reflex: "/white.jpg"
@@ -33,6 +50,7 @@ angry:
   upperlid_default_pos_y: 40
   upperlid_default_theta: -30
 sad:
+  path_outline: "/outline.jpg"
   path_iris: "/denden_tear.jpeg"
   path_pupil: "/denden_pupil.png"
   path_reflex: "/denden_reflex_sad.png"
@@ -42,14 +60,22 @@ sad:
   upperlid_default_pos_y: 40
   upperlid_default_theta: 30
 star:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/white.jpg"
   path_reflex: "/white.jpg"
   path_upperlid: "/denden_upperlid_star.jpeg"
   upperlid_position: [130, 131, 132, 133, 134, 135]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
 heart:
+  path_outline: "/outline.jpg"
   path_iris: "/white.jpg"
   path_pupil: "/white.jpg"
   path_reflex: "/white.jpg"
   path_upperlid: "/denden_upperlid_heart.jpeg"
   upperlid_position: [130, 131, 132, 133, 134, 135]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
