@@ -221,7 +221,7 @@ jobs:
             ROSDEP_PACKAGE_MAPPING: "yaml https://raw.githubusercontent.com/v4hn/ros-o-builder/jammy-one/repository/local.yaml debian"
           - DISTRO: ubuntu:24.04
             ROS_ONE_VARIANT: techfak
-            ROS_REPOSITORY_URL: "deb [trusted=yes] https://ros.packages.techfak.net noble main"
+            ROS_REPOSITORY_URL: "deb [trusted=yes] https://ros.packages.techfak.net noble-testing main"
             ROSDEP_PACKAGE_MAPPING: "yaml https://ros.packages.techfak.net/ros-one.yaml ubuntu"
 
     container: ${{ matrix.DISTRO }}
