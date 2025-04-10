@@ -2,7 +2,7 @@
   <arg name="port" />
   <arg name="baud" default="57600" />
   <arg name="mode_right" default="true" />
-  <arg name="direction" default="1" />
+  <arg name="direction" default="0" />
   <arg name="debug" default="false"/>
 
   <include file="$(find eye_display)/launch/demo.launch" >
