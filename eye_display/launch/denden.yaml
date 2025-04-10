@@ -1,4 +1,4 @@
-names: [normal, blink, surprised, sleepy, angry, sad, happy, heart]
+names: [neutral, blink, surprised, tired, angry, sad, star, heart]
 neutral:
   path_iris: "/white.jpg"
   path_pupil: "/denden_pupil.png"
