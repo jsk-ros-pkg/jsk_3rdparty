@@ -1,0 +1,56 @@
+#ifndef _ROS_roseus_smach_Sub5ActionResult_h
+#define _ROS_roseus_smach_Sub5ActionResult_h
+
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ros/msg.h"
+#include "std_msgs/Header.h"
+#include "actionlib_msgs/GoalStatus.h"
+#include "roseus_smach/Sub5Result.h"
+
+namespace roseus_smach
+{
+
+  class Sub5ActionResult : public ros::Msg
+  {
+    public:
+      typedef std_msgs::Header _header_type;
+      _header_type header;
+      typedef actionlib_msgs::GoalStatus _status_type;
+      _status_type status;
+      typedef roseus_smach::Sub5Result _result_type;
+      _result_type result;
+
+    Sub5ActionResult():
+      header(),
+      status(),
+      result()
+    {
+    }
+
+    virtual int serialize(unsigned char *outbuffer) const override
+    {
+      int offset = 0;
+      offset += this->header.serialize(outbuffer + offset);
+      offset += this->status.serialize(outbuffer + offset);
+      offset += this->result.serialize(outbuffer + offset);
+      return offset;
+    }
+
+    virtual int deserialize(unsigned char *inbuffer) override
+    {
+      int offset = 0;
+      offset += this->header.deserialize(inbuffer + offset);
+      offset += this->status.deserialize(inbuffer + offset);
+      offset += this->result.deserialize(inbuffer + offset);
+     return offset;
+    }
+
+    virtual const char * getType() override { return "roseus_smach/Sub5ActionResult"; };
+    virtual const char * getMD5() override { return "9599baaab13952d63dd1c52591805a79"; };
+
+  };
+
+}
+#endif
