@@ -15,3 +15,24 @@ Install the required Python package:
 
 ```bash
 pip install hume
+```
+
+## Usage
+
+### Set your Hume API key
+Before running the node, set your API key using rosparam:
+```bash
+rosparam set /hume_api_key "your_hume_api_key_here"
+```
+Note that you need "".
+
+### Run the ROS node
+```bash
+rosrun emotion_analyzer analyze_text_service.py
+```
+
+### Call the service
+```bash
+rosservice call /analyze_text "text: 'text you want to analyze'"
+```
+
