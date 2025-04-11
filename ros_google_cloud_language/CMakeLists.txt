@@ -42,7 +42,15 @@ catkin_package(
   CATKIN_DEPENDS
 )
 
+# generate the virtualenv
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(Python3_FOUND)
+  message(STATUS "Found Python: ${Python3_EXECUTABLE}")
+  message(STATUS "Python Version: ${Python3_VERSION}")
+endif()
+if((NOT Python3_FOUND) OR (Python3_VERSION VERSION_LESS "3.12"))
 catkin_generate_virtualenv(
+  INPUT_REQUIREMENTS requirements.in
   # specify python version
   # https://github.com/jsk-ros-pkg/jsk_3rdparty/pull/367/files
   PYTHON_INTERPRETER "python$ENV{ROS_PYTHON_VERSION}"
@@ -51,7 +59,13 @@ catkin_generate_virtualenv(
   # # futures==3.3.0
   CHECK_VENV FALSE  # Default TRUE
   )
-
+else()
+catkin_generate_virtualenv(
+  INPUT_REQUIREMENTS requirements.in.python3.12
+  PYTHON_INTERPRETER python3
+  CHECK_VENV FALSE
+  )
+endif()
 include_directories()
 
 file(GLOB PYTHON_SCRIPT_FILES node_scripts/*.py test/*.py)
@@ -62,10 +76,6 @@ catkin_install_python(
 install(DIRECTORY launch samples
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
-)
-
-install(FILES requirements.txt
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 if(CATKIN_ENABLE_TESTING)

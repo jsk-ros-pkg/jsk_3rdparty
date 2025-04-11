@@ -8,6 +8,7 @@ TARBALL     = build/bayesian-belief-networks.zip
 TARBALL_URL = https://github.com/eBay/bayesian-belief-networks/archive/$(GIT_REVISION).zip
 SOURCE_DIR  = build/bayesian-belief-networks-$(GIT_REVISION)
 MD5SUM_FILE = $(INSTALL_DIR)/bayesian-belief-networks.zip.md5sum
+TARBALL_PATCH = $(INSTALL_DIR)/bayesian-belief-networks.2to3
 UNPACK_CMD  = unzip
 
 PYTHONBIN   = python$(ROS_PYTHON_VERSION)
@@ -34,7 +35,10 @@ installed: $(DIST_DIR) # examples
 
 $(DIST_DIR): $(SOURCE_DIR)/unpacked
 	mkdir -p $(DIST_DIR)
-	cd $(SOURCE_DIR) && $(PYTHONBIN) ./setup.py build && PYTHONPATH=$(DIST_DIR) $(PYTHONBIN) ./setup.py install --prefix=$(INSTALL_DIR) $(SETUPTOOLS_ARG_EXTRA) --record installed_files.txt
+	cd $(SOURCE_DIR) && \
+	$(PYTHONBIN) ./setup.py build && \
+	(PYTHONPATH=$(DIST_DIR) $(PYTHONBIN) ./setup.py install --prefix=$(INSTALL_DIR) $(SETUPTOOLS_ARG_EXTRA) --single-version-externally-managed --record installed_files.txt || \
+	 PYTHONPATH=$(DIST_DIR) $(PYTHONBIN) ./setup.py install --prefix=$(INSTALL_DIR) $(SETUPTOOLS_ARG_EXTRA) --record installed_files.txt)
 
 
 clean:

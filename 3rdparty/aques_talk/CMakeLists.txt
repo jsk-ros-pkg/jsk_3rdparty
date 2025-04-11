@@ -5,6 +5,10 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
+if(DEFINED ENV{GITHUB_ACTIONS})
+  message(WARNING "skip downloading aques_talk within GithubAction")
+  return()
+endif()
 # Considering the use of docker in addition to the usual use,
 # we use dpkg-architecture command instead of ${CMAKE_SYSTEM_PROCESSOR} to get the architecture.
 # https://stackoverflow.com/a/58222507

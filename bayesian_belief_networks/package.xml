@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="3">
   <name>bayesian_belief_networks</name>
   <version>2.1.29</version>
   <description>The bayesian_belief_networks package form https://github.com/eBay/bayesian-belief-networks, Authored by Neville Newey, Anzar Afaq, Copyright 2013 eBay Software Foundation</description>
@@ -20,10 +20,13 @@
   <build_depend>unzip</build_depend>
   <build_depend>git</build_depend>
   <build_depend>message_generation</build_depend>
+  <build_depend condition="$ROS_PYTHON_VERSION == 2">python-packaging</build_depend>
+  <build_depend condition="$ROS_PYTHON_VERSION == 3">python3-packaging</build_depend>
+  <build_export_depend>std_msgs</build_export_depend>
 
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>message_runtime</run_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
   <export>
   </export>
