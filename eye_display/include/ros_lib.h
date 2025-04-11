@@ -57,6 +57,8 @@ void setup_asset(EyeManager& eye)
     nh.spinOnce();
     delay(1000);
   }
+  delay(500);  // wait 0.5 sec before reading asset
+  nh.loginfo("Setup eye asset");
 
   bool mode_right;
   int direction = 1;
