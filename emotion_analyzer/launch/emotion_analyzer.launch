@@ -1,0 +1,10 @@
+<launch>
+  <!-- 引数（APIキー）をコマンドラインから渡せるようにする -->
+  <arg name="api_key" default="" />
+
+  <!-- パラメータとして渡す -->
+  <param name="hume_api_key" value="$(arg api_key)" />
+
+  <!-- ノード起動 -->
+  <node name="analyze_text_service" pkg="emotion_analyzer" type="analyze_text_service.py" output="screen" />
+</launch>
