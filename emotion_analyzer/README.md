@@ -19,11 +19,12 @@ pip install hume
 
 ## Usage
 
+### 1. Launch Emotion_Analyzer
 ```bash
 roslaunch emotion_analyzer emotion_analyzer.launch api_key:=<your_api_key>
 ```
 
-### Call the service
+### 2. Call the service
 ```bash
 rosservice call /analyze_text "text: '<text you want to analyze>'"
 ```
