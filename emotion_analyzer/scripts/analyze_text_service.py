@@ -4,6 +4,7 @@ import asyncio
 from hume import HumeStreamClient
 from hume.models.config import LanguageConfig
 from emotion_analyzer.srv import AnalyzeText, AnalyzeTextResponse
+import pprint
 
 class TextServiceNode:
     def __init__(self):
@@ -26,6 +27,7 @@ class TextServiceNode:
     async def analyze_text(self, text):
         async with self.client.connect([self.config]) as socket:
             result = await socket.send_text(text)
+            pprint.pprint(result)
             emotions = result["language"]["predictions"][0]["emotions"]
             return str(emotions)  # 必要ならJSON文字列に変換してもOK
 
