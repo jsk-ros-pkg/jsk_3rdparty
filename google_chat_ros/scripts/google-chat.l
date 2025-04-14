@@ -4,11 +4,11 @@
 (ros::roseus "google_chat_eus_client")
 
 (defun send-google-chat-text (space content
-                              &key (thread-name nil) (action-goal-name "google_chat_ros/send") (wait t))
+                              &key (thread-name nil) (action-goal-name "google_chat_ros/send") (wait t)
+                                (ac (instance ros::simple-action-client :init
+                                              action-goal-name google_chat_ros::SendMessageAction)))
   (wait (boundp 'google_chat_ros::SendMessageAction)
-        (let ((goal (instance google_chat_ros::SendMessageActionGoal :init))
-              (ac (instance ros::simple-action-client :init
-                            action-goal-name google_chat_ros::SendMessageAction)))
+        (let ((goal (instance google_chat_ros::SendMessageActionGoal :init)))
           (when (send ac :wait-for-server 1)
             (when (eq (send ac :get-state) actionlib_msgs::GoalStatus::*active*)
               (send ac :cancel-goal)
@@ -25,11 +25,11 @@
 (defun send-google-chat-image
     (space image-path
      &key (image-header "") (thread-name nil)
-       (action-goal-name "google_chat_ros/send") (wait t))
+       (action-goal-name "google_chat_ros/send") (wait t)
+       (ac (instance ros::simple-action-client :init
+                     action-goal-name google_chat_ros::SendMessageAction)))
   (when (boundp 'google_chat_ros::SendMessageAction)
-    (let ((goal (instance google_chat_ros::SendMessageActionGoal :init))
-          (ac (instance ros::simple-action-client :init
-                        action-goal-name google_chat_ros::SendMessageAction))
+    (let ((goal (instance google_chat_ros::SendMessageActionGoal :init)))
           (card (instance google_chat_ros::Card :init))
           (section (instance google_chat_ros::Section :init))
           (widget (instance google_chat_ros::WidgetMarkup :init))
@@ -72,11 +72,11 @@
     ;; buttons should be list
     (space buttons
      &key (buttons-header "") (thread-name nil)
-       (action-goal-name "google_chat_ros/send") (wait nil))
+       (action-goal-name "google_chat_ros/send") (wait nil)
+       (ac (instance ros::simple-action-client :init
+                     action-goal-name google_chat_ros::SendMessageAction)))
   (when (boundp 'google_chat_ros::SendMessageAction)
     (let ((goal (instance google_chat_ros::SendMessageActionGoal :init))
-          (ac (instance ros::simple-action-client :init
-                        action-goal-name google_chat_ros::SendMessageAction))
           (card (instance google_chat_ros::Card :init))
           (section (instance google_chat_ros::Section :init))
           (widget (instance google_chat_ros::WidgetMarkup :init)))
