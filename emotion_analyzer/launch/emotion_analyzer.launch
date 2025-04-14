@@ -7,4 +7,5 @@
 
   <!-- ノード起動 -->
   <node name="analyze_text_service" pkg="emotion_analyzer" type="analyze_text_service.py" output="screen" />
+  <node name="analyze_audio_service" pkg="emotion_analyzer" type="analyze_audio_service.py" output="screen" />   
 </launch>

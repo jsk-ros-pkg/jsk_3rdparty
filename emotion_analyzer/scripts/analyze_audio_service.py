@@ -67,15 +67,21 @@ class AudioServiceNode:
         async with self.client.connect(self.config) as socket:
             result = await socket.send_file(wav_path)
             pprint.pprint(result)
+
+            result_prosody = None
+            result_burst = None
+            
             if result and isinstance(result, dict):
                 # 予測結果を取得
-                prosody = result.get('prosody', {}).get('emotions', [])
-                burst = result.get('burst', {}).get('emotions', [])
+                if 'prosody' in result and 'predictions' in result['prosody']:
+                    result_prosody = result['prosody']['predictions'][0]['emotions']
+                if 'burst' in result and 'predictions' in result['burst']:
+                    result_burst = result['burst']['predictions'][0]['emotions']
             
                 # 予測結果がない場合の処理を追加する
                 # if not predictions:
                 #     rospy.logwarn("No predictions found in the result.")
-                return {"prosody": prosody, "burst": burst}
+                return {"prosody": result_prosody, "burst": result_burst}
             else:
                 rospy.logerr("Error in receiving valid result.")
                 return {"prosody": None, "burst": None}

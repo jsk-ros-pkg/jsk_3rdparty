@@ -5,6 +5,7 @@ from hume import HumeStreamClient
 from hume.models.config import LanguageConfig
 from emotion_analyzer.srv import AnalyzeText, AnalyzeTextResponse
 import pprint
+import json
 
 class TextServiceNode:
     def __init__(self):
@@ -14,7 +15,8 @@ class TextServiceNode:
             exit(1)
 
         self.client = HumeStreamClient(self.api_key)
-        self.config = LanguageConfig()
+        self.config = LanguageConfig(granularity="sentence")
+        #granularity="word": analyze each word / granularity="turn": analyze whole text
         rospy.Service("analyze_text", AnalyzeText, self.handle_request)
         rospy.loginfo("Text-to-Emotion Analysis Service ready.")
 
@@ -22,14 +24,15 @@ class TextServiceNode:
         rospy.loginfo("Received text for analysis")  # テキストを受け取ったときにログ
         result = asyncio.run(self.analyze_text(req.text))
         rospy.loginfo("Finished analysis")  # 結果を返したときにログ
-        return AnalyzeTextResponse(result)
+        result_json = json.dumps(result)
+        return AnalyzeTextResponse(result_json)
 
     async def analyze_text(self, text):
         async with self.client.connect([self.config]) as socket:
             result = await socket.send_text(text)
             pprint.pprint(result)
             emotions = result["language"]["predictions"][0]["emotions"]
-            return str(emotions)  # 必要ならJSON文字列に変換してもOK
+            return {"emotions": emotions}  # dict型で返す
 
 if __name__ == "__main__":
     rospy.init_node("analyze_text_service_node")
