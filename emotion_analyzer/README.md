@@ -41,6 +41,7 @@ roslaunch emotion_analyzer capture.launch
 rosservice call /analyze_audio "audio_file: ''"
 ```
 You can check the device information by `arecord -l`.
+Also, when the device is busy, you can try `pasuspender -- roslaunch emotion_analyzer capture.launch`.
 
 
 
