@@ -25,7 +25,25 @@ roslaunch emotion_analyzer emotion_analyzer.launch api_key:=<your_api_key>
 ```
 
 ### 2. Call the service
+For text,
 ```bash
 rosservice call /analyze_text "text: '<text you want to analyze>'"
 ```
+For prepared audio (up to 5 seconds),
+```bash
+rosservice call /analyze_audio "audio_file: <audio_file_path>"
+```
+As a sample, you can use `'/home/leus/ros/catkin_ws/src/jsk_3rdparty/emotion_analyzer/data/purugacha_short.wav'` as <audio_file_path>.
+
+For audio from microphone,
+```bash
+roslaunch emotion_analyzer capture.launch
+rosservice call /analyze_audio "audio_file: ''"
+```
+You can check the device information by `arecord -l`.
+
+
+
+
+
 
