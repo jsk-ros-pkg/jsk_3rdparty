@@ -6,16 +6,18 @@ This ROS1 package provides a service to analyze emotions from a given text using
 
 - ROS1 Noetic
 - Python 3.8+
-- `hume` Python package
 - An API key from Hume AI
 
 ## Installation
 
-Install the required Python package:
+Clone this repository and move to this directory
 
-```bash
-pip install hume
+``` bash
+rosdep install -iry .
+catkin build --this
 ```
+
+then source your workspace
 
 ## Usage
 
@@ -37,7 +39,7 @@ As a sample, you can use `'/home/leus/ros/catkin_ws/src/jsk_3rdparty/emotion_ana
 
 For audio from microphone,
 ```bash
-roslaunch emotion_analyzer capture.launch
+roslaunch audio_capture capture.launch
 rosservice call /analyze_audio "audio_file: ''"
 ```
 You can check the device information by `arecord -l`.
