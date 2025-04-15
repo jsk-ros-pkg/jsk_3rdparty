@@ -25,6 +25,6 @@
   <depend>std_msgs</depend>
 
   <export>
-    requirements.txt
+    <pip_requirements>requirements.txt</pip_requirements>
   </export>
 </package>
