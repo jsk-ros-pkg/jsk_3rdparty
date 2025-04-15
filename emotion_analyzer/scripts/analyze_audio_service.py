@@ -4,7 +4,7 @@ import asyncio
 from hume import HumeStreamClient
 from hume.models.config import ProsodyConfig, BurstConfig
 from emotion_analyzer.srv import AnalyzeAudio, AnalyzeAudioResponse
-from utils.audio_buffer import AudioBuffer
+from emotion_analyzer.utils.audio_buffer import AudioBuffer
 import soundfile as sf
 from pydub import AudioSegment
 from io import BytesIO
