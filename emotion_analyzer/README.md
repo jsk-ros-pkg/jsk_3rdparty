@@ -19,6 +19,15 @@ catkin build --this
 
 then source your workspace
 
+## Usage (Quick)
+
+Using your microphone
+
+``` bash
+roslaunch emotion_analyzer sample_emotion_analyzer.launch api_key:=<your_api_key>
+```
+
+
 ## Usage
 
 ### 1. Launch Emotion_Analyzer
