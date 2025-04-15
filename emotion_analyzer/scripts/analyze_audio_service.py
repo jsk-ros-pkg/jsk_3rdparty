@@ -17,7 +17,7 @@ from std_msgs.msg import String
 class AudioServiceNode:
     def __init__(self):
         self.api_key = rospy.get_param("hume_api_key", None)
-        if self.api_key is None:
+        if not self.api_key:
             rospy.logerr("API key has not been set")
             exit(1)
 
