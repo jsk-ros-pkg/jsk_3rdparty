@@ -4,8 +4,8 @@ from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup(
-    packages=['emotion_analyzer', 'emotion_analyzer.utils'],
-    package_dir={'': '.'}
+    packages=['emotion_analyzer'],
+    package_dir={'': 'src'}
 )
 
 setup(**d)

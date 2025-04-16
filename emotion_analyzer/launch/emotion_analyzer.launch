@@ -1,5 +1,7 @@
 <launch>
-  <!-- 引数（APIキー）をコマンドラインから渡せるようにする -->
+  <arg name="input_audio" default="~audio" />
+
+  <!-- 引数（API キー）をコマンドラインから渡せるようにする -->
   <arg name="api_key" default="" />
 
   <!-- パラメータとして渡す -->
@@ -7,5 +9,7 @@
 
   <!-- ノード起動 -->
   <node name="analyze_text_service" pkg="emotion_analyzer" type="analyze_text_service.py" output="screen" />
-  <node name="analyze_audio_service" pkg="emotion_analyzer" type="analyze_audio_service.py" output="screen" />   
+  <node name="analyze_audio_service" pkg="emotion_analyzer" type="analyze_audio_service.py" output="screen" >
+    <remap from="~audio" to="$(arg input_audio)" />
+  </node>
 </launch>

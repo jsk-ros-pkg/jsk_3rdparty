@@ -105,8 +105,7 @@ class AudioBuffer(object):
 
     def read(self, size=None, wait=False, normalize=False):
         if size is None:
-            size = self.audio_buffer_len
-        size = int(size * self.input_sample_rate)
+            size = int(self.audio_buffer_len)
         while wait is True \
                 and not rospy.is_shutdown() and len(self.audio_buffer) < size:
             rospy.sleep(0.001)
