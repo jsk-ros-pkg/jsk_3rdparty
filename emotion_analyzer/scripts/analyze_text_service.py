@@ -21,9 +21,9 @@ class TextServiceNode:
         rospy.loginfo("Text-to-Emotion Analysis Service ready.")
 
     def handle_request(self, req):
-        rospy.loginfo("Received text for analysis")  # テキストを受け取ったときにログ
+        rospy.loginfo("Received text for analysis")  
         result = asyncio.run(self.analyze_text(req.text))
-        rospy.loginfo("Finished analysis")  # 結果を返したときにログ
+        rospy.loginfo("Finished analysis")  
         result_json = json.dumps(result)
         return AnalyzeTextResponse(result_json)
 
@@ -32,7 +32,7 @@ class TextServiceNode:
             result = await socket.send_text(text)
             pprint.pprint(result)
             emotions = result["language"]["predictions"][0]["emotions"]
-            return {"emotions": emotions}  # dict型で返す
+            return {"emotions": emotions}  # return dict
 
 if __name__ == "__main__":
     rospy.init_node("analyze_text_service_node")

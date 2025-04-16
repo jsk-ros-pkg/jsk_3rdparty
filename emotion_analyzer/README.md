@@ -48,11 +48,11 @@ As a sample, you can use `'/home/leus/ros/catkin_ws/src/jsk_3rdparty/emotion_ana
 
 For audio from microphone,
 ```bash
-roslaunch audio_capture capture.launch
+roslaunch audio_capture capture.launch format:=wave
 rosservice call /analyze_audio "audio_file: ''"
 ```
 You can check the device information by `arecord -l`.
-Also, when the device is busy, you can try `pasuspender -- roslaunch emotion_analyzer capture.launch`.
+
 
 
 
