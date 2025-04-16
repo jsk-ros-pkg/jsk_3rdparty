@@ -1,13 +1,12 @@
 <launch>
-  <arg name="input_audio" default="~audio" />
+  <!-- check the audio topic -->
+  <arg name="input_audio" default="/audio/audio" />
 
-  <!-- 引数（API キー）をコマンドラインから渡せるようにする -->
+  <!-- set API key from the command line -->
   <arg name="api_key" default="" />
 
-  <!-- パラメータとして渡す -->
   <param name="hume_api_key" value="$(arg api_key)" />
 
-  <!-- ノード起動 -->
   <node name="analyze_text_service" pkg="emotion_analyzer" type="analyze_text_service.py" output="screen" />
   <node name="analyze_audio_service" pkg="emotion_analyzer" type="analyze_audio_service.py" output="screen" >
     <remap from="~audio" to="$(arg input_audio)" />

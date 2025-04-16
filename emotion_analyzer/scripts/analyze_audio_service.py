@@ -13,6 +13,7 @@ import os
 import pprint
 import json
 from std_msgs.msg import String
+from audio_common_msgs.msg import AudioInfo
 
 class AudioServiceNode:
     def __init__(self):
@@ -26,13 +27,20 @@ class AudioServiceNode:
         self.audio_buffer = AudioBuffer(topic_name="~audio",
                                         window_size=2.0,
                                         auto_start=True)
+        self.expected_coding_format = "wave"
+        self.audio_info_sub = rospy.Subscriber("/audio/audio_info", AudioInfo, self.audio_info_callback)
         rospy.Service("analyze_audio", AnalyzeAudio, self.handle_request)
         rospy.loginfo("Audio-to-Emotion Analysis Service ready.")
 
+    def audio_info_callback(self, msg):
+        #check the audio format
+        if msg.coding_format != self.expected_coding_format:
+            rospy.logwarn(f"Coding_format mismatch: expected {self.expected_coding_format}, got {msg.coding_format}")
+
     def handle_request(self, req):
-        rospy.loginfo("Received request for analysis")  # requestを受け取ったときにログ
+        rospy.loginfo("Received request for analysis")  
         result = asyncio.run(self.analyze_audio(req.audio_file))
-        rospy.loginfo("Finished analysis")  # 結果を返したときにログ
+        rospy.loginfo("Finished analysis")  
         if isinstance(result, dict):
             result_json = json.dumps(result)
         else:
@@ -48,6 +56,9 @@ class AudioServiceNode:
             frame_rate = segment.frame_rate
         else:
             samples = self.audio_buffer.read()
+            if samples is None or len(samples) == 0:
+                rospy.logwarn("Audio data cannot be found. Check the audio topic name.")
+                return {"error": "No audio data received."}            
             wav_bytes = samples.tobytes()
             sample_width = self.audio_buffer.bitdepth // 8
             channels = self.audio_buffer.n_channel
@@ -58,10 +69,10 @@ class AudioServiceNode:
                 channels=channels,
                 frame_rate=frame_rate,
             )
-        # Humeに送信（必要に応じて制限時間確認）
+        # check the length of the audio
         duration_ms = len(segment)
         if duration_ms > 5000:
-            raise Exception(f"Hume API制限超過: 音声長 = {duration_ms}ms")
+            raise Exception(f"Audio is too long: audio length = {duration_ms}ms")
 
         buf = BytesIO()
         segment.export(buf, format="wav")
@@ -76,13 +87,10 @@ class AudioServiceNode:
             result_burst = None
 
             if result and isinstance(result, dict):
-                # 予測結果を取得
                 if 'prosody' in result and 'predictions' in result['prosody']:
                     result_prosody = result['prosody']['predictions'][0]['emotions']
                 if 'burst' in result and 'predictions' in result['burst']:
                     result_burst = result['burst']['predictions'][0]['emotions']
-            
-                # 予測結果がない場合の処理を追加する
                 # if not predictions:
                 #     rospy.logwarn("No predictions found in the result.")
                 return {"prosody": result_prosody, "burst": result_burst}
@@ -90,7 +98,7 @@ class AudioServiceNode:
                 rospy.logerr("Error in receiving valid result.")
                 return {"prosody": None, "burst": None}
             #emotions = result["prosody"]["predictions"][0]["emotions"]
-            #return str(emotions)  # 必要ならJSON文字列に変換してもOK
+            #return str(emotions)  
                    
 if __name__ == "__main__":
     rospy.init_node("analyze_audio_service_node")
