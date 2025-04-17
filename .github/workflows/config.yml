@@ -280,10 +280,6 @@ jobs:
           # setup workspace
           mkdir -p ~/ws/src
           cd ~/ws/src
-          if [[ "${{ matrix.ROS_ONE_VARIANT }}" == "techfak" ]]; then
-          # TODO: remove these lines and uncomment https://github.com/ubi-agni/ros-builder-action/blob/191fab06004ad5784c28cf2ba2b18f6d163a860d/ros-one.repos#L1089
-              git clone https://github.com/locusrobotics/catkin_virtualenv.git
-          fi
           ln -sf $GITHUB_WORKSPACE .
           rosdep install -qq -r -y --from-path . --ignore-src || echo "OK"
           # check all system packages are able to install, because ROS-O build deb files that needs all packages
