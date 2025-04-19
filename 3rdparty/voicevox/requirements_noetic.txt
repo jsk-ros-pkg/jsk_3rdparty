@@ -13,7 +13,7 @@ numpy==1.24.4             # via -r requirements.in, pyopenjtalk, pyworld, scipy
 pycparser==2.22           # via cffi
 pydantic-core==2.16.3     # via pydantic
 pydantic==2.6.4           # via fastapi
-git+https://github.com/VOICEVOX/pyopenjtalk@b35fc89fe42948a28e33aed886ea145a51113f88#egg=pyopenjtalk  # via -r requirements.in
+git+https://github.com/VOICEVOX/pyopenjtalk@5b70b94f3460ece07ea183227db088ce8d5212a6#egg=pyopenjtalk  # via -r requirements.in
 python-multipart==0.0.9   # via -r requirements.in
 pyworld==0.3.4            # via -r requirements.in
 pyyaml==6.0.1             # via -r requirements.in
