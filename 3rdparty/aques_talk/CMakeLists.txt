@@ -50,8 +50,8 @@ target_link_libraries(SampleTalk AquesTalk2)
 add_dependencies(SampleTalk aqtk2-lnx-eva)
 
 # install
-install(FILES text2wave
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+catkin_install_python(PROGRAMS text2wave
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
