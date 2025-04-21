@@ -26,6 +26,7 @@ catkin_generate_virtualenv(
   INPUT_REQUIREMENTS ${REQUIREMENTS_TXT_FILE}
   PYTHON_INTERPRETER python3
   USE_SYSTEM_PACKAGES FALSE
+  CHECK_VENV FALSE  # Default TRUE
 )
 
 add_custom_command(
