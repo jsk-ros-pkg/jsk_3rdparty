@@ -12,8 +12,18 @@ set(INSTALL_DIR ${PROJECT_SOURCE_DIR})
 
 catkin_package()
 
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(NOT Python3_FOUND)
+  message(WARNING "voicevox requires python3")
+  return()
+endif()
+if("$ENV{ROS_DISTRO}" STREQUAL "melodic")
+  set(REQUIREMENTS_TXT_FILE requirements_melodic.txt)
+else()
+  set(REQUIREMENTS_TXT_FILE requirements_noetic.txt)
+endif()
 catkin_generate_virtualenv(
-  INPUT_REQUIREMENTS requirements_$ENV{ROS_DISTRO}.txt
+  INPUT_REQUIREMENTS ${REQUIREMENTS_TXT_FILE}
   PYTHON_INTERPRETER python3
   USE_SYSTEM_PACKAGES FALSE
 )
