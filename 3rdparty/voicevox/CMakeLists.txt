@@ -17,10 +17,19 @@ if(NOT Python3_FOUND)
   message(WARNING "voicevox requires python3")
   return()
 endif()
+# generate the virtualenv
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(Python3_FOUND)
+  message(STATUS "Found Python: ${Python3_EXECUTABLE}")
+  message(STATUS "Python Version: ${Python3_VERSION}")
+endif()
+
 if("$ENV{ROS_DISTRO}" STREQUAL "melodic")
   set(REQUIREMENTS_TXT_FILE requirements_melodic.txt)
-else()
+elseif(Python3_VERSION VERSION_LESS "3.12")
   set(REQUIREMENTS_TXT_FILE requirements_noetic.txt)
+else()
+  set(REQUIREMENTS_TXT_FILE requirements_python3.12.txt)
 endif()
 catkin_generate_virtualenv(
   INPUT_REQUIREMENTS ${REQUIREMENTS_TXT_FILE}
