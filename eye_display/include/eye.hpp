@@ -186,6 +186,8 @@ void EyeManager::load_eye_images()
     const char *path_jpg_reflex = current_eye_asset.path_reflex.c_str();
     const char *path_jpg_upperlid = current_eye_asset.path_upperlid.c_str();
 
+    lcd.setRotation(current_eye_asset.direction);
+
     if (path_jpg_outline != NULL) {
         sprite_outline.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_outline, path_jpg_outline)) {
