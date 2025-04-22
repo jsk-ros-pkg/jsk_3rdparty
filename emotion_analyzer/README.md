@@ -52,6 +52,9 @@ roslaunch audio_capture capture.launch format:=wave
 rosservice call /analyze_audio "audio_file: ''"
 ```
 You can check the device information by `arecord -l`.
+Sometimes you need to replace "hw" with "plughw": 
+for example, `roslaunch audio_capture capture.launch format:=wave device:=plughw:1,0`.
+When the device is busy, you can try `fuser -v /dev/snd/*` to get PID and kill it by `kill -9 <PID>`.
 
 
 
