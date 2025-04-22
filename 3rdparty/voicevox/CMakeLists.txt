@@ -1,0 +1,93 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(voicevox)
+
+find_package(catkin REQUIRED
+  COMPONENTS
+  catkin_virtualenv
+)
+
+catkin_python_setup()
+
+set(INSTALL_DIR ${PROJECT_SOURCE_DIR})
+
+catkin_package()
+
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(NOT Python3_FOUND)
+  message(WARNING "voicevox requires python3")
+  return()
+endif()
+# generate the virtualenv
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(Python3_FOUND)
+  message(STATUS "Found Python: ${Python3_EXECUTABLE}")
+  message(STATUS "Python Version: ${Python3_VERSION}")
+endif()
+
+if("$ENV{ROS_DISTRO}" STREQUAL "melodic")
+  set(REQUIREMENTS_TXT_FILE requirements_melodic.txt)
+elseif(Python3_VERSION VERSION_LESS "3.12")
+  set(REQUIREMENTS_TXT_FILE requirements_noetic.txt)
+else()
+  set(REQUIREMENTS_TXT_FILE requirements_python3.12.txt)
+endif()
+catkin_generate_virtualenv(
+  INPUT_REQUIREMENTS ${REQUIREMENTS_TXT_FILE}
+  PYTHON_INTERPRETER python3
+  USE_SYSTEM_PACKAGES FALSE
+  CHECK_VENV FALSE  # Default TRUE
+)
+
+add_custom_command(
+  OUTPUT voicevox_model_installed
+  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.model
+  MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  INSTALL_DIR=${INSTALL_DIR}
+)
+
+
+add_custom_command(
+  OUTPUT voicevox_core_installed
+  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.core
+  MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  INSTALL_DIR=${INSTALL_DIR}
+)
+
+add_custom_command(
+  OUTPUT voicevox_engine_installed
+  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.engine
+  MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  INSTALL_DIR=${INSTALL_DIR}
+)
+
+add_custom_command(
+  OUTPUT open_jtalk_dic_installed
+  COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.open_jtalk_dic
+  MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  INSTALL_DIR=${INSTALL_DIR}
+)
+
+add_custom_target(all_installed ALL DEPENDS
+  voicevox_model_installed
+  voicevox_core_installed
+  voicevox_engine_installed
+  open_jtalk_dic_installed)
+
+file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
+catkin_install_python(
+  PROGRAMS ${NODE_SCRIPTS_FILES}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/node_scripts/
+)
+install(DIRECTORY node_scripts/voicevox_engine
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/catkin_virtualenv_scripts/
+  USE_SOURCE_PERMISSIONS)
+install(DIRECTORY launch dict
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)
+install(PROGRAMS bin/text2wave
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin)
+
+install(DIRECTORY
+  ${INSTALL_DIR}/lib
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)

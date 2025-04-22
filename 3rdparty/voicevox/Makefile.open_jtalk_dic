@@ -1,0 +1,25 @@
+# -*- makefile -*-
+
+all: installed.open_jtalk_dic
+
+VERSION = 1.11.1
+FILENAME = open_jtalk_dic_utf_8-1.11.tar.gz
+TARBALL = build/$(FILENAME)
+TARBALL_URL = "https://github.com/r9y9/open_jtalk/releases/download/v$(VERSION)/$(FILENAME)"
+SOURCE_DIR = build/open_jtalk_dic_utf_8-1.11
+UNPACK_CMD = tar xvzf
+MD5SUM_DIR = $(CURDIR)/md5sum
+MD5SUM_FILE = $(MD5SUM_DIR)/open_jtalk_dic.tar.gz.md5sum
+include $(shell rospack find mk)/download_unpack_build.mk
+INSTALL_DIR =	'./'
+
+
+installed.open_jtalk_dic: $(SOURCE_DIR)/unpacked
+	mkdir -p $(INSTALL_DIR)/dict
+	cp -r build/open_jtalk_dic_utf_8-1.11 $(INSTALL_DIR)/dict
+
+clean:
+	rm -rf $(TARBALL)
+	rm -rf $(SOURCE_DIR)
+	rm -rf $(INSTALL_DIR)/dict/open_jtalk_dic_utf_8-1.11
+	rm -rf build
