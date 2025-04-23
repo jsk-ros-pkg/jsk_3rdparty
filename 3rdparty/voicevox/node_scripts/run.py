@@ -1,87 +1,60 @@
-#!/usr/bin/env python3
+import argparse
 
-# This code was created based on the following link's code.
-# https://github.com/VOICEVOX/voicevox_engine/blob/0.11.4/run.py
-
+# import asyncio
 import base64
-from distutils.version import LooseVersion
-from functools import lru_cache
-import imp
 import json
 import multiprocessing
 import os
-import os.path as osp
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from tempfile import TemporaryFile
-from typing import Dict
-from typing import List
-from typing import Optional
-import zipfile
+import traceback
 
-import numpy as np
-from fastapi import FastAPI
-from fastapi import HTTPException
+# import sys
+import zipfile
+from distutils.version import LooseVersion
+from functools import lru_cache
+from pathlib import Path
+from tempfile import NamedTemporaryFile, TemporaryFile
+from typing import Dict, List, Optional
+
+import soundfile
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Query
-from fastapi import Response
-import rospkg
-import rospy
-import soundfile
+from pydantic import ValidationError
 from starlette.responses import FileResponse
-import uvicorn
-
-
-PKG_NAME = 'voicevox'
-abs_path = osp.dirname(osp.abspath(__file__))
-voicevox_engine = imp.load_package(
-    'voicevox_engine', osp.join(abs_path, 'voicevox_engine/voicevox_engine'))
-rospack = rospkg.RosPack()
-voicevox_dir = rospack.get_path(PKG_NAME)
-voicevox_lib_dir = osp.join(voicevox_dir, 'lib')
-# set pyopenjtalk's dic.tar.gz file
-os.environ['OPEN_JTALK_DICT_DIR'] = osp.join(
-    voicevox_dir, 'dict', 'open_jtalk_dic_utf_8-1.11')
-
 
 from voicevox_engine import __version__
-from voicevox_engine.tts_pipeline.kana_converter import create_kana
-from voicevox_engine.tts_pipeline.kana_converter import parse_kana
-from voicevox_engine.model import AccentPhrase
-from voicevox_engine.model import AudioQuery
-from voicevox_engine.model import ParseKanaBadRequest
-from voicevox_engine.model import ParseKanaError
-from voicevox_engine.model import Speaker
-from voicevox_engine.model import SpeakerInfo
-from voicevox_engine.model import SupportedDevicesInfo
-from voicevox_engine.model import Mora
-from voicevox_engine.morphing import \
-    synthesis_morphing_parameter as _synthesis_morphing_parameter
+from voicevox_engine.cancellable_engine import CancellableEngine
+from voicevox_engine.kana_parser import create_kana, parse_kana
+from voicevox_engine.model import (
+    AccentPhrase,
+    AudioQuery,
+    ParseKanaBadRequest,
+    ParseKanaError,
+    Speaker,
+    SpeakerInfo,
+    SupportedDevicesInfo,
+    UserDictWord,
+)
 from voicevox_engine.morphing import synthesis_morphing
-from voicevox_engine.preset import Preset
-from voicevox_engine.preset import PresetLoader
-from voicevox_engine.synthesis_engine import make_synthesis_engines
-from voicevox_engine.synthesis_engine import SynthesisEngineBase
-from voicevox_engine.user_dict import user_dict_startup_processing
-from voicevox_engine.utility import connect_base64_waves
-from voicevox_engine.utility import ConnectBase64WavesException
-from voicevox_engine.utility import engine_root
+from voicevox_engine.morphing import (
+    synthesis_morphing_parameter as _synthesis_morphing_parameter,
+)
+from voicevox_engine.preset import Preset, PresetLoader
+from voicevox_engine.synthesis_engine import SynthesisEngineBase, make_synthesis_engines
+from voicevox_engine.user_dict import (
+    apply_word,
+    delete_word,
+    read_dict,
+    rewrite_word,
+    user_dict_startup_processing,
+)
+from voicevox_engine.utility import (
+    ConnectBase64WavesException,
+    connect_base64_waves,
+    engine_root,
+)
 
-
-def convert_to_float(obj):
-    """
-    Recursively converts numpy.float32 values to Python float in an object's attributes.
-    """
-    if isinstance(obj, list):
-        return [convert_to_float(item) for item in obj]
-    elif isinstance(obj, AccentPhrase) or isinstance(obj, Mora):
-        for attr, value in obj.__dict__.items():
-            setattr(obj, attr, convert_to_float(value))
-        return obj
-    elif isinstance(obj, np.float32):
-        return float(obj)
-    else:
-        return obj
 
 def b64encode_str(s):
     return base64.b64encode(s).decode("utf-8")
@@ -146,7 +119,6 @@ def generate_app(
         """
         engine = get_engine(core_version)
         accent_phrases = engine.create_accent_phrases(text, speaker_id=speaker)
-        accent_phrases = [convert_to_float(ac) for ac in accent_phrases]
         return AudioQuery(
             accent_phrases=accent_phrases,
             speedScale=1,
@@ -326,6 +298,41 @@ def generate_app(
         return FileResponse(f.name, media_type="audio/wav")
 
     @app.post(
+        "/cancellable_synthesis",
+        response_class=FileResponse,
+        responses={
+            200: {
+                "content": {
+                    "audio/wav": {"schema": {"type": "string", "format": "binary"}}
+                },
+            }
+        },
+        tags=["音声合成"],
+        summary="音声合成する（キャンセル可能）",
+    )
+    def cancellable_synthesis(
+        query: AudioQuery,
+        speaker: int,
+        request: Request,
+        core_version: Optional[str] = None,
+    ):
+        if not args.enable_cancellable_synthesis:
+            raise HTTPException(
+                status_code=404,
+                detail="実験的機能はデフォルトで無効になっています。使用するには引数を指定してください。",
+            )
+        f_name = cancellable_engine._synthesis_impl(
+            query=query,
+            speaker_id=speaker,
+            request=request,
+            core_version=core_version,
+        )
+        if f_name == "":
+            raise HTTPException(status_code=422, detail="不明なバージョンです")
+
+        return FileResponse(f_name, media_type="audio/wav")
+
+    @app.post(
         "/multi_synthesis",
         response_class=FileResponse,
         responses={
@@ -369,7 +376,7 @@ def generate_app(
                             format="WAV",
                         )
                         wav_file.seek(0)
-                        zip_file.writestr(f"{str(i + 1).zfill(3)}.wav", wav_file.read())
+                        zip_file.writestr(f"{str(i+1).zfill(3)}.wav", wav_file.read())
 
         return FileResponse(f.name, media_type="application/zip")
 
@@ -547,6 +554,101 @@ def generate_app(
         ret_data = {"policy": policy, "portrait": portrait, "style_infos": style_infos}
         return ret_data
 
+    @app.get("/user_dict", response_model=Dict[str, UserDictWord], tags=["ユーザー辞書"])
+    def get_user_dict_words():
+        """
+        ユーザ辞書に登録されている単語の一覧を返します。
+        単語の表層形(surface)は正規化済みの物を返します。
+
+        Returns
+        -------
+        Dict[str, UserDictWord]
+            単語のUUIDとその詳細
+        """
+        try:
+            return read_dict()
+        except Exception:
+            traceback.print_exc()
+            raise HTTPException(status_code=422, detail="辞書の読み込みに失敗しました。")
+
+    @app.post("/user_dict_word", response_model=str, tags=["ユーザー辞書"])
+    def add_user_dict_word(surface: str, pronunciation: str, accent_type: int):
+        """
+        ユーザ辞書に言葉を追加します。
+
+        Parameters
+        ----------
+        surface : str
+            言葉の表層形
+        pronunciation: str
+            言葉の発音（カタカナ）
+        accent_type: int
+            アクセント型（音が下がる場所を指す）
+        """
+        try:
+            word_uuid = apply_word(
+                surface=surface, pronunciation=pronunciation, accent_type=accent_type
+            )
+            return Response(content=word_uuid)
+        except ValidationError as e:
+            raise HTTPException(status_code=422, detail="パラメータに誤りがあります。\n" + str(e))
+        except Exception:
+            traceback.print_exc()
+            raise HTTPException(status_code=422, detail="ユーザ辞書への追加に失敗しました。")
+
+    @app.put("/user_dict_word/{word_uuid}", status_code=204, tags=["ユーザー辞書"])
+    def rewrite_user_dict_word(
+        surface: str, pronunciation: str, accent_type: int, word_uuid: str
+    ):
+        """
+        ユーザ辞書に登録されている言葉を更新します。
+
+        Parameters
+        ----------
+        surface : str
+            言葉の表層形
+        pronunciation: str
+            言葉の発音（カタカナ）
+        accent_type: int
+            アクセント型（音が下がる場所を指す）
+        word_uuid: str
+            更新する言葉のUUID
+        """
+        try:
+            rewrite_word(
+                surface=surface,
+                pronunciation=pronunciation,
+                accent_type=accent_type,
+                word_uuid=word_uuid,
+            )
+            return Response(status_code=204)
+        except HTTPException:
+            raise
+        except ValidationError as e:
+            raise HTTPException(status_code=422, detail="パラメータに誤りがあります。\n" + str(e))
+        except Exception:
+            traceback.print_exc()
+            raise HTTPException(status_code=422, detail="ユーザ辞書の更新に失敗しました。")
+
+    @app.delete("/user_dict_word/{word_uuid}", status_code=204, tags=["ユーザー辞書"])
+    def delete_user_dict_word(word_uuid: str):
+        """
+        ユーザ辞書に登録されている言葉を削除します。
+
+        Parameters
+        ----------
+        word_uuid: str
+            削除する言葉のUUID
+        """
+        try:
+            delete_word(word_uuid=word_uuid)
+            return Response(status_code=204)
+        except HTTPException:
+            raise
+        except Exception:
+            traceback.print_exc()
+            raise HTTPException(status_code=422, detail="ユーザ辞書の更新に失敗しました。")
+
     @app.get("/supported_devices", response_model=SupportedDevicesInfo, tags=["その他"])
     def supported_devices(
         core_version: Optional[str] = None,
@@ -564,28 +666,45 @@ def generate_app(
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    rospy.init_node('voicevox_server')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", type=str, default="127.0.0.1")
+    parser.add_argument("--port", type=int, default=50021)
+    parser.add_argument("--use_gpu", action="store_true")
+    parser.add_argument("--voicevox_dir", type=Path, default=None)
+    parser.add_argument("--voicelib_dir", type=Path, default=None, action="append")
+    parser.add_argument("--runtime_dir", type=Path, default=None, action="append")
+    parser.add_argument("--enable_mock", action="store_true")
+    parser.add_argument("--enable_cancellable_synthesis", action="store_true")
+    parser.add_argument("--init_processes", type=int, default=2)
 
-    voicelib_dir = [Path(voicevox_lib_dir)]
-    use_gpu = False
-    host = rospy.get_param('~host', "127.0.0.1")
-    port = rospy.get_param('~port', 50021)
-    cpu_num_threads = rospy.get_param('~cpu_num_threads', None)
-    if cpu_num_threads is None:
-        cpu_num_threads = multiprocessing.cpu_count()
+    # 引数へcpu_num_threadsの指定がなければ、環境変数をロールします。
+    # 環境変数にもない場合は、Noneのままとします。
+    # VV_CPU_NUM_THREADSが空文字列でなく数値でもない場合、エラー終了します。
+    parser.add_argument(
+        "--cpu_num_threads", type=int, default=os.getenv("VV_CPU_NUM_THREADS") or None
+    )
+
+    args = parser.parse_args()
+
+    cpu_num_threads: Optional[int] = args.cpu_num_threads
 
     synthesis_engines = make_synthesis_engines(
-        use_gpu=use_gpu,
-        voicelib_dirs=voicelib_dir,
+        use_gpu=args.use_gpu,
+        voicelib_dirs=args.voicelib_dir,
+        voicevox_dir=args.voicevox_dir,
+        runtime_dirs=args.runtime_dir,
         cpu_num_threads=cpu_num_threads,
+        enable_mock=args.enable_mock,
     )
-    if len(synthesis_engines) == 0:
-        rospy.logerr("音声合成エンジンがありません。")
-    latest_core_version = str(max([LooseVersion(ver)
-                                   for ver in synthesis_engines]))
+    assert len(synthesis_engines) != 0, "音声合成エンジンがありません。"
+    latest_core_version = str(max([LooseVersion(ver) for ver in synthesis_engines]))
+
+    cancellable_engine = None
+    if args.enable_cancellable_synthesis:
+        cancellable_engine = CancellableEngine(args)
 
     uvicorn.run(
         generate_app(synthesis_engines, latest_core_version),
-        host=host,
-        port=port,
+        host=args.host,
+        port=args.port,
     )
