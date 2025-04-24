@@ -13,7 +13,7 @@ This ROS1 package provides a service to analyze emotions from a given text using
 Clone this repository and move to this directory
 
 ``` bash
-rosdep install -iry .
+rosdep install -iry --from-paths .
 catkin build --this
 ```
 
