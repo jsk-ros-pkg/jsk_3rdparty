@@ -2,7 +2,7 @@
 
 all: installed.voicevox_model
 
-VERSION = 1.10.0
+VERSION = 1.13.1
 ifeq ($(shell uname -m),x86_64)
 	DIRNAME = onnxruntime-linux-x64-$(VERSION)
 endif

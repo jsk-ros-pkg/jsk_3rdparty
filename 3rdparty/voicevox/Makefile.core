@@ -2,12 +2,12 @@
 
 all: installed.viocevox_core
 
-VERSION = 0.16.0
+VERSION = 0.15.7
 MD5SUM_DIR = $(CURDIR)/md5sum
 ifeq ($(shell uname -m),x86_64)
-	DIRNAME = voicevox_core-linux-x64-$(VERSION)
-	FILENAME = voicevox_core-linux-x64-$(VERSION).zip
-	SOURCE_DIR = build/voicevox_core-linux-x64-$(VERSION)
+	DIRNAME = voicevox_core-linux-x64-cpu-$(VERSION)
+	FILENAME = voicevox_core-linux-x64-cpu-$(VERSION).zip
+	SOURCE_DIR = build/voicevox_core-linux-x64-cpu-$(VERSION)
 	MD5SUM_FILE = $(MD5SUM_DIR)/core-linux-x64-cpu.md5sum
 endif
 ifeq ($(shell uname -m),aarch64)
@@ -27,7 +27,7 @@ INSTALL_DIR =	'./'
 
 installed.viocevox_core: $(SOURCE_DIR)/unpacked
 	mkdir -p $(INSTALL_DIR)/lib
-	cp build/$(DIRNAME)/lib/lib*.so $(INSTALL_DIR)/lib/
+	cp build/$(DIRNAME)/lib*.so $(INSTALL_DIR)/lib/
 
 clean:
 	rm -rf $(TARBALL)
