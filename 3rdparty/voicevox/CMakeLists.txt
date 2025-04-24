@@ -17,6 +17,11 @@ if(NOT Python3_FOUND)
   message(WARNING "voicevox requires python3")
   return()
 endif()
+
+find_program(EMPY_EXECUTABLE
+  NAMES empy3
+)
+
 # generate the virtualenv
 find_package(Python3 QUIET COMPONENTS Interpreter)
 if(Python3_FOUND)
@@ -66,13 +71,28 @@ add_custom_command(
   COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.open_jtalk_dic
   MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
   INSTALL_DIR=${INSTALL_DIR}
+  )
+
+set(TEMPLATE_EM        "${PROJECT_SOURCE_DIR}/node_scripts/run.py.em")
+set(GENERATED_RUN_PY   "${PROJECT_SOURCE_DIR}/node_scripts/run.py")
+set(ENGINE_RUN_PY_PATH "${PROJECT_SOURCE_DIR}/node_scripts/voicevox_engine/run.py")
+add_custom_command(
+  OUTPUT "${GENERATED_RUN_PY}"
+  DEPENDS voicevox_engine_installed "${TEMPLATE_EM}"
+  COMMAND ${EMPY_EXECUTABLE}
+          -D "VOICEVOX_ENGINE_RUN_PY='${ENGINE_RUN_PY_PATH}'"
+          -o "${GENERATED_RUN_PY}"
+          "${TEMPLATE_EM}"
+          "Generating run.py from run.py.em using empy"
+  VERBATIM
 )
 
 add_custom_target(all_installed ALL DEPENDS
   voicevox_model_installed
   voicevox_core_installed
   voicevox_engine_installed
-  open_jtalk_dic_installed)
+  open_jtalk_dic_installed
+  ${GENERATED_RUN_PY})
 
 file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 catkin_install_python(

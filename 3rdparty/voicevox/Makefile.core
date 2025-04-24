@@ -27,7 +27,7 @@ INSTALL_DIR =	'./'
 
 installed.viocevox_core: $(SOURCE_DIR)/unpacked
 	mkdir -p $(INSTALL_DIR)/lib
-	cp build/$(DIRNAME)/lib*.so $(INSTALL_DIR)/lib/
+	cp -r build/$(DIRNAME)/* $(INSTALL_DIR)/lib/
 
 clean:
 	rm -rf $(TARBALL)
