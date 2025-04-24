@@ -1,0 +1,1170 @@
+diff -ur build_util/check_release_build.py build_util/check_release_build.py
+--- build_util/check_release_build.py	2025-04-24 10:13:04.075046066 +0900
++++ build_util/check_release_build.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ ビルド結果をテストする
+ """
+diff -ur build_util/generate_licenses.py build_util/generate_licenses.py
+--- build_util/generate_licenses.py	2025-04-24 10:13:04.075046066 +0900
++++ build_util/generate_licenses.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ import os
+ import subprocess
+diff -ur build_util/get_cost_candidates.py build_util/get_cost_candidates.py
+--- build_util/get_cost_candidates.py	2025-04-24 10:13:04.075046066 +0900
++++ build_util/get_cost_candidates.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ user_dict/part_of_speech_data.pyのcost_candidatesを計算するプログラムです。
+ 引数のnaist_jdic_pathには、open_jtalkのsrc/mecab-naist-jdic/naist-jdic.csvを指定してください。
+diff -ur build_util/make_docs.py build_util/make_docs.py
+--- build_util/make_docs.py	2025-04-24 10:13:04.075046066 +0900
++++ build_util/make_docs.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ from pathlib import Path
+ 
+diff -ur build_util/merge_update_infos.py build_util/merge_update_infos.py
+--- build_util/merge_update_infos.py	2025-04-24 10:13:04.075046066 +0900
++++ build_util/merge_update_infos.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ 更新履歴をマージする。
+ """
+diff -ur run.py run.py
+--- run.py	2025-04-24 10:13:04.075046066 +0900
++++ run.py	2025-04-24 09:44:23.737863258 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import argparse
+ import asyncio
+ import base64
+@@ -14,7 +15,7 @@
+ from io import BytesIO, TextIOWrapper
+ from pathlib import Path
+ from tempfile import NamedTemporaryFile, TemporaryFile
+-from typing import Annotated, Any, Literal, Optional
++from typing import Any, Dict, Literal, List, Optional
+ 
+ import soundfile
+ import uvicorn
+@@ -347,7 +348,7 @@
+ 
+     @app.post(
+         "/accent_phrases",
+-        response_model=list[AccentPhrase],
++        response_model=List[AccentPhrase],
+         tags=["クエリ編集"],
+         summary="テキストからアクセント句を得る",
+         responses={
+@@ -362,7 +363,7 @@
+         style_id: StyleId = Query(alias="speaker"),  # noqa: B008
+         is_kana: bool = False,
+         core_version: str | None = None,
+-    ) -> list[AccentPhrase]:
++    ) -> List[AccentPhrase]:
+         """
+         テキストからアクセント句を得ます。
+         is_kanaが`true`のとき、テキストは次のAquesTalk 風記法で解釈されます。デフォルトは`false`です。
+@@ -385,43 +386,43 @@
+ 
+     @app.post(
+         "/mora_data",
+-        response_model=list[AccentPhrase],
++        response_model=List[AccentPhrase],
+         tags=["クエリ編集"],
+         summary="アクセント句から音高・音素長を得る",
+     )
+     def mora_data(
+-        accent_phrases: list[AccentPhrase],
++        accent_phrases: List[AccentPhrase],
+         style_id: StyleId = Query(alias="speaker"),  # noqa: B008
+         core_version: str | None = None,
+-    ) -> list[AccentPhrase]:
++    ) -> List[AccentPhrase]:
+         engine = get_engine(core_version)
+         return engine.update_length_and_pitch(accent_phrases, style_id)
+ 
+     @app.post(
+         "/mora_length",
+-        response_model=list[AccentPhrase],
++        response_model=List[AccentPhrase],
+         tags=["クエリ編集"],
+         summary="アクセント句から音素長を得る",
+     )
+     def mora_length(
+-        accent_phrases: list[AccentPhrase],
++        accent_phrases: List[AccentPhrase],
+         style_id: StyleId = Query(alias="speaker"),  # noqa: B008
+         core_version: str | None = None,
+-    ) -> list[AccentPhrase]:
++    ) -> List[AccentPhrase]:
+         engine = get_engine(core_version)
+         return engine.update_length(accent_phrases, style_id)
+ 
+     @app.post(
+         "/mora_pitch",
+-        response_model=list[AccentPhrase],
++        response_model=List[AccentPhrase],
+         tags=["クエリ編集"],
+         summary="アクセント句から音高を得る",
+     )
+     def mora_pitch(
+-        accent_phrases: list[AccentPhrase],
++        accent_phrases: List[AccentPhrase],
+         style_id: StyleId = Query(alias="speaker"),  # noqa: B008
+         core_version: str | None = None,
+-    ) -> list[AccentPhrase]:
++    ) -> List[AccentPhrase]:
+         engine = get_engine(core_version)
+         return engine.update_pitch(accent_phrases, style_id)
+ 
+@@ -515,7 +516,7 @@
+         summary="複数まとめて音声合成する",
+     )
+     def multi_synthesis(
+-        queries: list[AudioQuery],
++        queries: List[AudioQuery],
+         style_id: StyleId = Query(alias="speaker"),  # noqa: B008
+         core_version: str | None = None,
+     ) -> FileResponse:
+@@ -550,13 +551,13 @@
+ 
+     @app.post(
+         "/morphable_targets",
+-        response_model=list[dict[str, MorphableTargetInfo]],
++        response_model=List[Dict[str, MorphableTargetInfo]],
+         tags=["音声合成"],
+         summary="指定したスタイルに対してエンジン内の話者がモーフィングが可能か判定する",
+     )
+     def morphable_targets(
+-        base_style_ids: list[StyleId], core_version: str | None = None
+-    ) -> list[dict[str, MorphableTargetInfo]]:
++        base_style_ids: List[StyleId], core_version: str | None = None
++    ) -> List[dict[str, MorphableTargetInfo]]:
+         """
+         指定されたベーススタイルに対してエンジン内の各話者がモーフィング機能を利用可能か返します。
+         モーフィングの許可/禁止は`/speakers`の`speaker.supported_features.synthesis_morphing`に記載されています。
+@@ -731,7 +732,7 @@
+         tags=["その他"],
+         summary="base64エンコードされた複数のwavデータを一つに結合する",
+     )
+-    def connect_waves(waves: list[str]) -> FileResponse:
++    def connect_waves(waves: List[str]) -> FileResponse:
+         """
+         base64エンコードされたwavデータを一纏めにし、wavファイルで返します。
+         """
+@@ -756,11 +757,11 @@
+ 
+     @app.get(
+         "/presets",
+-        response_model=list[Preset],
++        response_model=List[Preset],
+         response_description="プリセットのリスト",
+         tags=["その他"],
+     )
+-    def get_presets() -> list[Preset]:
++    def get_presets() -> List[Preset]:
+         """
+         エンジンが保持しているプリセットの設定を返します
+         """
+@@ -778,12 +779,7 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def add_preset(
+-        preset: Annotated[
+-            Preset,
+-            Body(
+-                description="新しいプリセット。プリセットIDが既存のものと重複している場合は、新規のプリセットIDが採番されます。"
+-            ),
+-        ]
++        preset
+     ) -> int:
+         """
+         新しいプリセットを追加します
+@@ -802,12 +798,7 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def update_preset(
+-        preset: Annotated[
+-            Preset,
+-            Body(
+-                description="更新するプリセット。プリセットIDが更新対象と一致している必要があります。"
+-            ),
+-        ]
++        preset
+     ) -> int:
+         """
+         既存のプリセットを更新します
+@@ -825,7 +816,7 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def delete_preset(
+-        id: Annotated[int, Query(description="削除するプリセットのプリセットID")]
++        id
+     ) -> Response:
+         """
+         既存のプリセットを削除します
+@@ -840,17 +831,17 @@
+     def version() -> str:
+         return __version__
+ 
+-    @app.get("/core_versions", response_model=list[str], tags=["その他"])
++    @app.get("/core_versions", response_model=List[str], tags=["その他"])
+     def core_versions() -> Response:
+         return Response(
+             content=json.dumps(list(cores.keys())),
+             media_type="application/json",
+         )
+ 
+-    @app.get("/speakers", response_model=list[Speaker], tags=["その他"])
++    @app.get("/speakers", response_model=List[Speaker], tags=["その他"])
+     def speakers(
+         core_version: str | None = None,
+-    ) -> list[Speaker]:
++    ) -> List[Speaker]:
+         speakers = metas_store.load_combined_metas(get_core(core_version))
+         return filter_speakers_and_styles(speakers, "speaker")
+ 
+@@ -900,7 +891,7 @@
+ 
+         # 該当話者の検索
+         speakers = parse_obj_as(
+-            list[Speaker], json.loads(get_core(core_version).speakers)
++            List[Speaker], json.loads(get_core(core_version).speakers)
+         )
+         speakers = filter_speakers_and_styles(speakers, speaker_or_singer)
+         for i in range(len(speakers)):
+@@ -964,10 +955,10 @@
+         )
+         return ret_data
+ 
+-    @app.get("/singers", response_model=list[Speaker], tags=["その他"])
++    @app.get("/singers", response_model=List[Speaker], tags=["その他"])
+     def singers(
+         core_version: str | None = None,
+-    ) -> list[Speaker]:
++    ) -> List[Speaker]:
+         singers = metas_store.load_combined_metas(get_core(core_version))
+         return filter_speakers_and_styles(singers, "singer")
+ 
+@@ -990,11 +981,11 @@
+ 
+         @app.get(
+             "/downloadable_libraries",
+-            response_model=list[DownloadableLibraryInfo],
++            response_model=List[DownloadableLibraryInfo],
+             response_description="ダウンロード可能な音声ライブラリの情報リスト",
+             tags=["音声ライブラリ管理"],
+         )
+-        def downloadable_libraries() -> list[DownloadableLibraryInfo]:
++        def downloadable_libraries() -> List[DownloadableLibraryInfo]:
+             """
+             ダウンロード可能な音声ライブラリの情報を返します。
+             """
+@@ -1006,11 +997,11 @@
+ 
+         @app.get(
+             "/installed_libraries",
+-            response_model=dict[str, InstalledLibraryInfo],
++            response_model=Dict[str, InstalledLibraryInfo],
+             response_description="インストールした音声ライブラリの情報",
+             tags=["音声ライブラリ管理"],
+         )
+-        def installed_libraries() -> dict[str, InstalledLibraryInfo]:
++        def installed_libraries() -> Dict[str, InstalledLibraryInfo]:
+             """
+             インストールした音声ライブラリの情報を返します。
+             """
+@@ -1027,7 +1018,7 @@
+             dependencies=[Depends(check_disabled_mutable_api)],
+         )
+         async def install_library(
+-            library_uuid: Annotated[str, FAPath(description="音声ライブラリのID")],
++            library_uuid,
+             request: Request,
+         ) -> Response:
+             """
+@@ -1052,7 +1043,7 @@
+             dependencies=[Depends(check_disabled_mutable_api)],
+         )
+         def uninstall_library(
+-            library_uuid: Annotated[str, FAPath(description="音声ライブラリのID")]
++            library_uuid
+         ) -> Response:
+             """
+             音声ライブラリをアンインストールします。
+@@ -1094,11 +1085,11 @@
+ 
+     @app.get(
+         "/user_dict",
+-        response_model=dict[str, UserDictWord],
++        response_model=Dict[str, UserDictWord],
+         response_description="単語のUUIDとその詳細",
+         tags=["ユーザー辞書"],
+     )
+-    def get_user_dict_words() -> dict[str, UserDictWord]:
++    def get_user_dict_words() -> Dict[str, UserDictWord]:
+         """
+         ユーザー辞書に登録されている単語の一覧を返します。
+         単語の表層形(surface)は正規化済みの物を返します。
+@@ -1118,25 +1109,11 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def add_user_dict_word(
+-        surface: Annotated[str, Query(description="言葉の表層形")],
+-        pronunciation: Annotated[str, Query(description="言葉の発音（カタカナ）")],
+-        accent_type: Annotated[
+-            int, Query(description="アクセント型（音が下がる場所を指す）")
+-        ],
+-        word_type: Annotated[
+-            WordTypes | None,
+-            Query(
+-                description="PROPER_NOUN（固有名詞）、COMMON_NOUN（普通名詞）、VERB（動詞）、ADJECTIVE（形容詞）、SUFFIX（語尾）のいずれか"
+-            ),
+-        ] = None,
+-        priority: Annotated[
+-            int | None,
+-            Query(
+-                ge=MIN_PRIORITY,
+-                le=MAX_PRIORITY,
+-                description="単語の優先度（0から10までの整数）。数字が大きいほど優先度が高くなる。1から9までの値を指定することを推奨",
+-            ),
+-        ] = None,
++        surface,
++        pronunciation,
++        accent_type,
++        word_type = None,
++        priority = None,
+     ) -> Response:
+         """
+         ユーザー辞書に言葉を追加します。
+@@ -1167,26 +1144,12 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def rewrite_user_dict_word(
+-        surface: Annotated[str, Query(description="言葉の表層形")],
+-        pronunciation: Annotated[str, Query(description="言葉の発音（カタカナ）")],
+-        accent_type: Annotated[
+-            int, Query(description="アクセント型（音が下がる場所を指す）")
+-        ],
+-        word_uuid: Annotated[str, FAPath(description="更新する言葉のUUID")],
+-        word_type: Annotated[
+-            WordTypes | None,
+-            Query(
+-                description="PROPER_NOUN（固有名詞）、COMMON_NOUN（普通名詞）、VERB（動詞）、ADJECTIVE（形容詞）、SUFFIX（語尾）のいずれか"
+-            ),
+-        ] = None,
+-        priority: Annotated[
+-            int | None,
+-            Query(
+-                ge=MIN_PRIORITY,
+-                le=MAX_PRIORITY,
+-                description="単語の優先度（0から10までの整数）。数字が大きいほど優先度が高くなる。1から9までの値を指定することを推奨。",
+-            ),
+-        ] = None,
++        surface,
++        pronunciation,
++        accent_type,
++        word_uuid,
++        word_type = None,
++        priority = None,
+     ) -> Response:
+         """
+         ユーザー辞書に登録されている言葉を更新します。
+@@ -1220,7 +1183,7 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def delete_user_dict_word(
+-        word_uuid: Annotated[str, FAPath(description="削除する言葉のUUID")]
++        word_uuid
+     ) -> Response:
+         """
+         ユーザー辞書に登録されている言葉を削除します。
+@@ -1243,13 +1206,8 @@
+         dependencies=[Depends(check_disabled_mutable_api)],
+     )
+     def import_user_dict_words(
+-        import_dict_data: Annotated[
+-            dict[str, UserDictWord],
+-            Body(description="インポートするユーザー辞書のデータ"),
+-        ],
+-        override: Annotated[
+-            bool, Query(description="重複したエントリがあった場合、上書きするかどうか")
+-        ],
++        import_dict_data,
++        override,
+     ) -> Response:
+         """
+         他のユーザー辞書をインポートします。
+@@ -1292,7 +1250,7 @@
+         },
+     )
+     def validate_kana(
+-        text: Annotated[str, Query(description="判定する対象の文字列")]
++        text
+     ) -> bool:
+         """
+         テキストがAquesTalk 風記法に従っているかどうかを判定します。
+@@ -1533,8 +1491,8 @@
+     # Synthesis Engine
+     use_gpu: bool = args.use_gpu
+     voicevox_dir: Path | None = args.voicevox_dir
+-    voicelib_dirs: list[Path] | None = args.voicelib_dir
+-    runtime_dirs: list[Path] | None = args.runtime_dir
++    voicelib_dirs: List[Path] | None = args.voicelib_dir
++    runtime_dirs: List[Path] | None = args.runtime_dir
+     enable_mock: bool = args.enable_mock
+     cpu_num_threads: int | None = args.cpu_num_threads
+     load_all_models: bool = args.load_all_models
+diff -ur test/conftest.py test/conftest.py
+--- test/conftest.py	2025-04-24 10:13:04.079045708 +0900
++++ test/conftest.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import pytest
+ from syrupy.assertion import SnapshotAssertion
+ from syrupy.extensions.json import JSONSnapshotExtension
+diff -ur test/e2e/conftest.py test/e2e/conftest.py
+--- test/e2e/conftest.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/conftest.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from pathlib import Path
+ from typing import Any
+ 
+diff -ur test/e2e/single_api/test_accent_phrases.py test/e2e/single_api/test_accent_phrases.py
+--- test/e2e/single_api/test_accent_phrases.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_accent_phrases.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /accent_phrases API のテスト
+ """
+diff -ur test/e2e/single_api/test_audio_query.py test/e2e/single_api/test_audio_query.py
+--- test/e2e/single_api/test_audio_query.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_audio_query.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ AudioQuery APIのテスト
+ """
+diff -ur test/e2e/single_api/test_audio_query_from_preset.py test/e2e/single_api/test_audio_query_from_preset.py
+--- test/e2e/single_api/test_audio_query_from_preset.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_audio_query_from_preset.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /audio_query_from_preset API のテスト
+ """
+diff -ur test/e2e/single_api/test_core_versions.py test/e2e/single_api/test_core_versions.py
+--- test/e2e/single_api/test_core_versions.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_core_versions.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /core_versions API のテスト
+ """
+diff -ur test/e2e/single_api/test_engine_manifest.py test/e2e/single_api/test_engine_manifest.py
+--- test/e2e/single_api/test_engine_manifest.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_engine_manifest.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /engine_manifest APIのテスト
+ """
+diff -ur test/e2e/single_api/test_frame_synthesis.py test/e2e/single_api/test_frame_synthesis.py
+--- test/e2e/single_api/test_frame_synthesis.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_frame_synthesis.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /frame_synthesis API のテスト
+ """
+diff -ur test/e2e/single_api/test_initialize_speaker.py test/e2e/single_api/test_initialize_speaker.py
+--- test/e2e/single_api/test_initialize_speaker.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_initialize_speaker.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /initialize_speaker API のテスト
+ """
+diff -ur test/e2e/single_api/test_is_initialized_speaker.py test/e2e/single_api/test_is_initialized_speaker.py
+--- test/e2e/single_api/test_is_initialized_speaker.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_is_initialized_speaker.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /is_initialized_speaker API のテスト
+ """
+diff -ur test/e2e/single_api/test_mora_data.py test/e2e/single_api/test_mora_data.py
+--- test/e2e/single_api/test_mora_data.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_mora_data.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /mora_data API のテスト
+ """
+diff -ur test/e2e/single_api/test_mora_length.py test/e2e/single_api/test_mora_length.py
+--- test/e2e/single_api/test_mora_length.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_mora_length.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /mora_length API のテスト
+ """
+diff -ur test/e2e/single_api/test_mora_pitch.py test/e2e/single_api/test_mora_pitch.py
+--- test/e2e/single_api/test_mora_pitch.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_mora_pitch.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /mora_pitch API のテスト
+ """
+diff -ur test/e2e/single_api/test_morphable_targets.py test/e2e/single_api/test_morphable_targets.py
+--- test/e2e/single_api/test_morphable_targets.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_morphable_targets.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /morphable_targets API のテスト
+ """
+diff -ur test/e2e/single_api/test_multi_synthesis.py test/e2e/single_api/test_multi_synthesis.py
+--- test/e2e/single_api/test_multi_synthesis.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_multi_synthesis.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /multi_synthesis API のテスト
+ """
+diff -ur test/e2e/single_api/test_preset_api.py test/e2e/single_api/test_preset_api.py
+--- test/e2e/single_api/test_preset_api.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_preset_api.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ プリセットAPIのテスト
+ """
+diff -ur test/e2e/single_api/test_setting_api.py test/e2e/single_api/test_setting_api.py
+--- test/e2e/single_api/test_setting_api.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_setting_api.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ setting APIのテスト
+ """
+diff -ur test/e2e/single_api/test_sing_frame_audio_query.py test/e2e/single_api/test_sing_frame_audio_query.py
+--- test/e2e/single_api/test_sing_frame_audio_query.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_sing_frame_audio_query.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /sing_frame_audio_query API のテスト
+ """
+diff -ur test/e2e/single_api/test_singer_info.py test/e2e/single_api/test_singer_info.py
+--- test/e2e/single_api/test_singer_info.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_singer_info.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /singer_info API のテスト
+ """
+diff -ur test/e2e/single_api/test_singers.py test/e2e/single_api/test_singers.py
+--- test/e2e/single_api/test_singers.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_singers.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /singers API のテスト
+ """
+diff -ur test/e2e/single_api/test_speaker_info.py test/e2e/single_api/test_speaker_info.py
+--- test/e2e/single_api/test_speaker_info.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_speaker_info.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /speaker_info API のテスト
+ """
+diff -ur test/e2e/single_api/test_speakers.py test/e2e/single_api/test_speakers.py
+--- test/e2e/single_api/test_speakers.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_speakers.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /speakers API のテスト
+ """
+diff -ur test/e2e/single_api/test_supported_devices.py test/e2e/single_api/test_supported_devices.py
+--- test/e2e/single_api/test_supported_devices.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_supported_devices.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /supported_devices API のテスト
+ """
+diff -ur test/e2e/single_api/test_synthesis.py test/e2e/single_api/test_synthesis.py
+--- test/e2e/single_api/test_synthesis.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_synthesis.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /synthesis API のテスト
+ """
+diff -ur test/e2e/single_api/test_synthesis_morphing.py test/e2e/single_api/test_synthesis_morphing.py
+--- test/e2e/single_api/test_synthesis_morphing.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_synthesis_morphing.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /synthesis_morphing API のテスト
+ """
+diff -ur test/e2e/single_api/test_user_dict_word.py test/e2e/single_api/test_user_dict_word.py
+--- test/e2e/single_api/test_user_dict_word.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_user_dict_word.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ ユーザー辞書の言葉のAPIのテスト
+ """
+diff -ur test/e2e/single_api/test_version.py test/e2e/single_api/test_version.py
+--- test/e2e/single_api/test_version.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/test_version.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ /version API のテスト
+ """
+diff -ur test/e2e/single_api/utils.py test/e2e/single_api/utils.py
+--- test/e2e/single_api/utils.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/single_api/utils.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from typing import TypedDict
+ 
+ 
+diff -ur test/e2e/test_disable_api.py test/e2e/test_disable_api.py
+--- test/e2e/test_disable_api.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/test_disable_api.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ APIを無効化するテスト
+ """
+diff -ur test/e2e/test_openapi.py test/e2e/test_openapi.py
+--- test/e2e/test_openapi.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/test_openapi.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from typing import Any
+ 
+ from fastapi import FastAPI
+diff -ur test/e2e/test_speakers.py test/e2e/test_speakers.py
+--- test/e2e/test_speakers.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/test_speakers.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ 話者・歌手のテスト。
+ TODO: 話者と歌手の両ドメイン共通のドメイン用語を定め、このテストファイル名を変更する。
+diff -ur test/e2e/test_tts.py test/e2e/test_tts.py
+--- test/e2e/test_tts.py	2025-04-24 10:13:04.079045708 +0900
++++ test/e2e/test_tts.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ TTSのテスト
+ """
+diff -ur test/preset/test_preset.py test/preset/test_preset.py
+--- test/preset/test_preset.py	2025-04-24 10:13:04.079045708 +0900
++++ test/preset/test_preset.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from os import remove
+ from pathlib import Path
+ from shutil import copyfile
+diff -ur test/setting/test_setting.py test/setting/test_setting.py
+--- test/setting/test_setting.py	2025-04-24 10:13:04.079045708 +0900
++++ test/setting/test_setting.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from pathlib import Path
+ from tempfile import TemporaryDirectory
+ from unittest import TestCase
+diff -ur test/test_connect_base64_waves.py test/test_connect_base64_waves.py
+--- test/test_connect_base64_waves.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_connect_base64_waves.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import base64
+ import io
+ from unittest import TestCase
+diff -ur test/test_core_utility.py test/test_core_utility.py
+--- test/test_core_utility.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_core_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ from unittest.mock import patch
+ 
+diff -ur test/test_core_version_utility.py test/test_core_version_utility.py
+--- test/test_core_version_utility.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_core_version_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.utility.core_version_utility import (
+diff -ur test/test_library_manager.py test/test_library_manager.py
+--- test/test_library_manager.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_library_manager.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import copy
+ import glob
+ import json
+diff -ur test/test_metas_store.py test/test_metas_store.py
+--- test/test_metas_store.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_metas_store.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import uuid
+ from unittest import TestCase
+ 
+diff -ur test/test_mock_tts_engine.py test/test_mock_tts_engine.py
+--- test/test_mock_tts_engine.py	2025-04-24 10:13:04.079045708 +0900
++++ test/test_mock_tts_engine.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.dev.tts_engine.mock import MockTTSEngine
+diff -ur test/tts_pipeline/test_kana_converter.py test/tts_pipeline/test_kana_converter.py
+--- test/tts_pipeline/test_kana_converter.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_kana_converter.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.model import AccentPhrase, Mora, ParseKanaError, ParseKanaErrorCode
+diff -ur test/tts_pipeline/test_mora_mapping.py test/tts_pipeline/test_mora_mapping.py
+--- test/tts_pipeline/test_mora_mapping.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_mora_mapping.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.tts_pipeline.mora_mapping import mora_phonemes_to_mora_kana
+diff -ur test/tts_pipeline/test_phoneme.py test/tts_pipeline/test_phoneme.py
+--- test/tts_pipeline/test_phoneme.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_phoneme.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ import pytest
+diff -ur test/tts_pipeline/test_text_analyzer.py test/tts_pipeline/test_text_analyzer.py
+--- test/tts_pipeline/test_text_analyzer.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_text_analyzer.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.model import AccentPhrase, Mora
+diff -ur test/tts_pipeline/test_tts_engine.py test/tts_pipeline/test_tts_engine.py
+--- test/tts_pipeline/test_tts_engine.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_tts_engine.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from test.utility import pydantic_to_native_type, round_floats
+ from unittest import TestCase
+ from unittest.mock import Mock
+diff -ur test/tts_pipeline/test_wave_synthesizer.py test/tts_pipeline/test_wave_synthesizer.py
+--- test/tts_pipeline/test_wave_synthesizer.py	2025-04-24 10:13:04.079045708 +0900
++++ test/tts_pipeline/test_wave_synthesizer.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """波形合成のテスト"""
+ 
+ import numpy as np
+diff -ur test/user_dict/test_user_dict.py test/user_dict/test_user_dict.py
+--- test/user_dict/test_user_dict.py	2025-04-24 10:13:04.079045708 +0900
++++ test/user_dict/test_user_dict.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ from copy import deepcopy
+ from pathlib import Path
+diff -ur test/user_dict/test_user_dict_model.py test/user_dict/test_user_dict_model.py
+--- test/user_dict/test_user_dict_model.py	2025-04-24 10:13:04.079045708 +0900
++++ test/user_dict/test_user_dict_model.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from typing import TypedDict
+ from unittest import TestCase
+ 
+diff -ur test/user_dict/test_word_types.py test/user_dict/test_word_types.py
+--- test/user_dict/test_word_types.py	2025-04-24 10:13:04.079045708 +0900
++++ test/user_dict/test_word_types.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from unittest import TestCase
+ 
+ from voicevox_engine.model import WordTypes
+diff -ur test/utility.py test/utility.py
+--- test/utility.py	2025-04-24 10:13:04.079045708 +0900
++++ test/utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import hashlib
+ import json
+ from typing import Any
+diff -ur voicevox_engine/__init__.py voicevox_engine/__init__.py
+--- voicevox_engine/__init__.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/__init__.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,1 +1,2 @@
++from __future__ import annotations
+ __version__ = "latest"
+diff -ur voicevox_engine/cancellable_engine.py voicevox_engine/cancellable_engine.py
+--- voicevox_engine/cancellable_engine.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/cancellable_engine.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import asyncio
+ import queue
+ import sys
+diff -ur voicevox_engine/core/core_adapter.py voicevox_engine/core/core_adapter.py
+--- voicevox_engine/core/core_adapter.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/core/core_adapter.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import threading
+ 
+ import numpy as np
+diff -ur voicevox_engine/core/core_initializer.py voicevox_engine/core/core_initializer.py
+--- voicevox_engine/core/core_initializer.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/core/core_initializer.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ import sys
+ from pathlib import Path
+diff -ur voicevox_engine/core/core_wrapper.py voicevox_engine/core/core_wrapper.py
+--- voicevox_engine/core/core_wrapper.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/core/core_wrapper.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import os
+ import platform
+ from ctypes import _Pointer  # noqa: F401
+@@ -385,21 +386,10 @@
+         )
+ 
+ 
+-_C_TYPE = (
+-    type[c_bool]
+-    | type[c_int]
+-    | type[c_long]
+-    | type[c_float]
+-    | type[c_char_p]
+-    | type["_Pointer[c_long]"]
+-    | type["_Pointer[c_float]"]
+-)
+-
+-
+ @dataclass(frozen=True)
+ class _CoreApiType:
+-    argtypes: tuple[_C_TYPE, ...]
+-    restype: _C_TYPE | None
++    argtypes: any
++    restype: any
+ 
+ 
+ # コアAPIの型情報
+diff -ur voicevox_engine/dev/core/mock.py voicevox_engine/dev/core/mock.py
+--- voicevox_engine/dev/core/mock.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/dev/core/mock.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ from pathlib import Path
+ 
+diff -ur voicevox_engine/dev/tts_engine/mock.py voicevox_engine/dev/tts_engine/mock.py
+--- voicevox_engine/dev/tts_engine/mock.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/dev/tts_engine/mock.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import copy
+ from logging import getLogger
+ from typing import Any
+diff -ur voicevox_engine/engine_manifest/EngineManifest.py voicevox_engine/engine_manifest/EngineManifest.py
+--- voicevox_engine/engine_manifest/EngineManifest.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/engine_manifest/EngineManifest.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ # マルチエンジン環境下においては、エンジンのバージョンがエディタのバージョンより
+ # 古くなる可能性が十分に考えられる。その場合、エディタ側がEngineManifestの情報不足によって
+ # エラーを吐いて表示が崩壊する可能性がある。これを防止するため、EngineManifest関連の定義を
+diff -ur voicevox_engine/engine_manifest/EngineManifestLoader.py voicevox_engine/engine_manifest/EngineManifestLoader.py
+--- voicevox_engine/engine_manifest/EngineManifestLoader.py	2025-04-24 10:13:04.079045708 +0900
++++ voicevox_engine/engine_manifest/EngineManifestLoader.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ from base64 import b64encode
+ from pathlib import Path
+diff -ur voicevox_engine/library_manager.py voicevox_engine/library_manager.py
+--- voicevox_engine/library_manager.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/library_manager.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import base64
+ import json
+ import os
+diff -ur voicevox_engine/metas/Metas.py voicevox_engine/metas/Metas.py
+--- voicevox_engine/metas/Metas.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/metas/Metas.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from enum import Enum
+ from typing import List, Literal, NewType, Optional
+ 
+diff -ur voicevox_engine/metas/MetasStore.py voicevox_engine/metas/MetasStore.py
+--- voicevox_engine/metas/MetasStore.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/metas/MetasStore.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ from copy import deepcopy
+ from pathlib import Path
+diff -ur voicevox_engine/model.py voicevox_engine/model.py
+--- voicevox_engine/model.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/model.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from enum import Enum
+ from re import findall, fullmatch
+ from typing import Any, Dict, List, Optional
+diff -ur voicevox_engine/morphing.py voicevox_engine/morphing.py
+--- voicevox_engine/morphing.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/morphing.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ WORLDを使ってモーフィングするためのモジュール。
+ pyworldの入出力はnp.doubleやnp.float64なので注意。
+diff -ur voicevox_engine/preset/Preset.py voicevox_engine/preset/Preset.py
+--- voicevox_engine/preset/Preset.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/preset/Preset.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from pydantic import BaseModel, Field
+ 
+ from voicevox_engine.metas.Metas import StyleId
+diff -ur voicevox_engine/preset/PresetError.py voicevox_engine/preset/PresetError.py
+--- voicevox_engine/preset/PresetError.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/preset/PresetError.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,2 +1,3 @@
++from __future__ import annotations
+ class PresetError(Exception):
+     pass
+diff -ur voicevox_engine/preset/PresetManager.py voicevox_engine/preset/PresetManager.py
+--- voicevox_engine/preset/PresetManager.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/preset/PresetManager.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from pathlib import Path
+ from typing import List
+ 
+diff -ur voicevox_engine/setting/Setting.py voicevox_engine/setting/Setting.py
+--- voicevox_engine/setting/Setting.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/setting/Setting.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from enum import Enum
+ from typing import Optional
+ 
+diff -ur voicevox_engine/setting/SettingLoader.py voicevox_engine/setting/SettingLoader.py
+--- voicevox_engine/setting/SettingLoader.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/setting/SettingLoader.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from enum import Enum
+ from pathlib import Path
+ 
+diff -ur voicevox_engine/tts_pipeline/kana_converter.py voicevox_engine/tts_pipeline/kana_converter.py
+--- voicevox_engine/tts_pipeline/kana_converter.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/tts_pipeline/kana_converter.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ 「AquesTalk 風記法」を実装した AquesTalk 風記法テキスト <-> アクセント句系列 変換。
+ 
+diff -ur voicevox_engine/tts_pipeline/mora_mapping.py voicevox_engine/tts_pipeline/mora_mapping.py
+--- voicevox_engine/tts_pipeline/mora_mapping.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/tts_pipeline/mora_mapping.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ """
+ 以下のモーラ対応表はOpenJTalkのソースコードから取得し、
+ カタカナ表記とモーラが一対一対応するように改造した。
+diff -ur voicevox_engine/tts_pipeline/phoneme.py voicevox_engine/tts_pipeline/phoneme.py
+--- voicevox_engine/tts_pipeline/phoneme.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/tts_pipeline/phoneme.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from typing import Literal
+ 
+ import numpy as np
+@@ -6,7 +7,7 @@
+ # NOTE: `Vowel` は母音 (a/i/u/e/o の有声・無声) + 無音 pau + 撥音 N ("ん") + 促音 cl ("っ")
+ # NOTE: 型の名称は暫定的
+ BaseVowel = Literal["pau", "N", "a", "cl", "e", "i", "o", "u"]
+-Vowel = BaseVowel | Literal["A", "E", "I", "O", "U"]
++Vowel = Literal["A", "E", "I", "O", "U"]
+ 
+ Consonant = Literal[
+     "b",
+diff -ur voicevox_engine/tts_pipeline/text_analyzer.py voicevox_engine/tts_pipeline/text_analyzer.py
+--- voicevox_engine/tts_pipeline/text_analyzer.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/tts_pipeline/text_analyzer.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,7 +1,8 @@
++from __future__ import annotations
+ import re
+ from dataclasses import dataclass
+ from itertools import chain
+-from typing import Callable, Literal, Self
++from typing import Callable, Literal
+ 
+ import pyopenjtalk
+ 
+@@ -46,7 +47,6 @@
+     "z",
+ ]
+ OjtUnknown = Literal["xx"]
+-OjtPhoneme = OjtVowel | OjtConsonant | OjtUnknown
+ 
+ 
+ @dataclass
+@@ -56,7 +56,7 @@
+     contexts: dict[str, str]  # ラベルの属性
+ 
+     @classmethod
+-    def from_feature(cls, feature: str) -> Self:
++    def from_feature(cls, feature: str):
+         """OpenJTalk feature から Label インスタンスを生成する"""
+         # フルコンテキストラベルの仕様は、http://hts.sp.nitech.ac.jp/?Download の HTS-2.3のJapanese tar.bz2 (126 MB)をダウンロードして、data/lab_format.pdfを見るとリストが見つかります。 # noqa
+         # VOICEVOX ENGINE で利用されている属性: p3 phoneme / a2 moraIdx / f1 n_mora / f2 pos_accent / f3 疑問形 / f5 アクセント句Idx / i3 BreathGroupIdx  # noqa: B950
+@@ -144,7 +144,7 @@
+     is_interrogative: bool  # 疑問文か否か
+ 
+     @classmethod
+-    def from_labels(cls, labels: list[Label]) -> Self:
++    def from_labels(cls, labels: list[Label]):
+         """ラベル系列をcontextで区切りアクセント句ラベルを生成する"""
+ 
+         # NOTE:「モーラごとのラベル系列」はラベル系列をcontextで区切り生成される。
+@@ -204,7 +204,7 @@
+     accent_phrases: list[AccentPhraseLabel]  # アクセント句のリスト
+ 
+     @classmethod
+-    def from_labels(cls, labels: list[Label]) -> Self:
++    def from_labels(cls, labels: list[Label]):
+         """ラベル系列をcontextで区切りBreathGroupLabelインスタンスを生成する"""
+ 
+         # NOTE:「アクセント句ごとのラベル系列」はラベル系列をcontextで区切り生成される。
+@@ -253,7 +253,7 @@
+     pauses: list[Label]  # 無音のリスト
+ 
+     @classmethod
+-    def from_labels(cls, labels: list[Label]) -> Self:
++    def from_labels(cls, labels: list[Label]):
+         """ラベル系列をポーズで区切りUtteranceLabelインスタンスを生成する"""
+ 
+         # NOTE:「BreathGroupLabelごとのラベル系列」はラベル系列をポーズで区切り生成される。
+diff -ur voicevox_engine/tts_pipeline/tts_engine.py voicevox_engine/tts_pipeline/tts_engine.py
+--- voicevox_engine/tts_pipeline/tts_engine.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/tts_pipeline/tts_engine.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import copy
+ import math
+ 
+diff -ur voicevox_engine/user_dict/part_of_speech_data.py voicevox_engine/user_dict/part_of_speech_data.py
+--- voicevox_engine/user_dict/part_of_speech_data.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/user_dict/part_of_speech_data.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from typing import Dict
+ 
+ from ..model import (
+diff -ur voicevox_engine/user_dict/user_dict.py voicevox_engine/user_dict/user_dict.py
+--- voicevox_engine/user_dict/user_dict.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/user_dict/user_dict.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import json
+ import sys
+ import threading
+diff -ur voicevox_engine/utility/connect_base64_waves.py voicevox_engine/utility/connect_base64_waves.py
+--- voicevox_engine/utility/connect_base64_waves.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/connect_base64_waves.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import base64
+ import io
+ 
+diff -ur voicevox_engine/utility/core_utility.py voicevox_engine/utility/core_utility.py
+--- voicevox_engine/utility/core_utility.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/core_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import os
+ 
+ 
+diff -ur voicevox_engine/utility/core_version_utility.py voicevox_engine/utility/core_version_utility.py
+--- voicevox_engine/utility/core_version_utility.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/core_version_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ from collections.abc import Collection
+ 
+ from semver.version import Version
+diff -ur voicevox_engine/utility/mutex_utility.py voicevox_engine/utility/mutex_utility.py
+--- voicevox_engine/utility/mutex_utility.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/mutex_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,11 +1,10 @@
++from __future__ import annotations
+ import threading
+ from collections.abc import Callable
+ from typing import Any, TypeVar
+ 
+-F = TypeVar("F", bound=Callable[..., Any])
+ 
+-
+-def mutex_wrapper(lock: threading.Lock) -> Callable[[F], F]:
++def mutex_wrapper(lock: threading.Lock):
+     def wrap(f):
+         def func(*args, **kw):
+             lock.acquire()
+diff -ur voicevox_engine/utility/path_utility.py voicevox_engine/utility/path_utility.py
+--- voicevox_engine/utility/path_utility.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/path_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import os
+ import sys
+ import traceback
+diff -ur voicevox_engine/utility/run_utility.py voicevox_engine/utility/run_utility.py
+--- voicevox_engine/utility/run_utility.py	2025-04-24 10:13:04.083045350 +0900
++++ voicevox_engine/utility/run_utility.py	2025-04-24 09:44:23.741863304 +0900
+@@ -1,3 +1,4 @@
++from __future__ import annotations
+ import os
+ import warnings
+ 

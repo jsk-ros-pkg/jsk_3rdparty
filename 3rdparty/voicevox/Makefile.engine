@@ -10,6 +10,7 @@ SOURCE_DIR = build/voicevox_engine-$(VERSION)
 UNPACK_CMD = tar xvzf
 MD5SUM_DIR = $(CURDIR)/md5sum
 MD5SUM_FILE = $(MD5SUM_DIR)/voicevox_engine.tar.gz.md5sum
+TARBALL_PATCH = patches/voicevox_engine.patch
 include $(shell rospack find mk)/download_unpack_build.mk
 INSTALL_DIR =	'./'
 
