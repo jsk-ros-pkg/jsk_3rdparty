@@ -57,6 +57,7 @@ add_custom_command(
   OUTPUT voicevox_engine_installed
   COMMAND make -f ${PROJECT_SOURCE_DIR}/Makefile.engine
   MD5SUM_DIR=${PROJECT_SOURCE_DIR}/md5sum
+  TARBALL_PATCH=${PROJECT_SOURCE_DIR}/patches/voicevox_engine.patch
   INSTALL_DIR=${INSTALL_DIR}
 )
 
