@@ -8,7 +8,7 @@
   <description>VOICEVOX: AI speech synthesis</description>
   <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
 
-  <license>MIT</license>
+  <license>LGPLv3</license>
 
   <url type="website">http://ros.org/wiki/voicevox</url>
 
