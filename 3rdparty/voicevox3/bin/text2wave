@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+exec rosrun voicevox3 request_synthesis.py $@
