@@ -1,0 +1,14 @@
+# Edit launch file in ExecStart section according to your application
+
+[Unit]
+Description=launch main rosserial programs
+
+[Service]
+Type=simple
+Restart=on-success
+Environment=M5STACK_ROS_WS=/home/ubuntu/m5stack_ros_ws
+# --wait is important to wait for the roscore to come up
+ExecStart=/bin/bash -c ". ${M5STACK_ROS_WS}/devel/setup.bash && roslaunch m5stack_ros m5stack_ros.launch --wait"
+
+[Install]
+WantedBy=default.target
