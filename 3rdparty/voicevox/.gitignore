@@ -1,6 +1,0 @@
-build
-dict
-lib
-node_scripts/voicevox_engine
-requirements.txt
-!.gitignore

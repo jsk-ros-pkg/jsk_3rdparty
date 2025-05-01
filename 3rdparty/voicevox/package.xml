@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>voicevox</name>
-  <version>2.1.24</version>
+  <version>2.1.29</version>
   <description>VOICEVOX: AI speech synthesis</description>
   <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
 
@@ -17,17 +17,11 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>catkin_virtualenv</build_depend>
 
-  <build_depend>mk</build_depend>
-  <build_depend>roslib</build_depend>
-  <build_depend>rospack</build_depend>
   <build_depend>unzip</build_depend>
   <build_depend>wget</build_depend>
 
   <exec_depend>python3</exec_depend>
-  <exec_depend>python3-requests</exec_depend>
   <exec_depend>sound_play</exec_depend>
-  <exec_depend>unzip</exec_depend>
-  <exec_depend>wget</exec_depend>
 
   <export>
     <pip_requirements>requirements.txt</pip_requirements>
