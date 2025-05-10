@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>zdepth</name>
-  <version>2.1.29</version>
+  <version>2.1.30</version>
   <description>The zdepth package</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>

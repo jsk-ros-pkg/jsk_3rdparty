@@ -2,8 +2,8 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.30 (2025-05-10)
+-------------------
 * [ros-o] collada_urdf_jsk_patch: skip cmake/pkg config generation (`#517 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/517>`_)
 * Contributors: Kei Okada
 

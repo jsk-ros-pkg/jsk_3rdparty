@@ -2,8 +2,8 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.30 (2025-05-10)
+-------------------
 * [ros-o] julius: use system install julius (`#518 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/518>`_)
 * julius_ros/scripts/run_julius.sh: more information on how to install julius and grammer/dictation kit
 * [ros-o] julius: use system install julius, download dictation and grammer kit by script

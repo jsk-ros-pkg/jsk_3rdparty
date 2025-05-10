@@ -2,8 +2,8 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.30 (2025-05-10)
+-------------------
 * google_chat_ros: enable to get therad_name message result (`#516 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/516>`_)
 * Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
 * Contributors: Kei Okada, Yoshiki Obinata

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>osqp</name>
-  <version>2.1.29</version>
+  <version>2.1.30</version>
   <description>ROS wrapper for OSQP</description>
   <maintainer email="chou@jsk.imi.i.u-tokyo.ac.jp">Moju Zhao</maintainer>
 
