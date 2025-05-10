@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="api_key" default="" />
+
+  <include file="$(find audio_capture)/launch/capture.launch">
+    <arg name="format" default="wave" />
+  </include>
+
+  <include file="$(find emotion_analyzer)/launch/emotion_analyzer.launch"
+           pass_all_args="true" >
+    <arg name="input_audio" value="/audio/audio" />
+  </include>
+
+</launch>
