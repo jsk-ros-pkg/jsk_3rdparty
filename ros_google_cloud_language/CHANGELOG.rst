@@ -2,6 +2,11 @@
 Changelog for package ros_google_cloud_language
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
+* Contributors: Kei Okada
+
 2.1.29 (2025-01-05)
 -------------------
 * [ros_google_cloud_language] chmod -x test_rospy_node for catkin_virtualenv (`#506 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/506>`_)

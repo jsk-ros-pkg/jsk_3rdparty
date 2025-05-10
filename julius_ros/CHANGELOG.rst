@@ -2,6 +2,13 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ros-o] julius: use system install julius (`#518 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/518>`_)
+* julius_ros/scripts/run_julius.sh: more information on how to install julius and grammer/dictation kit
+* [ros-o] julius: use system install julius, download dictation and grammer kit by script
+* Contributors: Kei Okada
+
 2.1.29 (2025-01-05)
 -------------------
 * GA: relax failed test dialogflow_task_executive, julius_ros (`#497 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/497>`_)

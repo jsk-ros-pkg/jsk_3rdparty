@@ -2,6 +2,11 @@
 Changelog for package dialogflow_task_executive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
+* Contributors: Kei Okada
+
 2.1.29 (2025-01-05)
 -------------------
 * Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)

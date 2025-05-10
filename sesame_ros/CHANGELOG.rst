@@ -2,6 +2,14 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* CI: add ROS-O testing on arm (`#528 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/528>`_), fix sesame_ros on arm64
+  * CI: add ROS-O testing on arm
+  * CI: use ros-one-catkin-virtualenv
+  * sesami_ros: add requirements.in.python3.12, for arm64 22.04/24.04
+* Contributors: Kei Okada, Yoshiki Obinata
+
 2.1.29 (2025-01-05)
 -------------------
 * Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)

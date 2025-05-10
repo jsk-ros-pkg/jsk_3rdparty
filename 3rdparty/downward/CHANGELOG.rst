@@ -2,6 +2,9 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.29 (2025-01-05)
 -------------------
 * Fix for ROS-O (`#515 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/515>`_)

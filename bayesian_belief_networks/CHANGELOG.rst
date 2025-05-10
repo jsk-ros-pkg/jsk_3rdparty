@@ -2,6 +2,13 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* bayesian_belief_networks: fix deb build (`#525 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/525>`_) --single-version-externally-managed only available on ubuntu<20
+  checked with 'git clean -xfd .; bloom-generate rosdebian --os-name=ubuntu --os-version=noble --ros-distro one  --skip-pip; dpkg-buildpackage -b -us -u'
+* Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
+* Contributors: Kei Okada
+
 2.1.29 (2025-01-05)
 -------------------
 

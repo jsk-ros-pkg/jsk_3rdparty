@@ -2,6 +2,12 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* google_chat_ros: enable to get therad_name message result (`#516 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/516>`_)
+* Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
+* Contributors: Kei Okada, Yoshiki Obinata
+
 2.1.29 (2025-01-05)
 -------------------
 * [google_chat_ros] check whether google_chat_button's parameters include NoneType object for avoiding rospy serialization error (`#501 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/501>`_)

@@ -2,6 +2,12 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* CI:aques_talk : run aques_talk only when download was succeeded (`#534 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/534>`_)
+* Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)
+* Contributors: Kei Okada, Yoshiki Obinata
+
 2.1.29 (2025-01-05)
 -------------------
 
