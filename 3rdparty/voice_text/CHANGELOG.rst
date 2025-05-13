@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.31 (2025-05-13)
+-------------------
 * add LICENSE files
 * Contributors: Kei Okada
 
