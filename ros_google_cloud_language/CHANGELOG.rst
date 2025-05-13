@@ -2,6 +2,9 @@
 Changelog for package ros_google_cloud_language
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.30 (2025-05-10)
 -------------------
 * Add ROS-O 24.04 test (`#521 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/521>`_)

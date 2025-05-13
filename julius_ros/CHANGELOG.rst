@@ -2,6 +2,9 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.30 (2025-05-10)
 -------------------
 * [ros-o] julius: use system install julius (`#518 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/518>`_)

@@ -2,6 +2,9 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.1.30 (2025-05-10)
 -------------------
 * CI:aques_talk : run aques_talk only when download was succeeded (`#534 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/534>`_)
