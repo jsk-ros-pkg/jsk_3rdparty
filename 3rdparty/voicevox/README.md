@@ -75,7 +75,7 @@ docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubun
 ```
 
 ```
-roslaunch voicevox voicevox_texttospeech.launch ip:=<Docker PC IP>
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true host:=<Docker PC IP>
 ```
 
 
