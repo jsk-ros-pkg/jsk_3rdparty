@@ -26,12 +26,6 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>zdepth</exec_depend>
 
-  <build_depend>pluginlib</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>zdepth</build_depend>
-
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
