@@ -45,6 +45,7 @@
   <run_depend>ff</run_depend>
   <run_depend>ffha</run_depend>
   <run_depend>google_cloud_texttospeech</run_depend>
+  <run_depend>m5stack_ros</run_depend>
   <run_depend>julius</run_depend>
   <run_depend>libcmt</run_depend>
   <run_depend>libsiftfast</run_depend>
