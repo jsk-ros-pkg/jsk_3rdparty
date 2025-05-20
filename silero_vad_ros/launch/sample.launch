@@ -1,21 +1,28 @@
 <launch>
-    <arg name="aggressiveness" default="1" />
+    <arg name="vad_threshold" default="0.5" />
+    <arg name="vad_minimum_duration" default="0.6" />
+    <arg name="vad_maximum_duration" default="10.0" />
+    <arg name="vad_audio_timeout_duration" default="0.5" />
 
     <include file="$(find audio_capture)/launch/capture.launch">
-        <arg name="format" value="wave"/>
+        <arg name="format" value="wave" />
     </include>
 
     <node
-        name="webrtcvad_ros"
-        pkg="webrtcvad_ros"
+        name="silero_vad_ros"
+        pkg="silero_vad_ros"
         type="vad.py"
         output="screen"
+        respawn="true"
     >
         <rosparam subst_value="true">
-            aggressiveness: $(arg aggressiveness)
+            threshold: $(arg vad_threshold)
+            minimum_duration: $(arg vad_minimum_duration)
+            maximum_duration: $(arg vad_maximum_duration)
+            audio_timeout_duration: $(arg vad_audio_timeout_duration)
         </rosparam>
-        <remap from="audio_data" to="/audio/audio"/>
-        <remap from="audio_info" to="/audio/audio_info"/>
+        <remap from="audio_data" to="/audio/audio" />
+        <remap from="audio_info" to="/audio/audio_info" />
     </node>
 
     <node
@@ -24,7 +31,7 @@
         type="speech_to_text.py"
         output="log"
     >
-        <remap from="audio" to="/webrtcvad_ros/speech_audio"/>
+        <remap from="audio" to="/silero_vad_ros/speech_audio" />
         <rosparam subst_value="true">
             language: ja-JP
             self_cancellation: true
