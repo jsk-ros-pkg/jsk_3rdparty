@@ -1,0 +1,38 @@
+<launch>
+
+  <arg name="troubleshooter_port"
+       doc="Port connecting with USB-Serial troubleshooter (e.g., '/dev/ttyACM0')" />
+  <arg name="monitored_topic"
+       doc="Topic monitored for determining USB health. If this is not published for an unusually long period, USB power cycle occurs" />
+  <arg name="monitored_topic_expected_hz"
+       doc="Expected Hz of monitored topic" />
+  <arg name="monitored_topic_respawn_delay"
+       doc="For this duration [sec] after USB power cycle, new power cycle does not occur to wait for topic to be published" />
+
+  <arg name="troubleshooter_serial_timeout" default="1"
+       doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
+  <arg name="troubleshooter_power_cycle_interval" default="0.1"
+       doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
+  <arg name="monitored_topic_allowed_delay_cycles" default="1.0"
+       doc="If monitored topic is not published in the expected timing and is delayed for ((1 / monitored_topic_expected_hz) * monitored_topic_allowed_delay_cycles) [sec], USB power cycle occurs" />
+
+  <include file="$(find century_ros)/launch/usb_serial_troubleshooter.launch">
+    <arg name="port" value="$(arg troubleshooter_port)" />
+    <arg name="serial_timeout" value="$(arg troubleshooter_serial_timeout)" />
+    <arg name="power_cycle_interval" value="$(arg troubleshooter_power_cycle_interval)" />
+  </include>
+
+  <node name="usb_auto_power_cycle"
+        pkg="century_ros" type="usb_auto_power_cycle.py"
+        respawn="true"
+        output="screen">
+    <remap from="~monitored_topic" to="$(arg monitored_topic)" />
+    <remap from="~power_cycle" to="usb_serial_troubleshooter_driver/power_cycle" />
+    <rosparam subst_value="true">
+      monitored_topic_expected_hz: $(arg monitored_topic_expected_hz)
+      monitored_topic_allowed_delay_cycles: $(arg monitored_topic_allowed_delay_cycles)
+      monitored_topic_respawn_delay: $(arg monitored_topic_respawn_delay)
+    </rosparam>
+  </node>
+
+</launch>

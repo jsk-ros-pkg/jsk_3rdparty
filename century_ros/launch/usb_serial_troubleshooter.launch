@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="port"
+       doc="Port connecting with USB-Serial troubleshooter (e.g., '/dev/ttyACM0')" />
+
+  <arg name="serial_timeout" default="1"
+       doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
+  <arg name="power_cycle_interval" default="0.1"
+       doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
+
+  <node name="usb_serial_troubleshooter_driver"
+        pkg="century_ros" type="usb_serial_troubleshooter_driver.py"
+        respawn="true"
+        output="screen">
+    <rosparam subst_value="true">
+      port: $(arg port)
+      serial_timeout: $(arg serial_timeout)
+      power_cycle_interval: $(arg power_cycle_interval)
+    </rosparam>
+  </node>
+
+</launch>
