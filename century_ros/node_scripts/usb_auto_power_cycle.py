@@ -45,9 +45,13 @@ class UsbAutoPowerCycle(object):
                 try:
                     res = self.pwr_cyc_srv()
                 except rospy.service.ServiceException as e:
-                    rospy.logerr(
-                        '[{}] Service call failed: {}'.format(rospy.get_name(), e))
-                    rospy.signal_shutdown('Service call failed')
+                    rospy.logwarn(
+                        '[{}] USB power cycle failed due to '
+                        'service call failure, try next time'.format(
+                            rospy.get_name()))
+                    rospy.logdebug(
+                        '[{}] Service call error: {}'.format(
+                            rospy.get_name(), e))
                 self.limit_tm = rospy.Time.now() + rospy.Duration(
                     self.respawn_dly)
 
