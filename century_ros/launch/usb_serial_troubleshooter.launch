@@ -5,7 +5,7 @@
 
   <arg name="serial_timeout" default="1"
        doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
-  <arg name="power_cycle_interval" default="0.1"
+  <arg name="power_cycle_interval" default="1.0"
        doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
 
   <node name="usb_serial_troubleshooter_driver"

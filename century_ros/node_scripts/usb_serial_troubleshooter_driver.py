@@ -14,7 +14,7 @@ class UsbSerialTroubleshooterDriver(object):
     def __init__(self):
         port = rospy.get_param('~port', '/dev/ttyACM0')
         ser_timeout = rospy.get_param('~serial_timeout', None)
-        self.pwr_cyc_iv = rospy.get_param('~power_cycle_interval', 0.1)
+        self.pwr_cyc_iv = rospy.get_param('~power_cycle_interval', 1.0)
         self.lock = threading.Lock()
 
         rospy.loginfo('[{}] Port: {}'.format(rospy.get_name(), port))

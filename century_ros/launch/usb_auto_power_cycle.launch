@@ -11,7 +11,7 @@
 
   <arg name="troubleshooter_serial_timeout" default="1"
        doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
-  <arg name="troubleshooter_power_cycle_interval" default="0.1"
+  <arg name="troubleshooter_power_cycle_interval" default="1.0"
        doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
   <arg name="monitored_topic_allowed_delay_cycles" default="1.0"
        doc="If monitored topic is not published in the expected timing and is delayed for ((1 / monitored_topic_expected_hz) * monitored_topic_allowed_delay_cycles) [sec], USB power cycle occurs" />
