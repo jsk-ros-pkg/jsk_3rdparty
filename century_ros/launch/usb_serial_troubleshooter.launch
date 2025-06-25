@@ -7,6 +7,8 @@
        doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
   <arg name="power_cycle_interval" default="1.0"
        doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
+  <arg name="init_with_power_on" default="true"
+       doc="Power on USB when driver of USB-Serial troubleshooter is initialized" />
 
   <node name="usb_serial_troubleshooter_driver"
         pkg="century_ros" type="usb_serial_troubleshooter_driver.py"
@@ -16,6 +18,7 @@
       port: $(arg port)
       serial_timeout: $(arg serial_timeout)
       power_cycle_interval: $(arg power_cycle_interval)
+      init_with_power_on: $(arg init_with_power_on)
     </rosparam>
   </node>
 
