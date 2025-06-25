@@ -10,7 +10,7 @@ class UsbAutoPowerCycle(object):
         self.expt_hz = rospy.get_param(
             '~monitored_topic_expected_hz', 10)
         self.allowed_dly = rospy.get_param(
-            '~monitored_topic_allowed_delay_cycles', 1.0)
+            '~monitored_topic_allowed_delay_cycles', 2.0)
         self.respawn_dly = rospy.get_param(
             '~monitored_topic_respawn_delay', 10.0)
         self.is_topic_sub = False

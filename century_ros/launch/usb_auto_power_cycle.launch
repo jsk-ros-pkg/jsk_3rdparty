@@ -15,7 +15,7 @@
        doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
   <arg name="troubleshooter_init_with_power_on" default="true"
        doc="Power on USB when driver of USB-Serial troubleshooter is initialized" />
-  <arg name="monitored_topic_allowed_delay_cycles" default="1.0"
+  <arg name="monitored_topic_allowed_delay_cycles" default="2.0"
        doc="If monitored topic is not published in the expected timing and is delayed for ((1 / monitored_topic_expected_hz) * monitored_topic_allowed_delay_cycles) [sec], USB power cycle occurs" />
 
   <include file="$(find century_ros)/launch/usb_serial_troubleshooter.launch">
