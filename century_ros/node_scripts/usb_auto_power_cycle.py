@@ -33,11 +33,18 @@ class UsbAutoPowerCycle(object):
     def _monitoring_cb(self, timer):
         if self.is_topic_sub:
             self.is_topic_sub = False
+            if self.limit_tm is None:
+                rospy.loginfo(
+                    '[{}] Got first message of '
+                    'monitored topic'.format(rospy.get_name()))
             self.limit_tm = rospy.Time.now() + rospy.Duration(
                 (1.0 / self.expt_hz) * (1 + self.allowed_dly))
         else:
             if self.limit_tm is None:
-                pass
+                rospy.logwarn_throttle(
+                    10,
+                    '[{}] First message of monitored topic does not '
+                    'come yet, waiting...'.format(rospy.get_name()))
             elif rospy.Time.now() > self.limit_tm:
                 rospy.logwarn(
                     '[{}] Monitored topic stops, '
