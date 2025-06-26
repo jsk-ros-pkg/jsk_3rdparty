@@ -19,8 +19,13 @@ rosrun century_ros setup_udev_for_usb_serial_troubleshooter <serial_number> <sym
 
 When inserting your USB-Serial troubleshooter to your PC, check if LED in the troubleshooter becomes blue after a few moments.
 If it remains red, the connection between the troubleshooter and the PC fails to be established.
-If you face this phenomenon, try changing the insertion process.
-Our experience has shown that success is more likely to be achieved if the insertion is stopped at a shallow point and then immediately deepened.
+If you face this phenomenon, try the following:
+- Reversing USB-C connector of USB hub/adapter/cable if you connect the troubleshooter to a USB hub/adapter/cable connected to a USB-C port of the PC
+- Connecting the troubleshooter to a USB-A port of the PC directly (not via a USB hub)
+- Connecting the troubleshooter to a USB-C port of the PC via an adapter/cable ([example](https://www.amazon.co.jp/dp/B09SFS9C5K))
+- Changing USB hub/adapter/cable
+- Changing the insertion process. Our experience has shown that success is more likely to be achieved if the insertion is stopped at a shallow point and then immediately deepened
+- Using USB 2.0 hub/adapter/cable. Note that you will be unable to use USB 3.0 features on the devices under the troubleshooter
 
 ### Minimal usage: launching driver only
 
