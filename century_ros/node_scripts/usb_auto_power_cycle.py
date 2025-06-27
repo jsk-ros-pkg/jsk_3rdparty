@@ -13,6 +13,7 @@ class UsbAutoPowerCycle(object):
             '~monitored_topic_allowed_delay_cycles', 2.0)
         self.respawn_dly = rospy.get_param(
             '~monitored_topic_respawn_delay', 10.0)
+        self.is_init_cyc = rospy.get_param('~init_with_power_cycle', True)
         self.is_topic_sub = False
         self.limit_tm = None
 
@@ -30,6 +31,8 @@ class UsbAutoPowerCycle(object):
             '[{}] Found power cycle service'.format(
                 rospy.get_name()))
         self.pwr_cyc_srv = rospy.ServiceProxy(srv_name, Trigger)
+        if self.is_init_cyc:
+            res = self.pwr_cyc_srv()
         self.monitoring_timer = rospy.Timer(
             rospy.Duration(1.0 / (self.expt_hz * 10)), self._monitoring_cb)
 

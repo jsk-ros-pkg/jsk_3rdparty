@@ -66,4 +66,6 @@ roslaunch century_ros usb_auto_power_cycle.launch troubleshooter_port:=/dev/<sym
 # <monitored_topic> : Topic monitored for determining USB health. If this is not published for an unusually long period, USB power cycle occurs
 # <monitored_topic_expected_hz> : Expected Hz of monitored topic
 # <monitored_topic_respawn_delay> : For this duration [sec] after USB power cycle, new power cycle does not occur to wait for topic to be published
+#
+# In default, this launch firstly executes power cycle of USB once. If you want to change this behavior, set "init_with_power_cycle:=false"
 ```
