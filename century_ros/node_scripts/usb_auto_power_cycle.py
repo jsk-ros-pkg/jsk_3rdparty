@@ -22,7 +22,13 @@ class UsbAutoPowerCycle(object):
             self._mon_topic_cb,
         )
         srv_name = '~power_cycle'
+        rospy.logwarn(
+            '[{}] Waiting for power cycle service...'.format(
+                rospy.get_name()))
         rospy.wait_for_service(srv_name)
+        rospy.loginfo(
+            '[{}] Found power cycle service'.format(
+                rospy.get_name()))
         self.pwr_cyc_srv = rospy.ServiceProxy(srv_name, Trigger)
         self.monitoring_timer = rospy.Timer(
             rospy.Duration(1.0 / (self.expt_hz * 10)), self._monitoring_cb)

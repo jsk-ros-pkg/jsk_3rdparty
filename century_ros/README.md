@@ -43,6 +43,8 @@ Required Arguments:
 Optional Arguments:
   init_with_power_on (default "true"): Power on USB when driver of USB-Serial troubleshooter is initialized
   power_cycle_interval (default "1.0"): Interval [sec] in USB power cycle using USB-Serial troubleshooter
+  power_cycle_service (default "~power_cycle"): Name of service for USB power cycle
+  power_service (default "~power"): Name of service for USB power switching
   serial_timeout (default "1"): Timeout [sec] of serial communication with USB-Serial troubleshooter
 ```
 
