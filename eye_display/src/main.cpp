@@ -56,6 +56,9 @@ void setup_asset(EyeManager& eye)  // returns initial status
 }
 #endif
 
+unsigned long interval_time = 150;  // this will reproduce delay(100)
+unsigned long next_time = millis() + interval_time;
+
 void setup()
 {
   pinMode(TFT_BL, OUTPUT);
@@ -81,6 +84,8 @@ void setup()
 #if defined(USE_I2C)
   setup_i2c();
 #endif
+
+  next_time = millis() + interval_time;
 }
 
 void loop()
@@ -88,14 +93,18 @@ void loop()
 #if defined(USE_ROS)  // USE_ROS
   reconnect_ros(eye);
 #endif
-  delay(100);
+  long sleep_time = next_time - millis();
+  if ( sleep_time > 0 ) {
+    delay(sleep_time);
+  }
+  next_time += interval_time;
 
   // update emotion, this calls update_look to display
   int frame = eye.update_emotion();
 
 #if defined(USE_ROS)
   nh.spinOnce();
-  nh.loginfo("Eye status: %s (%d)", eye.get_emotion().c_str(), frame);
+  nh.loginfo("[%8ld] Eye status: %s (%d) (sleep %ld ms)", millis(), eye.get_emotion().c_str(), frame, sleep_time);
 #endif
 
 #if !defined(USE_I2C) && !defined(USE_ROS) // sample code for eye asset

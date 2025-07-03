@@ -252,6 +252,7 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
 }
 
 void EyeManager::set_emotion(const std::string eye_status_name) {
+  frame = 0;  // reset frame cound for synchronize
   auto it = eye_asset_map.find(eye_status_name);
   if (it == eye_asset_map.end()) {
     logerror("Unknown eye_asset status name %s", eye_status_name.c_str());
