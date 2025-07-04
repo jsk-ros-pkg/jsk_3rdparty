@@ -15,6 +15,7 @@ class UsbSerialTroubleshooterDriver(object):
         port = rospy.get_param('~port', '/dev/ttyACM0')
         ser_timeout = rospy.get_param('~serial_timeout', None)
         self.pwr_cyc_iv = rospy.get_param('~power_cycle_interval', 1.0)
+        self.is_init_set = rospy.get_param('~init_with_power_set', True)
         self.is_init_on = rospy.get_param('~init_with_power_on', True)
         self.lock = threading.Lock()
 
@@ -26,8 +27,11 @@ class UsbSerialTroubleshooterDriver(object):
             timeout=ser_timeout,
             writeTimeout=ser_timeout,
         )
-        if self.is_init_on:
-            self._pwr(True)
+        if self.is_init_set:
+            if self.is_init_on:
+                self._pwr(True)
+            else:
+                self._pwr(False)
 
         self.pwr_srv = rospy.Service(
             '~power', SetBool, self._pwr_srv_cb)

@@ -41,7 +41,8 @@ Check them by `roslaunch century_ros usb_serial_troubleshooter.launch --ros-args
 Required Arguments:
   port: Port connecting with USB-Serial troubleshooter (e.g., '/dev/ttyACM0')
 Optional Arguments:
-  init_with_power_on (default "true"): Power on USB when driver of USB-Serial troubleshooter is initialized
+  init_with_power_on (default "true"): Power on USB when driver of USB-Serial troubleshooter is initialized. This argument is valid only when init_with_power_set is true
+  init_with_power_set (default "true"): Set power state of USB when driver of USB-Serial troubleshooter is initialized. Which state (ON or OFF) is set is defined by init_with_power_on
   power_cycle_interval (default "1.0"): Interval [sec] in USB power cycle using USB-Serial troubleshooter
   power_cycle_service (default "~power_cycle"): Name of service for USB power cycle
   power_service (default "~power"): Name of service for USB power switching
