@@ -51,8 +51,9 @@ class EkEwIDriver(object):
         timeout = rospy.get_param('~timeout', None)
         rospy.loginfo('port=%s', port)
         # EK-i/EW-i series default settings
+        baud = rospy.get_param('~baud', 2400)
         self.ser = serial.Serial(
-            port, baudrate=2400, bytesize=7, parity=serial.PARITY_EVEN,
+            port, baudrate=baud, bytesize=7, parity=serial.PARITY_EVEN,
             timeout=timeout, writeTimeout=timeout)
         self.pub = rospy.Publisher('~output', WeightStamped, queue_size=1)
         rate = rospy.get_param('~rate', 10)
