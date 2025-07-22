@@ -2,6 +2,114 @@
 Changelog for package downward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+
+2.1.29 (2025-01-05)
+-------------------
+* Fix for ROS-O (`#515 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/515>`_)
+
+  * [.github/workflows/config.yml: disable installing recommends in apt-get install
+  * [3rdparty/downward/package.xml: add linbfl-dev for FlexLexer.h
+
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [downward] [ros-o] add -Wno-maybe-uninitialized
+  * [downward] patching to fix std::vector namespace
+
+* Contributors: Kei Okada, Yoshiki Obinata
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * downward: fix for python3, remove time.clock() and import commands
+  * fix for python2/3 with ROS_PYTHON_VERSION
+  * downward: -Wno-error=deprecated-copy is only for noetic
+  * add -Wno-error=deprecated-copy for 20.04
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+* downward: compile with -Wno-maybe-uninitialized to avoid error for 18.04 (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+* Contributors: Kei Okada
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+2.1.6 (2017-11-21)
+------------------
+* remove both "g++" "g++-static" from package.xml (`#129 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/129>`_)
+* Contributors: Kei Okada
+
+2.1.5 (2017-11-20)
+------------------
+* change from g++-static to g++ (`#115 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/115>`_)
+* Contributors: Kei Okada
+
 2.1.4 (2017-07-16)
 ------------------
 

@@ -1,0 +1,39 @@
+<launch>
+    <include file="$(find audio_capture)/launch/capture.launch">
+        <arg name="format" value="wave" />
+    </include>
+
+    <node
+        name="webrtcvad_ros"
+        pkg="webrtcvad_ros"
+        type="webrtcvad_ros.py"
+        output="screen"
+        >
+        <rosparam>
+            aggressiveness: 1
+        </rosparam>
+        <remap from="audio_data" to="/audio/audio" />
+        <remap from="audio_info" to="/audio/audio_info" />
+    </node>
+
+    <node
+        name="speech_to_text"
+        pkg="respeaker_ros"
+        type="speech_to_text.py"
+        output="log"
+        >
+        <remap from="audio" to="/webrtcvad_ros/speech_audio"/>
+        <rosparam subst_value="true">
+            language: ja-JP
+            self_cancellation: false
+            tts_tolerance: 1.0
+        </rosparam>
+    </node>
+
+    <node
+        name="print_stt_result"
+        pkg="webrtcvad_ros"
+        type="print_stt_result.py"
+        output="screen"
+        />
+</launch>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>zdepth</name>
+  <version>2.1.31</version>
+  <description>The zdepth package</description>
+
+  <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>ros_environment</build_depend>
+
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

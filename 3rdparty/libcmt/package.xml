@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>libcmt</name>
-  <version>2.1.4</version>
+  <version>2.1.31</version>
   <description>libCMT ROS Wrapper</description>
   <maintainer email="inagaki@jsk.imi.i.u-tokyo.ac.jp">Yuto Inagaki</maintainer>
 
@@ -10,11 +10,11 @@
   <buildtool_depend>cmake</buildtool_depend>
 
   <build_depend>git</build_depend>
-  <build_depend>libopencv-dev</build_depend>
+  <build_depend>cv_bridge</build_depend>
   <build_depend>ca-certificates</build_depend>
   <build_depend>openssl</build_depend>
 
-  <run_depend>libopencv-dev</run_depend>
+  <run_depend>cv_bridge</run_depend>
 
  <export>
     <build_type>cmake</build_type>

@@ -2,6 +2,110 @@
 Changelog for package libsiftfast
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+
+2.1.29 (2025-01-05)
+-------------------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [libsiftfast] [ros-o] only use != to compare ROS_DISTRO in Makefile
+  * [libsiftfast] support multiple python3 version
+
+* Contributors: Yoshiki Obinata
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * fix for python2/3 with ROS_PYTHON_VERSION
+  * fix libsiftfast for python3 / boost 1.71
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+* enable to compile libsiftfast with current numpy.get_include() (`#162 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/162>`_ )
+* Contributors: Kei Okada
+
+2.1.11 (2018-08-29)
+-------------------
+* fix for melodic (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+  * libsiftfast : add 02.cmake_warn_narrowing.patch 03.skip_python_bindings.patch.bak 04.boost_65_numpy_1_10.patch for 18.04
+  * libsiftfast: patch all fiels within pathes directory
+* Contributors: Kei Okada
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+
 2.1.4 (2017-07-16)
 ------------------
 

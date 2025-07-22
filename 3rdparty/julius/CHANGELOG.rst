@@ -2,6 +2,110 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+* [ros-o] julius: use system install julius, download dictation and grammer kit by script (`#518 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/518>`_)
+* Contributors: Kei Okada
+
+2.1.29 (2025-01-05)
+-------------------
+
+2.1.28 (2023-07-24)
+-------------------
+* fix build farm (`#487 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/487>`_)
+  * julius: fix location URLs, because osdn is too slow
+
+* Contributors: Kei Okada
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* julius: Use DEB_TARGET_GNU_TYPE to fix https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/467 (`#470 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/470>`_)
+* GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
+* fix catkin build stacks in GA (`#316 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/316>`_)
+
+  * use wget to download from osdn, to use mirror site
+  * download .zip file from https://osdn.net/dl/julius/
+
+* Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa
+
+2.1.24 (2021-07-26)
+-------------------
+* use latest config.guess.patch for https://github.com/ros/rosdistro/pull/30279 (`#275 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/275>`_)
+
+* Contributors: Kei Okada
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+* julius: add wget to dependencies (`#138 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/138>`_)
+* Contributors: Yuki Furuta
+
+2.1.7 (2018-04-09)
+------------------
+* julius: add rsync & unzip to run_depend (`#134 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/134>`_)
+* Contributors: Yuki Furuta
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+
 2.1.4 (2017-07-16)
 ------------------
 

@@ -1,0 +1,68 @@
+<launch>
+  <arg name="launch_sound_play" default="true" doc="Launch sound_play node to speak" />
+  <arg name="launch_audio_capture" default="true" doc="Launch audio_capture node to publish audio topic from microphone" />
+
+  <arg name="audio_topic" default="/audio" doc="Name of audio topic captured from microphone" />
+  <arg name="voice_topic" default="/speech_to_text" doc="Name of text topic of recognized speech" />
+  <arg name="n_channel" default="1" doc="Number of channels of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
+  <arg name="depth" default="16" doc="Bit depth of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
+  <arg name="sample_rate" default="16000" doc="Frame rate of audio topic and microphone. '$ pactl list short sinks' to check your hardware"/>
+  <arg name="device" default="" doc="Card and device number of microphone (e.g. hw:0,0). you can check card number and device number by '$ arecord -l', then uses hw:[card number],[device number]" />
+  <arg name="engine" default="Google" doc="Speech to text engine. TTS engine, Google, GoogleCloud, Sphinx, Wit, Bing Houndify, IBM" />
+  <arg name="language" default="en-US" doc="Speech to text language. For Japanese, set ja-JP." />
+  <arg name="continuous" default="true" doc="If false, /speech_recognition service is published. If true, /speech_to_text topic is published." />
+  <arg name="auto_start" default="true" doc="Whether speech_recognition starts automatically or not. This parameter works when continuous is true" />
+
+  <arg name="self_cancellation" default="true" doc="Do not recognize the audio when robot is speaking or not." />
+  <arg name="tts_tolerance" default="1.0" doc="Tolerance second for recognizing whether robot is speaking or not" />
+  <arg name="tts_action_names" default="['sound_play']" doc="tts action name. these servers outputs are ignored by sound_recognition" />
+
+  <!-- sound play -->
+  <node name="sound_play" pkg="sound_play" type="soundplay_node.py"
+        if="$(arg launch_sound_play)"
+        respawn="true">
+    <remap from="robotsound" to="sound_play" />
+  </node>
+
+  <!-- audio capture from microphone -->
+  <node name="audio_capture" pkg="audio_capture" type="audio_capture"
+        if="$(arg launch_audio_capture)"
+        respawn="true">
+    <remap from="audio" to="$(arg audio_topic)" />
+    <rosparam subst_value="true">
+      format: wave
+      channels: $(arg n_channel)
+      depth: $(arg depth)
+      sample_rate: $(arg sample_rate)
+    </rosparam>
+    <param name="device" value="$(arg device)" />
+  </node>
+
+  <node name="speech_recognition"
+        pkg="ros_speech_recognition" type="speech_recognition_node.py"
+        respawn="true"
+        output="screen">
+    <rosparam subst_value="true">
+      audio_topic: $(arg audio_topic)
+      voice_topic: $(arg voice_topic)
+      n_channel: $(arg n_channel)
+      depth: $(arg depth)
+      sample_rate: $(arg sample_rate)
+      engine: $(arg engine)
+      language: $(arg language)
+      continuous: $(arg continuous)
+      auto_start: $(arg auto_start)
+      enable_sound_effect: $(arg launch_sound_play)
+      self_cancellation: $(arg self_cancellation)
+      tts_tolerance: $(arg tts_tolerance)
+      tts_action_names: $(arg tts_action_names)
+    </rosparam>
+  </node>
+
+
+  <node name="speech_recognition_candidates_to_string"
+        pkg="ros_speech_recognition" type="speech_recognition_candidates_to_string.py"
+        output="screen">
+    <remap from="~input" to="$(arg voice_topic)" />
+  </node>
+</launch>

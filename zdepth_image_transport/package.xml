@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>zdepth_image_transport</name>
+  <version>2.1.31</version>
+  <description>The zdepth_image_transport package</description>
+
+  <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+
+  <license>BSD</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>zdepth</build_depend>
+
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>zdepth</exec_depend>
+
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>zdepth</build_depend>
+
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>pluginlib</build_export_depend>
+  <build_export_depend>image_transport</build_export_depend>
+
+  <export>
+    <image_transport plugin="${prefix}/zdepth_plugins.xml"/>
+   </export>
+</package>

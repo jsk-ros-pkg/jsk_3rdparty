@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>chaplus_ros</name>
+  <version>2.1.31</version>
+  <description>The ROS package for chaplus service</description>
+
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+
+  <license>BSD</license>
+
+  <author email="a-fujii@jsk.imi.i.u-tokyo.ac.jp">Ayaka Fujii</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-requests</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-requests</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+  <export>
+  </export>
+</package>

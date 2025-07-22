@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package>
+  <name>ros_speech_recognition</name>
+  <version>2.1.31</version>
+  <description>ROS wrapper for Python SpeechRecognition library</description>
+  <url type="website">https://pypi.python.org/pypi/SpeechRecognition/</url>
+
+  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
+  <license>BSD</license>
+  <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>catkin_virtualenv</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>jsk_data</build_depend>
+  <build_depend>speech_recognition_msgs</build_depend>
+  <build_depend>g++-static</build_depend>
+
+  <run_depend>audio_capture</run_depend>
+  <run_depend>audio_common_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>flac</run_depend>
+  <run_depend>jsk_data</run_depend>
+  <run_depend>sound_play</run_depend>
+  <run_depend>sound-theme-freedesktop</run_depend>
+  <run_depend>speech_recognition_msgs</run_depend>
+  <run_depend>python3-pycryptodome</run_depend> <!-- melodic requries to install python3-pycryptodome for rosbag with python3 -->
+  <run_depend>python3-gnupg</run_depend>
+
+  <test_depend>rostest</test_depend>
+  <test_depend>roslaunch</test_depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
+</package>

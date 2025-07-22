@@ -1,0 +1,20 @@
+<launch>
+  <arg name="google_cloud_credentials_json" default="" />
+  <include file="$(find ros_google_cloud_language)/launch/analyze_text.launch" >
+    <arg name="google_cloud_credentials_json" value="$(arg google_cloud_credentials_json)" />
+  </include>
+
+  <!-- start chaplus subscribe /request and publish /response -->
+  <arg name="chatbot_engine" default="Chaplus" />
+  <arg name="use_sample" default="True" />
+  <node pkg="chaplus_ros" type="chaplus_ros.py" name="chaplus_ros"
+        output="screen" >
+    <rosparam subst_value="true">
+      chatbot_engine: $(arg chatbot_engine)
+      use_sample: $(arg use_sample)
+    </rosparam>
+  </node>
+  
+  <node pkg="ros_google_cloud_language" type="client_with_chat.l"
+        name="client" output="screen" />
+</launch>

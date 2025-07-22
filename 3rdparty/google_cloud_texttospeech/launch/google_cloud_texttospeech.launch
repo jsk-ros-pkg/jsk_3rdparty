@@ -1,0 +1,53 @@
+<launch>
+  <machine name="localhost" address="localhost" />
+
+  <arg name="sound_play_machine" default="localhost"
+       doc="Machine to run sound_play node (default: localhost)" />
+  <arg name="sound_play_respawn" default="true"
+       doc="Respawn sound_play node or not (default: true)" />
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS /etc/opt/jsk/robot/google-speech-recognition.json)"
+       doc="Credential json path for Google Cloud Text-to-Speech
+            (default: $GOOGLE_APPLICATION_CREDENTIALS or /etc/opt/jsk/robot/google-speech-recognition.json)" />
+  <arg name="use_english" default="true" 
+       doc="Use  Google Cloud Text-to-Speech for English or not (default: true)" />
+  <arg name="use_japanese" default="true"
+       doc="Use  Google Cloud Text-to-Speech for Japanese or not (default: true)" />
+  <arg name="english_speed" default="100"
+       doc="English speaking speed (default: 100)" />
+  <arg name="japanese_speed" default="100"
+       doc="Japanese speaking speed (default: 100)" />
+  <arg name="cache" default="$(optenv GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED true)"
+       doc="Cache generated sound file (default: true)" />
+
+  <node name="sound_play" if="$(arg use_english)"
+        pkg="sound_play" type="soundplay_node.py"
+        respawn="$(arg sound_play_respawn)"
+        machine="$(arg sound_play_machine)"
+        output="screen" >
+    <remap from="robotsound" to="robotsound"/>
+    <remap from="sound_play" to="robotsound"/>
+    <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+    <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
+    <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />
+    <rosparam subst_value="true">
+      speaking_rate: $(arg english_speed)
+    </rosparam>
+  </node>
+
+  <node name="sound_play_jp" if="$(arg use_japanese)"
+        pkg="sound_play" type="soundplay_node.py"
+        respawn="$(arg sound_play_respawn)"
+        machine="$(arg sound_play_machine)"
+        output="screen" >
+    <remap from="robotsound" to="robotsound_jp"/>
+    <remap from="sound_play" to="robotsound_jp"/>
+    <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+    <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
+    <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />
+    <rosparam subst_value="true">
+      speaking_rate: $(arg japanese_speed)
+    </rosparam>
+  </node>
+</launch>

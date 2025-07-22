@@ -1,0 +1,37 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 54)
++++ CMakeLists.txt	(working copy)
+@@ -155,7 +155,10 @@
+ if( NOT $ENV{BOOST_LIBRARYDIR} STREQUAL "" )
+   set(Boost_LIBRARY_DIRS $ENV{BOOST_LIBRARYDIR})
+ endif()
+-find_package(Boost COMPONENTS python)
++set(Python3_FIND_STRATEGY VERSION)
++find_package(Python3 COMPONENTS Interpreter Development)
++find_package(Boost REQUIRED COMPONENTS system python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
++add_definitions("-Wno-narrowing")
+ 
+ if( Boost_FOUND )
+   message(STATUS "found boost version: ${Boost_VERSION}")
+@@ -194,9 +195,9 @@
+ # generate python bindings via boost-python
+ #
+ set(BUILD_SIFTFASTPY)
+-if( Boost_PYTHON_FOUND )
++if( Boost_PYTHON${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}_FOUND )
+   find_package(PythonLibs)
+ 
+   if( PYTHONLIBS_FOUND OR PYTHON_LIBRARIES )
+ 
+     find_package(PythonInterp)
+@@ -210,7 +213,7 @@
+     if( PYTHON_EXECUTABLE )
+       # get the site-packages directory
+       execute_process(
+-        COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
++        COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+         OUTPUT_VARIABLE _python_sitepackage
+         RESULT_VARIABLE _python_failed)
+       if( ${_python_failed} EQUAL 0 )
+

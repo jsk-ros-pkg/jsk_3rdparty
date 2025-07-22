@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>voicevox</name>
+  <version>2.1.31</version>
+  <description>VOICEVOX: AI speech synthesis</description>
+  <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
+
+  <license>MIT</license>
+
+  <url type="website">http://ros.org/wiki/voicevox</url>
+
+  <author>Iori Yanokura</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>catkin_virtualenv</build_depend>
+
+  <build_depend>unzip</build_depend>
+  <build_depend>wget</build_depend>
+
+  <exec_depend>python3</exec_depend>
+  <exec_depend>sound_play</exec_depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
+
+</package>

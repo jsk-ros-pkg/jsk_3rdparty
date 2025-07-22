@@ -19,11 +19,11 @@ if __name__ == '__main__':
                    type=str)
     p.add_argument("path_or_words", nargs='+', type=str)
 
-    print rospy.myargv()[1:]
+    print(rospy.myargv()[1:])
 
     args = p.parse_args(rospy.myargv()[1:])
 
-    print args
+    print(args)
 
     if args.isolated:
         if len(args.path_or_words) < 1:

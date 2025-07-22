@@ -2,6 +2,122 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+* add LICENSE files
+* Contributors: Kei Okada
+
+2.1.30 (2025-05-10)
+-------------------
+
+2.1.29 (2025-01-05)
+-------------------
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+
+2.1.26 (2023-06-14)
+-------------------
+
+2.1.25 (2023-06-08)
+-------------------
+* GA: enable melodic/aarch64 (`#432 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/432>`_)
+* Restart voice text if verification fails (`#300 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/300>`_)
+* Add verification check rosinfo (`#298 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/298>`_)
+* Contributors: Aoi Nakane, Kei Okada, Naoto Tsukamoto, Naoya Yamaguchi, Shingo Kitagawa, Yoshiki Obinata
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+* [voice_text] Fix README to follow supporting other speakers than SAYAKA (`#220 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/220>`_)
+
+* Contributors: Shun Hasegawa
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+* [voice_text] Call rosservice from python instead of bash (`#166 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/166>`_ )
+
+  * rewrite text2wave with python
+  * call rosservice from python instead of bash
+
+* Contributors: Hideaki Ito
+
+2.1.12 (2019-05-25)
+-------------------
+* Fix install directory of text2wave to ./lib -> ./bin (`#160 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/160>`_)
+  `text2wave` Was wrongly  installed to `CATKIN_PACKAGE_LIB_DESTINATION`
+  The launch file is assumed that it is installed under `rospack find voice_text`/bin
+  https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/2.1.10/3rdparty/voice_text/launch/voice_text.launch#L29
+* Contributors: Kei Okada
+
+2.1.11 (2018-08-29)
+-------------------
+
+2.1.10 (2018-04-25)
+-------------------
+* add dependencies from voice_text to vt_dummy, solves `#139 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/139>`_ (`#143 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/143>`_)
+* Contributors: Kei Okada
+
+2.1.9 (2018-04-24)
+------------------
+* voice_text: add gencfg target to deps (`#141 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/141>`_)
+* Contributors: Yuki Furta
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+* voice_text: support dynamic linking (`#135 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/135>`_)
+  * install voice_text TARGETS - voice_text: CMakeLists.txt: remove debug code to force non-exists VT_LIB_PATH
+  * voice_text: guide to install libs
+  * install voice_text TARGETS
+  * voice_text: CMakeLists.txt: remove debug code to force non-exists VT_LIB_PATH
+  * add dependencies from generate_message_cpp to voice_text
+  * use vt_dummy when we do not have voice_text library
+* Contributors: Kei Okada, Yuki Furuta
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+* [voice_text] Add respawn argument for sound_play (`#125 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/125>`_)
+* Contributors: Shunichi Nozawa
+
 2.1.4 (2017-07-16)
 ------------------
 

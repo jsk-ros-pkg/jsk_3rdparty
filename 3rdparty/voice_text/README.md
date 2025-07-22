@@ -55,7 +55,7 @@ Robot says "Hello!"
 
 ### Parameters
 
-* `~db_path` (String, default: `"/var/vt/sayaka/M16"`)
+* `~db_path` (String, default: path found at build time (e.g., `"/var/vt/sayaka/M16"`))
 
   Path to VoiceText database directory.
 

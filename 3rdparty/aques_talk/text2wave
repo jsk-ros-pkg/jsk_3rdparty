@@ -1,30 +1,51 @@
-#!/bin/bash
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-# for festival compaibility
-ARGS=`echo $@ | sed 's/\-eval\ ()//' | sed 's/\-eval\ (\(.\+\))\ \(.\+\)$/\2\ \-p\ \1/'`
-eval set -- "$ARGS"
+import argparse
+import os
+import rospkg
+import rospy
+import sys
 
-INPUT_FILE=$1;shift;
-OUTPUT_FILE=/tmp/_aques_talk_sound_$$.wav
-JPTEXT_FILE=/tmp/_aques_talk_text_$$.txt
-PHONT_FILE=aq_f1c.phont
-while getopts p:o: OPT
-do
-    case ${OPT} in
-	"o")
-	    OUTPUT_FILE=${OPTARG};;
-	"p")
-	    PHONT_FILE=${OPTARG};;
-	esac
-done
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
 
-PHONT_FILE=`rospack find aques_talk`/phont/$PHONT_FILE
-PATH=`rospack find aques_talk`/bin:$PATH
-nkf -j $INPUT_FILE | kakasi -JH | nkf -w | \
-    sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
-    sed -e 's/．/。/g' | sed -e 's/\./。/g' > \
-    $JPTEXT_FILE
-cat $JPTEXT_FILE 1>&2
-`rospack find aques_talk`/bin/SampleTalk -p $PHONT_FILE -o $OUTPUT_FILE $JPTEXT_FILE
-#rm -f /tmp/_jtalk_{log,input}_$$.*
+    input_file = args.text
+    jptext_file = "/tmp/_voice_text_%s.txt"%os.getpid()
+    output_file = "/tmp/_voice_text_%s.wav"%os.getpid()
+    phont_file  = "aq_f1c.phont"
+    phont_file  ="%s/phont/%s"%(rospkg.RosPack().get_path("aques_talk"), phont_file)
+    if args.output is not None:
+        output_file = args.output
 
+    if not os.path.exists(input_file):
+        rospy.logerr("%s not found"%input_file)
+        sys.exit(1)
+
+    if args.evaluate in ['(en)']:
+        os.system("/usr/bin/text2wave %s > %s"%(input_file, output_file))
+        sys.exit(0)
+
+    # escape invalid code
+    # For detail, please see README.md of aques_talk
+    # sed command for Japanese
+    # https://ja.stackoverflow.com/questions/29179/sed-%E3%81%A7-%E3%81%82-%E3%82%9E-%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E6%96%87%E5%AD%97%E7%AF%84%E5%9B%B2%E3%82%92%E4%BD%BF%E3%81%84%E3%81%9F%E3%81%84
+    os.system("unset LC_ALL && unset LC_CTYPE && export LC_ALL=C.UTF-8 && \
+               nkf -j %s | kakasi -JH | nkf -w | \
+               sed -e 's/，/、/g' | sed -e 's/,/、/g' | \
+               sed -e 's/．/。/g' | sed -e 's/\./。/g' | \
+               sed -e 's/！/。/g' | sed -e 's/\!/。/g' | \
+               sed -e 's/〜/ー/g' | \
+               sed -e 's/[^a-zA-Z0-9ぁ-んァ-ンー、。?？]//g' | \
+               sed -e 's/^[ぁぃぅぇぉァィゥェォ、。ー]*//' | \
+               sed -e 's/\([a-zA-Z]\+\)/<ALPHA VAL=\\1>/g' | \
+               sed -e 's/\([0-9]\+\)/<NUMK VAL=\\1>/g' > \
+               %s"%(input_file, jptext_file))
+    os.system("cat %s 1>&2"%(jptext_file))
+    os.system("rosrun aques_talk SampleTalk -p %s -o %s %s"%(phont_file, output_file, jptext_file))
+
+    os.remove(jptext_file)

@@ -1,0 +1,65 @@
+<launch>
+
+  <!-- you can choose chatbot_engine "Chaplus" or "A3RT" or "Mebo" currently-->
+  <arg name="chatbot_engine" default="Mebo" />
+
+  <arg name="use_sample" default="false" />
+  <arg name="use_respeaker" default="true" doc="set false if you do not use respeaker"/>
+  <arg name="chaplus_apikey_file" default="$(find chaplus_ros)/apikey.json" />
+
+  <group if="$(arg use_respeaker)">
+    <!-- node to convert /speech_to_text (speech_recognition_msgs/SpeechRecognitionCandidates) to /request (std_msgs/String) -->
+    <node pkg="topic_tools" type="relay_field" name="sound_request_to_request"
+          args="--wait-for-start /speech_to_text /request std_msgs/String
+		'data: m.transcript[0]'" />
+  </group>
+
+  <group unless="$(arg use_respeaker)">
+    <!-- start talker
+	 subscribe /robotsound_jp sound_play/SoundRequest -->
+    <include file="$(find aques_talk)/launch/aques_talk.launch" />
+
+    <!-- start listener
+	 publishes /Tablet/voice speech_recognition_msgs/SpeechRecognitionCandidates -->
+    <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch" >
+      <arg name="launch_sound_play" value="false" />
+      <arg name="continuous" value="true" />
+      <arg name="engine" default="GoogleCloud" />
+      <arg name="language" value="ja" />
+      <arg name="n_channel" value="2" />
+      <arg name="depth" value="16" />
+      <arg name="sample_rate" value="44100" />
+      <arg name="device" value="hw:0,0" />
+    </include>
+    <param name="/speech_recognition/google_cloud_credentials_json"
+           value="/home/a-fujii/Downloads/eternal-byte-236613-4bc6962824d1.json" />
+    <!--
+	<param name="/speech_recognition/diarizationConfig"
+        type="yaml"
+        value="{'enableSpeakerDiarization': True, 'maxSpeakerCount': 3}" />
+    -->
+
+    <!-- node to convert /Tablet/voice (speech_recognition_msgs/SpeechRecognitionCandidates) to /request (std_msgs/String)
+	 c.f.: https://github.com/ros/ros_comm/pull/639#issuecomment-618750038 -->
+    <node pkg="topic_tools" type="relay_field" name="sound_request_to_request"
+          args="--wait-for-start /Tablet/voice /request std_msgs/String
+		'data: m.transcript[0]'" />
+  </group>
+
+  <!-- node to convert /response (std_msgs/String) to /robotsound_jp (sound_play/SoundRequest) -->
+  <node pkg="topic_tools" type="relay_field" name="string_to_sound_request"
+        args="--wait-for-start /response /robotsound_jp sound_play/SoundRequest
+              '{sound: -3, command: 1, volume: 1.0, arg: m.data}'" />
+
+  <!-- start chaplus
+       subscribe /request and publish /response -->
+  <node pkg="chaplus_ros" type="chaplus_ros.py" name="chaplus_ros"
+        output="screen" >
+    <rosparam subst_value="true">
+      chatbot_engine: $(arg chatbot_engine)
+      use_sample: $(arg use_sample)
+      chaplus_apikey_file: $(arg chaplus_apikey_file)
+    </rosparam>
+  </node>
+
+</launch>

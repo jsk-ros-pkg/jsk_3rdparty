@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>emotion_analyzer</name>
+  <version>2.1.31</version>
+  <description>The emotion_analyzer package</description>
+
+  <maintainer email="k-okada@jsk.imi.i.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <maintainer email="obinata@jsk.imi.i.u-tokyo.ac.jp">Yoshiki Obinata</maintainer>
+
+  <license>BSD</license>
+
+  <author email="nagata@jsk.imi.i.u-tokyo.ac.jp">Ayaha Nagata</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>catkin_virtualenv</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <exec_depend>audio_capture</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>python3-pydub</exec_depend>
+  <exec_depend>python3-soundfile</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+  <depend>std_msgs</depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
+</package>

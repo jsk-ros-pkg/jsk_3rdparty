@@ -22,7 +22,9 @@ clone: $(SVN_DIR)
 	cd $(SVN_DIR) && svn up && mkdir -p $(BUILDDIR)
 
 patch: clone
-	cd $(SVN_DIR) && svn revert --recursive . && patch -p0 -f -E < $(SOURCE_DIR)/patches/01.fix_python_binding.patch
+	cd $(SVN_DIR) && svn revert --recursive . && for patch in $(SOURCE_DIR)/patches/0*.patch; do patch -p0 -f -E < $$patch; done
+	# for python3
+	if [ "${ROS_DISTRO}" != "kinetic" -a "${ROS_DISTRO}" != "melodic" ]; then cd $(SVN_DIR) && svn revert --recursive . && for patch in $(SOURCE_DIR)/patches/1*.patch; do patch -p0 -f -E < $$patch; done; fi
 
 libsiftfast: patch
 	cd $(SVN_DIR)/$(BUILDDIR) && BOOST_INCLUDEDIR=$(BOOST_INCLUDE_DIRS) BOOST_LIBRARYDIR=$(BOOST_LIBRARY_DIRS) cmake -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) .. && make $(ROS_PARALLEL_JOBS) install

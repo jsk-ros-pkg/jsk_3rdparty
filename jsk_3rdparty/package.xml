@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<package>
+  <name>jsk_3rdparty</name>
+  <version>2.1.31</version>
+  <description>
+   <p>Metapackage that contains commonly used 3rdparty toolset for jsk-ros-pkg</p>
+  </description>
+
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</author>
+
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/jsk_3rdparty</url>
+  <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
+  <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>bayesian_belief_networks</run_depend>
+  <run_depend>chaplus_ros</run_depend>
+  <run_depend>dialogflow_task_executive</run_depend>
+  <run_depend>emotion_analyzer</run_depend>
+  <run_depend>gdrive_ros</run_depend>
+  <run_depend>google_chat_ros</run_depend>
+  <run_depend>influxdb_store</run_depend>
+  <run_depend>julius_ros</run_depend>
+  <run_depend>nfc_ros</run_depend>
+  <run_depend>opt_camera</run_depend>
+  <run_depend>pgm_learner</run_depend>
+  <run_depend>respeaker_ros</run_depend>
+  <run_depend>ros_google_cloud_language</run_depend>
+  <run_depend>ros_speech_recognition</run_depend>
+  <run_depend>rospatlite</run_depend>
+  <run_depend>rosping</run_depend>
+  <run_depend>rostwitter</run_depend>
+  <run_depend>sesame_ros</run_depend>
+  <run_depend>switchbot_ros</run_depend>
+  <run_depend>webrtcvad_ros</run_depend>
+  <run_depend>zdepth_image_transport</run_depend>
+
+  <!-- 3rdparty/ dir -->
+  <run_depend>aques_talk</run_depend>
+  <run_depend>assimp_devel</run_depend>
+  <run_depend>downward</run_depend>
+  <run_depend>ff</run_depend>
+  <run_depend>ffha</run_depend>
+  <run_depend>google_cloud_texttospeech</run_depend>
+  <run_depend>julius</run_depend>
+  <run_depend>libcmt</run_depend>
+  <run_depend>libsiftfast</run_depend>
+  <run_depend>lpg_planner</run_depend>
+  <run_depend>mini_maxwell</run_depend>
+  <run_depend>nlopt</run_depend>
+  <run_depend>osqp</run_depend>
+  <!-- https://github.com/ros/rosdistro/pull/45713 -->
+  <!-- <run_depend>slic</run_depend> -->
+  <run_depend>voice_text</run_depend>
+  <run_depend>voicevox</run_depend>
+  <run_depend>zdepth</run_depend>
+
+  <!-- jsk_ros_patch/ dir -->
+  <!-- <run_depend>collada_urdf_jsk_patch</run_depend> -->
+  <!-- <run_depend>depth_image_proc_jsk_patch</run_depend> -->
+  <!-- <run_depend>eecart_imped_jsk_patch</run_depend> -->
+  <run_depend>laser_filters_jsk_patch</run_depend>
+  <!-- <run_depend>openni_tracker_jsk_patch</run_depend> -->
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

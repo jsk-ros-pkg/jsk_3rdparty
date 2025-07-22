@@ -1,0 +1,13 @@
+# # last kinetic release was 0.2.13,
+# # rostwitter requries sound_play >= 0.3.7 https://github.com/ros-drivers/audio_common/pull/149
+# - git:
+#     local-name: audio_common/sound_play
+#     uri: https://github.com/k-okada/audio_common
+#     version: indigo_setup
+# we need to install catkin_virtualenv 0.2.2
+# https://github.com/locusrobotics/catkin_virtualenv/pull/32
+# we need to avoid pip upgrade
+- git:
+    local-name: locusrobotics/catkin_virtualenv
+    uri: https://github.com/locusrobotics/catkin_virtualenv-release
+    version: release/melodic/catkin_virtualenv/0.2.2-0

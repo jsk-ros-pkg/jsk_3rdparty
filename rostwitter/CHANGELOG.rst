@@ -2,6 +2,128 @@
 Changelog for package rostwitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+
+2.1.29 (2025-01-05)
+-------------------
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* [rostwitter] use sub and not delete (`#446 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/446>`_)
+* [rostwitter] reduce save file io (`#441 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/441>`_)
+* [rostwitter] Support extracting base64 images and tweet them from text. with jpeg suffix support (`#437 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/437>`_)
+* [tweet_image_server] control volume by dynamic_reconfigure (`#398 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/398>`_)
+* rostwitter : install resource directory (`#370 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/370>`_)
+* [rostwitter] Suppress tweet log (`#378 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/378>`_)
+* GithubAction: add test for  aarch64(melodic) / indigo (arm64) (`#365 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/365>`_)
+
+  * tweet_image_server.py: sound_play version < 0.3.7 does not support 'sound_action' argument, so it uses robot_sound, instead of robot_sound_jp
+
+* add rostwitter.test (`#285 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/285>`_)
+* [rostwitter] set_aborted when error in tweet_image_server.py (`#277 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/277>`_)
+* Contributors: Aoi Nakane, Iori Yanokura, Kei Okada, Naoto Tsukamoto, Shingo Kitagawa, Yoshiki Obinata
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+* Refactor rostwitter (`#235 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/235>`_)
+
+  * fix desired_encoding=bgr8
+  * use action
+  * speak warning
+  * remove only if exists
+  * add utf-8 encoding
+  * add tweet_image_server
+  * do not raise error
+  * add util.py
+  * add Tweet srv
+  * add twitter.py for reuse
+
+* Contributors: Shingo Kitagawa
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * clean up CMakeList.txt find_package
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* remove debug print line in rostwitter to suppress log (`#178 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/178>`_)
+* Contributors: Shingo Kitagawa
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+* update to use python-requests-oauthlib, maybe we can now just to copy python-twitter (`#128 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/128>`_ )
+* Contributors: Kei Okada
+
 2.1.4 (2017-07-16)
 ------------------
 

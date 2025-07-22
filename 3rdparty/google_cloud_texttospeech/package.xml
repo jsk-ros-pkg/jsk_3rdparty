@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="1">
+  <name>google_cloud_texttospeech</name>
+  <version>2.1.31</version>
+  <description>The google_cloud_texttospeech package</description>
+
+  <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+
+  <license>BSD</license>
+  <author email="h-ito@jsk.imi.i.u-tokyo.ac.jp">Hideaki Ito</author>
+  <url type="website">http://ros.org/wiki/google_cloud_texttospeech</url>
+  <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
+  <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend version_lte="1.0.1">python-google-cloud-texttospeech-pip</run_depend>
+  <run_depend>sound_play</run_depend>
+
+  <export>
+  </export>
+
+</package>

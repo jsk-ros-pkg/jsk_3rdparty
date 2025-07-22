@@ -1,0 +1,459 @@
+#!/usr/bin/env python
+
+import argparse
+from distutils.version import LooseVersion
+import hashlib
+import os
+import shutil
+import sys
+
+from google.cloud.texttospeech import TextToSpeechClient
+import pkg_resources
+import rospy
+
+
+# The submodules enums and types have been removed from v2.0.0
+# https://github.com/googleapis/python-texttospeech/blob/master/UPGRADING.md#enums-and-types  # NOQA
+texttospeech_version = pkg_resources.get_distribution(
+    "google-cloud-texttospeech").version
+if LooseVersion(texttospeech_version) >= LooseVersion('2.0.0'):
+    from google.cloud.texttospeech import AudioConfig
+    from google.cloud.texttospeech import AudioEncoding
+    from google.cloud.texttospeech import SsmlVoiceGender
+    from google.cloud.texttospeech import SynthesisInput
+    from google.cloud.texttospeech import VoiceSelectionParams
+else:
+    from google.cloud.texttospeech_v1.gapic.enums import AudioEncoding
+    from google.cloud.texttospeech_v1.gapic.enums import SsmlVoiceGender
+    from google.cloud.texttospeech_v1.types import AudioConfig
+    from google.cloud.texttospeech_v1.types import SynthesisInput
+    from google.cloud.texttospeech_v1.types import VoiceSelectionParams
+
+
+cache_enabled = os.environ.get(
+    'GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED', True)
+cache_enabled = cache_enabled is True \
+    or cache_enabled == 'true'  # for launch env tag.
+
+# You can see which language is available here
+# https://cloud.google.com/text-to-speech/docs/voices
+voice_name_to_language_code = {
+    'af-ZA-Standard-A': 'af-ZA',  # Afrikaans (South Africa), FEMALE
+    'ar-XA-Standard-A': 'ar-XA',  # Arabic, FEMALE
+    'ar-XA-Standard-B': 'ar-XA',  # Arabic, MALE
+    'ar-XA-Standard-C': 'ar-XA',  # Arabic, MALE
+    'ar-XA-Standard-D': 'ar-XA',  # Arabic, FEMALE
+    'ar-XA-Wavenet-A': 'ar-XA',  # Arabic, FEMALE
+    'ar-XA-Wavenet-B': 'ar-XA',  # Arabic, MALE
+    'ar-XA-Wavenet-C': 'ar-XA',  # Arabic, MALE
+    'ar-XA-Wavenet-D': 'ar-XA',  # Arabic, FEMALE
+    'bn-IN-Standard-A': 'bn-IN',  # Bengali (India), FEMALE
+    'bn-IN-Standard-B': 'bn-IN',  # Bengali (India), MALE
+    'bn-IN-Wavenet-A': 'bn-IN',  # Bengali (India), FEMALE
+    'bn-IN-Wavenet-B': 'bn-IN',  # Bengali (India), MALE
+    'bg-bg-Standard-A': 'bg-BG',  # Bulgarian (Bulgaria), FEMALE
+    'ca-es-Standard-A': 'ca-ES',  # Catalan (Spain), FEMALE
+    'yue-HK-Standard-A': 'yue-HK',  # Chinese (Hong Kong), FEMALE
+    'yue-HK-Standard-B': 'yue-HK',  # Chinese (Hong Kong), MALE
+    'yue-HK-Standard-C': 'yue-HK',  # Chinese (Hong Kong), FEMALE
+    'yue-HK-Standard-D': 'yue-HK',  # Chinese (Hong Kong), MALE
+    'cs-CZ-Standard-A': 'cs-CZ',  # Czech (Czech Republic), FEMALE
+    'cs-CZ-Wavenet-A': 'cs-CZ',  # Czech (Czech Republic), FEMALE
+    'da-DK-Standard-A': 'da-DK',  # Danish (Denmark), FEMALE
+    'da-DK-Standard-C': 'da-DK',  # Danish (Denmark), MALE
+    'da-DK-Standard-D': 'da-DK',  # Danish (Denmark), FEMALE
+    'da-DK-Standard-E': 'da-DK',  # Danish (Denmark), FEMALE
+    'da-DK-Wavenet-A': 'da-DK',  # Danish (Denmark), FEMALE
+    'da-DK-Wavenet-C': 'da-DK',  # Danish (Denmark), MALE
+    'da-DK-Wavenet-D': 'da-DK',  # Danish (Denmark), FEMALE
+    'da-DK-Wavenet-E': 'da-DK',  # Danish (Denmark), FEMALE
+    'nl-BE-Standard-A': 'nl-BE',  # Dutch (Belgium), FEMALE
+    'nl-BE-Standard-B': 'nl-BE',  # Dutch (Belgium), MALE
+    'nl-BE-Wavenet-A': 'nl-BE',  # Dutch (Belgium), FEMALE
+    'nl-BE-Wavenet-B': 'nl-BE',  # Dutch (Belgium), MALE
+    'nl-NL-Standard-A': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'nl-NL-Standard-B': 'nl-NL',  # Dutch (Netherlands), MALE
+    'nl-NL-Standard-C': 'nl-NL',  # Dutch (Netherlands), MALE
+    'nl-NL-Standard-D': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'nl-NL-Standard-E': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'nl-NL-Wavenet-A': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'nl-NL-Wavenet-B': 'nl-NL',  # Dutch (Netherlands), MALE
+    'nl-NL-Wavenet-C': 'nl-NL',  # Dutch (Netherlands), MALE
+    'nl-NL-Wavenet-D': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'nl-NL-Wavenet-E': 'nl-NL',  # Dutch (Netherlands), FEMALE
+    'en-US-Standard-A': 'en-US',  # English (US), MALE
+    'en-US-Standard-B': 'en-US',  # English (US), MALE
+    'en-US-Standard-C': 'en-US',  # English (US), FEMALE
+    'en-US-Standard-D': 'en-US',  # English (US), MALE
+    'en-US-Standard-E': 'en-US',  # English (US), FEMALE
+    'en-US-Standard-F': 'en-US',  # English (US), FEMALE
+    'en-US-Standard-G': 'en-US',  # English (US), FEMALE
+    'en-US-Standard-H': 'en-US',  # English (US), FEMALE
+    'en-US-Standard-I': 'en-US',  # English (US), MALE
+    'en-US-Standard-J': 'en-US',  # English (US), MALE
+    'en-US-Wavenet-A': 'en-US',  # English (US), MALE
+    'en-US-Wavenet-B': 'en-US',  # English (US), MALE
+    'en-US-Wavenet-C': 'en-US',  # English (US), FEMALE
+    'en-US-Wavenet-D': 'en-US',  # English (US), MALE
+    'en-US-Wavenet-E': 'en-US',  # English (US), FEMALE
+    'en-US-Wavenet-F': 'en-US',  # English (US), FEMALE
+    'en-US-Wavenet-G': 'en-US',  # English (US), FEMALE
+    'en-US-Wavenet-H': 'en-US',  # English (US), FEMALE
+    'en-US-Wavenet-I': 'en-US',  # English (US), MALE
+    'en-US-Wavenet-J': 'en-US',  # English (US), MALE
+    'en-AU-Standard-A': 'en-AU',  # English (Australia), FEMALE
+    'en-AU-Standard-B': 'en-AU',  # English (Australia), MALE
+    'en-AU-Standard-C': 'en-AU',  # English (Australia), FEMALE
+    'en-AU-Standard-D': 'en-AU',  # English (Australia), MALE
+    'en-AU-Wavenet-A': 'en-AU',  # English (Australia), FEMALE
+    'en-AU-Wavenet-B': 'en-AU',  # English (Australia), MALE
+    'en-AU-Wavenet-C': 'en-AU',  # English (Australia), FEMALE
+    'en-AU-Wavenet-D': 'en-AU',  # English (Australia), MALE
+    'en-IN-Standard-A': 'en-IN',  # English (India), FEMALE
+    'en-IN-Standard-B': 'en-IN',  # English (India), MALE
+    'en-IN-Standard-C': 'en-IN',  # English (India), MALE
+    'en-IN-Standard-D': 'en-IN',  # English (India), FEMALE
+    'en-IN-Wavenet-A': 'en-IN',  # English (India), FEMALE
+    'en-IN-Wavenet-B': 'en-IN',  # English (India), MALE
+    'en-IN-Wavenet-C': 'en-IN',  # English (India), MALE
+    'en-IN-Wavenet-D': 'en-IN',  # English (India), FEMALE
+    'en-GB-Standard-A': 'en-GB',  # English (UK), FEMALE
+    'en-GB-Standard-B': 'en-GB',  # English (UK), MALE
+    'en-GB-Standard-C': 'en-GB',  # English (UK), FEMALE
+    'en-GB-Standard-D': 'en-GB',  # English (UK), MALE
+    'en-GB-Standard-F': 'en-GB',  # English (UK), FEMALE
+    'en-GB-Wavenet-A': 'en-GB',  # English (UK), FEMALE
+    'en-GB-Wavenet-B': 'en-GB',  # English (UK), MALE
+    'en-GB-Wavenet-C': 'en-GB',  # English (UK), FEMALE
+    'en-GB-Wavenet-D': 'en-GB',  # English (UK), MALE
+    'en-GB-Wavenet-F': 'en-GB',  # English (UK), FEMALE
+    'fil-PH-Standard-A': 'fil-PH',  # Filipino (Philippines), FEMALE
+    'fil-PH-Standard-B': 'fil-PH',  # Filipino (Philippines), FEMALE
+    'fil-PH-Standard-C': 'fil-PH',  # Filipino (Philippines), MALE
+    'fil-PH-Standard-D': 'fil-PH',  # Filipino (Philippines), MALE
+    'fil-PH-Wavenet-A': 'fil-PH',  # Filipino (Philippines), FEMALE
+    'fil-PH-Wavenet-B': 'fil-PH',  # Filipino (Philippines), FEMALE
+    'fil-PH-Wavenet-C': 'fil-PH',  # Filipino (Philippines), MALE
+    'fil-PH-Wavenet-D': 'fil-PH',  # Filipino (Philippines), MALE
+    'fi-FI-Standard-A': 'fi-FI',  # Finnish (Finland), FEMALE
+    'fi-FI-Wavenet-A': 'fi-FI',  # Finnish (Finland), FEMALE
+    'fr-CA-Standard-A': 'fr-CA',  # French (Canada), FEMALE
+    'fr-CA-Standard-B': 'fr-CA',  # French (Canada), MALE
+    'fr-CA-Standard-C': 'fr-CA',  # French (Canada), FEMALE
+    'fr-CA-Standard-D': 'fr-CA',  # French (Canada), MALE
+    'fr-CA-Wavenet-A': 'fr-CA',  # French (Canada), FEMALE
+    'fr-CA-Wavenet-B': 'fr-CA',  # French (Canada), MALE
+    'fr-CA-Wavenet-C': 'fr-CA',  # French (Canada), FEMALE
+    'fr-CA-Wavenet-D': 'fr-CA',  # French (Canada), MALE
+    'fr-FR-Standard-A': 'fr-FR',  # French (France), FEMALE
+    'fr-FR-Standard-B': 'fr-FR',  # French (France), MALE
+    'fr-FR-Standard-C': 'fr-FR',  # French (France), FEMALE
+    'fr-FR-Standard-D': 'fr-FR',  # French (France), MALE
+    'fr-FR-Standard-E': 'fr-FR',  # French (France), FEMALE
+    'fr-FR-Wavenet-A': 'fr-FR',  # French (France), FEMALE
+    'fr-FR-Wavenet-B': 'fr-FR',  # French (France), MALE
+    'fr-FR-Wavenet-C': 'fr-FR',  # French (France), FEMALE
+    'fr-FR-Wavenet-D': 'fr-FR',  # French (France), MALE
+    'fr-FR-Wavenet-E': 'fr-FR',  # French (France), FEMALE
+    'de-DE-Standard-A': 'de-DE',  # German (Germany), FEMALE
+    'de-DE-Standard-B': 'de-DE',  # German (Germany), MALE
+    'de-DE-Standard-C': 'de-DE',  # German (Germany), FEMALE
+    'de-DE-Standard-D': 'de-DE',  # German (Germany), MALE
+    'de-DE-Standard-E': 'de-DE',  # German (Germany), MALE
+    'de-DE-Standard-F': 'de-DE',  # German (Germany), FEMALE
+    'de-DE-Wavenet-A': 'de-DE',  # German (Germany), FEMALE
+    'de-DE-Wavenet-B': 'de-DE',  # German (Germany), MALE
+    'de-DE-Wavenet-C': 'de-DE',  # German (Germany), FEMALE
+    'de-DE-Wavenet-D': 'de-DE',  # German (Germany), MALE
+    'de-DE-Wavenet-E': 'de-DE',  # German (Germany), MALE
+    'de-DE-Wavenet-F': 'de-DE',  # German (Germany), FEMALE
+    'el-GR-Standard-A': 'el-GR',  # Greek (Greece), FEMALE
+    'el-GR-Wavenet-A': 'el-GR',  # Greek (Greece), FEMALE
+    'gu-IN-Standard-A': 'gu-IN',  # Gujarati (India), FEMALE
+    'gu-IN-Standard-B': 'gu-IN',  # Gujarati (India), MALE
+    'gu-IN-Wavenet-A': 'gu-IN',  # Gujarati (India), FEMALE
+    'gu-IN-Wavenet-B': 'gu-IN',  # Gujarati (India), MALE
+    'hi-IN-Standard-A': 'hi-IN',  # Hindi (India), FEMALE
+    'hi-IN-Standard-B': 'hi-IN',  # Hindi (India), MALE
+    'hi-IN-Standard-C': 'hi-IN',  # Hindi (India), MALE
+    'hi-IN-Standard-D': 'hi-IN',  # Hindi (India), FEMALE
+    'hi-IN-Wavenet-A': 'hi-IN',  # Hindi (India), FEMALE
+    'hi-IN-Wavenet-B': 'hi-IN',  # Hindi (India), MALE
+    'hi-IN-Wavenet-C': 'hi-IN',  # Hindi (India), MALE
+    'hi-IN-Wavenet-D': 'hi-IN',  # Hindi (India), FEMALE
+    'hu-HU-Standard-A': 'hu-HU',  # Hungarian (Hungary), FEMALE
+    'hu-HU-Wavenet-A': 'hu-HU',  # Hungarian (Hungary), FEMALE
+    'is-is-Standard-A': 'is-IS',  # Icelandic (Iceland), FEMALE
+    'id-ID-Standard-A': 'id-ID',  # Indonesian (Indonesia), FEMALE
+    'id-ID-Standard-B': 'id-ID',  # Indonesian (Indonesia), MALE
+    'id-ID-Standard-C': 'id-ID',  # Indonesian (Indonesia), MALE
+    'id-ID-Standard-D': 'id-ID',  # Indonesian (Indonesia), FEMALE
+    'id-ID-Wavenet-A': 'id-ID',  # Indonesian (Indonesia), FEMALE
+    'id-ID-Wavenet-B': 'id-ID',  # Indonesian (Indonesia), MALE
+    'id-ID-Wavenet-C': 'id-ID',  # Indonesian (Indonesia), MALE
+    'id-ID-Wavenet-D': 'id-ID',  # Indonesian (Indonesia), FEMALE
+    'it-IT-Standard-A': 'it-IT',  # Italian (Italy), FEMALE
+    'it-IT-Standard-B': 'it-IT',  # Italian (Italy), FEMALE
+    'it-IT-Standard-C': 'it-IT',  # Italian (Italy), MALE
+    'it-IT-Standard-D': 'it-IT',  # Italian (Italy), MALE
+    'it-IT-Wavenet-A': 'it-IT',  # Italian (Italy), FEMALE
+    'it-IT-Wavenet-B': 'it-IT',  # Italian (Italy), FEMALE
+    'it-IT-Wavenet-C': 'it-IT',  # Italian (Italy), MALE
+    'it-IT-Wavenet-D': 'it-IT',  # Italian (Italy), MALE
+    'ja-JP-Standard-A': 'ja-JP',  # Japanese (Japan), FEMALE
+    'ja-JP-Standard-B': 'ja-JP',  # Japanese (Japan), FEMALE
+    'ja-JP-Standard-C': 'ja-JP',  # Japanese (Japan), MALE
+    'ja-JP-Standard-D': 'ja-JP',  # Japanese (Japan), MALE
+    'ja-JP-Wavenet-A': 'ja-JP',  # Japanese (Japan), FEMALE
+    'ja-JP-Wavenet-B': 'ja-JP',  # Japanese (Japan), FEMALE
+    'ja-JP-Wavenet-C': 'ja-JP',  # Japanese (Japan), MALE
+    'ja-JP-Wavenet-D': 'ja-JP',  # Japanese (Japan), MALE
+    'kn-IN-Standard-A': 'kn-IN',  # Kannada (India), FEMALE
+    'kn-IN-Standard-B': 'kn-IN',  # Kannada (India), MALE
+    'kn-IN-Wavenet-A': 'kn-IN',  # Kannada (India), FEMALE
+    'kn-IN-Wavenet-B': 'kn-IN',  # Kannada (India), MALE
+    'ko-KR-Standard-A': 'ko-KR',  # Korean (South Korea), FEMALE
+    'ko-KR-Standard-B': 'ko-KR',  # Korean (South Korea), FEMALE
+    'ko-KR-Standard-C': 'ko-KR',  # Korean (South Korea), MALE
+    'ko-KR-Standard-D': 'ko-KR',  # Korean (South Korea), MALE
+    'ko-KR-Wavenet-A': 'ko-KR',  # Korean (South Korea), FEMALE
+    'ko-KR-Wavenet-B': 'ko-KR',  # Korean (South Korea), FEMALE
+    'ko-KR-Wavenet-C': 'ko-KR',  # Korean (South Korea), MALE
+    'ko-KR-Wavenet-D': 'ko-KR',  # Korean (South Korea), MALE
+    'lv-lv-Standard-A': 'lv-LV',  # Latvian (Latvia), MALE
+    'ms-MY-Wavenet-A': 'ms-MY',  # Malay (Malaysia), FEMALE
+    'ms-MY-Wavenet-B': 'ms-MY',  # Malay (Malaysia), MALE
+    'ms-MY-Wavenet-C': 'ms-MY',  # Malay (Malaysia), FEMALE
+    'ms-MY-Wavenet-D': 'ms-MY',  # Malay (Malaysia), MALE
+    'ml-IN-Standard-A': 'ml-IN',  # Malayalam (India), FEMALE
+    'ml-IN-Standard-B': 'ml-IN',  # Malayalam (India), MALE
+    'ml-IN-Wavenet-A': 'ml-IN',  # Malayalam (India), FEMALE
+    'ml-IN-Wavenet-B': 'ml-IN',  # Malayalam (India), MALE
+    'cmn-CN-Standard-A': 'cmn-CN',  # Mandarin Chinese, FEMALE
+    'cmn-CN-Standard-B': 'cmn-CN',  # Mandarin Chinese, MALE
+    'cmn-CN-Standard-C': 'cmn-CN',  # Mandarin Chinese, MALE
+    'cmn-CN-Standard-D': 'cmn-CN',  # Mandarin Chinese, FEMALE
+    'cmn-CN-Wavenet-A': 'cmn-CN',  # Mandarin Chinese, FEMALE
+    'cmn-CN-Wavenet-B': 'cmn-CN',  # Mandarin Chinese, MALE
+    'cmn-CN-Wavenet-C': 'cmn-CN',  # Mandarin Chinese, MALE
+    'cmn-CN-Wavenet-D': 'cmn-CN',  # Mandarin Chinese, FEMALE
+    'cmn-TW-Standard-A': 'cmn-TW',  # Mandarin Chinese, FEMALE
+    'cmn-TW-Standard-B': 'cmn-TW',  # Mandarin Chinese, MALE
+    'cmn-TW-Standard-C': 'cmn-TW',  # Mandarin Chinese, MALE
+    'cmn-TW-Wavenet-A': 'cmn-TW',  # Mandarin Chinese, FEMALE
+    'cmn-TW-Wavenet-B': 'cmn-TW',  # Mandarin Chinese, MALE
+    'cmn-TW-Wavenet-C': 'cmn-TW',  # Mandarin Chinese, MALE
+    'nb-NO-Standard-A': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-NO-Standard-B': 'nb-NO',  # Norwegian (Norway), MALE
+    'nb-NO-Standard-C': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-NO-Standard-D': 'nb-NO',  # Norwegian (Norway), MALE
+    'nb-NO-Wavenet-A': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-NO-Wavenet-B': 'nb-NO',  # Norwegian (Norway), MALE
+    'nb-NO-Wavenet-C': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-NO-Wavenet-D': 'nb-NO',  # Norwegian (Norway), MALE
+    'nb-no-Standard-E': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-no-Standard-E': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'nb-no-Wavenet-E': 'nb-NO',  # Norwegian (Norway), FEMALE
+    'pl-PL-Standard-A': 'pl-PL',  # Polish (Poland), FEMALE
+    'pl-PL-Standard-B': 'pl-PL',  # Polish (Poland), MALE
+    'pl-PL-Standard-C': 'pl-PL',  # Polish (Poland), MALE
+    'pl-PL-Standard-D': 'pl-PL',  # Polish (Poland), FEMALE
+    'pl-PL-Standard-E': 'pl-PL',  # Polish (Poland), FEMALE
+    'pl-PL-Wavenet-A': 'pl-PL',  # Polish (Poland), FEMALE
+    'pl-PL-Wavenet-B': 'pl-PL',  # Polish (Poland), MALE
+    'pl-PL-Wavenet-C': 'pl-PL',  # Polish (Poland), MALE
+    'pl-PL-Wavenet-D': 'pl-PL',  # Polish (Poland), FEMALE
+    'pl-PL-Wavenet-E': 'pl-PL',  # Polish (Poland), FEMALE
+    'pt-BR-Standard-A': 'pt-BR',  # Portuguese (Brazil), FEMALE
+    'pt-BR-Wavenet-A': 'pt-BR',  # Portuguese (Brazil), FEMALE
+    'pt-PT-Standard-A': 'pt-PT',  # Portuguese (Portugal), FEMALE
+    'pt-PT-Standard-B': 'pt-PT',  # Portuguese (Portugal), MALE
+    'pt-PT-Standard-C': 'pt-PT',  # Portuguese (Portugal), MALE
+    'pt-PT-Standard-D': 'pt-PT',  # Portuguese (Portugal), FEMALE
+    'pt-PT-Wavenet-A': 'pt-PT',  # Portuguese (Portugal), FEMALE
+    'pt-PT-Wavenet-B': 'pt-PT',  # Portuguese (Portugal), MALE
+    'pt-PT-Wavenet-C': 'pt-PT',  # Portuguese (Portugal), MALE
+    'pt-PT-Wavenet-D': 'pt-PT',  # Portuguese (Portugal), FEMALE
+    'ro-RO-Standard-A': 'ro-RO',  # Romanian (Romania), FEMALE
+    'ro-RO-Wavenet-A': 'ro-RO',  # Romanian (Romania), FEMALE
+    'ru-RU-Standard-A': 'ru-RU',  # Russian (Russia), FEMALE
+    'ru-RU-Standard-B': 'ru-RU',  # Russian (Russia), MALE
+    'ru-RU-Standard-C': 'ru-RU',  # Russian (Russia), FEMALE
+    'ru-RU-Standard-D': 'ru-RU',  # Russian (Russia), MALE
+    'ru-RU-Standard-E': 'ru-RU',  # Russian (Russia), FEMALE
+    'ru-RU-Wavenet-A': 'ru-RU',  # Russian (Russia), FEMALE
+    'ru-RU-Wavenet-B': 'ru-RU',  # Russian (Russia), MALE
+    'ru-RU-Wavenet-C': 'ru-RU',  # Russian (Russia), FEMALE
+    'ru-RU-Wavenet-D': 'ru-RU',  # Russian (Russia), MALE
+    'ru-RU-Wavenet-E': 'ru-RU',  # Russian (Russia), FEMALE
+    'sr-rs-Standard-A': 'sr-RS',  # Serbian (Cyrillic), FEMALE
+    'sk-SK-Standard-A': 'sk-SK',  # Slovak (Slovakia), FEMALE
+    'sk-SK-Wavenet-A': 'sk-SK',  # Slovak (Slovakia), FEMALE
+    'es-ES-Standard-A': 'es-ES',  # Spanish (Spain), FEMALE
+    'es-ES-Standard-B': 'es-ES',  # Spanish (Spain), MALE
+    'es-ES-Standard-C': 'es-ES',  # Spanish (Spain), FEMALE
+    'es-ES-Standard-D': 'es-ES',  # Spanish (Spain), FEMALE
+    'es-ES-Wavenet-B': 'es-ES',  # Spanish (Spain), MALE
+    'es-ES-Wavenet-C': 'es-ES',  # Spanish (Spain), FEMALE
+    'es-ES-Wavenet-D': 'es-ES',  # Spanish (Spain), FEMALE
+    'es-US-Standard-A': 'es-US',  # Spanish (US), FEMALE
+    'es-US-Standard-B': 'es-US',  # Spanish (US), MALE
+    'es-US-Standard-C': 'es-US',  # Spanish (US), MALE
+    'es-US-Wavenet-A': 'es-US',  # Spanish (US), FEMALE
+    'es-US-Wavenet-B': 'es-US',  # Spanish (US), MALE
+    'es-US-Wavenet-C': 'es-US',  # Spanish (US), MALE
+    'sv-SE-Standard-A': 'sv-SE',  # Swedish (Sweden), FEMALE
+    'sv-SE-Wavenet-A': 'sv-SE',  # Swedish (Sweden), FEMALE
+    'ta-IN-Standard-A': 'ta-IN',  # Tamil (India), FEMALE
+    'ta-IN-Standard-B': 'ta-IN',  # Tamil (India), MALE
+    'ta-IN-Wavenet-A': 'ta-IN',  # Tamil (India), FEMALE
+    'ta-IN-Wavenet-B': 'ta-IN',  # Tamil (India), MALE
+    'te-IN-Standard-A': 'te-IN',  # Telugu (India), FEMALE
+    'te-IN-Standard-B': 'te-IN',  # Telugu (India), MALE
+    'th-TH-Standard-A': 'th-TH',  # Thai (Thailand), FEMALE
+    'tr-TR-Standard-A': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Standard-B': 'tr-TR',  # Turkish (Turkey), MALE
+    'tr-TR-Standard-C': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Standard-D': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Standard-E': 'tr-TR',  # Turkish (Turkey), MALE
+    'tr-TR-Wavenet-A': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Wavenet-B': 'tr-TR',  # Turkish (Turkey), MALE
+    'tr-TR-Wavenet-C': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Wavenet-D': 'tr-TR',  # Turkish (Turkey), FEMALE
+    'tr-TR-Wavenet-E': 'tr-TR',  # Turkish (Turkey), MALE
+    'uk-UA-Standard-A': 'uk-UA',  # Ukrainian (Ukraine), FEMALE
+    'uk-UA-Wavenet-A': 'uk-UA',  # Ukrainian (Ukraine), FEMALE
+    'vi-VN-Standard-A': 'vi-VN',  # Vietnamese (Vietnam), FEMALE
+    'vi-VN-Standard-B': 'vi-VN',  # Vietnamese (Vietnam), MALE
+    'vi-VN-Standard-C': 'vi-VN',  # Vietnamese (Vietnam), FEMALE
+    'vi-VN-Standard-D': 'vi-VN',  # Vietnamese (Vietnam), MALE
+    'vi-VN-Wavenet-A': 'vi-VN',  # Vietnamese (Vietnam), FEMALE
+    'vi-VN-Wavenet-B': 'vi-VN',  # Vietnamese (Vietnam), MALE
+    'vi-VN-Wavenet-C': 'vi-VN',  # Vietnamese (Vietnam), FEMALE
+    'vi-VN-Wavenet-D': 'vi-VN',  # Vietnamese (Vietnam), MALE
+}
+lower2original = {k.lower(): k
+                  for k in voice_name_to_language_code}
+
+
+def determine_voice_name(voice_name):
+    voice_name = voice_name.lower()
+    if len(voice_name) == 0:
+        name = 'en-US-Wavenet-A'
+        language_code = 'en-US'
+    else:
+        candidates = list(filter(
+            lambda lower_name: lower_name.startswith(voice_name),
+            lower2original))
+        if candidates:
+            wavenet_candidates = list(
+                filter(lambda c: 'wavenet' in c, candidates))
+            voice_name = wavenet_candidates[0] \
+                if wavenet_candidates else candidates[0]
+            name = lower2original[voice_name]
+            language_code = voice_name_to_language_code[name]
+        else:
+            print('[Text2Wave] Invalid voice_name ({}). Use english voice.'
+                  .format(voice_name))
+            name = 'en-US-Wavenet-A'
+            language_code = 'en-US'
+    print('[Text2Wave] Speak using voice_name ({})..'.format(name))
+    return name, language_code
+
+
+def get_cache_dir():
+    """Return cache dir.
+
+    Returns
+    -------
+    cache_dir : str
+        cache directory.
+    """
+    ros_home = os.getenv('ROS_HOME', os.path.expanduser('~/.ros'))
+    pkg_ros_home = os.path.join(ros_home, 'google_cloud_texttospeech')
+    default_cache_dir = os.path.join(pkg_ros_home, 'cache')
+    cache_dir = os.environ.get(
+        'GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_DIR',
+        default_cache_dir)
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+    return cache_dir
+
+
+def checksum_md5(filename, blocksize=8192):
+    """Calculate md5sum.
+
+    Parameters
+    ----------
+    filename : str or pathlib.Path
+        input filename.
+    blocksize : int
+        MD5 has 128-byte digest blocks (default: 8192 is 128x64).
+    Returns
+    -------
+    md5 : str
+        calculated md5sum.
+    """
+    filename = str(filename)
+    hash_factory = hashlib.md5()
+    with open(filename, 'rb') as f:
+        for chunk in iter(lambda: f.read(blocksize), b''):
+            hash_factory.update(chunk)
+    return hash_factory.hexdigest()
+
+
+if __name__ == '__main__':
+    speaking_rate = rospy.get_param('~speaking_rate', 1.0)
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-eval', '--evaluate')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('text')
+    args = parser.parse_args()
+
+    # Instantiates a client
+    client = TextToSpeechClient()
+    with open(args.text, 'rb') as f:
+        speech_text = f.readline()
+    synthesis_input = SynthesisInput(
+        text=speech_text)
+
+    name, language_code = determine_voice_name(
+        args.evaluate.lstrip('(').rstrip(')'))
+
+    if cache_enabled:
+        cache_dir = get_cache_dir()
+        md5 = checksum_md5(args.text)
+        cache_filename = os.path.join(
+            cache_dir,
+            '--'.join([md5, language_code, name, str(speaking_rate)])
+            + '.mp3')
+        if os.path.exists(cache_filename):
+            print('[Text2Wave] Using cached sound file ({}) for {}'
+                  .format(cache_filename, speech_text.decode('utf-8')))
+            shutil.copy(cache_filename, args.output)
+            sys.exit(0)
+
+    voice = VoiceSelectionParams(
+        language_code=language_code,
+        name=name,
+        ssml_gender=SsmlVoiceGender.FEMALE)
+
+    # Select the type of audio file you want returned
+    audio_config = AudioConfig(
+        audio_encoding=AudioEncoding.MP3,
+        speaking_rate=speaking_rate)
+    if LooseVersion(texttospeech_version) >= LooseVersion('2.0.0'):
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config)
+    else:
+        response = client.synthesize_speech(
+            synthesis_input, voice, audio_config)
+    with open(args.output, 'wb') as out:
+        # Write the response to the output file.
+        out.write(response.audio_content)
+    if cache_enabled:
+        text_cache_filename = os.path.splitext(cache_filename)[0] + '.txt'
+        shutil.copy(args.text, text_cache_filename)
+        shutil.copy(args.output, cache_filename)

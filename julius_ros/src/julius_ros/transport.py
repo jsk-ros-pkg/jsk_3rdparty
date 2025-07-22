@@ -3,6 +3,7 @@
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 
+import sys
 import socket
 import struct
 import rospy
@@ -44,9 +45,14 @@ class SocketTransport(Thread):
         while not self.alive.wait(self.poll_rate):
             try:
                 self.socket.settimeout(1)
-                recvbuf += self.socket.recv(self.recv_buffer_size)
+                buf = self.socket.recv(self.recv_buffer_size)
+                if sys.version_info.major >= 3 and type(buf) == bytes: # on Python3 convert buf to str
+                    buf = buf.decode()
+                recvbuf += buf
             except socket.error as e:
-                if e.message == "timed out":
+                if sys.version_info.major >= 3 and type(e) == socket.timeout:
+                    continue
+                if sys.version_info.major <  3 and e.message == "timed out":
                     continue
                 self.reconnect()
             try:
@@ -110,6 +116,8 @@ class SocketTransport(Thread):
         self.connect()
 
     def send(self, data):
+        if sys.version_info.major >= 3 and type(data) == str: # on Python3 convert data to bytes
+            data = data.encode()
         try:
             self.socket.sendall(data)
         except socket.error:

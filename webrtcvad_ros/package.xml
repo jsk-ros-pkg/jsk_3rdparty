@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>webrtcvad_ros</name>
+  <version>2.1.31</version>
+  <description>This package provides a wrapper node for webrtcvad. It subscribes an audio topic and publish a flag if curretly speeched or not with VAD.</description>
+
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <maintainer email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</maintainer>
+
+  <author email="shinjo@jsk.imi.i.u-tokyo.ac.jp">Koki Shinjo</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>audio_common_msgs</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>python-webrtcvad-pip</exec_depend>
+
+  <export>
+  </export>
+</package>

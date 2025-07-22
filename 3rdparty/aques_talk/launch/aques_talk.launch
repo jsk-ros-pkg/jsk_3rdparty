@@ -1,0 +1,21 @@
+<launch>
+  <arg name="voice_text_machine" default="localhost" />
+  <arg name="sound_play_machine" default="localhost" />
+  <arg name="sound_play_topic" default="robotsound_jp" />
+  <arg name="sound_play_node_name" default="sound_play_jp" />
+
+  <arg name="launch_sound_play" default="true" />
+
+  <arg name="use_machine" default="true" />
+  <machine if="$(arg use_machine)" name="localhost" address="localhost" />
+
+  <arg name="sound_play_respawn" default="true" />
+
+  <node pkg="sound_play" type="soundplay_node.py" name="$(arg sound_play_node_name)"
+        if="$(arg launch_sound_play)" respawn="$(arg sound_play_respawn)"
+        machine="$(arg sound_play_machine)">
+    <remap from="robotsound" to="$(arg sound_play_topic)"/>
+    <remap from="sound_play" to="$(arg sound_play_topic)"/>
+    <env name="PATH" value="$(find aques_talk):$(env PATH)" />
+  </node>
+</launch>

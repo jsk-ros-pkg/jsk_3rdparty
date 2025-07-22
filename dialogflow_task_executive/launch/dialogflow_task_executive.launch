@@ -1,0 +1,60 @@
+<launch>
+  <arg name="run_app_manager" default="false" />
+  <arg name="applist" default="$(find dialogflow_task_executive)/apps"/>
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
+  <arg name="override_project_id" default="false" doc="Specify true if the project_id argument takes priority over the project_id section of the credential file." />
+  <arg name="enable_hotword" default="true" />
+  <arg name="always_publish_result" default="false" doc="Always publish dialog_response topic even the node gets actionlib request." />
+
+  <!-- options for dialogflow_client -->
+  <arg name="launch_dialogflow" default="true" />
+  <arg name="use_audio" default="false" />
+  <arg name="use_tts" default="true" />
+  <arg name="language" default="ja-JP" />
+  <arg name="soundplay_action_name" default="robotsound_jp" />
+  <arg name="volume" default="1.0" />
+
+
+  <node name="speech_to_text_mux" pkg="topic_tools" type="mux"
+        args="/speech_to_text /speech_to_text_google /speech_to_text_julius /speech_to_text_other" >
+    <remap from="mux" to="speech_to_text_mux"/>
+  </node>
+
+  <group if="$(arg launch_dialogflow)">
+    <include file="$(find dialogflow_task_executive)/launch/dialogflow_ros.launch">
+      <arg name="use_audio" value="$(arg use_audio)" />
+      <arg name="use_tts" value="$(arg use_tts)" />
+      <arg name="language" value="$(arg language)" />
+      <arg name="soundplay_action_name" value="$(arg soundplay_action_name)" />
+      <arg name="volume" value="$(arg volume)" />
+      <arg name="credential" value="$(arg credential)" />
+      <arg name="project_id" value="$(arg project_id)" />
+      <arg name="override_project_id" value="$(arg override_project_id)" />
+      <arg name="enable_hotword" value="$(arg enable_hotword)" />
+      <arg name="always_publish_result" value="$(arg always_publish_result)" />
+    </include>
+  </group>
+
+  <node name="task_executive"
+        pkg="dialogflow_task_executive" type="task_executive.py"
+        output="screen">
+    <rosparam subst_value="true">
+    </rosparam>
+  </node>
+  
+  <group if="$(arg run_app_manager)">
+    <rosparam>
+      /robot/type: dummy
+      /robot/name: test
+    </rosparam>
+    <node pkg="app_manager" type="appmaster" name="appmaster"
+          args="-p 11313"/>
+    <node pkg="app_manager" type="app_manager" name="app_manager"
+          args="--applist $(arg applist)"
+          output="screen">
+      <param name="interface_master" value="http://localhost:11313"/>
+    </node>
+  </group>
+
+</launch>

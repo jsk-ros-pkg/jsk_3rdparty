@@ -1,0 +1,14 @@
+<launch>
+  <!-- check the audio topic -->
+  <arg name="input_audio" default="/audio/audio" />
+
+  <!-- set API key from the command line -->
+  <arg name="api_key" default="" />
+
+  <param name="hume_api_key" value="$(arg api_key)" />
+
+  <node name="analyze_text_service" pkg="emotion_analyzer" type="analyze_text_service.py" output="screen" />
+  <node name="analyze_audio_service" pkg="emotion_analyzer" type="analyze_audio_service.py" output="screen" >
+    <remap from="~audio" to="$(arg input_audio)" />
+  </node>
+</launch>

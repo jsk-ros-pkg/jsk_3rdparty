@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="use_audio" default="false" />
+  <arg name="use_tts" default="true" />
+  <arg name="language" default="ja-JP" />
+  <arg name="soundplay_action_name" default="robotsound_jp" />
+  <arg name="volume" default="1.0" />
+  <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS false)" doc="Read credentials JSON from this value when use_yaml is false." />
+  <arg name="project_id" default="$(optenv DIALOGFLOW_PROJECT_ID false)"/>
+  <arg name="override_project_id" default="false" doc="Specify true if the project_id argument takes priority over the project_id section of the credential file." />
+  <arg name="enable_hotword" default="true" />
+  <arg name="always_publish_result" default="false" doc="Always publish dialog_response topic even the node gets actionlib request." />
+
+  <node name="dialogflow_client"
+        pkg="dialogflow_task_executive" type="dialogflow_client.py"
+        output="screen">
+    <rosparam subst_value="true">
+      use_audio: $(arg use_audio)
+      use_tts: $(arg use_tts)
+      language: $(arg language)
+      soundplay_action_name: $(arg soundplay_action_name)
+      volume: $(arg volume)
+      project_id: $(arg project_id)
+      override_project_id: $(arg override_project_id)
+      google_cloud_credentials_json: $(arg credential)
+      enable_hotword: $(arg enable_hotword)
+      always_publish_result: $(arg always_publish_result)
+    </rosparam>
+    <rosparam command="load" ns="/dialogflow_client/hotword"
+              file="$(find dialogflow_task_executive)/config/dialogflow_hotword.yaml"/>
+  </node>
+
+</launch>

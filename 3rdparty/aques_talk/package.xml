@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="1">
+  <name>aques_talk</name>
+  <version>2.1.31</version>
+  <description>ROS interface aques_talk demo program
+  </description>
+  <author email="kei.okada@gmail.com">AQUEST Corp, ROS package maintained by Kei Okada</author>
+  <maintainer email="kei.okada@gmail.com">Kei Okada</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/aques_talk</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>kakasi</run_depend>
+  <run_depend>nkf</run_depend>
+  <run_depend>sound_play</run_depend>
+
+  <test_depend>rostest</test_depend>
+
+</package>
+
+

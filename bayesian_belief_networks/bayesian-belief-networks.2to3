@@ -1,0 +1,445 @@
+--- ./bayesian/bbn.py	(original)
++++ ./bayesian/bbn.py	(refactored)
+@@ -115,7 +115,7 @@
+                              '%8.6f' % prob])
+             else:
+                 tab.add_row([node, value, '%8.6f' % prob])
+-        print tab
++        print(tab)
+ 
+ 
+ class JoinTree(UndirectedGraph):
+--- ./bayesian/factor_graph.py	(original)
++++ ./bayesian/factor_graph.py	(refactored)
+@@ -32,8 +32,8 @@
+     def send(self, message):
+         recipient = message.destination
+         if DEBUG:
+-            print '%s ---> %s' % (
+-                self.name, recipient.name), message
++            print('%s ---> %s' % (
++                self.name, recipient.name), message)
+         recipient.received_messages[
+             self.name] = message
+ 
+@@ -50,13 +50,13 @@
+         List out all messages Node
+         currently has received.
+         '''
+-        print '------------------------------'
+-        print 'Messages at Node %s' % self.name
+-        print '------------------------------'
++        print('------------------------------')
++        print('Messages at Node %s' % self.name)
++        print('------------------------------')
+         for k, v in self.received_messages.iteritems():
+-            print '%s <-- Argspec:%s' % (v.source.name, v.argspec)
++            print('%s <-- Argspec:%s' % (v.source.name, v.argspec))
+             v.list_factors()
+-        print '--'
++        print('--')
+ 
+     def get_target(self):
+         '''
+@@ -219,12 +219,12 @@
+ class Message(object):
+ 
+     def list_factors(self):
+-        print '---------------------------'
+-        print 'Factors in message %s -> %s' % \
+-            (self.source.name, self.destination.name)
+-        print '---------------------------'
++        print('---------------------------')
++        print('Factors in message %s -> %s' % \
++            (self.source.name, self.destination.name))
++        print('---------------------------')
+         for factor in self.factors:
+-            print factor
++            print(factor)
+ 
+     def __call__(self, var):
+         '''
+@@ -683,8 +683,8 @@
+                     sample_dict[var.name] = test_var
+                 break
+         if not var.name in sample_dict:
+-            print 'Iterated through all values for %s and %s but no go...' \
+-                % (var.name, func.__name__)
++            print('Iterated through all values for %s and %s but no go...' \
++                % (var.name, func.__name__))
+             # This seems to mean that we have never seen this combination
+             # of variables before, we can either discard it as irrelevant or
+             # use some type of +1 smoothing???
+@@ -722,7 +722,7 @@
+                 domains = dict()
+                 for arg in get_args(node.func):
+                     if not arg in arg_domains:
+-                        print 'WARNING: missing variable for arg:%s' % arg
++                        print('WARNING: missing variable for arg:%s' % arg)
+                     else:
+                         domains.update({arg: arg_domains[arg]})
+                 node.func.domains = domains
+@@ -741,7 +741,7 @@
+                 # no cycles.
+                 self.inference_method = 'sumproduct'
+         except:
+-            print 'Failed to determine if graph has cycles, '
++            print('Failed to determine if graph has cycles, ')
+             'setting inference to sample.'
+             self.inference_method = 'sample'
+         self.enforce_minimum_samples = False
+@@ -825,18 +825,18 @@
+         while not q.empty():
+             current_node = q.get()
+             if DEBUG:
+-                print "Current Node: ", current_node
+-                print "Discovered Nodes before adding Current Node: ", \
+-                    discovered_nodes
++                print("Current Node: ", current_node)
++                print("Discovered Nodes before adding Current Node: ", \
++                    discovered_nodes)
+             if current_node.name in discovered_nodes:
+                 # We have a cycle!
+                 if DEBUG:
+-                    print 'Dequeued node already processed: %s', current_node
++                    print('Dequeued node already processed: %s', current_node)
+                 return True
+             discovered_nodes.add(current_node.name)
+             if DEBUG:
+-                print "Discovered Nodes after adding Current Node: ", \
+-                    discovered_nodes
++                print("Discovered Nodes after adding Current Node: ", \
++                    discovered_nodes)
+             for neighbour in current_node.neighbours:
+                 edge = [current_node.name, neighbour.name]
+                 # Since this is undirected and we want
+@@ -852,7 +852,7 @@
+                 # and record this edge as traversed
+                 if neighbour.name not in discovered_nodes:
+                     if DEBUG:
+-                        print 'Enqueuing: %s' % neighbour
++                        print('Enqueuing: %s' % neighbour)
+                     q.put(neighbour)
+                 traversed_edges.add(edge)
+         return False
+@@ -874,29 +874,29 @@
+                     not isinstance(node, FactorNode):
+                 bases = node.__class__.__bases__
+                 if not VariableNode in bases and not FactorNode in bases:
+-                    print ('Factor Graph does not '
+-                           'support nodes of type: %s' % node.__class__)
++                    print(('Factor Graph does not '
++                           'support nodes of type: %s' % node.__class__))
+                     raise InvalidGraphException
+         # First check that for each node
+         # only connects to nodes of the
+         # other type.
+-        print 'Checking neighbour node types...'
++        print('Checking neighbour node types...')
+         for node in self.nodes:
+             if not node.verify_neighbour_types():
+-                print '%s has invalid neighbour type.' % node
++                print('%s has invalid neighbour type.' % node)
+                 return False
+-        print 'Checking that all factor functions have domains...'
++        print('Checking that all factor functions have domains...')
+         for node in self.nodes:
+             if isinstance(node, FactorNode):
+                 if not hasattr(node.func, 'domains'):
+-                    print '%s has no domains.' % node
++                    print('%s has no domains.' % node)
+                     raise InvalidGraphException
+                 elif not node.func.domains:
+                     # Also check for an empty domain dict!
+-                    print '%s has empty domains.' % node
++                    print('%s has empty domains.' % node)
+                     raise InvalidGraphException
+-        print 'Checking that all variables are accounted for' + \
+-            ' by at least one function...'
++        print('Checking that all variables are accounted for' + \
++            ' by at least one function...')
+         variables = set([vn.name for vn in self.nodes
+                          if isinstance(vn, VariableNode)])
+ 
+@@ -906,20 +906,20 @@
+         args = set(reduce(lambda x, y: x + y, largs))
+ 
+         if not variables.issubset(args):
+-            print 'These variables are not used in any factors nodes: '
+-            print variables.difference(args)
++            print('These variables are not used in any factors nodes: ')
++            print(variables.difference(args))
+             return False
+-        print 'Checking that all arguments have matching variable nodes...'
++        print('Checking that all arguments have matching variable nodes...')
+         if not args.issubset(variables):
+-            print 'These arguments have missing variables:'
+-            print args.difference(variables)
++            print('These arguments have missing variables:')
++            print(args.difference(variables))
+             return False
+-        print 'Checking that graph has at least one leaf node...'
++        print('Checking that graph has at least one leaf node...')
+         leaf_nodes = filter(
+             lambda x: x.is_leaf(),
+             self.nodes)
+         if not leaf_nodes:
+-            print 'Graph has no leaf nodes.'
++            print('Graph has no leaf nodes.')
+             raise InvalidGraphException
+         return True
+ 
+@@ -1017,7 +1017,7 @@
+                              '%8.6f' % prob])
+             else:
+                 tab.add_row([node, value, '%8.6f' % prob])
+-        print tab
++        print(tab)
+ 
+     def discover_sample_ordering(self):
+         return discover_sample_ordering(self)
+@@ -1037,13 +1037,13 @@
+         counts = defaultdict(int)
+         valid_samples = 0
+         while valid_samples < self.n_samples:
+-            print "%s of %s" % (valid_samples, self.n_samples)
++            print("%s of %s" % (valid_samples, self.n_samples))
+             try:
+                 sample = self.get_sample(kwds)
+                 valid_samples += 1
+             except:
+-                print 'Failed to get a valid sample...'
+-                print 'continuing...'
++                print('Failed to get a valid sample...')
++                print('continuing...')
+                 continue
+             for var in sample:
+                 key = (var.name, var.value)
+@@ -1079,7 +1079,7 @@
+             sdb.save_sample([(v.name, v.value) for v in sample])
+             valid_samples += 1
+         sdb.commit()
+-        print '%s samples stored in %s' % (n, self.sample_db_filename)
++        print('%s samples stored in %s' % (n, self.sample_db_filename))
+ 
+     def query_by_external_samples(self, **kwds):
+         counts = defaultdict(int)
+--- ./bayesian/gaussian_bayesian_network.py	(original)
++++ ./bayesian/gaussian_bayesian_network.py	(refactored)
+@@ -190,11 +190,11 @@
+         mu = result['joint']['mu']
+         sigma = result['joint']['sigma']
+         evidence = result['evidence']
+-        print 'Evidence: %s' % str(evidence)
+-        print 'Covariance Matrix:'
+-        print sigma
+-        print 'Means:'
+-        print mu
++        print('Evidence: %s' % str(evidence))
++        print('Covariance Matrix:')
++        print(sigma)
++        print('Means:')
++        print(mu)
+ 
+ 
+     def discover_sample_ordering(self):
+--- ./bayesian/linear_algebra.py	(original)
++++ ./bayesian/linear_algebra.py	(refactored)
+@@ -219,8 +219,8 @@
+     my_b.rows.append([2, 3])
+     my_b.rows.append([4, 5])
+     m = my_a * my_b
+-    print my_a * my_b
++    print(my_a * my_b)
+     import ipdb; ipdb.set_trace()
+     mi = m.I
+-    print m
+-    print mi
++    print(m)
++    print(mi)
+--- ./bayesian/persistance.py	(original)
++++ ./bayesian/persistance.py	(refactored)
+@@ -51,7 +51,7 @@
+         try:
+             metadata[k.name] = P2S_MAPPING[type(v[0])]
+         except KeyError:
+-            print k, v
++            print(k, v)
+             raise UnsupportedTypeException
+     return metadata
+ 
+@@ -80,7 +80,7 @@
+         CREATE TABLE samples (%s);
+     ''' % ','.join(['%s %s' % (col, type_) for col, type_ in type_specs])
+     cur = conn.cursor()
+-    print SQL
++    print(SQL)
+     cur.execute(SQL)
+ 
+ 
+@@ -177,10 +177,10 @@
+             self.commit()
+ 
+     def commit(self):
+-        print 'Committing....'
++        print('Committing....')
+         try:
+             self.conn.commit()
+             self.insert_count = 1
+         except:
+-            print 'Commit to db file failed...'
++            print('Commit to db file failed...')
+             raise
+--- ./bayesian/stats.py	(original)
++++ ./bayesian/stats.py	(refactored)
+@@ -103,4 +103,4 @@
+                      self.median_absolute_deviation])
+         tab.add_row(['Mode Absolute Deviation',
+                      self.mode_absolute_deviation])
+-        print tab
++        print(tab)
+--- ./bayesian/examples/bbns/monty_hall.py	(original)
++++ ./bayesian/examples/bbns/monty_hall.py	(refactored)
+@@ -62,7 +62,7 @@
+     # Initial Marginals without any knowledge.
+     # Observe that the likelihood for
+     # all three doors is 1/3.
+-    print 'Initial Marginal Probabilities:'
++    print('Initial Marginal Probabilities:')
+     g.q()
+     # Now suppose the guest chooses
+     # door A and Monty chooses door B.
+--- ./bayesian/examples/bif/bif_inference_tester.py	(original)
++++ ./bayesian/examples/bif/bif_inference_tester.py	(refactored)
+@@ -17,16 +17,16 @@
+ 
+     start = time()
+     module_name = bif_parser.parse(name)
+-    print str(time()-start) + "s to parse .bif file into python module"
++    print(str(time()-start) + "s to parse .bif file into python module")
+     start = time()
+     module = __import__(module_name)
+-    print str(time()-start) + "s to import the module"
++    print(str(time()-start) + "s to import the module")
+     start = time()
+     fg = module.create_graph()
+-    print str(time()-start) + "s to create factor graph"
++    print(str(time()-start) + "s to create factor graph")
+     start = time()
+     bg = module.create_bbn()
+-    print str(time()-start) + "s to create bayesian network"
++    print(str(time()-start) + "s to create bayesian network")
+ 
+     # Methods of inference to demonstrate
+     exact = True
+@@ -41,8 +41,8 @@
+             # and select a key of interest
+             bg.q()
+         else:
+-            print 'Exact probability:', bg.query()[key]
+-        print 'Time taken for exact query:', time()-start
++            print('Exact probability:', bg.query()[key])
++        print('Time taken for exact query:', time()-start)
+ 
+     if sampling:
+         fg.inference_method = 'sample_db'
+@@ -66,4 +66,4 @@
+             prev_p = p
+             table.add_row([n, generate_time, query_time, p, diff])
+ 
+-        print table
++        print(table)
+--- ./bayesian/examples/factor_graphs/monty_hall.py	(original)
++++ ./bayesian/examples/factor_graphs/monty_hall.py	(refactored)
+@@ -62,7 +62,7 @@
+     # Initial Marginals without any knowledge.
+     # Observe that the likelihood for
+     # all three doors is 1/3.
+-    print 'Initial Marginal Probabilities:'
++    print('Initial Marginal Probabilities:')
+     g.q()
+     # Now suppose the guest chooses
+     # door A and Monty chooses door B.
+@@ -74,5 +74,5 @@
+     # The likelihood for door C has
+     # indeed increased to 2/3 therefore
+     # we should switch to door C.
+-    print 'Marginals after knowing Guest chose A and Monty chose B.'
++    print('Marginals after knowing Guest chose A and Monty chose B.')
+     g.q(guest_door='A', monty_door='B')
+--- ./bayesian/examples/factor_graphs/walk.py	(original)
++++ ./bayesian/examples/factor_graphs/walk.py	(refactored)
+@@ -92,12 +92,12 @@
+     for k, v in deco:
+         if k[1] is not False:
+             table.add_row(list(k) + [v / normalizer])
+-    print table
++    print(table)
+ 
+ 
+ if __name__ == '__main__':
+     graph.verify()
+-    print graph.get_sample()
++    print(graph.get_sample())
+ 
+     n = 10000
+     counts = defaultdict(int)
+@@ -111,5 +111,5 @@
+ 
+     from pprint import pprint
+     pprint(counts)
+-    print 'Sampled:'
++    print('Sampled:')
+     tabulate(counts, n)
+--- ./bayesian/test/test_gaussian.py	(original)
++++ ./bayesian/test/test_gaussian.py	(refactored)
+@@ -274,8 +274,8 @@
+                 [12, 13, 28, 42]],
+             names=['a', 'b', 'c', 'd'])
+         sigma_xx, sigma_xy, sigma_yx, sigma_yy = sigma.split('a')
+-        print sigma_xx
+-        print sigma_xy
++        print(sigma_xx)
++        print(sigma_xy)
+         for name in ['b', 'c', 'd']:
+             assert name in sigma_xx.names
+             assert name in sigma_xy.names
+--- ./bayesian/test/test_gbn_examples.py	(original)
++++ ./bayesian/test/test_gbn_examples.py	(refactored)
+@@ -28,4 +28,4 @@
+ 
+     def test_query(self, river_graph):
+         r = river_graph.query(a=7)
+-        print r
++        print(r)
+--- ./bayesian/examples/bif/bif_parser.py	(original)
++++ ./bayesian/examples/bif/bif_parser.py	(refactored)
+@@ -76,7 +76,7 @@
+                           'var': variable,
+                           'dict': str(dict(
+                               zip(variables[variable],
+-                                  map(float, match.group(1).split(", ")))))
++                                  list(map(float, match.group(1).split(", "))))))
+                       }
+                 )
+                 infile.readline()  # }
+@@ -101,7 +101,7 @@
+                         given_values = match.group(1).split(", ")
+                         for value, prob in zip(
+                                 variables[variable],
+-                                map(float, match.group(2).split(", "))):
++                                list(map(float, match.group(2).split(", ")))):
+                             dictionary[tuple(given_values + [value])] = prob
+                     write("""dictionary_%(var)s = %(dict)s
+ def %(function)s(%(given)s, %(var)s):
+--- bayesian/linear_algebra.py	(original)
++++ bayesian/linear_algebra.py	(refactored)
+@@ -135,7 +135,7 @@
+ 
+ def inner_product(x, y):
+     assert len(x) == len(y)
+-    return sum(map(lambda (x, y): x * y, zip(x, y)))
++    return sum([x_y[0] * x_y[1] for x_y in zip(x, y)])
+ 
+ 
+ def zeros(size):

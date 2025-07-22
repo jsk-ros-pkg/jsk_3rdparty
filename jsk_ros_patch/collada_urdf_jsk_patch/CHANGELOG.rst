@@ -2,6 +2,118 @@
 Changelog for package collada_urdf_jsk_patch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+* [ros-o] collada_urdf_jsk_patch: skip cmake/pkg config generation (`#517 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/517>`_)
+* Contributors: Kei Okada
+
+2.1.29 (2025-01-05)
+-------------------
+* Support ros-o / Ubuntu 22.04 (`#512 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/512>`_)
+
+  * [collada_urdf_jsk_patch] [ros-o] add CATKIN_IGNORE only when ROS-O, use STREQUAL to compare ROS_DISTRO in cmake
+  * [collada_urdf_jsk_patch] [ros-o] ignore it because no longer needed
+
+* Contributors: Yoshiki Obinata
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+
+2.1.22 (2021-06-10)
+-------------------
+
+2.1.21 (2020-08-19)
+-------------------
+* add missing packages, closes https://github.com/ros/rosdistro/pull/26216 (`#211 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/211>`_)
+
+* Contributors: Kei Okada
+
+2.1.20 (2020-08-07)
+-------------------
+* apply fix_issue_18 only for collada_urdf 1.12.12 (`#209 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/209>`_)
+
+  * add https://github.com/Naoki-Hiraoka/collada_urdf/commit/c37592e86af2d949479e3db9e271e34ff8eff189
+  * use collada_urdf 1.12.12 for melodic and later
+  * fix bug introduced in 0c200c7ce26cdf3c16f36cf5dd68d05ee06775e2
+
+* Contributors: Kei Okada
+
+2.1.19 (2020-07-21)
+-------------------
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * collada_urdf_jsk_patch : use download_unpack_build instead of git_checkout
+  * remove collada_urdf from find_packaeg(catkin) unitl assimp_devel v5.0.1 released
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+* collada_urdf_jsk_patch: std=gnu++11 need for kinetic and later (`#154 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/154>`_)
+* Contributors: Kei Okada
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+
 2.1.4 (2017-07-16)
 ------------------
 

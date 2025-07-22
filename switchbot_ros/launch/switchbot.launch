@@ -1,0 +1,28 @@
+<launch>
+  <arg name="token" />
+  <arg name="secret" default="''" />
+  <arg name="respawn" default="true" />
+  <arg name="pub_status" default="false" />
+  <arg name="pub_status_rate" default="0.1" />
+  <arg name="pub_device_name" default="bot74a" />
+
+  <node name="switchbot_ros" pkg="switchbot_ros" type="switchbot_ros_server.py"
+        respawn="$(arg respawn)" output="screen">
+    <rosparam subst_value="true">
+      token: $(arg token)
+      secret: $(arg secret)
+    </rosparam>
+  </node>
+
+  <node if="$(arg pub_status)"
+        name="switchbot_status_publisher" pkg="switchbot_ros" type="switchbot_status_publisher.py"
+        respawn="$(arg respawn)" output="screen">
+    <rosparam subst_value="true">
+      token: $(arg token)
+      secret: $(arg secret)
+      device_name: $(arg pub_device_name)
+      rate: $(arg pub_status_rate)
+    </rosparam>
+  </node>
+
+</launch>

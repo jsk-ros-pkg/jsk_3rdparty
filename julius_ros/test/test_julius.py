@@ -14,7 +14,10 @@ class TestJulius(unittest.TestCase):
         self.transcripts.append(msg.transcript[0])
 
     def test_julius(self):
-        expected_sentences = ['わかめ', 'きつね']
+        if rospy.get_param('~dnn', False):
+            expected_sentences = [' わかめ 。']
+        else:
+            expected_sentences = ['わかめ', 'きつね']
         self.transcripts = []
         sub = rospy.Subscriber("speech_to_text", SpeechRecognitionCandidates,
                                self.on_speech)
@@ -22,7 +25,7 @@ class TestJulius(unittest.TestCase):
         start_time = rospy.Time.now()
         while len(self.transcripts) < len(expected_sentences):
             rospy.sleep(1)
-            if (rospy.Time.now() - start_time).to_sec() > 20:
+            if (rospy.Time.now() - start_time).to_sec() > 60:
                 self.fail("Timeout.")
 
         for s in expected_sentences:

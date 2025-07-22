@@ -1,0 +1,34 @@
+<launch>
+
+  <arg name="device" default="" />
+  <arg name="launch_sound_play" default="true" />
+  <arg name="sound_play_respawn" default="true"
+       doc="Respawn sound_play node or not (default: true)" />
+  <arg name="default_speaker" default="$(optenv VOICEVOX_DEFAULT_SPEAKER_ID 2)"
+       doc="Default speaker for VOICEVOX" />
+  <arg name="host" default="$(optenv VOICEVOX_TEXTTOSPEECH_URL localhost)" />
+  <arg name="port" default="$(optenv VOICEVOX_TEXTTOSPEECH_PORT 50021)" />
+  <arg name="cpu_num_threads" default="1"
+       doc="Number of cpu threads" />
+
+  <node name="voicevox_server"
+        pkg="voicevox" type="run-voicevox"
+        args="--voicelib_dir=$(find voicevox)/voicevox_core --host $(arg host) --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --load_all_models --"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+  </node>
+
+  <node if="$(arg launch_sound_play)"
+        name="sound_play_jp"
+        pkg="sound_play" type="soundplay_node.py"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+    <remap from="robotsound" to="robotsound_jp"/>
+    <remap from="sound_play" to="robotsound_jp"/>
+    <env name="VOICEVOX_DEFAULT_SPEAKER_ID" value="$(arg default_speaker)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(arg host)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(arg port)" />
+    <env name="PATH" value="$(find voicevox)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+  </node>
+</launch>

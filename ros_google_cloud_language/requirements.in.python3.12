@@ -1,0 +1,10 @@
+google-api-core[grpc]==2.16.2  # via google-cloud-language
+google-auth==2.25.2       # via google-api-core
+google-cloud-language==2.13.4  # via -r requirements.in
+googleapis-common-protos==1.62.0  # via google-api-core
+grpcio==1.59.5            # via google-api-core
+protobuf<=5.28.3          # via google-api-core, googleapis-common-protos
+requests-oauthlib==2.0.0
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

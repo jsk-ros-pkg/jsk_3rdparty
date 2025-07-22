@@ -3,7 +3,6 @@ project(pgm_learner)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  std_msgs
   rospy
 )
 
@@ -33,7 +32,6 @@ add_service_files(
 
 generate_messages(
   DEPENDENCIES
-  std_msgs
 )
 
 catkin_package()
@@ -45,7 +43,10 @@ install(
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(test/test_discrete_bn.test)
-  add_rostest(test/test_lg_bn.test)
+  # python-libpgm-pip did not work with python3
+  if ("$ENV{ROS_PYTHON_VERSION}" STREQUAL "2")
+    find_package(rostest REQUIRED)
+    add_rostest(test/test_discrete_bn.test)
+    add_rostest(test/test_lg_bn.test)
+  endif()
 endif()

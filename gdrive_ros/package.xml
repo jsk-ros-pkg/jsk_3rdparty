@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="1">
+  <name>gdrive_ros</name>
+  <version>2.1.31</version>
+  <description>Google drive upload and download package</description>
+
+  <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
+  <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>
+
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/gdrive_ros</url>
+  <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
+  <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>catkin_virtualenv</build_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>message_runtime</run_depend>
+
+  <test_depend>rostest</test_depend>
+  <test_depend>roslaunch</test_depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
+</package>

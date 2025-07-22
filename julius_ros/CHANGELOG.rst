@@ -2,6 +2,129 @@
 Changelog for package julius_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.31 (2025-05-13)
+-------------------
+
+2.1.30 (2025-05-10)
+-------------------
+* [ros-o] julius: use system install julius (`#518 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/518>`_)
+* julius_ros/scripts/run_julius.sh: more information on how to install julius and grammer/dictation kit
+* [ros-o] julius: use system install julius, download dictation and grammer kit by script
+* Contributors: Kei Okada
+
+2.1.29 (2025-01-05)
+-------------------
+* GA: relax failed test dialogflow_task_executive, julius_ros (`#497 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/497>`_)
+* Contributors: Kei Okada
+
+2.1.28 (2023-07-24)
+-------------------
+
+2.1.27 (2023-06-24)
+-------------------
+* fix package.xml/CMakeLists.txt to supress catkin_lint errors (`#479 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/479>`_)
+* Contributors: Kei Okada
+
+2.1.26 (2023-06-14)
+-------------------
+* add LICENSE files (`#476 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/476>`_)
+* Contributors: Kei Okada
+
+2.1.25 (2023-06-08)
+-------------------
+* Pr/use sound themes freedesktop (`#472 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/472>`_)
+* add test to check if ros node is loadable (`#463 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/463>`_)
+* Contributors: Kei Okada, Koki Shinjo
+
+2.1.24 (2021-07-26)
+-------------------
+
+2.1.23 (2021-07-21)
+-------------------
+* Add DNN version julius (`#259 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/259>`_)
+
+  * Fix order of args in julius.launch
+  * Update README
+  * Do not use git-lfs and revert unnecessary change
+  * Add julius_ros test for DNN version
+  * Use audio port instead of microphone input
+  * Update README and julius.launch arg doc
+  * Use Julius config file in julius_ros
+  * Fix typo: input audio via port
+
+* Contributors: Naoya Yamaguchi
+
+2.1.22 (2021-06-10)
+-------------------
+
+2.1.21 (2020-08-19)
+-------------------
+
+2.1.20 (2020-08-07)
+-------------------
+
+2.1.19 (2020-07-21)
+-------------------
+* fix typo in julius_client.py (`#203 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/203>`_)
+* add more arg options for julius.launch (`#144 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/144>`_)
+
+  * add julius_output args
+  * add julius_args
+  * add args for device,channels,depth,sample_rate,format
+
+* Contributors: Kei Okada, Shingo Kitagawa
+
+2.1.18 (2020-07-20)
+-------------------
+* Fix for noetic (`#200 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/200>`_)
+
+  * julius_ros: fix for python3, specially str <-> bytes
+  * fix 2to3, with print, raise, exception
+  * use package.xml format 3 for package contains python depends
+
+* Contributors: Kei Okada
+
+2.1.17 (2020-04-16)
+-------------------
+
+2.1.16 (2020-04-16)
+-------------------
+
+2.1.15 (2019-12-12)
+-------------------
+
+2.1.14 (2019-11-21)
+-------------------
+* set SoundRequest.volume for kinetic (`#173 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/173>`_)
+* Contributors: Kei OKada
+
+2.1.13 (2019-07-10)
+-------------------
+
+2.1.12 (2019-05-25)
+-------------------
+
+2.1.11 (2018-08-29)
+-------------------
+
+2.1.10 (2018-04-25)
+-------------------
+
+2.1.9 (2018-04-24)
+------------------
+
+2.1.8 (2018-04-17)
+------------------
+
+2.1.7 (2018-04-09)
+------------------
+
+2.1.6 (2017-11-21)
+------------------
+
+2.1.5 (2017-11-20)
+------------------
+
 2.1.4 (2017-07-16)
 ------------------
 * [julius_ros] set timeout to self.play_sound(self.start_signal) (`#116 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/116>`_)

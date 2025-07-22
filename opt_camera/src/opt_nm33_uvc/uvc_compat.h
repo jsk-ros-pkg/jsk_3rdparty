@@ -183,7 +183,9 @@ enum  v4l2_exposure_auto_type {
 #endif
 
 #define V4L2_CID_ROLL_ABSOLUTE			(V4L2_CID_CAMERA_CLASS_BASE+17)
+#ifndef V4L2_CID_IRIS_ABSOLUTE
 #define V4L2_CID_IRIS_ABSOLUTE			(V4L2_CID_CAMERA_CLASS_BASE+18)
+#endif
 
 #ifdef __KERNEL__
 

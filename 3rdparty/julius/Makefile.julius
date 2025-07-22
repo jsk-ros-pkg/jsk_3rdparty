@@ -5,8 +5,9 @@ all: installed.julius
 VERSION = 4.4.2
 FILENAME = julius-$(VERSION).tar.gz
 TARBALL = build/$(FILENAME)
-TARBALL_URL = "https://github.com/julius-speech/julius/archive/v$(VERSION).tar.gz"
-TARBALL_PATCH =
+TARBALL_URL = "https://github.com/jsk-ros-pkg/archives/raw/master/$(FILENAME)"
+PATCH_DIR = $(CURDIR)/patch
+TARBALL_PATCH = $(PATCH_DIR)/config.patch $(PATCH_DIR)/aarch64.patch
 SOURCE_DIR = build/julius-$(VERSION)
 UNPACK_CMD = tar xf
 MD5SUM_DIR = $(CURDIR)/md5sum
@@ -18,9 +19,12 @@ INSTALL_DIR = `rospack find julius`
 # Compiler Options (see http://julius.osdn.jp/juliusbook/ja/desc_install.html for detail)
 LIBSENT_OPTION =
 LIBJULIUS_OPTION = "--enable-decoder-vad"
-
+ifndef DEB_TARGET_GNU_TYPE
+	DEB_TARGET_GNU_TYPE = x86_64-linux-gnu
+endif
 installed.julius: $(SOURCE_DIR)/unpacked
-	(cd $(SOURCE_DIR); unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && ./configure --prefix=$(INSTALL_DIR) $(LIBSENT_OPTION) $(LIBJULIUS_OPTION); make; make install)
+	echo $DEB_TARGET_GNU_TYPE
+	(cd $(SOURCE_DIR); unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && ./configure --build=$(DEB_TARGET_GNU_TYPE) --prefix=$(INSTALL_DIR) $(LIBSENT_OPTION) $(LIBJULIUS_OPTION); make; make install)
 	touch installed.julius
 
 clean:

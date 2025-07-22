@@ -1,0 +1,13 @@
+<library path="lib/libzdepth_image_transport">
+  <class name="image_transport/zdepth_pub" type="zdepth_image_transport::ZDepthPublisher" base_class_type="image_transport::PublisherPlugin">
+    <description>
+      This plugin publishes a zdepth version of the image.
+    </description>
+  </class>
+
+  <class name="image_transport/zdepth_sub" type="zdepth_image_transport::ZDepthSubscriber" base_class_type="image_transport::SubscriberPlugin">
+    <description>
+      This plugin subscribes a zdepth version of the image.
+    </description>
+  </class>
+</library>
