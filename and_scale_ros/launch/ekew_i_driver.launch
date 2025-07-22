@@ -1,8 +1,21 @@
 <launch>
+
+  <arg name="port" default="/dev/ttyUSB0"
+       doc="Port connecting with target scale" />
+  <arg name="baud" default="2400"
+       doc="Baud rate of target scale" />
+  <arg name="rate" default="10"
+       doc="Target Hz of the reading loop. The actual Hz will be the same as or lower than this" />
+  <arg name="timeout" default="1"
+       doc="Timeout [sec] of serial communication. If the communication times out, the node quits and restarts" />
+
   <node name="ekew_i_driver" pkg="and_scale_ros" type="ekew_i_driver.py" respawn="true">
-    <rosparam>
-      port: /dev/ttyUSB0
-      timeout: 1
+    <rosparam subst_value="true">
+      port: $(arg port)
+      baud: $(arg baud)
+      rate: $(arg rate)
+      timeout: $(arg timeout)
     </rosparam>
   </node>
+
 </launch>

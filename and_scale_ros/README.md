@@ -24,3 +24,8 @@ You can get scale value:
 ``` bash
 rostopic echo /ekew_i_driver/output
 ```
+
+To check more options, run:
+``` bash
+roslaunch and_scale_ros ekew_i_driver.launch --ros-args
+```
