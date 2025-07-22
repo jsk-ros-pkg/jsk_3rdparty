@@ -41,8 +41,9 @@ import rospy
 class EkEwIDriver(object):
 
     """Read data from EK-i/EW-i scale.
-
-    Data Sheet: https://www.aandd.co.jp/adhome/pdf/manual/balance/ekew-i.pdf
+    Data Sheet: https://www.aandd.co.jp/pdf_storage/manual/balance/m_ekew-i.pdf
+    This class should also work with other A&D scales supporting A&D standard format
+    (e.g., FZ-i/FX-i/FZ-iWP/FX-iWP (https://www.aandd.co.jp/pdf_storage/manual/balance/m_fzi_fxi_fziwp_fxiwp.pdf))
     """
 
     def __init__(self):
