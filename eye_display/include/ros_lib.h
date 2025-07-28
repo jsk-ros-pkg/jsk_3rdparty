@@ -92,9 +92,24 @@ std::string ros_read_asset()
     // upperlid_position, upperlid_default_pos_x, upperlid_default_pos_y, upperlid_default_theta
     std::vector<int> position;
     snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position", name.c_str());
-    if (nh.getParam(eye_asset_map_key, position)) {
+    if (nh.getParam(eye_asset_map_key, position, 300)) {  // timeout == 300
       oss << "eye_asset_position: " << name << ": upperlid: " << joinVector(position) << "\n";
-    }
+    } else { // v2 API, upperlid_position_x, upperlid_position_y, upperlid_rotate_theta instead of upperlid_position
+      nh.logwarn("Using v2 API (position_x, position_y, rotation_theta). Please ignore the above 'Parameter %sn does not exist' message", eye_asset_map_key);
+      std::vector<int> position_x, position_y, rotation_theta;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position_x", name.c_str());
+      if (nh.getParam(eye_asset_map_key, position_x)) {
+        oss << "eye_asset_position_x: " << name << ": upperlid: " << joinVector(position_x) << "\n";
+      }
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position_y", name.c_str());
+      if (nh.getParam(eye_asset_map_key, position_y)) {
+        oss << "eye_asset_position_y: " << name << ": upperlid: " << joinVector(position_y) << "\n";
+      }
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_rotation_theta", name.c_str());
+      if (nh.getParam(eye_asset_map_key, rotation_theta)) {
+        oss << "eye_asset_rotation_theta: " << name << ": upperlid: " << joinVector(rotation_theta) << "\n";
+      }
+    } //v2 API
     for(const std::string& pos: {"default_pos_x", "default_pos_y", "default_theta"}) {
       int data;
       snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_%s", name.c_str(), pos.c_str());

@@ -25,7 +25,9 @@ struct EyeAsset {
  std::string path_pupil = "/pupil.jpg";        //  move along with iris
  std::string path_reflex = "/reflex.jpg" ;     //  move along with puppil + random motion
  std::string path_upperlid = "/upperlid.jpg";  // use upperlid_position_map to set y-axis motoin
- std::vector<int> upperlid_position = {0};   // upperlid = motion layer
+ std::vector<int> upperlid_position_x = {0};   // upperlid = motion layer
+ std::vector<int> upperlid_position_y = {0};   // upperlid = motion layer
+ std::vector<int> upperlid_rotation_theta = {0};   // upperlid = motion layer
  int direction = 0;
  bool invert_rl = false;
  int upperlid_pivot_x = 75;
@@ -277,13 +279,17 @@ std::string EyeManager::get_emotion() {
 
 int EyeManager::update_emotion() {
     EyeAsset& current_eye_asset = eye_asset_map[current_eye_asset_name];
-    float upperlid_y;
-    if (current_eye_asset.upperlid_position.size() > 0) {
-      upperlid_y = current_eye_asset.upperlid_position[frame % current_eye_asset.upperlid_position.size()];
-    }else{
-      upperlid_y = 0;
+    float upperlid_x = 0, upperlid_y = 0, upperlid_theta = 0;
+    if (current_eye_asset.upperlid_position_x.size() > 0) {
+      upperlid_x = current_eye_asset.upperlid_position_x[frame % current_eye_asset.upperlid_position_x.size()];
     }
-    update_look(look_x, look_y, 0, upperlid_y);  // dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid
+    if (current_eye_asset.upperlid_position_y.size() > 0) {
+      upperlid_y = current_eye_asset.upperlid_position_y[frame % current_eye_asset.upperlid_position_y.size()];
+    }
+    if (current_eye_asset.upperlid_rotation_theta.size() > 0) {
+      upperlid_theta = current_eye_asset.upperlid_rotation_theta[frame % current_eye_asset.upperlid_rotation_theta.size()];
+    }
+    update_look(look_x, look_y, upperlid_x, upperlid_y, upperlid_theta);  // dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid
     frame ++;
     return frame;
 }
@@ -355,7 +361,7 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
         logerror("Invalid eye_asset type_path : %s (%s,%s)", type_path.c_str(), type.c_str(), path.c_str());
         return -1;
       }
-    } else if ( key == "eye_asset_position" ) {
+    } else if ( key == "eye_asset_position" || key == "eye_asset_position_y") {
       std::string name, type_position, type, position;
       splitKeyValue(value, name, type_position);
       check_eye_asset_map_key(name);
@@ -366,12 +372,50 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       EyeAsset *asset = &(eye_asset_map[name]);
       std::list<std::string> eye_asset_upperlid_position = splitComma(position);
       if ( type == "upperlid" ) {
-        asset->upperlid_position.clear();
+        asset->upperlid_position_y.clear();
         for(std::string pos: eye_asset_upperlid_position) {
-          asset->upperlid_position.push_back(std::stoi(pos));
+          asset->upperlid_position_y.push_back(std::stoi(pos));
         }
       } else {
         logerror("Invalid eye_asset type_position : %s (%s,%s)", type_position.c_str(), type.c_str(), position.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_position_x" ) {
+      std::string name, type_position_x, type, position_x;
+      splitKeyValue(value, name, type_position_x);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_position_x, type, position_x);
+      //
+      // update eye_asset image map from eye_asset_upperlid_position_x
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      std::list<std::string> eye_asset_upperlid_position_x = splitComma(position_x);
+      if ( type == "upperlid" ) {
+        asset->upperlid_position_x.clear();
+        for(std::string pos: eye_asset_upperlid_position_x) {
+          asset->upperlid_position_x.push_back(std::stoi(pos));
+        }
+      } else {
+        logerror("Invalid eye_asset type_position_x : %s (%s,%s)", type_position_x.c_str(), type.c_str(), position_x.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_rotation_theta" ) {
+      std::string name, type_rotation_theta, type, rotation_theta;
+      splitKeyValue(value, name, type_rotation_theta);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_rotation_theta, type, rotation_theta);
+      //
+      // update eye_asset image map from eye_asset_upperlid_rotation_theta
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      std::list<std::string> eye_asset_upperlid_rotation_theta = splitComma(rotation_theta);
+      if ( type == "upperlid" ) {
+        asset->upperlid_rotation_theta.clear();
+        for(std::string pos: eye_asset_upperlid_rotation_theta) {
+          asset->upperlid_rotation_theta.push_back(std::stoi(pos));
+        }
+      } else {
+        logerror("Invalid eye_asset type_rotation_theta : %s (%s,%s)", type_rotation_theta.c_str(), type.c_str(), rotation_theta.c_str());
         return -1;
       }
     } else if ( key == "eye_asset_default_pos_x" ) {
@@ -441,9 +485,16 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     loginfo("   reflex image : %s", eye_asset.path_reflex.c_str());
     loginfo(" upperlid image : %s", eye_asset.path_upperlid.c_str());
     std::ostringstream oss;
-    std::copy(eye_asset.upperlid_position.begin(), eye_asset.upperlid_position.end(), std::ostream_iterator<float>(oss, ", "));
-    std::string result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
-    loginfo(" upperlid_positions: %s", result.c_str());
+    std::string result;
+    std::copy(eye_asset.upperlid_position_x.begin(), eye_asset.upperlid_position_x.end(), std::ostream_iterator<float>(oss, ", "));
+    result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
+    loginfo(" upperlid_position_x: %s", result.c_str());
+    std::copy(eye_asset.upperlid_position_y.begin(), eye_asset.upperlid_position_y.end(), std::ostream_iterator<float>(oss, ", "));
+    result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
+    loginfo(" upperlid_position_y: %s", result.c_str());
+    std::copy(eye_asset.upperlid_rotation_theta.begin(), eye_asset.upperlid_rotation_theta.end(), std::ostream_iterator<float>(oss, ", "));
+    result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
+    loginfo(" upperlid_rotation_theta: %s", result.c_str());
     loginfo(" upperlid_default_pos_x : %d", eye_asset.upperlid_default_pos_x);
     loginfo(" upperlid_default_pos_y : %d", eye_asset.upperlid_default_pos_y);
     loginfo(" upperlid_default_theta : %d", eye_asset.upperlid_default_theta);
