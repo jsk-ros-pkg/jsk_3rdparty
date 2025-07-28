@@ -117,6 +117,19 @@ roslaunch eye_display demo.launch use_i2c:=true i2c_device:=<device number> i2c_
 
 See `node_scripts/ros_to_i2c.py` for control protocol.
 
+#### Dual eye mode
+
+You can start two device with `demo_dual.launch`
+
+```bash
+roslaunch eye_display demo_dual.launch use_i2c:=false port_right:=/dev/ttyACM0 port_left:=/dev/ttyACM1 baud:=115200 debug:=true
+```
+
+You can control dual eye status with demo scripts
+```bash
+rosrun eye_display pub_eye_status.py --dual --rate 0.3 --names sleepy surprised happy
+```
+
 ### Description of direction
 
 ![eye_display_direction](./doc/eye_display_direction.svg)
