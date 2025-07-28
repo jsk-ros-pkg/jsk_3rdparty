@@ -147,6 +147,9 @@ void setup_asset(EyeManager& eye)
 
 void setup_ros()
 {
+#if defined(STAMPC3)
+  nh.getHardware()->setBaud(115200);
+#endif
   nh.initNode();
   nh.subscribe(sub_point);
   nh.subscribe(sub_eye_status);
