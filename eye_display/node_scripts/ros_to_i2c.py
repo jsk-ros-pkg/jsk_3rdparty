@@ -98,31 +98,20 @@ def main():
    send_data_to_i2c("eye_asset_names: {}".format(', '.join(eye_asset_names)))
 
    for name in eye_asset_names:
-      path_outline = rospy.get_param("~eye_asset/{}/path_outline".format(name), None)
-      path_iris = rospy.get_param("~eye_asset/{}/path_iris".format(name), None)
-      path_pupil = rospy.get_param("~eye_asset/{}/path_pupil".format(name), None)
-      path_reflex = rospy.get_param("~eye_asset/{}/path_reflex".format(name), None)
-      path_upperlid = rospy.get_param("~eye_asset/{}/path_upperlid".format(name), None)
-      upperlid_position = rospy.get_param("~eye_asset/{}/upperlid_position".format(name), None)
-      upperlid_default_pos_x = rospy.get_param("~eye_asset/{}/upperlid_default_pos_x".format(name), None)
-      upperlid_default_pos_y = rospy.get_param("~eye_asset/{}/upperlid_default_pos_y".format(name), None)
-      upperlid_default_theta = rospy.get_param("~eye_asset/{}/upperlid_default_theta".format(name), None)
-
-      rospy.loginfo("{}".format(name))
-      rospy.loginfo("  outline image : {}".format(path_outline)) if path_outline is not None else None
-      rospy.loginfo("     iris image : {}".format(path_iris)) if path_iris is not None else None
-      rospy.loginfo("    pupil image : {}".format(path_pupil)) if path_pupil is not None else None
-      rospy.loginfo("   reflex image : {}".format(path_reflex)) if path_reflex is not None else None
-      rospy.loginfo(" upperlid image : {}".format(path_upperlid)) if path_upperlid is not None else None
-      rospy.loginfo(" upperlid_position: {}".format(upperlid_position)) if upperlid_position is not None else None
-      rospy.loginfo(" upperlid_default_pos_x : {}".format(upperlid_default_pos_x)) if upperlid_default_pos_x is not None else None
-      rospy.loginfo(" upperlid_default_pos_y : {}".format(upperlid_default_pos_y)) if upperlid_default_pos_y is not None else None
-      rospy.loginfo(" upperlid_default_theta : {}".format(upperlid_default_theta)) if upperlid_default_theta is not None else None
-
-      send_data_to_i2c("eye_asset_images: {}: {}".format(name, ', '.join(x if x else '' for x in [path_outline, path_iris, path_pupil, path_reflex, path_upperlid])))
-      send_data_to_i2c("eye_asset_upperlid_position: {}: {}".format(name, ', '.join(str(x) for x in upperlid_position)))
-      send_data_to_i2c("eye_asset_upperlid_default: {}: {}".format(name, ', '.join([str(x) if x is not None else '' for x in [upperlid_default_pos_x, upperlid_default_pos_y, upperlid_default_theta]])))
-
+      eye_asset_params = rospy.get_param("~eye_asset/{}".format(name))
+      for key, value in eye_asset_params.items():
+         # image path : cehck if key start with path_
+         if key.startswith("path_"):
+            eye_type = key[len("path_"):]
+            send_data_to_i2c("eye_asset_image_path: {}: {}: {}".format(name, eye_type, value))
+         # position*
+         if "_position" in key:
+            eye_type = key[:key.find("_position")]
+            send_data_to_i2c("eye_asset_{}: {}: {}: {}".format(key[len(eye_type)+1:], name, eye_type, value))
+         # default_*
+         if "_default" in key:
+            eye_type = key[:key.find("_default")]
+            send_data_to_i2c("eye_default_{}: {}: {}: {}".format(key[len(eye_type)+1:], name, eye_type, value))
 
    # start subscriber
    rospy.Subscriber('~eye_status', String, eye_status_cb)

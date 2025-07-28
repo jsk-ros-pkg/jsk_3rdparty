@@ -9,6 +9,15 @@
 #include <Arduino.h>
 #include <SPIFFS.h>
 
+#include "util.h"
+
+//  should be implemented in {ros,i2c}_lib.h
+extern void logdebug(const char *fmt, ...);
+extern void loginfo(const char *fmt, ...);
+extern void logwarn(const char *fmt, ...);
+extern void logerror(const char *fmt, ...);
+extern void logfatal(const char *fmt, ...);
+
 struct EyeAsset {
  std::string name = "default";
  std::string path_outline = "/outline.jpg";    // static
@@ -60,12 +69,6 @@ private:
 
   int frame = 0;
 
-  virtual void logdebug(const char *fmt, ...) = 0;
-  virtual void loginfo(const char *fmt, ...) = 0;
-  virtual void logwarn(const char *fmt, ...) = 0;
-  virtual void logerror(const char *fmt, ...) = 0;
-  virtual void logfatal(const char *fmt, ...) = 0;
-
   void load_eye_images();
   bool draw_image_file(LGFX_Sprite& sprite, const char* filePath);
 
@@ -76,6 +79,7 @@ public:
   EyeManager();
 
   void init(const int image_width, const int image_height);
+  int setup_asset(std::string eye_asset_text);
   void set_gaze_direction(float look_x, float look_y);
   void set_emotion(const std::string eye_status_name);
   std::string get_emotion();
@@ -154,16 +158,16 @@ bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath)
     bool ret = false;
 
     if (extension == "jpg" || extension == "jpeg") {
-      logdebug("loading jpeg: %s", filePath);
+      logdebug("[%8ld] loading jpeg: %s", millis(), filePath);
       ret = sprite.drawJpgFile(SPIFFS, filePath);
     } else if (extension == "png") {
-      logdebug("loading png: %s", filePath);
+      logdebug("[%8ld] loading png: %s", millis(), filePath);
       ret = sprite.drawPngFile(SPIFFS, filePath);
     } else {
-      logerror("invalid image extension %s", filePath);
+      logerror("[%8ld] invalid image extension %s", millis(), filePath);
     }
     if (not ret) {
-      logerror("Failed to load %s", filePath);
+      logerror("[%8ld] Failed to load %s", millis(), filePath);
     }
     return ret;
 }
@@ -173,7 +177,7 @@ void EyeManager::set_gaze_direction(float look_x, float look_y)
 {
     this->look_x = look_x;
     this->look_y = look_y;
-    loginfo("Look at (%.1f, %.1f)", look_x, look_y);
+    loginfo("[%8ld] Look at (%.1f, %.1f)", millis(), look_x, look_y);
 }
 
 // 目の状態を更新する
@@ -231,7 +235,7 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
           float random_scale = 5.0)
 {
     EyeAsset& current_eye_asset = eye_asset_map[current_eye_asset_name];
-    logdebug("[update_look] dx: %.1f, dy: %.1f, dx_upperlid: %d, dy_upperlid: %d, dtheta_upperlid: %d, random_scale: %.1f", dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid, random_scale);
+    logdebug("[%8ld] [update_look] dx: %.1f, dy: %.1f, dx_upperlid: %d, dy_upperlid: %d, dtheta_upperlid: %d, random_scale: %.1f", millis(), dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid, random_scale);
 
     long rx = (int)(random_scale * random(100) / 100);
     long ry = (int)(random_scale * random(100) / 100);
@@ -255,15 +259,15 @@ void EyeManager::set_emotion(const std::string eye_status_name) {
   frame = 0;  // reset frame cound for synchronize
   auto it = eye_asset_map.find(eye_status_name);
   if (it == eye_asset_map.end()) {
-    logerror("Unknown eye_asset status name %s", eye_status_name.c_str());
-    logerror("possible status are");
+    logerror("[%8ld] Unknown eye_asset status name %s", millis(), eye_status_name.c_str());
+    logerror("[%8ld] possible status are", millis());
     for(auto & eye_asset: eye_asset_map) {
-      logerror("... [%s]", eye_asset.first.c_str());
+      logerror("[%8ld] ... [%s]", millis(), eye_asset.first.c_str());
     }
     return;
   }
   current_eye_asset_name = it->first;
-  loginfo("Status updated: %s", it->first.c_str());
+  loginfo("[%8ld] Status updated: %s", millis(), it->first.c_str());
   load_eye_images();
 }
 
@@ -284,15 +288,179 @@ int EyeManager::update_emotion() {
     return frame;
 }
 
+#define check_eye_asset_map_key(name) \
+  if (eye_asset_map.find(name) == eye_asset_map.end()) {        \
+    logerror("Invalid eye_asset_map_key : [%s]", name.c_str()); \
+    logerror("Available keys are...");                          \
+    for(auto & eye_asset: eye_asset_map) {                      \
+      logerror(" ... [%s]", eye_asset.first.c_str());           \
+    }                                                           \
+    return -1;                                                  \
+  }
+
+int EyeManager::setup_asset(std::string eye_asset_text) {
+  static bool mode_right;
+  static int direction;
+
+  loginfo("Setup eye asset");
+  std::istringstream iss(eye_asset_text);
+  std::string message;
+  while (std::getline(iss, message)) {
+    if ( message.empty() ) { continue; }
+    std::string key, value;
+    splitKeyValue(message, key, value);
+    logdebug("received : %s", message.c_str());
+    if ( key == "mode_right" ) {
+      if ( value == "True" ) {
+        mode_right = true;
+      } else if ( value == "False" ) {
+        mode_right = false;
+      } else {
+        logerror("Invalid command for mode_right : %s", value.c_str());
+      }
+    } else if ( key == "direction" ) {
+      direction = std::stoi(value);
+    } else if ( key == "eye_asset_names" ) {
+      std::list<std::string> eye_asset_names = splitComma(value);
+      //
+      // initialize eye_asset_map from eye_asset_names
+      //
+      //std::map<std::string, EyeAsset>& eye_asset_map = this->eye_asset_map;
+      for(auto name: eye_asset_names) {
+        eye_asset_map[name] = EyeAsset();
+        eye_asset_map[name].name = name;
+        eye_asset_map[name].direction = direction;
+        eye_asset_map[name].invert_rl = not mode_right;
+      }
+    } else if ( key == "eye_asset_image_path" ) {
+      std::string name, type_path, type, path;
+      splitKeyValue(value, name, type_path);
+      //      check_eye_asset_map_key(name);
+      splitKeyValue(type_path, type, path);
+      //
+      // update eye_asset image map from eye_asset_images
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      if ( type == "outline" ) {
+        asset->path_outline = path;
+      } else if ( type == "iris" ) {
+        asset->path_iris = path;
+      } else if ( type == "pupil" ) {
+        asset->path_pupil = path;
+      } else if ( type == "reflex" ) {
+        asset->path_reflex = path;
+      } else if ( type == "upperlid" ) {
+        asset->path_upperlid = path;
+      } else {
+        logerror("Invalid eye_asset type_path : %s (%s,%s)", type_path.c_str(), type.c_str(), path.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_position" ) {
+      std::string name, type_position, type, position;
+      splitKeyValue(value, name, type_position);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_position, type, position);
+      //
+      // update eye_asset image map from eye_asset_upperlid_position
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      std::list<std::string> eye_asset_upperlid_position = splitComma(position);
+      if ( type == "upperlid" ) {
+        asset->upperlid_position.clear();
+        for(std::string pos: eye_asset_upperlid_position) {
+          asset->upperlid_position.push_back(std::stoi(pos));
+        }
+      } else {
+        logerror("Invalid eye_asset type_position : %s (%s,%s)", type_position.c_str(), type.c_str(), position.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_default_pos_x" ) {
+      std::string name, type_default_pos_x, type, default_pos_x;
+      splitKeyValue(value, name, type_default_pos_x);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_default_pos_x, type, default_pos_x);
+      //
+      // update eye_asset image map from eye_asset_default_pos_x
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      if ( type == "upperlid" ) {
+        asset->upperlid_default_pos_x = std::stoi(default_pos_x);
+      } else {
+        logerror("Invalid eye_asset type_default_pos_x : %s (%s,%s)", type_default_pos_x.c_str(), type.c_str(), default_pos_x.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_default_pos_y" ) {
+      std::string name, type_default_pos_y, type, default_pos_y;
+      splitKeyValue(value, name, type_default_pos_y);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_default_pos_y, type, default_pos_y);
+      //
+      // update eye_asset image map from eye_asset_default_pos_y
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      if ( type == "upperlid" ) {
+        asset->upperlid_default_pos_y = std::stoi(default_pos_y);
+      } else {
+        logerror("Invalid eye_asset type_default_pos_y : %s (%s,%s)", type_default_pos_y.c_str(), type.c_str(), default_pos_y.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_default_theta" ) {
+      std::string name, type_default_theta, type, default_theta;
+      splitKeyValue(value, name, type_default_theta);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_default_theta, type, default_theta);
+      //
+      // update eye_asset image map from eye_asset_default_theta
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      if ( type == "upperlid" ) {
+        asset->upperlid_default_theta = std::stoi(default_theta);
+      } else {
+        logerror("Invalid eye_asset type_default_theta : %s (%s,%s)", type_default_theta.c_str(), type.c_str(), default_theta.c_str());
+        return -1;
+      }
+    } else {
+      logerror("Invlalid command : %s (key : %s, value : %s)", message.c_str(), key.c_str(), value.c_str());
+      return -1;
+    }
+  }
+  // display map data
+  // to show this message,
+  //  call rosservice call eye_display/set_logger_level rosout DEBUG
+  // or
+  //  roslaunch launch file with debug:=true
+  for(auto& it: eye_asset_map) {
+    std::string name = it.first;
+    EyeAsset &eye_asset = eye_asset_map[name];
+    loginfo("[%s]", name.c_str());
+    loginfo("     mode_right : %s", eye_asset.invert_rl?"True":"False");
+    loginfo("      direction : %d", eye_asset.direction);
+    loginfo("  outline image : %s", eye_asset.path_outline.c_str());
+    loginfo("     iris image : %s", eye_asset.path_iris.c_str());
+    loginfo("    pupil image : %s", eye_asset.path_pupil.c_str());
+    loginfo("   reflex image : %s", eye_asset.path_reflex.c_str());
+    loginfo(" upperlid image : %s", eye_asset.path_upperlid.c_str());
+    std::ostringstream oss;
+    std::copy(eye_asset.upperlid_position.begin(), eye_asset.upperlid_position.end(), std::ostream_iterator<float>(oss, ", "));
+    std::string result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
+    loginfo(" upperlid_positions: %s", result.c_str());
+    loginfo(" upperlid_default_pos_x : %d", eye_asset.upperlid_default_pos_x);
+    loginfo(" upperlid_default_pos_y : %d", eye_asset.upperlid_default_pos_y);
+    loginfo(" upperlid_default_theta : %d", eye_asset.upperlid_default_theta);
+  }
+  // eyeの初期化
+  if ( !eye_asset_map.empty() ) {
+    set_emotion(eye_asset_map.begin()->first);
+  } else {
+    logwarn("Faile to initialize emotion, use default asset");
+  }
+  return 0;
+}
+
 #if !defined(USE_I2C) && !defined(USE_ROS) // sample code for eye asset without ROS/I2C
-class EyeManagerIO: public EyeManager
-{
-public:
-  EyeManagerIO() : EyeManager() {}
-  void logdebug(const char *fmt, ...) { } // should be implemented in EyeManagerIO class
-  void loginfo(const char *fmt, ...) { } // should be implemented in EyeManagerIO class
-  void logwarn(const char *fmt, ...) { } // should be implemented in EyeManagerIO class
-  void logerror(const char *fmt, ...) { } // should be implemented in EyeManagerIO class
-  void logfatal(const char *fmt, ...) { } // should be implemented in EyeManagerIO class
-};
+void logdebug(const char *fmt, ...) { }
+void loginfo(const char *fmt, ...) { }
+void logwarn(const char *fmt, ...) { }
+void logerror(const char *fmt, ...) { }
+void logfatal(const char *fmt, ...) { }
 #endif
