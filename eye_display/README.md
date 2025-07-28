@@ -99,8 +99,8 @@ If you want to control the device through I2C bus, please use following env.
 
 - `stampc3-i2c-right`: Stamp C3 device on right eye
 - `stampc3-i2c-left`: Stamp C3 device on left eye
-- `stamps3-i2c-right`: Stamp C3 device on right eye
-- `stamps3-i2c-left`: Stamp C3 device on left eye
+- `stamps3-i2c-right`: Stamp S3 device on right eye
+- `stamps3-i2c-left`: Stamp S3 device on left eye
 
 ```bash
 roscd eye_display
@@ -110,6 +110,12 @@ pio run -e stampc3-i2c-right -t upload --upload-port <port to device>
 ```
 
 Then you can control the device with I2C.
+
+```bash
+roslaunch eye_display demo.launch use_i2c:=true i2c_device:=<device number> i2c_bus:=<bus number>
+```
+
+See `node_scripts/ros_to_i2c.py` for control protocol.
 
 ### Description of direction
 

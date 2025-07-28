@@ -1,19 +1,37 @@
 <launch>
-    <arg name="port" />
+    <arg name="port" default="/dev/ttyUSB0" />
     <arg name="baud" default="57600" />
     <arg name="mode_right" default="true" />
     <arg name="direction" default="1" />
     <arg name="eye_asset_file" default="$(find eye_display)/launch/default.yaml" />
     <arg name="debug" default="false"/>
+    <arg name="use_i2c" default="false" />
+    <arg name="i2c_device" default="0x42" />
+    <arg name="i2c_bus" default="0" />
 
     <node
         pkg="rosserial_python"
         type="serial_node.py"
         name="eye_display"
         output="screen"
+	unless="$(arg use_i2c)"
         >
         <param name="port" value="$(arg port)" />
         <param name="baud" value="$(arg baud)" />
+        <param name="mode_right" value="$(arg mode_right)" />
+        <param name="direction" value="$(arg direction)" />
+        <rosparam command="load" ns="eye_asset" file="$(arg eye_asset_file)" />
+        <param name="eye_asset_text" command="cat $(arg eye_asset_file)" />
+    </node>
+    <node
+        pkg="eye_display"
+        type="ros_to_i2c.py"
+        name="eye_display"
+        output="screen"
+	if="$(arg use_i2c)"
+        >
+        <param name="i2c_device" value="$(arg i2c_device)" />
+        <param name="i2c_bus" value="$(arg i2c_bus)" />
         <param name="mode_right" value="$(arg mode_right)" />
         <param name="direction" value="$(arg direction)" />
         <rosparam command="load" ns="eye_asset" file="$(arg eye_asset_file)" />
@@ -24,7 +42,7 @@
           pkg="rosservice"
           type="rosservice"
           name="set_debug_mode"
-          args="call --wait /eye_display/set_logger_level rosout DEBUG"
+          args="call --wait eye_display/set_logger_level rosout DEBUG"
           />
     </group>
 </launch>
