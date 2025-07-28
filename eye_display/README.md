@@ -117,6 +117,11 @@ roslaunch eye_display demo.launch use_i2c:=true i2c_device:=<device number> i2c_
 
 See `node_scripts/ros_to_i2c.py` for control protocol.
 
+To monitor the serial output in the dual I2C mode. Use the following logger tool.
+
+```bash
+./node_scripts/dual_serial_logger.py /dev/ttyACM0 /dev/ttyACM1 115200
+```
 #### Dual eye mode
 
 You can start two device with `demo_dual.launch`
