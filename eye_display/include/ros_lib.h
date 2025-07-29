@@ -74,13 +74,26 @@ std::string ros_read_asset()
   nh.getParam("~eye_asset/names", eye_asset_names);
   oss << "eye_asset_names: ";
   for (auto it = eye_asset_names.begin(); it != eye_asset_names.end(); ++it) {
-    oss << *it;
+    std::string name = *it;
+    std::string suffix = "_extra";
+    if (name.size() >= suffix.size() &&
+        name.rfind(suffix) == name.size() - suffix.size()) {
+        name = name.substr(0, name.size() - suffix.size());
+    }
+    oss << name;
     if (std::next(it) != eye_asset_names.end()) oss << ", ";
   }
   oss << "\n";
   //
   for(auto name: eye_asset_names) {
     char eye_asset_map_key[256];
+    bool have_extra = false;
+    std::string suffix = "_extra";
+    if (name.size() >= suffix.size() &&
+        name.rfind(suffix) == name.size() - suffix.size()) {
+        name = name.substr(0, name.size() - suffix.size());
+        have_extra = true;
+    }
     // path_upperlid
     for(const std::string& type: {"upperlid", "outline", "iris", "pupil", "reflex"}) {
       std::string path;
@@ -115,6 +128,42 @@ std::string ros_read_asset()
       snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_%s", name.c_str(), pos.c_str());
       if (nh.getParam(eye_asset_map_key, &data)) {
         oss << "eye_asset_" << pos << ": " << name << ": upperlid: " << data << "\n";
+      }
+    }
+    // v3 API (extra images)
+    if (have_extra) {
+      for(const std::string& type: {"extra1", "extra2"}) {
+        std::string path;
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_%s", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, path, 300)) {  // timeout == 300
+          oss << "eye_asset_image_path: " << name << ": " << type << ": " << path << "\n";
+        }
+        std::vector<int> position_x, position_y, rotation_theta;
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_position_x", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, position_x)) {
+          oss << "eye_asset_position_x: " << name << ": " << type << ": " << joinVector(position_x) << "\n";
+        }
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_position_y", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, position_y)) {
+          oss << "eye_asset_position_y: " << name << ": " << type << ": " << joinVector(position_y) << "\n";
+        }
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_rotation_theta", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, rotation_theta)) {
+          oss << "eye_asset_rotation_theta: " << name << ": " << type << ": " << joinVector(rotation_theta) << "\n";
+        }
+        int data;
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_pos_x", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, &data)) {
+          oss << "eye_asset_default_pos_x: " << name << ": " << type << ": " << data << "\n";
+        }
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_pos_y", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, &data)) {
+          oss << "eye_asset_default_pos_y: " << name << ": " << type << ": " << data << "\n";
+        }
+        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_theta", name.c_str(), type.c_str());
+        if (nh.getParam(eye_asset_map_key, &data)) {
+          oss << "eye_asset_default_theta: " << name << ": " << type << ": " << data << "\n";
+        }
       }
     }
   }

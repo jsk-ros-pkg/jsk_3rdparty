@@ -77,4 +77,27 @@ std::string joinVector(const std::vector<T>& vec, const std::string& sep = ", ")
   return oss.str();
 }
 
+#if !defined(USE_ROS)  // ROS uses it's own logdebug/loginfo....
+#define def_log_func(funcname)                \
+void funcname(const char *fmt, ...)          {          \
+  char *string;                                         \
+  va_list args;                                         \
+  va_start(args, fmt);                                  \
+  if (0 > vasprintf(&string, fmt, args)) string = NULL; \
+  va_end(args);                                         \
+  if (string) {                                         \
+    Serial.print("[");                                  \
+    Serial.print(#funcname);                            \
+    Serial.print("] ");                                 \
+    Serial.println(string);                             \
+    free(string);                                       \
+  }                                                     \
+};
+def_log_func(logdebug);
+def_log_func(loginfo);
+def_log_func(logwarn);
+def_log_func(logerror);
+def_log_func(logfatal);
+#endif
+
 #endif // __UTIL_H__

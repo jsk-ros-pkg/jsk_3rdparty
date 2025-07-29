@@ -24,13 +24,13 @@ EyeManager eye = EyeManager();
 
 std::string eye_asset_text =
   "eye_asset_names: normal, blink, happy\n"
-  "eye_asset_position: normal: 9\n"
-  "eye_asset_position: blink: 9, 9, 130, 130, 9, 9\n"
+  "eye_asset_position: normal: upperlid: 9\n"
+  "eye_asset_position: blink: upperlid: 9, 9, 130, 130, 9, 9\n"
   "eye_asset_image_path: happy: iris: /white.jpg\n"
   "eye_asset_image_path: happy: pupil: /white.jpg\n"
   "eye_asset_image_path: happy: reflex: /white.jpg\n"
   "eye_asset_image_path: happy: upperlid: /reflex_happy.jpg\n"
-  "eye_asset_position: happy: 130, 131, 132, 133, 134, 135\n";
+  "eye_asset_position: happy: upperlid: 130, 131, 132, 133, 134, 135\n";
 
 
 unsigned long interval_time = 150;  // this will reproduce delay(100)
@@ -44,24 +44,20 @@ void setup()
   SPIFFS.begin();
   Serial.begin(115200);
 
-  // initialize eye manager with current eye asset
-  eye.init();
-  // draw eye image
-  eye.update_look();
-
 #if defined(USE_ROS)  // USE_ROS
   setup_ros();
   eye_asset_text = ros_read_asset();
-#endif
-
-  // initialize eye_asset_map and set current_eye_status
-  eye.setup_asset(eye_asset_text);
-  // draw eye image
-  eye.update_look();
-
-#if defined(USE_I2C)
+#elif defined(USE_I2C)
   setup_i2c();
 #endif
+
+  // initialize eye manager with current eye asset
+  eye.init();
+  // initialize eye_asset_map and set current_eye_status
+  eye.setup_asset(eye_asset_text);
+
+  // draw eye image
+  eye.update_look();
 
   next_time = millis() + interval_time;
   loginfo("[%8ld] setup() done: next_time = %ld", next_time);

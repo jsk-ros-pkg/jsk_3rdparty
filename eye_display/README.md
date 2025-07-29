@@ -135,6 +135,27 @@ You can control dual eye status with demo scripts
 rosrun eye_display pub_eye_status.py --dual --rate 0.3 --names sleepy surprised happy
 ```
 
+#### extra images
+
+If you need more than the standard images (outline, iris, pupil, reflex, upperlid), use the extra　images.
+
+
+```
+  path_extra1: "/krmt_reflex_shine1.png"
+  extra1_default_pos_x: 75
+  extra1_default_pos_y: 75
+  extra1_default_theta: 0
+  extra1_position_x: [  0,  20, 40,  20,   0, -20, -40, -20]
+  extra1_position_y: [ 40,  20,  0, -20, -40, -20,   0,  20]
+  extra1_rotation_theta: [  0,  40,  80,  40,  0,  -40, -80, -40]
+  path_extra2: "/krmt_reflex_heart.png"
+  extra2_position_x: [  0,  20,   0, -20]
+  extra2_position_y: [  0,  10,   0, -10]
+  extra2_rotation_theta: [  0,  -40,  -80,  -40,  0,  40, 80, 40]
+  extra2_default_pos_x: 75
+  extra2_default_pos_y: 75
+  extra2_default_theta: 0
+```
 ### Description of direction
 
 ![eye_display_direction](./doc/eye_display_direction.svg)
