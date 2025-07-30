@@ -97,16 +97,14 @@ $rosparam get eye_display/eye_asset/names
 
 If you want to control the device through I2C bus, please use following env.
 
-- `stampc3-i2c-right`: Stamp C3 device on right eye
-- `stampc3-i2c-left`: Stamp C3 device on left eye
-- `stamps3-i2c-right`: Stamp S3 device on right eye
-- `stamps3-i2c-left`: Stamp S3 device on left eye
+- `stampc3-i2c`: Stamp C3 device
+- `stamps3-i2c`: Stamp S3 device
 
 ```bash
 roscd eye_display
-pio run -e stampc3-i2c-right
-pio run -e stampc3-i2c-right -t uploadfs --upload-port <port to device>
-pio run -e stampc3-i2c-right -t upload --upload-port <port to device>
+pio run -e stampc3-i2c
+pio run -e stampc3-i2c -t uploadfs --upload-port <port to device>
+pio run -e stampc3-i2c -t upload --upload-port <port to device>
 ```
 
 Then you can control the device with I2C.

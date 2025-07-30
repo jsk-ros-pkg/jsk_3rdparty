@@ -6,7 +6,11 @@
 
 constexpr int SDA_PIN = 8;
 constexpr int SCL_PIN = 9;
+#ifdef  I2C_SLAVE_ADDR
+constexpr int I2C_SLAVE_ADDR = I2C_SLAVE_ADDR;
+#else
 constexpr int I2C_SLAVE_ADDR = 0x42;
+#endif
 
 extern EyeManager eye;
 
