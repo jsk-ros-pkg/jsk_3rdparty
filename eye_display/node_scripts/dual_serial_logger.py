@@ -50,4 +50,3 @@ if __name__ == "__main__":
         print("\nStopping...")
         t1.join()
         t2.join()
-        print(f"Logs saved to {logfile}")

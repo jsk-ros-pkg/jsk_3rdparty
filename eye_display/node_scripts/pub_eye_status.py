@@ -46,7 +46,9 @@ def main():
         pubs = [rospy.Publisher("/right/eye_display/eye_status", String, queue_size=10, latch=True),
                rospy.Publisher("/left/eye_display/eye_status", String, queue_size=10, latch=True)]
         if eye_status_names is None:
-            eye_status_names = rospy.get_param("/right/eye_display/eye_asset/names", NAMES)
+            eye_status_names_raw = rospy.get_param("/right/eye_display/eye_asset/names", NAMES)
+            # remove '_extra' suffix when setting eye_asset_names.
+            eye_status_names = [s[:-len("_extra")] if s.endswith("_extra") else s for s in eye_status_names_raw]
     else:
         pubs = [rospy.Publisher("/eye_display/eye_status", String, queue_size=10, latch=True)]
         if eye_status_names is None:

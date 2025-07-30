@@ -57,7 +57,7 @@ def send_data_to_i2c(data):
          i2c.write(packet)
       except OSError as e:
          rospy.logerr(e)
-   time.sleep(0.01)
+   time.sleep(0.02)
 
 def eye_status_cb(msg):
    rospy.loginfo("[{}]: eye_status: {}".format(rospy.get_name(), msg.data))
@@ -94,7 +94,9 @@ def main():
          rospy.logwarn("Invalid direction ({})".format(direction))
 
    # get eye_asset param
-   eye_asset_names = rospy.get_param("~eye_asset/names")
+   eye_asset_names_raw = rospy.get_param("~eye_asset/names")
+   # remove '_extra' suffix when setting eye_asset_names.
+   eye_asset_names = [s[:-len("_extra")] if s.endswith("_extra") else s for s in eye_asset_names_raw]
    send_data_to_i2c("eye_asset_names: {}".format(', '.join(eye_asset_names)))
 
    for name in eye_asset_names:
@@ -107,11 +109,14 @@ def main():
          # position*
          if "_position" in key:
             eye_type = key[:key.find("_position")]
+            if isinstance(value, list):
+               value = ", ".join(map(str, value))
             send_data_to_i2c("eye_asset_{}: {}: {}: {}".format(key[len(eye_type)+1:], name, eye_type, value))
          # default_*
          if "_default" in key:
             eye_type = key[:key.find("_default")]
-            send_data_to_i2c("eye_default_{}: {}: {}: {}".format(key[len(eye_type)+1:], name, eye_type, value))
+            send_data_to_i2c("eye_asset_{}: {}: {}: {}".format(key[len(eye_type)+1:], name, eye_type, value))
+   send_data_to_i2c("eye_asset_done:\n");
 
    # start subscriber
    rospy.Subscriber('~eye_status', String, eye_status_cb)
