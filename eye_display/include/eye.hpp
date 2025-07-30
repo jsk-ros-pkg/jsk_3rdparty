@@ -420,6 +420,7 @@ int EyeManager::update_emotion() {
 int EyeManager::setup_asset(std::string eye_asset_text) {
   static bool mode_right;
   static int direction;
+  static std::string eye_asset_name_first = "";
 
   loginfo("Setup eye asset");
   std::istringstream iss(eye_asset_text);
@@ -441,6 +442,9 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       direction = std::stoi(value);
     } else if ( key == "eye_asset_names" ) {
       std::list<std::string> eye_asset_names = splitComma(value);
+      if (eye_asset_names.size() > 0) {
+	eye_asset_name_first = eye_asset_names.front();
+      }
       //
       // initialize eye_asset_map from eye_asset_names
       //
@@ -637,10 +641,17 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
         logerror("Invalid eye_asset type_default_theta : %s (%s,%s)", type_default_theta.c_str(), type.c_str(), default_theta.c_str());
         return -1;
       }
+    } else if ( key == "eye_asset_done" ) {
+      // skip special command to display and initialize eye for I2C
     } else {
       logerror("Invlalid command : %s (key : %s, value : %s)", message.c_str(), key.c_str(), value.c_str());
       return -1;
     }
+  }
+
+  if (eye_asset_text.find('\n') == std::string::npos) {
+    // Does not contain newline, i.e. I2C case
+    return 0;
   }
   // display map data
   // to show this message,
@@ -691,7 +702,11 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
   }
   // eyeの初期化
   if ( !eye_asset_map.empty() ) {
-    set_emotion(eye_asset_map.begin()->first);
+    if ( eye_asset_name_first.empty() ) {
+      eye_asset_name_first = eye_asset_map.begin()->first;
+    }
+    loginfo("[%8ld] initialize eye with %s", millis(), eye_asset_name_first.c_str());
+    set_emotion(eye_asset_name_first);
   } else {
     logwarn("Faile to initialize emotion, use default asset");
   }
