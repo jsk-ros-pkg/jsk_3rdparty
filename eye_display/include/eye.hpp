@@ -71,6 +71,14 @@ private:
   LGFX_Sprite sprite_upperlid;
   std::vector<LGFX_Sprite> sprite_extra;
 
+  // useing
+  float zoom_outline = 2.0f;
+  float zoom_iris = 2.0f;
+  float zoom_pupil = 1.0f;
+  float zoom_reflex = 2.0f;
+  float zoom_upperlid = 1.0f;
+  float zoom_extra = 1.0f;
+
   float zoom_ratio;
   int image_width = 139;
   int image_height = 139;
@@ -81,7 +89,7 @@ private:
   int frame = 0;
 
   void load_eye_images();
-  bool draw_image_file(LGFX_Sprite& sprite, const char* filePath);
+  bool draw_image_file(LGFX_Sprite& sprite, const char* filePath, float zoom);
 
   std::string current_eye_asset_name;
 public:
@@ -119,30 +127,39 @@ void EyeManager::init(
     lcd.init();
     lcd.setRotation(current_eye_asset.direction);
 
+    // Due to the limited RAM on StampC3, sprites are decoded at a lower resolution to optimize memory usage.
+#ifdef STAMPC3
+    zoom_outline = 2.0f;
+    zoom_iris = 2.0f;
+    zoom_pupil = 1.0f;
+    zoom_reflex = 2.0f;
+    zoom_upperlid = 1.0f;
+    zoom_extra = 1.0f;
+#endif
     // 目全体を描写するBufferとしてのSpriteを準備
     sprite_eye.createSprite(image_width, image_height);
     sprite_eye.fillScreen(TFT_WHITE);
 
     // 目の輪郭を描写するSpriteを準備
-    sprite_outline.createSprite(image_width, image_height);
+    sprite_outline.createSprite(image_width/zoom_outline, image_height/zoom_outline);
     if (current_eye_asset.invert_rl) sprite_outline.setRotation(6);
 
     // 虹彩を描写するSpriteを準備
-    sprite_iris.createSprite(image_width, image_height);
+    sprite_iris.createSprite(image_width/zoom_iris, image_height/zoom_iris);
     if (current_eye_asset.invert_rl) sprite_iris.setRotation(6);
 
     // 瞳孔を描写するSpriteを準備
-    sprite_pupil.createSprite(image_width, image_height);
+    sprite_pupil.createSprite(image_width/zoom_pupil, image_height/zoom_pupil);
     if (current_eye_asset.invert_rl) sprite_pupil.setRotation(6);
 
     // 光の反射を描画するSpriteを準備
-    sprite_reflex.createSprite(image_width, image_height);
+    sprite_reflex.createSprite(image_width/zoom_reflex, image_height/zoom_reflex);
     if (current_eye_asset.invert_rl) sprite_reflex.setRotation(6);
 
     // 上瞼を描写するSpriteを準備
-    sprite_upperlid.createSprite(image_width, image_height);
+    sprite_upperlid.createSprite(image_width/zoom_upperlid, image_height/zoom_upperlid);
     if (current_eye_asset.invert_rl) sprite_upperlid.setRotation(6);
-    sprite_upperlid.setPivot(current_eye_asset.upperlid_pivot_x, current_eye_asset.upperlid_pivot_y);
+    sprite_upperlid.setPivot(current_eye_asset.upperlid_pivot_x/zoom_upperlid, current_eye_asset.upperlid_pivot_y/zoom_upperlid);
 
     // その他描写するSpriteを準備
     sprite_extra.resize(EXTRA_EYE_ASSET_SIZE);
@@ -171,18 +188,24 @@ void EyeManager::init(
     set_emotion(current_eye_asset.name);
 }
 
-bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath)
+bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath, float zoom = 1.0)
 {
     std::string pathStr(filePath);
     std::string extension = pathStr.substr(pathStr.find_last_of('.') + 1);
     bool ret = false;
 
     if (extension == "jpg" || extension == "jpeg") {
-      logdebug("[%8ld] loading jpeg: %s", millis(), filePath);
-      ret = sprite.drawJpgFile(SPIFFS, filePath);
+      logdebug("[%8ld] loading jpg: %s (zoom:%d)", millis(), filePath, zoom);
+      if (zoom == 1) {
+        return sprite.drawJpgFile(SPIFFS, filePath);
+      }
+      ret = sprite.drawJpgFile(SPIFFS, filePath, 0, 0, 0, 0, 0, 0, 1.0/zoom, 1.0/zoom);
     } else if (extension == "png") {
-      logdebug("[%8ld] loading png: %s", millis(), filePath);
-      ret = sprite.drawPngFile(SPIFFS, filePath);
+      logdebug("[%8ld] loading png: %s (zoom:%d)", millis(), filePath, zoom);
+      if (zoom == 1) {
+        return sprite.drawPngFile(SPIFFS, filePath);
+      }
+      ret = sprite.drawPngFile(SPIFFS, filePath, 0, 0, 0, 0, 0, 0, 1.0/zoom, 1.0/zoom);
     } else {
       logerror("[%8ld] invalid image extension %s", millis(), filePath);
     }
@@ -214,14 +237,14 @@ void EyeManager::load_eye_images()
 
     if (path_jpg_outline != NULL) {
         sprite_outline.fillScreen(TFT_WHITE);
-        if (not draw_image_file(sprite_outline, path_jpg_outline)) {
+        if (not draw_image_file(sprite_outline, path_jpg_outline, zoom_outline)) {
             sprite_outline.fillScreen(TFT_WHITE);
         }
     }
 
     if (path_jpg_iris != NULL) {
         sprite_iris.fillScreen(TFT_WHITE);
-        if (not draw_image_file(sprite_iris, path_jpg_iris)) {
+        if (not draw_image_file(sprite_iris, path_jpg_iris, zoom_iris)) {
             sprite_iris.fillScreen(TFT_WHITE);
         }
     }
@@ -229,21 +252,21 @@ void EyeManager::load_eye_images()
 
     if (path_jpg_pupil != NULL) {
         sprite_pupil.fillScreen(TFT_WHITE);
-        if (not draw_image_file(sprite_pupil, path_jpg_pupil)) {
+        if (not draw_image_file(sprite_pupil, path_jpg_pupil, zoom_pupil)) {
             sprite_pupil.fillScreen(TFT_WHITE);
         }
     }
 
     if (path_jpg_reflex != NULL) {
         sprite_reflex.fillScreen(TFT_WHITE);
-        if (not draw_image_file(sprite_reflex, path_jpg_reflex)) {
+        if (not draw_image_file(sprite_reflex, path_jpg_reflex, zoom_reflex)) {
             sprite_reflex.fillScreen(TFT_WHITE);
         }
     }
 
     if (path_jpg_upperlid != NULL) {
         sprite_upperlid.fillScreen(TFT_WHITE);
-        if (not draw_image_file(sprite_upperlid, path_jpg_upperlid)) {
+        if (not draw_image_file(sprite_upperlid, path_jpg_upperlid, zoom_upperlid)) {
             sprite_upperlid.fillScreen(TFT_WHITE);
         }
     }
@@ -267,15 +290,27 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
 
     sprite_eye.clear();
     sprite_eye.fillScreen(TFT_WHITE);
-    sprite_outline.pushSprite(&sprite_eye, 0, 0, TFT_WHITE);
-    sprite_iris.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
-    sprite_pupil.pushSprite(&sprite_eye, dx, dy, TFT_WHITE); // 瞳孔をランダムに動かす
-    sprite_reflex.pushSprite(&sprite_eye, dx + rx, dy + ry, TFT_WHITE); // 光の反射をランダムに動かす
+    if (zoom_outline == 1)
+      sprite_outline.pushSprite(&sprite_eye, 0, 0, TFT_WHITE);
+    else
+      sprite_outline.pushRotateZoom(&sprite_eye, image_width/2, image_height/2, 0.0f, zoom_outline, zoom_outline, TFT_WHITE);
+    if (zoom_iris == 1)
+      sprite_iris.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
+    else
+      sprite_iris.pushRotateZoomWithAA(&sprite_eye, image_width/2, image_height/2, 0.0f, zoom_iris, zoom_iris, TFT_WHITE);
+    if (zoom_pupil == 1)
+      sprite_pupil.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
+    else
+      sprite_pupil.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_pupil, zoom_pupil, TFT_WHITE); // 瞳孔をランダムに動かす
+    if (zoom_reflex == 1)
+      sprite_reflex.pushSprite(&sprite_eye, dx + rx, dy + ry, TFT_WHITE);
+    else
+      sprite_reflex.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx + rx, image_height/2 + dy + ry, 0.0f, zoom_reflex, zoom_reflex, TFT_WHITE); // 光の反射をランダムに動かす
     sprite_upperlid.pushRotateZoom(&sprite_eye,
-            current_eye_asset.upperlid_default_pos_x + dx_upperlid,
-            current_eye_asset.upperlid_default_pos_y + dy_upperlid,
-            current_eye_asset.upperlid_default_theta + dtheta_upperlid,
-            1.0, 1.0, TFT_WHITE);
+                                   current_eye_asset.upperlid_default_pos_x + dx_upperlid,
+                                   current_eye_asset.upperlid_default_pos_y + dy_upperlid,
+                                   current_eye_asset.upperlid_default_theta + dtheta_upperlid,
+                                   zoom_upperlid, zoom_upperlid, TFT_WHITE);
 
     if (current_eye_asset.path_extra.size() > 0) {
       if ((current_eye_asset.path_extra.size() <= current_eye_asset.extra_default_pos_x.size()) &&
@@ -288,18 +323,18 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
         for(int i = 0; i < current_eye_asset.path_extra.size(); i ++ ) {
           if (!current_eye_asset.path_extra[i].empty()) {
             // allocate, draw and free sprite memory here to ensure enough memory for PNG loading
-            sprite_extra[i].createSprite(image_width, image_height);
+            sprite_extra[i].createSprite(image_width/zoom_extra, image_height/zoom_extra);
             if (current_eye_asset.invert_rl) sprite_extra[i].setRotation(6);
             const char *path_jpg_extra = current_eye_asset.path_extra[i].c_str();
             sprite_extra[i].fillScreen(TFT_WHITE);
-            if (not draw_image_file(sprite_extra[i], path_jpg_extra)) {
+            if (not draw_image_file(sprite_extra[i], path_jpg_extra, zoom_extra)) {
               sprite_extra[i].fillScreen(TFT_WHITE);
             }
             sprite_extra[i].pushRotateZoom(&sprite_eye,
                                            current_eye_asset.extra_default_pos_x[i] + dx_extra[i],
                                            current_eye_asset.extra_default_pos_y[i] + dy_extra[i],
                                            current_eye_asset.extra_default_theta[i] + dtheta_extra[i],
-                                           1.0, 1.0, TFT_WHITE);
+                                           zoom_extra, zoom_extra, TFT_WHITE);
             sprite_extra[i].deleteSprite();
           }
         }
