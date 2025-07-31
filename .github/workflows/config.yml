@@ -144,7 +144,7 @@ jobs:
 
   ## need to setup runners from https://github.com/jsk-ros-pkg/jsk_3rdparty/settings/actions/runners
   arm:
-    runs-on: ['self-hosted', 'Linux', 'ARM64']
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
