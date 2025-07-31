@@ -1,0 +1,16 @@
+<launch>
+
+  <arg name="arduino_path" default=""
+       doc="Path to arduino executable. e.g. /home/user/arduino-1.8.16/arduino" />
+  <arg name="sketch_name" default=""
+       doc="Sketch name. This is used to specity the each sketch path and to make the test name unique." />
+
+  <test test-name="test_stdout_$(arg sketch_name)"
+        name="test_stdout_$(arg sketch_name)"
+        pkg="jsk_tools" type="test_stdout.py"
+        time-limit="300.0" >
+    <param name="~command" value="$(arg arduino_path) --verify $(find m5stack_ros)/sketches/$(arg sketch_name)/$(arg sketch_name).ino" />
+    <param name="stdout" value="0" />
+  </test>
+
+</launch>
