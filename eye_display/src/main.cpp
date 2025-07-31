@@ -46,7 +46,6 @@ void setup()
 
 #if defined(USE_ROS)  // USE_ROS
   setup_ros();
-  eye_asset_text = ros_read_asset();
 #elif defined(USE_I2C)
   setup_i2c();
 #endif

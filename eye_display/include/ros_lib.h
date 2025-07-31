@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ArduinoJson.h>
 #include <iterator>
 #include <sstream>
 
@@ -13,10 +12,13 @@ void callback_emotion(const std_msgs::String &msg);
 
 ros::NodeHandleEx<ArduinoHardware> nh;
 
+bool ros_was_connected = false;
+bool ros_now_connected = false;
 #define def_log_func(funcname)                          \
 void funcname(const char *fmt, ...) {                   \
   char *string;                                         \
   va_list args;                                         \
+  if (!ros_now_connected) {return;}                     \
   va_start(args, fmt);                                  \
   if (0 > vasprintf(&string, fmt, args)) string = NULL; \
   va_end(args);                                         \
@@ -186,12 +188,11 @@ void setup_ros()
 
 void reconnect_ros(EyeManager &eye)
 {
-  while (not nh.connected())
-  {
-    nh.spinOnce();
-    delay(1000);
+  ros_now_connected = nh.connected();
+  if (ros_now_connected && !ros_was_connected) {
+    loginfo("ROS reconnected, initializing eye assets");
     // when ROS node is re-connected, get rosparam again
     eye.setup_asset(ros_read_asset());
-    eye.init();
   }
+  ros_was_connected = ros_now_connected;
 }
