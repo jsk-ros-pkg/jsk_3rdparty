@@ -1,0 +1,36 @@
+<launch>
+  <arg name="port_right" default="/dev/ttyUSB0" />
+  <arg name="port_left" default="/dev/ttyUSB1" />
+  <arg name="baud" default="115200" />
+
+  <arg name="use_i2c" default="false" />
+  <arg name="i2c_device" default="0x42" />
+  <arg name="i2c_bus_right" default="0" />
+  <arg name="i2c_bus_left" default="5" />
+
+  <arg name="direction_right" default="0" />
+  <arg name="direction_left" default="1" />
+  <arg name="eye_asset_file" default="$(find eye_display)/launch/default.yaml" />
+  <arg name="debug" default="false" />
+
+  <include file="$(find eye_display)/launch/demo.launch" ns="right" >
+    <arg name="eye_asset_file" value="$(arg eye_asset_file)" />
+    <arg name="mode_right" value="true" />
+    <arg name="direction" value="$(arg direction_right)" />
+    <arg name="port" value="$(arg port_right)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="use_i2c" value="$(arg use_i2c)" />
+    <arg name="i2c_bus" value="$(arg i2c_bus_right)" />
+    <arg name="debug" default="$(arg debug)" />
+  </include>
+  <include file="$(find eye_display)/launch/demo.launch" ns="left">
+    <arg name="eye_asset_file" value="$(arg eye_asset_file)" />
+    <arg name="mode_right" value="false" />
+    <arg name="direction" value="$(arg direction_left)" />
+    <arg name="port" value="$(arg port_left)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="use_i2c" value="$(arg use_i2c)" />
+    <arg name="i2c_bus" value="$(arg i2c_bus_left)" />
+    <arg name="debug" default="$(arg debug)" />
+  </include>
+</launch>

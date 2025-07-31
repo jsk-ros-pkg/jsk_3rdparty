@@ -97,20 +97,63 @@ $rosparam get eye_display/eye_asset/names
 
 If you want to control the device through I2C bus, please use following env.
 
-- `stampc3-i2c-right`: Stamp C3 device on right eye
-- `stampc3-i2c-left`: Stamp C3 device on left eye
-- `stamps3-i2c-right`: Stamp C3 device on right eye
-- `stamps3-i2c-left`: Stamp C3 device on left eye
+- `stampc3-i2c`: Stamp C3 device
+- `stamps3-i2c`: Stamp S3 device
 
 ```bash
 roscd eye_display
-pio run -e stampc3-i2c-right
-pio run -e stampc3-i2c-right -t uploadfs --upload-port <port to device>
-pio run -e stampc3-i2c-right -t upload --upload-port <port to device>
+pio run -e stampc3-i2c
+pio run -e stampc3-i2c -t uploadfs --upload-port <port to device>
+pio run -e stampc3-i2c -t upload --upload-port <port to device>
 ```
 
 Then you can control the device with I2C.
 
+```bash
+roslaunch eye_display demo.launch use_i2c:=true i2c_device:=<device number> i2c_bus:=<bus number>
+```
+
+See `node_scripts/ros_to_i2c.py` for control protocol.
+
+To monitor the serial output in the dual I2C mode. Use the following logger tool.
+
+```bash
+./node_scripts/dual_serial_logger.py /dev/ttyACM0 /dev/ttyACM1 115200
+```
+#### Dual eye mode
+
+You can start two device with `demo_dual.launch`
+
+```bash
+roslaunch eye_display demo_dual.launch use_i2c:=false port_right:=/dev/ttyACM0 port_left:=/dev/ttyACM1 baud:=115200 debug:=true
+```
+
+You can control dual eye status with demo scripts
+```bash
+rosrun eye_display pub_eye_status.py --dual --rate 0.3 --names sleepy surprised happy
+```
+
+#### extra images
+
+If you need more than the standard images (outline, iris, pupil, reflex, upperlid), use the extra　images.
+
+
+```
+  path_extra1: "/krmt_reflex_shine1.png"
+  extra1_default_pos_x: 75
+  extra1_default_pos_y: 75
+  extra1_default_theta: 0
+  extra1_position_x: [  0,  20, 40,  20,   0, -20, -40, -20]
+  extra1_position_y: [ 40,  20,  0, -20, -40, -20,   0,  20]
+  extra1_rotation_theta: [  0,  40,  80,  40,  0,  -40, -80, -40]
+  path_extra2: "/krmt_reflex_heart.png"
+  extra2_position_x: [  0,  20,   0, -20]
+  extra2_position_y: [  0,  10,   0, -10]
+  extra2_rotation_theta: [  0,  -40,  -80,  -40,  0,  40, 80, 40]
+  extra2_default_pos_x: 75
+  extra2_default_pos_y: 75
+  extra2_default_theta: 0
+```
 ### Description of direction
 
 ![eye_display_direction](./doc/eye_display_direction.svg)
