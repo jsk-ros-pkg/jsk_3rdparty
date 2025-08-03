@@ -18,7 +18,6 @@ public:
     return super::getParam(name, param, length, timeout);
   }
   bool getParam(const char* name, float* param, int length = 1, int timeout = 1000) {
-    logwarn("Failed to get param: length mismatch float");
     return super::getParam(name, param, length, timeout);
   }
   bool getParam(const char* name, char** param, int length = 1, int timeout = 1000) {
@@ -54,6 +53,16 @@ public:
       // copy it over
       for (int i = 0; i < super::req_param_resp.ints_length; i++)
           param[i] = super::req_param_resp.ints[i];
+      return true;
+  }
+  bool getParam(const char *name, std::vector<float> &param, int timeout = 1000)
+  {
+      if (!super::requestParam(name, timeout))
+          return false;
+      param.resize(super::req_param_resp.floats_length);
+      // copy it over
+      for (int i = 0; i < super::req_param_resp.floats_length; i++)
+          param[i] = super::req_param_resp.floats[i];
       return true;
   }
 

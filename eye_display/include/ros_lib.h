@@ -37,6 +37,7 @@ extern EyeManager eye;
 
 ros::Subscriber<geometry_msgs::Point> sub_point("~look_at", &callback_look_at);
 ros::Subscriber<std_msgs::String> sub_eye_status("~eye_status", &callback_emotion);
+
 void callback_look_at(const geometry_msgs::Point &msg)
 {
   eye.set_gaze_direction((float)msg.x, (float)msg.y);
@@ -49,13 +50,6 @@ void callback_emotion(const std_msgs::String &msg)
 std::string ros_read_asset()
 {
   std::map<std::string, EyeAsset>& eye_asset_map = eye.eye_asset_map;
-  while (not nh.connected())
-  {
-    nh.spinOnce();
-    delay(1000);
-  }
-  delay(500);  // wait 0.5 sec before reading asset
-
   std::ostringstream oss;
 
   bool mode_right;
@@ -77,11 +71,6 @@ std::string ros_read_asset()
   oss << "eye_asset_names: ";
   for (auto it = eye_asset_names.begin(); it != eye_asset_names.end(); ++it) {
     std::string name = *it;
-    std::string suffix = "_extra";
-    if (name.size() >= suffix.size() &&
-        name.rfind(suffix) == name.size() - suffix.size()) {
-        name = name.substr(0, name.size() - suffix.size());
-    }
     oss << name;
     if (std::next(it) != eye_asset_names.end()) oss << ", ";
   }
@@ -89,82 +78,95 @@ std::string ros_read_asset()
   //
   for(auto name: eye_asset_names) {
     char eye_asset_map_key[256];
-    bool have_extra = false;
-    std::string suffix = "_extra";
-    if (name.size() >= suffix.size() &&
-        name.rfind(suffix) == name.size() - suffix.size()) {
-        name = name.substr(0, name.size() - suffix.size());
-        have_extra = true;
-    }
-    // path_upperlid
-    for(const std::string& type: {"upperlid", "outline", "iris", "pupil", "reflex"}) {
+
+    // path
+    std::vector<std::string> eye_types;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_eye_types", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_types);
+    for(const std::string& type: eye_types) {
       std::string path;
       snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_%s", name.c_str(), type.c_str());
       if (nh.getParam(eye_asset_map_key, path)) {
         oss << "eye_asset_image_path: " << name << ": " << type << ": " << path << "\n";
       }
     }
-    // upperlid_position, upperlid_default_pos_x, upperlid_default_pos_y, upperlid_default_theta
-    std::vector<int> position;
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position", name.c_str());
-    if (nh.getParam(eye_asset_map_key, position, 300)) {  // timeout == 300
-      oss << "eye_asset_position: " << name << ": upperlid: " << joinVector(position) << "\n";
-    } else { // v2 API, upperlid_position_x, upperlid_position_y, upperlid_rotate_theta instead of upperlid_position
-      nh.logwarn("Using v2 API (position_x, position_y, rotation_theta). Please ignore the above 'Parameter %sn does not exist' message", eye_asset_map_key);
-      std::vector<int> position_x, position_y, rotation_theta;
-      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position_x", name.c_str());
-      if (nh.getParam(eye_asset_map_key, position_x)) {
-        oss << "eye_asset_position_x: " << name << ": upperlid: " << joinVector(position_x) << "\n";
-      }
-      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position_y", name.c_str());
-      if (nh.getParam(eye_asset_map_key, position_y)) {
-        oss << "eye_asset_position_y: " << name << ": upperlid: " << joinVector(position_y) << "\n";
-      }
-      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_rotation_theta", name.c_str());
-      if (nh.getParam(eye_asset_map_key, rotation_theta)) {
-        oss << "eye_asset_rotation_theta: " << name << ": upperlid: " << joinVector(rotation_theta) << "\n";
-      }
-    } //v2 API
-    for(const std::string& pos: {"default_pos_x", "default_pos_y", "default_theta"}) {
-      int data;
-      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_%s", name.c_str(), pos.c_str());
-      if (nh.getParam(eye_asset_map_key, &data)) {
-        oss << "eye_asset_" << pos << ": " << name << ": upperlid: " << data << "\n";
+
+    // position
+    std::vector<std::string> eye_positions;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_positions", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_positions);
+    for(const std::string& eye_position: eye_positions) {
+      if (eye_position == "NONE") continue;
+      std::vector<int> position;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_position.c_str());
+      if (nh.getParam(eye_asset_map_key, position)) {
+        size_t pos = eye_position.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_position.substr(0, pos);
+          std::string position_type = eye_position.substr(pos+1);
+          oss << "eye_asset_" << position_type << ": " << name << ": " << eye_type << ": " << joinVector(position) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_position);
+        }
       }
     }
-    // v3 API (extra images)
-    if (have_extra) {
-      for(const std::string& type: {"extra1", "extra2"}) {
-        std::string path;
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_%s", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, path, 300)) {  // timeout == 300
-          oss << "eye_asset_image_path: " << name << ": " << type << ": " << path << "\n";
+
+    // rotation
+    std::vector<std::string> eye_rotations;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_rotations", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_rotations);
+    for(const std::string& eye_rotation: eye_rotations) {
+      if (eye_rotation == "NONE") continue;
+      std::vector<int> rotation;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_rotation.c_str());
+      if (nh.getParam(eye_asset_map_key, rotation)) {
+        size_t pos = eye_rotation.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_rotation.substr(0, pos);
+          std::string rotation_type = eye_rotation.substr(pos+1);
+          oss << "eye_asset_" << rotation_type << ": " << name << ": " << eye_type << ": " << joinVector(rotation) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_rotation);
         }
-        std::vector<int> position_x, position_y, rotation_theta;
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_position_x", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, position_x)) {
-          oss << "eye_asset_position_x: " << name << ": " << type << ": " << joinVector(position_x) << "\n";
+      }
+    }
+
+    // default
+    std::vector<std::string> eye_defaults;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_defaults", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_defaults);
+    for(const std::string& eye_default: eye_defaults) {
+      if (eye_default == "NONE") continue;
+      std::vector<int> defaults;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
+      if (nh.getParam(eye_asset_map_key, defaults)) {
+        size_t pos = eye_default.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_default.substr(0, pos);
+          std::string default_type = eye_default.substr(pos+1);
+          oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_default);
         }
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_position_y", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, position_y)) {
-          oss << "eye_asset_position_y: " << name << ": " << type << ": " << joinVector(position_y) << "\n";
-        }
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_rotation_theta", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, rotation_theta)) {
-          oss << "eye_asset_rotation_theta: " << name << ": " << type << ": " << joinVector(rotation_theta) << "\n";
-        }
-        int data;
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_pos_x", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, &data)) {
-          oss << "eye_asset_default_pos_x: " << name << ": " << type << ": " << data << "\n";
-        }
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_pos_y", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, &data)) {
-          oss << "eye_asset_default_pos_y: " << name << ": " << type << ": " << data << "\n";
-        }
-        snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s_default_theta", name.c_str(), type.c_str());
-        if (nh.getParam(eye_asset_map_key, &data)) {
-          oss << "eye_asset_default_theta: " << name << ": " << type << ": " << data << "\n";
+      }
+    }
+
+    // zoom
+    std::vector<std::string> eye_zooms;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_zooms", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_zooms);
+    for(const std::string& eye_zoom: eye_zooms) {
+      if (eye_zoom == "NONE") continue;
+      std::vector<float> zooms;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_zoom.c_str());
+      if (nh.getParam(eye_asset_map_key, zooms)) {
+        size_t pos = eye_zoom.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_zoom.substr(0, pos);
+          std::string zoom_type = eye_zoom.substr(pos+1);
+          oss << "eye_asset_" << zoom_type << ": " << name << ": " << eye_type << ": " << joinVector(zooms) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_zoom);
         }
       }
     }

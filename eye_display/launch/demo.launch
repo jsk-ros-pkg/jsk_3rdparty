@@ -14,21 +14,34 @@
         type="serial_node.py"
         name="eye_display"
         output="screen"
-	unless="$(arg use_i2c)"
+        unless="$(arg use_i2c)"
         >
         <param name="port" value="$(arg port)" />
         <param name="baud" value="$(arg baud)" />
         <param name="mode_right" value="$(arg mode_right)" />
         <param name="direction" value="$(arg direction)" />
         <rosparam command="load" ns="eye_asset" file="$(arg eye_asset_file)" />
-        <param name="eye_asset_text" command="cat $(arg eye_asset_file)" />
+    </node>
+    <!-- The namespace (ns) used by asset_param_list must match the
+         node name of serial_node.py. If you rename node name of
+         serial_node.py, make sure to update the namespace in
+         asset_param_list.py accordingly to ensure proper parameter
+         retrieval. -->
+    <node
+        ns="eye_display"
+        pkg="eye_display"
+        type="asset_param_list.py"
+        name="asset_param_list"
+        output="screen"
+        unless="$(arg use_i2c)"
+        >
     </node>
     <node
         pkg="eye_display"
         type="ros_to_i2c.py"
         name="eye_display"
         output="screen"
-	if="$(arg use_i2c)"
+        if="$(arg use_i2c)"
         >
         <param name="i2c_device" value="$(arg i2c_device)" />
         <param name="i2c_bus" value="$(arg i2c_bus)" />

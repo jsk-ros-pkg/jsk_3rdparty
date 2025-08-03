@@ -146,10 +146,12 @@ If you need more than the standard images (outline, iris, pupil, reflex, upperli
   extra1_position_x: [  0,  20, 40,  20,   0, -20, -40, -20]
   extra1_position_y: [ 40,  20,  0, -20, -40, -20,   0,  20]
   extra1_rotation_theta: [  0,  40,  80,  40,  0,  -40, -80, -40]
+  extra1_zoom: [  1.0, 1.1, 1.2, 1.3, 1.4, 1.2, 1.0, 0.8, 0.7, 0.8, 0.9]
   path_extra2: "/krmt_reflex_heart.png"
   extra2_position_x: [  0,  20,   0, -20]
   extra2_position_y: [  0,  10,   0, -10]
   extra2_rotation_theta: [  0,  -40,  -80,  -40,  0,  40, 80, 40]
+  extra2_zoom: [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 1.5, 1.0, 0.5]
   extra2_default_pos_x: 75
   extra2_default_pos_y: 75
   extra2_default_theta: 0
@@ -183,6 +185,8 @@ rosrun eye_display update_ros_lib.sh
 This feature requires git 2.27+, so if you use Ubuntu<=20.04, please install latest version of git https://git-scm.com/downloads/linux
 
 ```
-$ git clone --filter=blob:none --sparse https://github.com/jsk-ros-pkg/jsk_3rdparty.git -b eye_display
-$ git sparse-checkout set eye_display
+git clone --filter=blob:none --sparse https://github.com/jsk-ros-pkg/jsk_3rdparty.git
+cd jsk_3rdparty
+git sparse-checkout set eye_display
+git checkout eye_display
 ```

@@ -94,9 +94,7 @@ def main():
          rospy.logwarn("Invalid direction ({})".format(direction))
 
    # get eye_asset param
-   eye_asset_names_raw = rospy.get_param("~eye_asset/names")
-   # remove '_extra' suffix when setting eye_asset_names.
-   eye_asset_names = [s[:-len("_extra")] if s.endswith("_extra") else s for s in eye_asset_names_raw]
+   eye_asset_names = rospy.get_param("~eye_asset/names")
    send_data_to_i2c("eye_asset_names: {}".format(', '.join(eye_asset_names)))
 
    for name in eye_asset_names:
@@ -125,6 +123,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

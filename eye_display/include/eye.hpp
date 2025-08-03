@@ -5,6 +5,7 @@
 #include <array>
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -26,13 +27,16 @@ struct EyeAsset {
  std::string path_pupil = "/pupil.jpg";        //  move along with iris
  std::string path_reflex = "/reflex.jpg" ;     //  move along with puppil + random motion
  std::string path_upperlid = "/upperlid.jpg";  // use upperlid_position_map to set y-axis motoin
+ std::vector<float> iris_zoom = {};         // eyeball (iris, pupil, reflex)
  std::vector<int> upperlid_position_x = {0};   // upperlid = motion layer
  std::vector<int> upperlid_position_y = {9};   // upperlid = motion layer
  std::vector<int> upperlid_rotation_theta = {0};   // upperlid = motion layer
+ std::vector<float> upperlid_zoom = {};   // upperlid = motion layer
  std::vector<std::string> path_extra = {};
  std::vector<std::vector<int>> extra_position_x = {};
  std::vector<std::vector<int>> extra_position_y = {};
  std::vector<std::vector<int>> extra_rotation_theta = {};
+ std::vector<std::vector<float>> extra_zoom = {};
  int direction = 0;
  bool invert_rl = false;
  int upperlid_pivot_x = 75;
@@ -103,9 +107,9 @@ public:
   void set_emotion(const std::string eye_status_name);
   std::string get_emotion();
   int update_emotion();
-  void update_look(float dx, float dy,
-                   int dx_upperlid, int dy_upperlid, float dtheta_upperlid,
-                   std::vector<int> dx_extra, std::vector<int> dy_extra, std::vector<int> dtheta_extra,
+  void update_look(float dx, float dy, float dzoom,
+                   int dx_upperlid, int dy_upperlid, float dtheta_upperlid, float dzoom_upperlid,
+                   std::vector<int> dx_extra, std::vector<int> dy_extra, std::vector<int> dtheta_extra, std::vector<float> dzoom_extra,
                    float random_scale);
 };
 
@@ -164,7 +168,7 @@ void EyeManager::init(
     // その他描写するSpriteを準備
     sprite_extra.resize(EXTRA_EYE_ASSET_SIZE);
     // do not createSprite() here; it causes PNG loading errors
-    // Instead, allocate and free sprite memory within update_loopk()
+    // Instead, allocate and free sprite memory within update_look()
 
     if (psramFound()) {
       logdebug("[%8ld] PSRAM available, using for PNG decode", millis());
@@ -195,13 +199,13 @@ bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath, floa
     bool ret = false;
 
     if (extension == "jpg" || extension == "jpeg") {
-      logdebug("[%8ld] loading jpg: %s (zoom:%d)", millis(), filePath, zoom);
+      logdebug("[%8ld] loading jpg: %s (zoom:%.2f)", millis(), filePath, zoom);
       if (zoom == 1) {
         return sprite.drawJpgFile(SPIFFS, filePath);
       }
       ret = sprite.drawJpgFile(SPIFFS, filePath, 0, 0, 0, 0, 0, 0, 1.0/zoom, 1.0/zoom);
     } else if (extension == "png") {
-      logdebug("[%8ld] loading png: %s (zoom:%d)", millis(), filePath, zoom);
+      logdebug("[%8ld] loading png: %s (zoom:%.2f)", millis(), filePath, zoom);
       if (zoom == 1) {
         return sprite.drawPngFile(SPIFFS, filePath);
       }
@@ -272,18 +276,37 @@ void EyeManager::load_eye_images()
     }
 
     // do not draw_image_file() here; it causes PNG loading errors
-    // Instead, allocate, draw and free sprite memory within update_loopk()
+    // Instead, allocate, draw and free sprite memory within update_look()
   }
 
 
 // 通常の目の描画
-void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
-          int dx_upperlid = 0.0, int dy_upperlid = 0.0, float dtheta_upperlid = 0.0,
+void EyeManager::update_look(float dx = 0.0, float dy = 0.0, float dzoom = 1.0f,
+          int dx_upperlid = 0.0, int dy_upperlid = 0.0, float dtheta_upperlid = 0.0, float dzoom_upperlid = 1.0,
           std::vector<int> dx_extra = {}, std::vector<int> dy_extra = {}, std::vector<int> dtheta_extra = {},
+          std::vector<float> dzoom_extra = {},
           float random_scale = 5.0)
 {
     EyeAsset& current_eye_asset = eye_asset_map[current_eye_asset_name];
-    logdebug("[%8ld] [update_look] dx: %.1f, dy: %.1f, dx_upperlid: %d, dy_upperlid: %d, dtheta_upperlid: %d, random_scale: %.1f, dx: %s, dy: %s, dtheta: %s", millis(), dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid, random_scale, joinVector(dx_extra).c_str(), joinVector(dy_extra).c_str(), joinVector(dtheta_extra).c_str());
+    std::ostringstream oss;
+    oss << "[" << millis << "] [update_look] "
+        << std::fixed << std::setprecision(1)  // 以下、浮動小数点はすべて%.1f
+        << "dx: " << dx << ", "
+        << "dy: " << dy << ", "
+	<< "dzoom: " << dzoom << ", "
+	<< "dx_upperlid: " << dx_upperlid << ", "
+        << "dy_upperlid: " << dy_upperlid << ", "
+        << "dtheta_upperlid: " << dtheta_upperlid << ", "
+        << "dzoom_upperlid: " << dzoom_upperlid << ", "
+        << "random_scale: " << random_scale;
+    if ( !dx_extra.empty() ) { oss << ", dx_extra: " << joinVector(dx_extra); }
+    if ( !dy_extra.empty() ) { oss << ", dy_extra: " << joinVector(dy_extra); }
+    if ( !dtheta_extra.empty() ) { oss << ", dtheta_extra: " << joinVector(dtheta_extra); }
+    if ( !dzoom_extra.empty() ) { oss << ", dzoom_extra: " << joinVector(dzoom_extra); }
+    logdebug(oss.str().c_str());
+    if ( dzoom <= 0.0f || dzoom_upperlid <= 0.0f) {
+      logwarn("zoom parametr must be > 0 (dzoom:%.1f dzoom_upperlid:%.1f", dzoom, dzoom_upperlid);
+    }
 
     long rx = (int)(random_scale * random(100) / 100);
     long ry = (int)(random_scale * random(100) / 100);
@@ -294,23 +317,23 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
       sprite_outline.pushSprite(&sprite_eye, 0, 0, TFT_WHITE);
     else
       sprite_outline.pushRotateZoom(&sprite_eye, image_width/2, image_height/2, 0.0f, zoom_outline, zoom_outline, TFT_WHITE);
-    if (zoom_iris == 1)
+    if (zoom_iris == 1 && dzoom == 1.0f)
       sprite_iris.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
     else
-      sprite_iris.pushRotateZoomWithAA(&sprite_eye, image_width/2, image_height/2, 0.0f, zoom_iris, zoom_iris, TFT_WHITE);
-    if (zoom_pupil == 1)
+      sprite_iris.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_iris*dzoom, zoom_iris*dzoom, TFT_WHITE);
+    if (zoom_pupil == 1 && dzoom == 1.0f)
       sprite_pupil.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
     else
-      sprite_pupil.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_pupil, zoom_pupil, TFT_WHITE); // 瞳孔をランダムに動かす
-    if (zoom_reflex == 1)
+      sprite_pupil.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_pupil*dzoom, zoom_pupil*dzoom, TFT_WHITE); // 瞳孔をランダムに動かす
+    if (zoom_reflex == 1 && dzoom == 1.0f)
       sprite_reflex.pushSprite(&sprite_eye, dx + rx, dy + ry, TFT_WHITE);
     else
-      sprite_reflex.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx + rx, image_height/2 + dy + ry, 0.0f, zoom_reflex, zoom_reflex, TFT_WHITE); // 光の反射をランダムに動かす
+      sprite_reflex.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx + rx, image_height/2 + dy + ry, 0.0f, zoom_reflex*dzoom, zoom_reflex*dzoom, TFT_WHITE); // 光の反射をランダムに動かす
     sprite_upperlid.pushRotateZoom(&sprite_eye,
                                    current_eye_asset.upperlid_default_pos_x + dx_upperlid,
                                    current_eye_asset.upperlid_default_pos_y + dy_upperlid,
                                    current_eye_asset.upperlid_default_theta + dtheta_upperlid,
-                                   zoom_upperlid, zoom_upperlid, TFT_WHITE);
+                                   zoom_upperlid*dzoom_upperlid, zoom_upperlid, TFT_WHITE);
 
     if (current_eye_asset.path_extra.size() > 0) {
       if ((current_eye_asset.path_extra.size() <= current_eye_asset.extra_default_pos_x.size()) &&
@@ -320,6 +343,7 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
           (current_eye_asset.path_extra.size() == dy_extra.size()) &&
           (current_eye_asset.path_extra.size() == dtheta_extra.size()) &&
           (current_eye_asset.path_extra.size() <= EXTRA_EYE_ASSET_SIZE)) {
+	dzoom_extra.resize(current_eye_asset.path_extra.size());
         for(int i = 0; i < current_eye_asset.path_extra.size(); i ++ ) {
           if (!current_eye_asset.path_extra[i].empty()) {
             // allocate, draw and free sprite memory here to ensure enough memory for PNG loading
@@ -334,18 +358,17 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0,
                                            current_eye_asset.extra_default_pos_x[i] + dx_extra[i],
                                            current_eye_asset.extra_default_pos_y[i] + dy_extra[i],
                                            current_eye_asset.extra_default_theta[i] + dtheta_extra[i],
-                                           zoom_extra, zoom_extra, TFT_WHITE);
+                                           dzoom_extra[i], dzoom_extra[i], TFT_WHITE);
             sprite_extra[i].deleteSprite();
           }
         }
       } else {
-        logerror("path_extra: %d, default_pos_x: %d, default_pos_y: %d, default_theta: %d, dx_extra: %d, dy_extra: %d, dtheta_extra: %d",
+        logerror("size of path_extra is %d, which is inconsistent with default_pos_x: %d, default_pos_y: %d, default_theta: %d, dx_extra: %d, dy_extra: %d, dtheta_extra: %d",
                  current_eye_asset.path_extra.size(),
                  current_eye_asset.extra_default_pos_x.size(), current_eye_asset.extra_default_pos_y.size(), current_eye_asset.extra_default_theta.size(),
                  dx_extra.size(), dy_extra.size(), dtheta_extra.size());
       }
     }
-
     sprite_eye.pushRotateZoom(&lcd, lcd.width() >> 1, lcd.height() >> 1, 0, zoom_ratio, zoom_ratio);
 }
 
@@ -381,12 +404,21 @@ int EyeManager::update_emotion() {
     if (current_eye_asset.upperlid_rotation_theta.size() > 0) {
       upperlid_theta = current_eye_asset.upperlid_rotation_theta[frame % current_eye_asset.upperlid_rotation_theta.size()];
     }
+    float upperlid_zoom = 1.0f, look_zoom = 1.0f;
+    if (current_eye_asset.upperlid_zoom.size() > 0) {
+      upperlid_zoom = current_eye_asset.upperlid_zoom[frame % current_eye_asset.upperlid_zoom.size()];
+    }
+    if (current_eye_asset.iris_zoom.size() > 0) {
+      look_zoom = current_eye_asset.iris_zoom[frame % current_eye_asset.iris_zoom.size()];
+    }
     std::vector<int> dx_extra = {}, dy_extra = {}, dtheta_extra = {};
+    std::vector<float> dzoom_extra = {};
     int path_extra_size = current_eye_asset.path_extra.size();
     if (path_extra_size > 0) {
       dx_extra.resize(path_extra_size, 0);
       dy_extra.resize(path_extra_size, 0);
       dtheta_extra.resize(path_extra_size, 0);
+      dzoom_extra.resize(path_extra_size, 0);
       for(int i = 0; i < current_eye_asset.path_extra.size(); i ++ ) {
         if ( (current_eye_asset.extra_position_x.size() > i) && (current_eye_asset.extra_position_x[i].size() > 0)) {
           dx_extra[i] = current_eye_asset.extra_position_x[i][frame % current_eye_asset.extra_position_x[i].size()];
@@ -397,11 +429,15 @@ int EyeManager::update_emotion() {
         if ( (current_eye_asset.extra_rotation_theta.size() > i) && (current_eye_asset.extra_rotation_theta[i].size() > 0)) {
           dtheta_extra[i] = current_eye_asset.extra_rotation_theta[i][frame % current_eye_asset.extra_rotation_theta[i].size()];
         }
+        if ( (current_eye_asset.extra_zoom.size() > i) && (current_eye_asset.extra_zoom[i].size() > 0)) {
+          dzoom_extra[i] = current_eye_asset.extra_zoom[i][frame % current_eye_asset.extra_zoom[i].size()];
+        }
       }
     }
 
-    update_look(look_x, look_y, upperlid_x, upperlid_y, upperlid_theta, // dx, dy, dx_upperlid, dy_upperlid, dtheta_upperlid
-                dx_extra, dy_extra, dtheta_extra
+    update_look(look_x, look_y, look_zoom,  // dx, dy, dzoom
+                upperlid_x, upperlid_y, upperlid_theta, upperlid_zoom, // dx_upperlid, dy_upperlid, dtheta_upperlid, zdoom_upperlid
+                dx_extra, dy_extra, dtheta_extra, dzoom_extra
                 );
     frame ++;
     return frame;
@@ -443,7 +479,7 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     } else if ( key == "eye_asset_names" ) {
       std::list<std::string> eye_asset_names = splitComma(value);
       if (eye_asset_names.size() > 0) {
-	eye_asset_name_first = eye_asset_names.front();
+        eye_asset_name_first = eye_asset_names.front();
       }
       //
       // initialize eye_asset_map from eye_asset_names
@@ -575,6 +611,41 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
         logerror("Invalid eye_asset type_rotation_theta : %s (%s,%s)", type_rotation_theta.c_str(), type.c_str(), rotation_theta.c_str());
         return -1;
       }
+    } else if ( key == "eye_asset_zoom" ) {
+      std::string name, type_zoom, type, zoom;
+      splitKeyValue(value, name, type_zoom);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_zoom, type, zoom);
+      //
+      // update eye_asset image map from eye_asset_upperlid_zoom
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      std::list<std::string> eye_asset_zoom = splitComma(zoom);
+      if ( type == "iris" ) {
+        asset->iris_zoom.clear();
+        for(std::string pos: eye_asset_zoom) {
+          asset->iris_zoom.push_back(std::stof(pos));
+        }
+      } else if ( type == "upperlid" ) {
+        asset->upperlid_zoom.clear();
+        for(std::string pos: eye_asset_zoom) {
+          asset->upperlid_zoom.push_back(std::stof(pos));
+        }
+      } else if ( type.compare(0, 5, "extra" ) == 0 ){
+        if (asset->extra_zoom.size() < EXTRA_EYE_ASSET_SIZE) {
+          std::vector<float> pos_list;
+          for(std::string pos: eye_asset_zoom) {
+            pos_list.push_back(std::stof(pos));
+          }
+          asset->extra_zoom.push_back(pos_list);
+        } else {
+          logerror("Extra zoom buffer overflow");
+          return -1;
+        }
+      } else {
+        logerror("Invalid eye_asset type_zoom : %s (%s,%s)", type_zoom.c_str(), type.c_str(), zoom.c_str());
+        return -1;
+      }
     } else if ( key == "eye_asset_default_pos_x" ) {
       std::string name, type_default_pos_x, type, default_pos_x;
       splitKeyValue(value, name, type_default_pos_x);
@@ -673,9 +744,15 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     for(int i = 0; i < eye_asset.path_extra.size(); i++) {
       loginfo("   extra%d image : %s", i, eye_asset.path_extra[i].c_str());
     }
+    if (eye_asset.iris_zoom.size() > 0) {
+      loginfo(" iris_positoin_zoom: %s", joinVector(eye_asset.iris_zoom).c_str());
+    }
     loginfo(" upperlid_position_x: %s", joinVector(eye_asset.upperlid_position_x).c_str());
     loginfo(" upperlid_position_y: %s", joinVector(eye_asset.upperlid_position_y).c_str());
     loginfo(" upperlid_rotation_theta: %s", joinVector(eye_asset.upperlid_rotation_theta).c_str());
+    if (eye_asset.upperlid_zoom.size() > 0) {
+      loginfo(" upperlid_positoin_zoom: %s", joinVector(eye_asset.upperlid_zoom).c_str());
+    }
     loginfo(" upperlid_default_pos_x : %d", eye_asset.upperlid_default_pos_x);
     loginfo(" upperlid_default_pos_y : %d", eye_asset.upperlid_default_pos_y);
     loginfo(" upperlid_default_theta : %d", eye_asset.upperlid_default_theta);
@@ -688,6 +765,9 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     }
     for(int i = 0; i < eye_asset.extra_rotation_theta.size(); i++) {
       loginfo("   extra%d_rotation_theta: %s", i, joinVector(eye_asset.extra_rotation_theta[i]).c_str());
+    }
+    for(int i = 0; i < eye_asset.extra_zoom.size(); i++) {
+      loginfo("   extra%d_zoom: %s", i, joinVector(eye_asset.extra_zoom[i]).c_str());
     }
 
     for(int i = 0; i < eye_asset.extra_default_pos_x.size(); i++) {
