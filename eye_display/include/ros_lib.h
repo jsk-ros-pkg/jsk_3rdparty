@@ -44,7 +44,14 @@ void callback_look_at(const geometry_msgs::Point &msg)
 }
 void callback_emotion(const std_msgs::String &msg)
 {
-  eye.set_emotion(msg.data);
+  // eye_status:
+  // {data : 'emotion name'} for set emotion
+  // {data : 'eye_asset_default_zoom: normal: iris: 1.2'} changes parameters
+  if (std::string(msg.data).find(':') == std::string::npos)  {
+    eye.set_emotion(msg.data);
+  } else {  // if message is key-value
+    eye.setup_asset(msg.data);
+  }
 }
 
 std::string ros_read_asset()

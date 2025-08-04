@@ -156,6 +156,26 @@ If you need more than the standard images (outline, iris, pupil, reflex, upperli
   extra2_default_pos_y: 75
   extra2_default_theta: 0
 ```
+
+#### Advanced control
+
+You can control the eye status in more detail through the `eye_status` topics.
+Use the following low-level commands.
+`<emotion>` is defined in the names list in the configuration YAML file (e.g., `names: [normal, happy, blink]`).
+`<type>` can be one of `iris`, `pupil`, `reflex`, `upperlid`, `extra1`, `extra2`.
+
+```
+eye_asset_image_path: <emotion>: <type>: <file name>
+eye_asset_default_pos_x: <emotion>: <type>: <value>
+eye_asset_default_pos_y: <emotion>: <type>: <value>
+eye_asset_default_theta: <emotion>: <type>: <value in degree>
+eye_asset_default_zoom: <emotion>: <type>: <value>
+eye_asset_position_x: <emotion>: <type>: <comma separated values>
+eye_asset_position_y: <emotion>: <type>: <comma separated values>
+eye_asset_rotation_theta: <emotion>: <type>: <comma separated values>
+eye_asset_zoom: <emotion>: <type>: <comma separated values>
+```
+
 ### Description of direction
 
 ![eye_display_direction](./doc/eye_display_direction.svg)
