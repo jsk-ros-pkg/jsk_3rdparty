@@ -106,7 +106,7 @@ public:
 
   void init(const int image_width, const int image_height);
   int setup_asset(std::string eye_asset_text);
-  void set_gaze_direction(float look_x, float look_y);
+  void set_gaze_direction(float look_x, float look_y, float look_theta);
   void set_emotion(const std::string eye_status_name);
   std::string get_emotion();
   int update_emotion();
@@ -223,12 +223,13 @@ bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath, floa
 }
 
    // 視線方向を変更（値を設定するだけ）
-void EyeManager::set_gaze_direction(float look_x, float look_y)
+void EyeManager::set_gaze_direction(float look_x, float look_y, float look_theta)
 {
     EyeAsset& current_eye_asset = eye_asset_map[current_eye_asset_name];
     current_eye_asset.iris_default_pos_x = look_x;
     current_eye_asset.iris_default_pos_y = look_y;
-    loginfo("[%8ld] Look at (%.1f, %.1f)", millis(), look_x, look_y);
+    current_eye_asset.iris_default_theta = look_theta;
+    loginfo("[%8ld] Look at (%.1f, %.1f, %.1f)", millis(), look_x, look_y, look_theta);
 }
 
 // 目の状態を更新する
@@ -322,18 +323,18 @@ void EyeManager::update_look(float dx = 0.0f, float dy = 0.0f, float dtheta = 0.
       sprite_outline.pushSprite(&sprite_eye, 0, 0, TFT_WHITE);
     else
       sprite_outline.pushRotateZoom(&sprite_eye, image_width/2, image_height/2, 0.0f, zoom_outline, zoom_outline, TFT_WHITE);
-    if (zoom_iris == 1 && dzoom == 1.0f)
+    if (zoom_iris == 1 && dzoom == 1.0f && dtheta == 0.0f)
       sprite_iris.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
     else
-      sprite_iris.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_iris*dzoom, zoom_iris*dzoom, TFT_WHITE);
-    if (zoom_pupil == 1 && dzoom == 1.0f)
+      sprite_iris.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, dtheta, zoom_iris*dzoom, zoom_iris*dzoom, TFT_WHITE);
+    if (zoom_pupil == 1 && dzoom == 1.0f && dtheta == 0.0f)
       sprite_pupil.pushSprite(&sprite_eye, dx, dy, TFT_WHITE);
     else
-      sprite_pupil.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, 0.0f, zoom_pupil*dzoom, zoom_pupil*dzoom, TFT_WHITE); // 瞳孔をランダムに動かす
-    if (zoom_reflex == 1 && dzoom == 1.0f)
+      sprite_pupil.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx, image_height/2 + dy, dtheta, zoom_pupil*dzoom, zoom_pupil*dzoom, TFT_WHITE); // 瞳孔をランダムに動かす
+    if (zoom_reflex == 1 && dzoom == 1.0f && dtheta == 0.0f)
       sprite_reflex.pushSprite(&sprite_eye, dx + rx, dy + ry, TFT_WHITE);
     else
-      sprite_reflex.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx + rx, image_height/2 + dy + ry, 0.0f, zoom_reflex*dzoom, zoom_reflex*dzoom, TFT_WHITE); // 光の反射をランダムに動かす
+      sprite_reflex.pushRotateZoomWithAA(&sprite_eye, image_width/2 + dx + rx, image_height/2 + dy + ry, dtheta, zoom_reflex*dzoom, zoom_reflex*dzoom, TFT_WHITE); // 光の反射をランダムに動かす
     sprite_upperlid.pushRotateZoom(&sprite_eye,
                                    current_eye_asset.upperlid_default_pos_x + dx_upperlid,
                                    current_eye_asset.upperlid_default_pos_y + dy_upperlid,

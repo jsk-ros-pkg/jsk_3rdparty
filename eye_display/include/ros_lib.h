@@ -40,7 +40,7 @@ ros::Subscriber<std_msgs::String> sub_eye_status("~eye_status", &callback_emotio
 
 void callback_look_at(const geometry_msgs::Point &msg)
 {
-  eye.set_gaze_direction((float)msg.x, (float)msg.y);
+  eye.set_gaze_direction((float)msg.x, (float)msg.y, (float)msg.z);
 }
 void callback_emotion(const std_msgs::String &msg)
 {
