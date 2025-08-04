@@ -137,17 +137,32 @@ std::string ros_read_asset()
     nh.getParam(eye_asset_map_key, eye_defaults);
     for(const std::string& eye_default: eye_defaults) {
       if (eye_default == "NONE") continue;
-      std::vector<int> defaults;
-      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
-      if (nh.getParam(eye_asset_map_key, defaults)) {
-        size_t pos = eye_default.find('_');
-        if ( pos != std::string::npos ) {
-          std::string eye_type = eye_default.substr(0, pos);
-          std::string default_type = eye_default.substr(pos+1);
-          oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
-        } else {
-          logerror("Invalid param name : %s", eye_default);
-        }
+      if (eye_default.find("_default_zoom") != std::string::npos) {
+	std::vector<float> defaults;
+	snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
+	if (nh.getParam(eye_asset_map_key, defaults)) {
+	  size_t pos = eye_default.find('_');
+	  if ( pos != std::string::npos ) {
+	    std::string eye_type = eye_default.substr(0, pos);
+	    std::string default_type = eye_default.substr(pos+1);
+	    oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
+	  } else {
+	    logerror("Invalid param name : %s", eye_default);
+	  }
+	}
+      } else {
+	std::vector<int> defaults;
+	snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
+	if (nh.getParam(eye_asset_map_key, defaults)) {
+	  size_t pos = eye_default.find('_');
+	  if ( pos != std::string::npos ) {
+	    std::string eye_type = eye_default.substr(0, pos);
+	    std::string default_type = eye_default.substr(pos+1);
+	    oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
+	  } else {
+	    logerror("Invalid param name : %s", eye_default);
+	  }
+	}
       }
     }
 

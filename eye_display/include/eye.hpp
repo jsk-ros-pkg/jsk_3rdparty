@@ -39,14 +39,20 @@ struct EyeAsset {
  std::vector<std::vector<float>> extra_zoom = {};
  int direction = 0;
  bool invert_rl = false;
+ float iris_default_pos_x = 0.0f;
+ float iris_default_pos_y = 0.2f;
+ float iris_default_theta = 0.0f;
+ float iris_default_zoom = 1.0f;
  int upperlid_pivot_x = 75;
  int upperlid_pivot_y = 139;
  int upperlid_default_pos_x = 75;
  int upperlid_default_pos_y = 7;
  int upperlid_default_theta = 0;
+ float upperlid_default_zoom = 1.0f;
  std::vector<int> extra_default_pos_x = {};
  std::vector<int> extra_default_pos_y = {};
  std::vector<int> extra_default_theta = {};
+ std::vector<float> extra_default_zoom = {};
 };
 
 #if defined(STAMPS3)
@@ -87,9 +93,6 @@ private:
   int image_width = 139;
   int image_height = 139;
 
-  float look_x = 0.0f;
-  float look_y = 0.2f;
-
   int frame = 0;
 
   void load_eye_images();
@@ -107,7 +110,7 @@ public:
   void set_emotion(const std::string eye_status_name);
   std::string get_emotion();
   int update_emotion();
-  void update_look(float dx, float dy, float dzoom,
+  void update_look(float dx, float dy, float dtheta, float dzoom,
                    int dx_upperlid, int dy_upperlid, float dtheta_upperlid, float dzoom_upperlid,
                    std::vector<int> dx_extra, std::vector<int> dy_extra, std::vector<int> dtheta_extra, std::vector<float> dzoom_extra,
                    float random_scale);
@@ -222,8 +225,9 @@ bool EyeManager::draw_image_file(LGFX_Sprite& sprite, const char* filePath, floa
    // 視線方向を変更（値を設定するだけ）
 void EyeManager::set_gaze_direction(float look_x, float look_y)
 {
-    this->look_x = look_x;
-    this->look_y = look_y;
+    EyeAsset& current_eye_asset = eye_asset_map[current_eye_asset_name];
+    current_eye_asset.iris_default_pos_x = look_x;
+    current_eye_asset.iris_default_pos_y = look_y;
     loginfo("[%8ld] Look at (%.1f, %.1f)", millis(), look_x, look_y);
 }
 
@@ -281,7 +285,7 @@ void EyeManager::load_eye_images()
 
 
 // 通常の目の描画
-void EyeManager::update_look(float dx = 0.0, float dy = 0.0, float dzoom = 1.0f,
+void EyeManager::update_look(float dx = 0.0f, float dy = 0.0f, float dtheta = 0.0f, float dzoom = 1.0f,
           int dx_upperlid = 0.0, int dy_upperlid = 0.0, float dtheta_upperlid = 0.0, float dzoom_upperlid = 1.0,
           std::vector<int> dx_extra = {}, std::vector<int> dy_extra = {}, std::vector<int> dtheta_extra = {},
           std::vector<float> dzoom_extra = {},
@@ -293,6 +297,7 @@ void EyeManager::update_look(float dx = 0.0, float dy = 0.0, float dzoom = 1.0f,
         << std::fixed << std::setprecision(1)  // 以下、浮動小数点はすべて%.1f
         << "dx: " << dx << ", "
         << "dy: " << dy << ", "
+        << "dtheta: " << dtheta << ", "
 	<< "dzoom: " << dzoom << ", "
 	<< "dx_upperlid: " << dx_upperlid << ", "
         << "dy_upperlid: " << dy_upperlid << ", "
@@ -435,7 +440,9 @@ int EyeManager::update_emotion() {
       }
     }
 
-    update_look(look_x, look_y, look_zoom,  // dx, dy, dzoom
+    update_look(current_eye_asset.iris_default_pos_x, current_eye_asset.iris_default_pos_y,
+		current_eye_asset.iris_default_theta,
+		current_eye_asset.iris_default_zoom * look_zoom,  // dx, dy, dtheta, dzoom
                 upperlid_x, upperlid_y, upperlid_theta, upperlid_zoom, // dx_upperlid, dy_upperlid, dtheta_upperlid, zdoom_upperlid
                 dx_extra, dy_extra, dtheta_extra, dzoom_extra
                 );
@@ -655,7 +662,9 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       // update eye_asset image map from eye_asset_default_pos_x
       //
       EyeAsset *asset = &(eye_asset_map[name]);
-      if ( type == "upperlid" ) {
+      if ( type == "iris" ) {
+        asset->iris_default_pos_x = std::stoi(default_pos_x);
+      } else if ( type == "upperlid" ) {
         asset->upperlid_default_pos_x = std::stoi(default_pos_x);
       } else if ( type.compare(0, 5, "extra" ) == 0 ){
         if (asset->extra_default_pos_x.size() < EXTRA_EYE_ASSET_SIZE) {
@@ -677,7 +686,9 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       // update eye_asset image map from eye_asset_default_pos_y
       //
       EyeAsset *asset = &(eye_asset_map[name]);
-      if ( type == "upperlid" ) {
+      if ( type == "iris" ) {
+        asset->iris_default_pos_y = std::stoi(default_pos_y);
+      } else if ( type == "upperlid" ) {
         asset->upperlid_default_pos_y = std::stoi(default_pos_y);
       } else if ( type.compare(0, 5, "extra" ) == 0 ){
         if (asset->extra_default_pos_y.size() < EXTRA_EYE_ASSET_SIZE) {
@@ -699,7 +710,9 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       // update eye_asset image map from eye_asset_default_theta
       //
       EyeAsset *asset = &(eye_asset_map[name]);
-      if ( type == "upperlid" ) {
+      if ( type == "iris" ) {
+        asset->iris_default_theta = std::stoi(default_theta);
+      } else if ( type == "upperlid" ) {
         asset->upperlid_default_theta = std::stoi(default_theta);
       } else if ( type.compare(0, 5, "extra" ) == 0 ){
         if (asset->extra_default_theta.size() < EXTRA_EYE_ASSET_SIZE) {
@@ -710,6 +723,30 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
         }
       } else {
         logerror("Invalid eye_asset type_default_theta : %s (%s,%s)", type_default_theta.c_str(), type.c_str(), default_theta.c_str());
+        return -1;
+      }
+    } else if ( key == "eye_asset_default_zoom" ) {
+      std::string name, type_default_zoom, type, default_zoom;
+      splitKeyValue(value, name, type_default_zoom);
+      check_eye_asset_map_key(name);
+      splitKeyValue(type_default_zoom, type, default_zoom);
+      //
+      // update eye_asset image map from eye_asset_default_zoom
+      //
+      EyeAsset *asset = &(eye_asset_map[name]);
+      if ( type == "iris" ) {
+        asset->iris_default_zoom = std::stof(default_zoom);
+      } else if ( type == "upperlid" ) {
+        asset->upperlid_default_zoom = std::stof(default_zoom);
+      } else if ( type.compare(0, 5, "extra" ) == 0 ){
+        if (asset->extra_default_zoom.size() < EXTRA_EYE_ASSET_SIZE) {
+          asset->extra_default_zoom.push_back(std::stof(default_zoom));
+        } else {
+          logerror("Extra default_zoom buffer overflow");
+          return -1;
+        }
+      } else {
+        logerror("Invalid eye_asset type_default_zoom : %s (%s,%s)", type_default_zoom.c_str(), type.c_str(), default_zoom.c_str());
         return -1;
       }
     } else if ( key == "eye_asset_done" ) {
@@ -756,6 +793,7 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     loginfo(" upperlid_default_pos_x : %d", eye_asset.upperlid_default_pos_x);
     loginfo(" upperlid_default_pos_y : %d", eye_asset.upperlid_default_pos_y);
     loginfo(" upperlid_default_theta : %d", eye_asset.upperlid_default_theta);
+    loginfo(" upperlid_default_zoom : %f", eye_asset.upperlid_default_zoom);
 
     for(int i = 0; i < eye_asset.extra_position_x.size(); i++) {
       loginfo("   extra%d_position_x : %s", i, joinVector(eye_asset.extra_position_x[i]).c_str());
