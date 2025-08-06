@@ -3,6 +3,8 @@ project(power_switching_tools_ros)
 
 find_package(catkin REQUIRED)
 
+catkin_python_setup()
+
 catkin_package()
 
 file(GLOB NODE_SCRIPTS_PY node_scripts/*.py)

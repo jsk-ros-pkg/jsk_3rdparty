@@ -1,23 +1,15 @@
 #!/usr/bin/env python
 
-from std_srvs.srv import SetBool
-from std_srvs.srv import SetBoolResponse
-from std_srvs.srv import Trigger
-from std_srvs.srv import TriggerResponse
+from power_switching_tools_ros.power_switching_driver_base import PowerSwitchingDriverBase
 import rospy
 import serial
-import threading
 
 
-class UsbSerialTroubleshooterDriver(object):
+class UsbSerialTroubleshooterDriver(PowerSwitchingDriverBase):
 
     def __init__(self):
         port = rospy.get_param('~port', '/dev/ttyACM0')
         ser_timeout = rospy.get_param('~serial_timeout', None)
-        self.pwr_cyc_iv = rospy.get_param('~power_cycle_interval', 1.0)
-        self.is_init_set = rospy.get_param('~init_with_power_set', True)
-        self.is_init_on = rospy.get_param('~init_with_power_on', True)
-        self.lock = threading.Lock()
 
         rospy.loginfo('[{}] Port: {}'.format(rospy.get_name(), port))
         # USB-Serial troubleshooter default settings
@@ -27,16 +19,8 @@ class UsbSerialTroubleshooterDriver(object):
             timeout=ser_timeout,
             writeTimeout=ser_timeout,
         )
-        if self.is_init_set:
-            if self.is_init_on:
-                self._pwr(True)
-            else:
-                self._pwr(False)
 
-        self.pwr_srv = rospy.Service(
-            '~power', SetBool, self._pwr_srv_cb)
-        self.pwr_cyc_srv = rospy.Service(
-            '~power_cycle', Trigger, self._pwr_cyc_srv_cb)
+        super(UsbSerialTroubleshooterDriver, self).__init__()
 
     def _pwr(self, is_on):
         try:
@@ -75,19 +59,6 @@ class UsbSerialTroubleshooterDriver(object):
                         rospy.get_name(), res))
                 rospy.signal_shutdown('Return value is erroneous')
             return False
-
-    def _pwr_srv_cb(self, req):
-        with self.lock:
-            res = self._pwr(req.data)
-        return SetBoolResponse(success=res)
-
-    def _pwr_cyc_srv_cb(self, req):
-        with self.lock:
-            res = self._pwr(False)
-            if res:
-                rospy.sleep(self.pwr_cyc_iv)
-                res = self._pwr(True)
-        return TriggerResponse(success=res)
 
 
 if __name__ == '__main__':

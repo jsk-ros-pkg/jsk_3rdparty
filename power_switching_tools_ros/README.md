@@ -62,11 +62,11 @@ Optional Arguments:
 ### Advanced usage: automated power cycle of USB
 
 ```bash
-roslaunch power_switching_tools_ros usb_auto_power_cycle.launch troubleshooter_port:=/dev/<symlink_name> monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
+roslaunch power_switching_tools_ros auto_power_cycle.launch troubleshooter_port:=/dev/<symlink_name> monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
 # <symlink_name> : The same as above
-# <monitored_topic> : Topic monitored for determining USB health. If this is not published for an unusually long period, USB power cycle occurs
+# <monitored_topic> : Topic monitored for determining health of monitored communication. If this is not published for an unusually long period, power cycle of that communication occurs
 # <monitored_topic_expected_hz> : Expected Hz of monitored topic
-# <monitored_topic_respawn_delay> : For this duration [sec] after USB power cycle, new power cycle does not occur to wait for topic to be published
+# <monitored_topic_respawn_delay> : For this duration [sec] after power cycle, new power cycle does not occur to wait for topic to be published
 #
-# In default, this launch firstly executes power cycle of USB once. If you want to change this behavior, set "init_with_power_cycle:=false"
+# In default, this launch firstly executes power cycle once. If you want to change this behavior, set "init_with_power_cycle:=false"
 ```

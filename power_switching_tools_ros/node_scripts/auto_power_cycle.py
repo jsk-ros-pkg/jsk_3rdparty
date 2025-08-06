@@ -4,7 +4,7 @@ from std_srvs.srv import Trigger
 import rospy
 
 
-class UsbAutoPowerCycle(object):
+class AutoPowerCycle(object):
 
     def __init__(self):
         self.expt_hz = rospy.get_param(
@@ -57,12 +57,12 @@ class UsbAutoPowerCycle(object):
             elif rospy.Time.now() > self.limit_tm:
                 rospy.logwarn(
                     '[{}] Monitored topic stops, '
-                    'try USB power cycle...'.format(rospy.get_name()))
+                    'try power cycle...'.format(rospy.get_name()))
                 try:
                     res = self.pwr_cyc_srv()
                 except rospy.service.ServiceException as e:
                     rospy.logwarn(
-                        '[{}] USB power cycle failed due to '
+                        '[{}] power cycle failed due to '
                         'service call failure, try next time'.format(
                             rospy.get_name()))
                     rospy.logdebug(
@@ -73,6 +73,6 @@ class UsbAutoPowerCycle(object):
 
 
 if __name__ == '__main__':
-    rospy.init_node('usb_auto_power_cycle')
-    app = UsbAutoPowerCycle()
+    rospy.init_node('auto_power_cycle')
+    app = AutoPowerCycle()
     rospy.spin()
