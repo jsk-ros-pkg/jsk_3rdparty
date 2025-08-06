@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(century_ros)
+project(power_switching_tools_ros)
 
 find_package(catkin REQUIRED)
 

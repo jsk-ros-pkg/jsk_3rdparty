@@ -26,7 +26,7 @@
 
   <group if="$(arg launch_driver)">
 
-    <include file="$(find century_ros)/launch/usb_serial_troubleshooter.launch">
+    <include file="$(find power_switching_tools_ros)/launch/usb_serial_troubleshooter.launch">
       <arg name="port" value="$(arg troubleshooter_port)" />
       <arg name="serial_timeout" value="$(arg troubleshooter_serial_timeout)" />
       <arg name="power_cycle_interval" value="$(arg troubleshooter_power_cycle_interval)" />
@@ -38,7 +38,7 @@
   </group>
 
   <node name="usb_auto_power_cycle"
-        pkg="century_ros" type="usb_auto_power_cycle.py"
+        pkg="power_switching_tools_ros" type="usb_auto_power_cycle.py"
         respawn="true"
         output="screen">
     <remap from="~monitored_topic" to="$(arg monitored_topic)" />

@@ -12,7 +12,7 @@ SERIAL_NUMBER="$1"
 SYMLINK_NAME="$2"
 
 RULES_DIR="/etc/udev/rules.d"
-TEMPLATE_PATH="$(rospack find century_ros)/udev/90-usb-serial-troubleshooter.rules.template"
+TEMPLATE_PATH="$(rospack find power_switching_tools_ros)/udev/90-usb-serial-troubleshooter.rules.template"
 RULES_PATH="$RULES_DIR/90-usb-serial-troubleshooter.rules"
 
 echo ""

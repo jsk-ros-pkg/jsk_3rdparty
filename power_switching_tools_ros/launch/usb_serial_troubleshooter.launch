@@ -17,7 +17,7 @@
        doc="Name of service for USB power cycle" />
 
   <node name="usb_serial_troubleshooter_driver"
-        pkg="century_ros" type="usb_serial_troubleshooter_driver.py"
+        pkg="power_switching_tools_ros" type="usb_serial_troubleshooter_driver.py"
         respawn="true"
         output="screen">
     <remap from="~power" to="$(arg power_service)" />
