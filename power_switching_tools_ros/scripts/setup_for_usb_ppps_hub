@@ -1,0 +1,25 @@
+#!/bin/bash
+
+RULES_PATH="/etc/udev/rules.d/52-usb.rules"
+
+echo ""
+echo "This script sets up your PC to control USB PPPS hubs"
+echo ""
+
+echo ""
+echo "Downloading udev rules for USB PPPS hubs to $RULES_PATH"
+echo ""
+sudo wget https://raw.githubusercontent.com/mvp/uhubctl/refs/heads/master/udev/rules.d/52-usb.rules -O "$RULES_PATH"
+
+echo ""
+echo "Restarting udev"
+echo ""
+sudo udevadm control --reload
+sudo udevadm trigger
+
+echo ""
+echo "Adding your user to dialout group"
+echo ""
+sudo usermod -a -G dialout "$USER"
+
+echo "Setup finished. Reboot your PC"

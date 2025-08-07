@@ -1,0 +1,53 @@
+<launch>
+
+  <arg name="monitored_topic"
+       doc="Topic monitored for determining health of monitored communication. If this is not published for an unusually long period, power cycle of that communication occurs" />
+  <arg name="monitored_topic_expected_hz"
+       doc="Expected Hz of monitored topic" />
+  <arg name="monitored_topic_respawn_delay"
+       doc="For this duration [sec] after power cycle, new power cycle does not occur to wait for topic to be published" />
+
+  <arg name="launch_default_driver" default="true"
+       doc="Launch driver of USB-Serial troubleshooter" />
+  <arg name="troubleshooter_port" default="/dev/ttyACM0"
+       doc="Port connecting with USB-Serial troubleshooter" />
+  <arg name="troubleshooter_serial_timeout" default="1"
+       doc="Timeout [sec] of serial communication with USB-Serial troubleshooter" />
+  <arg name="troubleshooter_power_cycle_interval" default="1.0"
+       doc="Interval [sec] in USB power cycle using USB-Serial troubleshooter" />
+  <arg name="troubleshooter_init_with_power_set" default="true"
+       doc="Set power state of USB when driver of USB-Serial troubleshooter is initialized. Which state (ON or OFF) is set is defined by troubleshooter_init_with_power_on" />
+  <arg name="troubleshooter_init_with_power_on" default="true"
+       doc="Power on USB when driver of USB-Serial troubleshooter is initialized. This argument is valid only when troubleshooter_init_with_power_set is true" />
+  <arg name="monitored_topic_allowed_delay_cycles" default="2.0"
+       doc="If monitored topic is not published in the expected timing and is delayed for ((1 / monitored_topic_expected_hz) * monitored_topic_allowed_delay_cycles) [sec], power cycle occurs" />
+  <arg name="init_with_power_cycle" default="true"
+       doc="Execute power cycle when auto_power_cycle node is initialized" />
+
+  <group if="$(arg launch_default_driver)">
+
+    <include file="$(find power_switching_tools_ros)/launch/usb_serial_troubleshooter.launch">
+      <arg name="port" value="$(arg troubleshooter_port)" />
+      <arg name="serial_timeout" value="$(arg troubleshooter_serial_timeout)" />
+      <arg name="power_cycle_interval" value="$(arg troubleshooter_power_cycle_interval)" />
+      <arg name="init_with_power_set" value="$(arg troubleshooter_init_with_power_set)" />
+      <arg name="init_with_power_on" value="$(arg troubleshooter_init_with_power_on)" />
+      <arg name="power_cycle_service" value="auto_power_cycle/power_cycle" />
+    </include>
+
+  </group>
+
+  <node name="auto_power_cycle"
+        pkg="power_switching_tools_ros" type="auto_power_cycle.py"
+        respawn="true"
+        output="screen">
+    <remap from="~monitored_topic" to="$(arg monitored_topic)" />
+    <rosparam subst_value="true">
+      monitored_topic_expected_hz: $(arg monitored_topic_expected_hz)
+      monitored_topic_allowed_delay_cycles: $(arg monitored_topic_allowed_delay_cycles)
+      monitored_topic_respawn_delay: $(arg monitored_topic_respawn_delay)
+      init_with_power_cycle: $(arg init_with_power_cycle)
+    </rosparam>
+  </node>
+
+</launch>
