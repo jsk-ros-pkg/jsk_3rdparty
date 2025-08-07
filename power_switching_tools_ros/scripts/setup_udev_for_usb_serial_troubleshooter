@@ -19,13 +19,44 @@ echo ""
 echo "This script generates udev rules for USB-Serial troubleshooter"
 echo "Serial number : $SERIAL_NUMBER"
 echo "Symlink name  : $SYMLINK_NAME"
-echo "Output rule   : $RULES_PATH"
+echo "Output file   : $RULES_PATH"
 echo ""
 
-sudo bash -c "sed \
-  -e 's|{{SERIAL}}|$SERIAL_NUMBER|' \
-  -e 's|{{SYMLINK}}|$SYMLINK_NAME|' \
-  '$TEMPLATE_PATH' > '$RULES_PATH'"
+NEW_RULE=$(sed \
+  -e "s|{{SERIAL}}|$SERIAL_NUMBER|" \
+  -e "s|{{SYMLINK}}|$SYMLINK_NAME|" \
+  "$TEMPLATE_PATH")
+
+# Check existing file
+if [ -f "$RULES_PATH" ]; then
+  echo "The file $RULES_PATH already exists. Current contents:"
+  echo "--------------------------------------------------"
+  cat "$RULES_PATH"
+  echo "--------------------------------------------------"
+  echo "How would you like to proceed?"
+  echo "  [o] Overwrite"
+  echo "  [a] Append"
+  echo "  [c] Cancel"
+  read -p "Enter your choice [o/a/c]: " USER_CHOICE
+
+  case "$USER_CHOICE" in
+    [oO])
+      echo "Overwriting $RULES_PATH..."
+      echo "$NEW_RULE" | sudo tee "$RULES_PATH" > /dev/null
+      ;;
+    [aA])
+      echo "Appending to $RULES_PATH..."
+      echo "$NEW_RULE" | sudo tee -a "$RULES_PATH" > /dev/null
+      ;;
+    *)
+      echo "Operation cancelled."
+      exit 0
+      ;;
+  esac
+else
+  echo "Creating new rules file..."
+  echo "$NEW_RULE" | sudo tee "$RULES_PATH" > /dev/null
+fi
 
 echo ""
 echo "Restarting udev"
