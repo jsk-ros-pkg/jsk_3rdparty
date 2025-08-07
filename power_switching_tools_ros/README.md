@@ -80,6 +80,7 @@ roslaunch power_switching_tools_ros auto_power_cycle.launch troubleshooter_port:
 Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.com/product/usb-hub/)) are listed [here](https://github.com/mvp/uhubctl?tab=readme-ov-file#compatible-usb-hubs).
 - Advantages compared with USB-Serial troubleshooter:
   - Having multiple ports
+  - [Connection problem](#connecting-usb-serial-troubleshooter) does not occur
 - Disadvantages compared with USB-Serial troubleshooter:
   - Power switching is slower
 
