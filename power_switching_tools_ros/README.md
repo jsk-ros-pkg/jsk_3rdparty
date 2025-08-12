@@ -139,6 +139,7 @@ Optional Arguments:
   power_cycle_interval (default "1.0"): Interval [sec] in USB power cycle using USB PPPS hub
   power_cycle_service (default "~power_cycle"): Name of service for USB power cycle
   power_service (default "~power"): Name of service for USB power switching
+  uhubctl_executable (default "uhubctl"): Command to control USB PPPS hub. You can add supplementary options to uhubctl command (e.g., 'uhubctl -r 100'). In addition, you can specify the path to uhubctl command you installed on your own (e.g., '~/uhubctl/uhubctl')
 ```
 
 #### Services

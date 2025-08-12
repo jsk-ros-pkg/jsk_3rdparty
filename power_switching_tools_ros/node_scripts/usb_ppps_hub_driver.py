@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from power_switching_tools_ros.power_switching_driver_base import PowerSwitchingDriverBase
+import os
 import rospy
 import subprocess
 
@@ -17,20 +18,21 @@ class UsbPppsHubDriver(PowerSwitchingDriverBase):
                     rospy.get_name()))
             rospy.signal_shutdown('Could not get required params')
             return
+        uhubctl_exec_str = os.path.expanduser(
+            rospy.get_param('~uhubctl_executable', 'uhubctl'))
+        self.uhubctl_exec = uhubctl_exec_str.split(' ')
 
+        # Check if provided parameters work
         try:
-            res = subprocess.run(
-                ['uhubctl',
-                 '-l', self.hub_loc,
-                 '-p', self.hub_port],
-                capture_output=True,
-                text=True,
-            )
+            cmd = self.uhubctl_exec[:]
+            cmd += ['-l', self.hub_loc,
+                    '-p', self.hub_port]
+            res = subprocess.run(cmd, capture_output=True, text=True)
         except FileNotFoundError as e:
             rospy.logfatal(
-                '[{}] Please install uhubctl '
-                'by "sudo apt install uhubctl"'.format(
-                    rospy.get_name()))
+                '[{}] {} does not exist. Install that executable '
+                '(e.g., "sudo apt install uhubctl")'.format(
+                    rospy.get_name(), cmd[0]))
             rospy.signal_shutdown('uhubctl is not installed')
             return
         if ((res.returncode == 0
@@ -52,22 +54,22 @@ class UsbPppsHubDriver(PowerSwitchingDriverBase):
                 return
             else:
                 rospy.logfatal(
-                    '[{}] Unknown error'.format(
+                    '[{}] uhubctl returned some error'.format(
                         rospy.get_name()))
-                rospy.signal_shutdown('Unknown error')
+                rospy.logfatal(
+                    '[{}] Error message returned from uhubctl: {}'.format(
+                        rospy.get_name(), res.stderr))
+                rospy.signal_shutdown('uhubctl returned some error')
                 return
 
         super(UsbPppsHubDriver, self).__init__()
 
     def _pwr(self, is_on):
-        res = subprocess.run(
-            ['uhubctl',
-             '-a', str(int(is_on)),
-             '-l', self.hub_loc,
-             '-p', self.hub_port],
-            capture_output=True,
-            text=True,
-        )
+        cmd = self.uhubctl_exec[:]
+        cmd += ['-a', str(int(is_on)),
+                '-l', self.hub_loc,
+                '-p', self.hub_port]
+        res = subprocess.run(cmd, capture_output=True, text=True)
         if res.returncode == 0:
             rospy.loginfo(
                 '[{}] Changed power state to {}'.format(
@@ -75,10 +77,10 @@ class UsbPppsHubDriver(PowerSwitchingDriverBase):
             return True
         else:
             rospy.logerr(
-                '[{}] uhubctl returns an error. '
+                '[{}] uhubctl returned some error. '
                 'Check if hub is connected'.format(
                     rospy.get_name()))
-            rospy.logdebug(
+            rospy.logerr(
                 '[{}] Error message returned from uhubctl: {}'.format(
                     rospy.get_name(), res.stderr))
             return False

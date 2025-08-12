@@ -15,6 +15,8 @@
        doc="Name of service for USB power switching" />
   <arg name="power_cycle_service" default="~power_cycle"
        doc="Name of service for USB power cycle" />
+  <arg name="uhubctl_executable" default="uhubctl"
+       doc="Command to control USB PPPS hub. You can add supplementary options to uhubctl command (e.g., 'uhubctl -r 100'). In addition, you can specify the path to uhubctl command you installed on your own (e.g., '~/uhubctl/uhubctl')" />
 
   <node name="usb_ppps_hub_driver"
         pkg="power_switching_tools_ros" type="usb_ppps_hub_driver.py"
@@ -28,6 +30,7 @@
       power_cycle_interval: $(arg power_cycle_interval)
       init_with_power_set: $(arg init_with_power_set)
       init_with_power_on: $(arg init_with_power_on)
+      uhubctl_executable: $(arg uhubctl_executable)
     </rosparam>
   </node>
 
