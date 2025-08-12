@@ -83,6 +83,7 @@ Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.
   - [Connection problem](#connecting-usb-serial-troubleshooter) does not occur
 - Disadvantages compared with USB-Serial troubleshooter:
   - Power switching is slower
+  - Some devices are hard to be powered off (e.g., [arbitrary power recovering problem](https://github.com/mvp/uhubctl?tab=readme-ov-file#power-comes-back-on-after-few-seconds-on-linux))
 
 ### Preparation
 
@@ -95,7 +96,7 @@ rosrun power_switching_tools_ros setup_for_usb_ppps_hub
 # Note that this script adds your user to dialout group, which means "chmod" becomes unnecessary for accessing some device files (e.g., /dev/ttyACM0)
 ```
 
-#### Check location of your hub
+#### Check if power switching works
 
 Connect your hub to your PC, connect devices you want to use in your application to your hub, then run:
 ```bash
@@ -116,7 +117,17 @@ Current status for hub 2-2 [366b:0005 VirtualHere Pty. Ltd. VirtualHere 4-Port H
 ```
 Write down the number just after `Current status for hub` whose section includes the device you want to power on/off (`3-5`, in the example above).
 This is the location of your hub.
-In addition, write down the port which that device is connected to.
+In addition, write down the port which that device is connected to (`1`, in the example above).
+Then try to power off and on the device:
+```bash
+uhubctl -a off -l <hub_location> -p <hub_port>
+# <hub_location> : Location of your hub
+# <hub_port> : Port of your hub which you want to power on/off
+uhubctl -a on -l <hub_location> -p <hub_port>
+```
+If USB power supply to the device is stopped and restarted as expected, `power_switching_tools_ros` can also power on/off the device.
+If not, check [the web page of uhubctl](https://github.com/mvp/uhubctl) (especially [FAQ](https://github.com/mvp/uhubctl?tab=readme-ov-file#faq)) to find candidates for a workaround and try them.
+If the found workaround requires supplementary options for `uhubctl`, write them down.
 
 ### Minimal usage: launching driver only
 
@@ -125,6 +136,7 @@ roslaunch power_switching_tools_ros usb_ppps_hub.launch hub_location:=<hub_locat
 # <hub_location> : Location of your hub
 # <hub_port> : Port of your hub which you want to power on/off
 ```
+If [the previous checking](#check-if-power-switching-works) tells you to add supplementary options to `uhubctl`, use `uhubctl_executable` argument explained below.
 
 #### Arguments
 
