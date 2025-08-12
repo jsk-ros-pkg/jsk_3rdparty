@@ -3,7 +3,7 @@
 RULES_PATH="/etc/udev/rules.d/52-usb.rules"
 
 echo ""
-echo "This script sets up your PC to control USB PPPS hubs"
+echo "This script sets up udev to control USB PPPS hubs"
 echo ""
 
 echo ""
@@ -18,8 +18,11 @@ sudo udevadm control --reload
 sudo udevadm trigger
 
 echo ""
-echo "Adding your user to dialout group"
+echo "Adding your user to dialout group to control the hubs without sudo"
 echo ""
 sudo usermod -a -G dialout "$USER"
+# We cannot make udev rules giving authority to all users for security reasons
+# because we cannot limit devices or operations subject to those rules on Linux before 6.0:
+# https://github.com/mvp/uhubctl/blob/v2.6.0/udev/rules.d/52-usb.rules#L18-L19
 
 echo "Setup finished. Reboot your PC"

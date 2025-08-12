@@ -91,7 +91,7 @@ Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.
 
 This is required for running the driver node without `sudo`.
 ```bash
-rosrun power_switching_tools_ros setup_for_usb_ppps_hub
+rosrun power_switching_tools_ros setup_udev_for_usb_ppps_hub
 # Reboot your PC after this script finishes
 # Note that this script adds your user to dialout group, which means "chmod" becomes unnecessary for accessing some device files (e.g., /dev/ttyACM0)
 ```
