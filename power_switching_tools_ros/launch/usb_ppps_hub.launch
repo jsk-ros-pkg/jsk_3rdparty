@@ -1,9 +1,9 @@
 <launch>
 
   <arg name="hub_location"
-       doc="Location of USB PPPS hub (e.g., '3-5')" />
+       doc="Location(s) of USB PPPS hub (e.g., '3-5', '[3-5, 2-2]', , '[3-5, 3-5]')" />
   <arg name="hub_port"
-       doc="Port of USB PPPS hub you want to power on/off (e.g., '1')" />
+       doc="Port(s) of USB PPPS hub you want to power on/off (e.g., '1', '[1, 1]', '[1, 2]'). Must be the same length as hub_location and each element corresponds to the element at the same position in hub_location" />
 
   <arg name="power_cycle_interval" default="1.0"
        doc="Interval [sec] in USB power cycle using USB PPPS hub" />

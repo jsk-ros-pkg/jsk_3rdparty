@@ -143,8 +143,8 @@ If [the previous checking](#check-if-power-switching-works) tells you to add sup
 Check them by `roslaunch power_switching_tools_ros usb_ppps_hub.launch --ros-args`:
 ```
 Required Arguments:
-  hub_location: Location of USB PPPS hub (e.g., '3-5')
-  hub_port: Port of USB PPPS hub you want to power on/off (e.g., '1')
+  hub_location: Location(s) of USB PPPS hub (e.g., '3-5', '[3-5, 2-2]', , '[3-5, 3-5]')
+  hub_port: Port(s) of USB PPPS hub you want to power on/off (e.g., '1', '[1, 1]', '[1, 2]'). Must be the same length as hub_location and each element corresponds to the element at the same position in hub_location
 Optional Arguments:
   init_with_power_on (default "true"): Power on USB when driver of USB PPPS hub is initialized. This argument is valid only when init_with_power_set is true
   init_with_power_set (default "true"): Set power state of USB when driver of USB PPPS hub is initialized. Which state (ON or OFF) is set is defined by init_with_power_on
