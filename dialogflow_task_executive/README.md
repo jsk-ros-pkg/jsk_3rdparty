@@ -65,6 +65,8 @@ Please read [app_manager](https://github.com/PR2/app_manager/) for more detailed
 
 ## Create new Intent in Dialogflow
 
+### Web console
+
 For your new task, create new Intent as below.
 
 `Action` section, you can set full name (`<package name>/<app name>`), app name or camel-cased name of your `app_manager` app.
@@ -78,6 +80,39 @@ If your app is registered as `your_package/your_demo`, you need to set `your_pac
 
 In order to fulfill other forms, please read [dialogflow doc](https://dialogflow.com/docs/intents) for more detailed information abount Intent.
 
+### ROS node using API
+
+You can add new intent with actionlib. First, you launch
+
+```shell
+roslaunch dialogflow_task_executive dialogflow_intent_client.launch credential:=<YOUR GOOGLE CLOUD JSON KEY>
+```
+or make `launch_intent_client` arg true in `dialogflow_ros.launch` .
+
+To check registered intent, call the action `~list_intent_action` .
+
+To register the intent, call the action `~register_intent_action` . For example, if you want to add the intent, named `hello`, invoked with the word `hi`, you call the action on shell like
+
+```shell
+rostopic pub /dialogflow_intent_client/register_intent_action/goal dialogflow_task_executive/RegisterIntentActionGoal "header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+goal_id:
+  stamp:
+    secs: 0
+    nsecs: 0
+  id: ''
+goal:
+  intent:
+    intent: 'hello'
+    concat_training_phrases:
+    - ''
+    message_texts:
+    - 'hi'"
+```
 
 ## Usage
 

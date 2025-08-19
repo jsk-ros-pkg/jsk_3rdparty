@@ -1,0 +1,6 @@
+std_msgs/Empty request
+---
+dialogflow_task_executive/IntentInfo[] intents
+bool done
+---
+string status

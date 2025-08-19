@@ -1,0 +1,5 @@
+dialogflow_task_executive/IntentInfo intent
+---
+bool done
+---
+string status
