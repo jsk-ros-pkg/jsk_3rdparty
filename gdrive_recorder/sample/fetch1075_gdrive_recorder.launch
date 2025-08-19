@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find gdrive_recorder)/launch/fetch_gdrive_recorder.launch">
+    <arg name="robot_name" value="fetch1075" />
+  </include>
+</launch>
