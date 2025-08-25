@@ -465,6 +465,7 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
   static bool mode_right;
   static int direction;
   static std::string eye_asset_name_first = "";
+  bool read_all_eye_asset_done = false;
 
   loginfo("Setup eye asset");
   std::istringstream iss(eye_asset_text);
@@ -752,14 +753,15 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
       }
     } else if ( key == "eye_asset_done" ) {
       // skip special command to display and initialize eye for I2C
+      read_all_eye_asset_done = true;
     } else {
       logerror("Invlalid command : %s (key : %s, value : %s)", message.c_str(), key.c_str(), value.c_str());
       return -1;
     }
   }
 
-  if (eye_asset_text.find('\n') == std::string::npos) {
-    // Does not contain newline, i.e. I2C case
+  if (!read_all_eye_asset_done) {
+    // display eye_asset_map only when read_all_eye_asset_done
     return 0;
   }
   // display map data

@@ -194,6 +194,7 @@ std::string ros_read_asset()
     }
   }
 
+  oss << "eye_asset_done:\n";
   std::string eye_asset_text = oss.str();
   nh.logdebug(eye_asset_text.c_str());
   return eye_asset_text;
