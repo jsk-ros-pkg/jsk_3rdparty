@@ -12,8 +12,8 @@
        doc="Number of cpu threads" />
 
   <node name="voicevox_server"
-        pkg="voicevox" type="run-voicevox"
-        args="--voicelib_dir=$(find voicevox)/voicevox_core --host $(arg host) --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --load_all_models --"
+        pkg="voicevox" type="run.py"
+        args="--voicelib_dir=$(find voicevox)/voicevox_core --host $(arg host) --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --load_all_models"
         respawn="$(arg sound_play_respawn)"
         output="screen" >
   </node>

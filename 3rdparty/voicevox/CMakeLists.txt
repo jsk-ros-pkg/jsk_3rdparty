@@ -56,6 +56,8 @@ ExternalProject_Add(voicevox_engine
   GIT_TAG           ${ENGINE_VERSION}
   BUILD_IN_SOURCE   TRUE
   CONFIGURE_COMMAND ""
+  PATCH_COMMAND
+    ${CMAKE_COMMAND} -E remove -f run.py
   BUILD_COMMAND
     COMMAND test -e speaker_info && mv speaker_info speaker_info.orig || echo "OK"
     COMMAND test -e resources/character_info && mv resources/character_info resources/character_info.orig || echo "OK"
@@ -83,21 +85,31 @@ ExternalProject_Add(voicevox_core
   INSTALL_COMMAND   ${CMAKE_COMMAND} -E copy_directory ./ ${VOICEVOX_TARGET_DIR}/voicevox_core
   )
 
-if(${voicevox_INSTALL_PREFIX})
-  set(ENGLNE_PATH ${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
+if(Python3_VERSION VERSION_LESS "3.12")
+  set(VOICEVOX_ENTRY_SRC ${CMAKE_CURRENT_SOURCE_DIR}/node_scripts/run_0_14_7.py)
 else()
-  set(ENGINE_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
+  set(VOICEVOX_ENTRY_SRC ${CMAKE_CURRENT_SOURCE_DIR}/node_scripts/run_0_23_0.py)
 endif()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox.in
-  ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox
-  @ONLY)
-
+set(VOICEVOX_ENTRY ${VOICEVOX_TARGET_DIR}/voicevox_engine/run.py)
+configure_file(${VOICEVOX_ENTRY_SRC} ${VOICEVOX_ENTRY} COPYONLY)
+file(READ ${VOICEVOX_ENTRY} _TXT)
+if(_TXT MATCHES "\n[ \t]*args[ \t]*=[ \t]*parser\\.parse_args\\(\\)\n")
+  string(REGEX REPLACE
+    "\n([ \t]*)args[ \t]*=[ \t]*parser\\.parse_args\\(\\)\n"
+    "\n\\1argv = [a for a in sys.argv[1:] if not a.startswith(\"__\")]\n\\1args = parser.parse_args(argv)\n"
+    _TXT "${_TXT}")
+  file(WRITE ${VOICEVOX_ENTRY} "${_TXT}")
+  message(STATUS "voicevox: patched run.py to drop __* args")
+else()
+  message(STATUS "voicevox: run.py already patched (or upstream changed); skipping")
+endif()
 
 catkin_install_python(
-  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
+  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py ${VOICEVOX_ENTRY}
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
+
 install(
-  PROGRAMS bin/text2wave ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox
+  PROGRAMS bin/text2wave
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin)
 
 install(DIRECTORY launch
