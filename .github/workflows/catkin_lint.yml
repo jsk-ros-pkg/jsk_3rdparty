@@ -14,7 +14,7 @@ jobs:
         run: apt update -q && apt install -y -q catkin-lint
       - name: Chcekout
         uses: actions/checkout@v3
-      - name: Check catkin_lint
+      - name: Check catkin_lint # skip voicevox because run.py is generated in configure step
         run: |
           catkin_lint --color always -W2 \
           --warning external_include_path \
@@ -27,4 +27,5 @@ jobs:
           --warning external_link_directory \
           --warning unused_catkin_include_dirs \
           --warning missing_directory \
+          --skip-pkg voicevox \
           $GITHUB_WORKSPACE
