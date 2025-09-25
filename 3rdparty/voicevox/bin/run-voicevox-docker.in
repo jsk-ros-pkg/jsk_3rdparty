@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Original arguments
+args=("$@")
+
+# Filtered arguments (up to first "--")
+filtered_args=()
+for arg in "${args[@]}"; do
+  if [[ "$arg" == -- ]]; then
+    break
+  fi
+  filtered_args+=("$arg")
+done
+
+# Extract arguments for docker run
+host="localhost"
+port="50021"
+cpu_num_threads="1"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --host)
+      host="$2"
+      shift 2
+      ;;
+    --port)
+      port="$2"
+      shift 2
+      ;;
+    --cpu_num_threads)
+      cpu_num_threads="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+# Check if host is localhost (start local container) or remote (just wait)
+if [[ "$host" == "localhost" || "$host" == "127.0.0.1" ]]; then
+  # Local Docker container mode
+  container_name="voicevox-engine-${port}"
+  if docker ps | grep -q "$container_name"; then
+    echo "VOICEVOX Docker container is already running on port $port"
+    # Keep the container running
+    docker logs -f "$container_name"
+    exit 0
+  fi
+
+  # Remove any existing stopped container with the same name
+  docker rm -f "$container_name" 2>/dev/null || true
+
+  # Check if voicevox image exists, if not pull it
+  if ! docker images | grep -q "voicevox/voicevox_engine"; then
+    echo "Pulling VOICEVOX Docker image..."
+    docker pull voicevox/voicevox_engine:latest
+  fi
+
+  # Run VOICEVOX Docker container
+  echo "Starting VOICEVOX Docker container on port $port with $cpu_num_threads CPU threads..."
+  exec docker run --rm \
+    --name "$container_name" \
+    -p "$port:50021" \
+    -e CPU_NUM_THREADS="$cpu_num_threads" \
+    voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+else
+  # Remote Docker container mode - just wait for connection
+  echo "Connecting to remote VOICEVOX Docker container at $host:$port"
+  echo "Make sure the Docker container is running on the remote host with:"
+  echo "docker run --rm --gpus all -p '$port:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest"
+  echo ""
+  echo "Waiting for connection to $host:$port..."
+  
+  # Wait for the remote service to be available
+  while true; do
+    if curl -s --connect-timeout 5 "http://$host:$port/docs" > /dev/null 2>&1; then
+      echo "Successfully connected to VOICEVOX engine at $host:$port"
+      break
+    else
+      echo "Waiting for VOICEVOX engine at $host:$port..."
+      sleep 5
+    fi
+  done
+  
+  # Keep the script running
+  echo "VOICEVOX engine is ready at $host:$port"
+  while true; do
+    sleep 30
+    if ! curl -s --connect-timeout 5 "http://$host:$port/docs" > /dev/null 2>&1; then
+      echo "Lost connection to VOICEVOX engine at $host:$port"
+      exit 1
+    fi
+  done
+fi
