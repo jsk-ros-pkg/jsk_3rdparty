@@ -91,13 +91,16 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox.in
   ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox
   @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox-docker.in
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox-docker
+  @ONLY)
 
 
 catkin_install_python(
   PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
 install(
-  PROGRAMS bin/text2wave ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox
+  PROGRAMS bin/text2wave ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox-docker
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin)
 
 install(DIRECTORY launch
