@@ -10,12 +10,14 @@
 
   <arg name="direction_right" default="0" />
   <arg name="direction_left" default="1" />
+  <arg name="mode_right" default="true" />
+  <arg name="mode_left" default="false" />
   <arg name="eye_asset_file" default="$(find eye_display)/launch/default.yaml" />
   <arg name="debug" default="false" />
 
   <include file="$(find eye_display)/launch/demo.launch" ns="right" >
     <arg name="eye_asset_file" value="$(arg eye_asset_file)" />
-    <arg name="mode_right" value="true" />
+    <arg name="mode_right" value="$(arg mode_right)" />
     <arg name="direction" value="$(arg direction_right)" />
     <arg name="port" value="$(arg port_right)" />
     <arg name="baud" value="$(arg baud)" />
@@ -25,7 +27,7 @@
   </include>
   <include file="$(find eye_display)/launch/demo.launch" ns="left">
     <arg name="eye_asset_file" value="$(arg eye_asset_file)" />
-    <arg name="mode_right" value="false" />
+    <arg name="mode_right" value="$(arg mode_left)" />
     <arg name="direction" value="$(arg direction_left)" />
     <arg name="port" value="$(arg port_left)" />
     <arg name="baud" value="$(arg baud)" />
