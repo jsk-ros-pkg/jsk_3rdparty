@@ -149,23 +149,18 @@ void EyeManager::init(
 
     // 目の輪郭を描写するSpriteを準備
     sprite_outline.createSprite(image_width/zoom_outline, image_height/zoom_outline);
-    if (current_eye_asset.invert_rl) sprite_outline.setRotation(6);
 
     // 虹彩を描写するSpriteを準備
     sprite_iris.createSprite(image_width/zoom_iris, image_height/zoom_iris);
-    if (current_eye_asset.invert_rl) sprite_iris.setRotation(6);
 
     // 瞳孔を描写するSpriteを準備
     sprite_pupil.createSprite(image_width/zoom_pupil, image_height/zoom_pupil);
-    if (current_eye_asset.invert_rl) sprite_pupil.setRotation(6);
 
     // 光の反射を描画するSpriteを準備
     sprite_reflex.createSprite(image_width/zoom_reflex, image_height/zoom_reflex);
-    if (current_eye_asset.invert_rl) sprite_reflex.setRotation(6);
 
     // 上瞼を描写するSpriteを準備
     sprite_upperlid.createSprite(image_width/zoom_upperlid, image_height/zoom_upperlid);
-    if (current_eye_asset.invert_rl) sprite_upperlid.setRotation(6);
     sprite_upperlid.setPivot(current_eye_asset.upperlid_pivot_x/zoom_upperlid, current_eye_asset.upperlid_pivot_y/zoom_upperlid);
 
     // その他描写するSpriteを準備
@@ -241,10 +236,17 @@ void EyeManager::load_eye_images()
     const char *path_jpg_pupil = current_eye_asset.path_pupil.c_str();
     const char *path_jpg_reflex = current_eye_asset.path_reflex.c_str();
     const char *path_jpg_upperlid = current_eye_asset.path_upperlid.c_str();
+    logdebug("[%8ld] load_eye_iamges: %s (%s)", millis(), current_eye_asset_name.c_str(), current_eye_asset.invert_rl?"true":"false");
+    logdebug("                   outline: %s", (path_jpg_outline==NULL)?"NULL":path_jpg_outline);
+    logdebug("                      iris: %s", (path_jpg_iris==NULL)?"NULL":path_jpg_iris);
+    logdebug("                     pupil: %s", (path_jpg_pupil==NULL)?"NULL":path_jpg_pupil);
+    logdebug("                    reflex: %s", (path_jpg_reflex==NULL)?"NULL":path_jpg_reflex);
+    logdebug("                  upperlid: %s", (path_jpg_upperlid==NULL)?"NULL":path_jpg_upperlid);
 
     lcd.setRotation(current_eye_asset.direction);
 
     if (path_jpg_outline != NULL) {
+      if (current_eye_asset.invert_rl) sprite_outline.setRotation(6);
         sprite_outline.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_outline, path_jpg_outline, zoom_outline)) {
             sprite_outline.fillScreen(TFT_WHITE);
@@ -252,6 +254,7 @@ void EyeManager::load_eye_images()
     }
 
     if (path_jpg_iris != NULL) {
+        if (current_eye_asset.invert_rl) sprite_iris.setRotation(6);
         sprite_iris.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_iris, path_jpg_iris, zoom_iris)) {
             sprite_iris.fillScreen(TFT_WHITE);
@@ -260,6 +263,7 @@ void EyeManager::load_eye_images()
 
 
     if (path_jpg_pupil != NULL) {
+        if (current_eye_asset.invert_rl) sprite_pupil.setRotation(6);
         sprite_pupil.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_pupil, path_jpg_pupil, zoom_pupil)) {
             sprite_pupil.fillScreen(TFT_WHITE);
@@ -267,6 +271,7 @@ void EyeManager::load_eye_images()
     }
 
     if (path_jpg_reflex != NULL) {
+        if (current_eye_asset.invert_rl) sprite_reflex.setRotation(6);
         sprite_reflex.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_reflex, path_jpg_reflex, zoom_reflex)) {
             sprite_reflex.fillScreen(TFT_WHITE);
@@ -274,6 +279,7 @@ void EyeManager::load_eye_images()
     }
 
     if (path_jpg_upperlid != NULL) {
+        if (current_eye_asset.invert_rl) sprite_upperlid.setRotation(6);
         sprite_upperlid.fillScreen(TFT_WHITE);
         if (not draw_image_file(sprite_upperlid, path_jpg_upperlid, zoom_upperlid)) {
             sprite_upperlid.fillScreen(TFT_WHITE);
