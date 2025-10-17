@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ArduinoJson.h>
 #include <iterator>
 #include <sstream>
 
@@ -13,140 +12,199 @@ void callback_emotion(const std_msgs::String &msg);
 
 ros::NodeHandleEx<ArduinoHardware> nh;
 
-class EyeManagerIO : public EyeManager {
-public:
-  EyeManagerIO() : EyeManager() {}
+bool ros_was_connected = false;
+bool ros_now_connected = false;
+#define def_log_func(funcname)                          \
+void funcname(const char *fmt, ...) {                   \
+  char *string;                                         \
+  va_list args;                                         \
+  if (!ros_now_connected) {return;}                     \
+  va_start(args, fmt);                                  \
+  if (0 > vasprintf(&string, fmt, args)) string = NULL; \
+  va_end(args);                                         \
+  if (string) {                                         \
+    nh.funcname(string);                                \
+    free(string);                                       \
+  }                                                     \
+}
+def_log_func(logdebug);
+def_log_func(loginfo);
+def_log_func(logwarn);
+def_log_func(logerror);
+def_log_func(logfatal);
 
-#define def_eye_manager_log_func(funcname)                \
-  void funcname(const char *fmt, ...) override {          \
-    char *string;                                         \
-    va_list args;                                         \
-    va_start(args, fmt);                                  \
-    if (0 > vasprintf(&string, fmt, args)) string = NULL; \
-    va_end(args);                                         \
-    if (string) {                                         \
-      nh.funcname(string);                                \
-      free(string);                                       \
-    }                                                     \
-  }
-  def_eye_manager_log_func(logdebug);
-  def_eye_manager_log_func(loginfo);
-  def_eye_manager_log_func(logwarn);
-  def_eye_manager_log_func(logerror);
-  def_eye_manager_log_func(logfatal);
-};
-
-extern EyeManagerIO eye;
+extern EyeManager eye;
 
 ros::Subscriber<geometry_msgs::Point> sub_point("~look_at", &callback_look_at);
 ros::Subscriber<std_msgs::String> sub_eye_status("~eye_status", &callback_emotion);
+
 void callback_look_at(const geometry_msgs::Point &msg)
 {
-  eye.set_gaze_direction((float)msg.x, (float)msg.y);
+  eye.set_gaze_direction((float)msg.x, (float)msg.y, (float)msg.z);
 }
 void callback_emotion(const std_msgs::String &msg)
 {
-  eye.set_emotion(msg.data);
+  // eye_status:
+  // {data : 'emotion name'} for set emotion
+  // {data : 'eye_asset_default_zoom: normal: iris: 1.2'} changes parameters
+  if (std::string(msg.data).find(':') == std::string::npos)  {
+    eye.set_emotion(msg.data);
+  } else {  // if message is key-value
+    eye.setup_asset(msg.data);
+  }
 }
 
-void setup_asset(EyeManager& eye)
+std::string ros_read_asset()
 {
   std::map<std::string, EyeAsset>& eye_asset_map = eye.eye_asset_map;
-  while (not nh.connected())
-  {
-    nh.spinOnce();
-    delay(1000);
-  }
-  delay(500);  // wait 0.5 sec before reading asset
-  nh.loginfo("Setup eye asset");
+  std::ostringstream oss;
 
   bool mode_right;
   int direction = 1;
   if (nh.getParam("~mode_right", &mode_right)) {
-    nh.loginfo(mode_right ? "Read rosparam : mode_right is true" : "mode_right is false");
+    nh.logdebug(mode_right ? "Read rosparam : mode_right is true" : "mode_right is false");
+    oss << "mode_right: " << (mode_right?"True":"False") << "\n";
   } else {
-    nh.loginfo("Failed to get mode_right parameter");
+    nh.logwarn("Failed to get mode_right parameter");
   }
 
   nh.getParam("~direction", &direction);
-  nh.loginfo("Read rosparam : direction is %d", direction);
+  nh.logdebug("Read rosparam : direction is %d", direction);
+  oss << "direction: " << direction << "\n";
 
   // get eye_asset_names from rosParam
   std::vector<std::string> eye_asset_names;
   nh.getParam("~eye_asset/names", eye_asset_names);
-  for (int i=0; i<eye_asset_names.size(); i++) {
-    nh.loginfo("~eye_asset/names[%d]: %s", i, eye_asset_names[i].c_str());
+  oss << "eye_asset_names: ";
+  for (auto it = eye_asset_names.begin(); it != eye_asset_names.end(); ++it) {
+    std::string name = *it;
+    oss << name;
+    if (std::next(it) != eye_asset_names.end()) oss << ", ";
   }
-  // initialize eye_asset_map from eye_asset_names
+  oss << "\n";
+  //
   for(auto name: eye_asset_names) {
-    eye_asset_map[name] = EyeAsset();
-    eye_asset_map[name].name = name;
-    eye_asset_map[name].direction = direction;
-    eye_asset_map[name].invert_rl = not mode_right;
-  }
-  for(auto name: eye_asset_names) {
-    EyeAsset *asset = &(eye_asset_map[name]);
-    char eye_asset_map_key[128];
-    // path_upperlid
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_upperlid", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->path_upperlid);
-    // path_outline
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_outline", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->path_outline);
-    // path_iris
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_iris", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->path_iris);
-    // path_pupil
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_pupil", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->path_pupil);
-    // path_reflex
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_reflex", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->path_reflex);
-    // upperlid_position
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_position", name.c_str());
-    nh.getParam(eye_asset_map_key, asset->upperlid_position);
-    // upperlid_default_pos_x
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_default_pos_x", name.c_str());
-    nh.getParam(eye_asset_map_key, &(asset->upperlid_default_pos_x));
-    // upperlid_default_pos_y
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_default_pos_y", name.c_str());
-    nh.getParam(eye_asset_map_key, &(asset->upperlid_default_pos_y));
-    // upperlid_default_theta
-    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/upperlid_default_theta", name.c_str());
-    nh.getParam(eye_asset_map_key, &(asset->upperlid_default_theta));
+    char eye_asset_map_key[256];
+
+    // path
+    std::vector<std::string> eye_types;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_eye_types", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_types);
+    for(const std::string& type: eye_types) {
+      std::string path;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/path_%s", name.c_str(), type.c_str());
+      if (nh.getParam(eye_asset_map_key, path)) {
+        oss << "eye_asset_image_path: " << name << ": " << type << ": " << path << "\n";
+      }
+    }
+
+    // position
+    std::vector<std::string> eye_positions;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_positions", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_positions);
+    for(const std::string& eye_position: eye_positions) {
+      if (eye_position == "NONE") continue;
+      std::vector<int> position;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_position.c_str());
+      if (nh.getParam(eye_asset_map_key, position)) {
+        size_t pos = eye_position.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_position.substr(0, pos);
+          std::string position_type = eye_position.substr(pos+1);
+          oss << "eye_asset_" << position_type << ": " << name << ": " << eye_type << ": " << joinVector(position) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_position);
+        }
+      }
+    }
+
+    // rotation
+    std::vector<std::string> eye_rotations;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_rotations", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_rotations);
+    for(const std::string& eye_rotation: eye_rotations) {
+      if (eye_rotation == "NONE") continue;
+      std::vector<int> rotation;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_rotation.c_str());
+      if (nh.getParam(eye_asset_map_key, rotation)) {
+        size_t pos = eye_rotation.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_rotation.substr(0, pos);
+          std::string rotation_type = eye_rotation.substr(pos+1);
+          oss << "eye_asset_" << rotation_type << ": " << name << ": " << eye_type << ": " << joinVector(rotation) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_rotation);
+        }
+      }
+    }
+
+    // default
+    std::vector<std::string> eye_defaults;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_defaults", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_defaults);
+    for(const std::string& eye_default: eye_defaults) {
+      if (eye_default == "NONE") continue;
+      if (eye_default.find("_default_zoom") != std::string::npos) {
+	std::vector<float> defaults;
+	snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
+	if (nh.getParam(eye_asset_map_key, defaults)) {
+	  size_t pos = eye_default.find('_');
+	  if ( pos != std::string::npos ) {
+	    std::string eye_type = eye_default.substr(0, pos);
+	    std::string default_type = eye_default.substr(pos+1);
+	    oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
+	  } else {
+	    logerror("Invalid param name : %s", eye_default);
+	  }
+	}
+      } else {
+	std::vector<int> defaults;
+	snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_default.c_str());
+	if (nh.getParam(eye_asset_map_key, defaults)) {
+	  size_t pos = eye_default.find('_');
+	  if ( pos != std::string::npos ) {
+	    std::string eye_type = eye_default.substr(0, pos);
+	    std::string default_type = eye_default.substr(pos+1);
+	    oss << "eye_asset_" << default_type << ": " << name << ": " << eye_type << ": " << joinVector(defaults) << "\n";
+	  } else {
+	    logerror("Invalid param name : %s", eye_default);
+	  }
+	}
+      }
+    }
+
+    // zoom
+    std::vector<std::string> eye_zooms;
+    snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset_%s_zooms", name.c_str());
+    nh.getParam(eye_asset_map_key, eye_zooms);
+    for(const std::string& eye_zoom: eye_zooms) {
+      if (eye_zoom == "NONE") continue;
+      std::vector<float> zooms;
+      snprintf(eye_asset_map_key, sizeof(eye_asset_map_key), "~eye_asset/%s/%s", name.c_str(), eye_zoom.c_str());
+      if (nh.getParam(eye_asset_map_key, zooms)) {
+        size_t pos = eye_zoom.find('_');
+        if ( pos != std::string::npos ) {
+          std::string eye_type = eye_zoom.substr(0, pos);
+          std::string zoom_type = eye_zoom.substr(pos+1);
+          oss << "eye_asset_" << zoom_type << ": " << name << ": " << eye_type << ": " << joinVector(zooms) << "\n";
+        } else {
+          logerror("Invalid param name : %s", eye_zoom);
+        }
+      }
+    }
   }
 
-  // display map data
-  // to show this message,
-  //  call rosservice call eye_display/set_logger_level rosout DEBUG
-  // or
-  //  roslaunch launch file with debug:=true
-  for(auto name: eye_asset_names) {
-    EyeAsset &eye_asset = eye_asset_map[name];
-    nh.logdebug("[%s]", name.c_str());
-    nh.logdebug("  outline image : %s", eye_asset.path_outline.c_str());
-    nh.logdebug("     iris image : %s", eye_asset.path_iris.c_str());
-    nh.logdebug("    pupil image : %s", eye_asset.path_pupil.c_str());
-    nh.logdebug("   reflex image : %s", eye_asset.path_reflex.c_str());
-    nh.logdebug(" upperlid image : %s", eye_asset.path_upperlid.c_str());
-    std::ostringstream oss;
-    std::copy(eye_asset.upperlid_position.begin(), eye_asset.upperlid_position.end(), std::ostream_iterator<float>(oss, ", "));
-    std::string result = oss.str(); result.pop_back(); result.pop_back();  // remove last ","
-    nh.logdebug(" upperlid_positions: %s", result.c_str());
-    nh.logdebug(" upperlid_default_pos_x : %d", eye_asset.upperlid_default_pos_x);
-    nh.logdebug(" upperlid_default_pos_y : %d", eye_asset.upperlid_default_pos_y);
-    nh.logdebug(" upperlid_default_theta : %d", eye_asset.upperlid_default_theta);
-  }
-  // eyeの初期化
-  if ( eye_asset_names.size() > 0 ) {
-    eye.set_emotion(eye_asset_names[0]);
-  } else {
-    nh.logwarn("Faile to initialize emotion, use default asset");
-  }
+  oss << "eye_asset_done:\n";
+  std::string eye_asset_text = oss.str();
+  nh.logdebug(eye_asset_text.c_str());
+  return eye_asset_text;
 }
 
 void setup_ros()
 {
+#if defined(STAMPC3)
+  nh.getHardware()->setBaud(115200);
+#endif
   nh.initNode();
   nh.subscribe(sub_point);
   nh.subscribe(sub_eye_status);
@@ -155,12 +213,11 @@ void setup_ros()
 
 void reconnect_ros(EyeManager &eye)
 {
-  while (not nh.connected())
-  {
-    nh.spinOnce();
-    delay(1000);
+  ros_now_connected = nh.connected();
+  if (ros_now_connected && !ros_was_connected) {
+    loginfo("ROS reconnected, initializing eye assets");
     // when ROS node is re-connected, get rosparam again
-    setup_asset(eye);
-    eye.init();
+    eye.setup_asset(ros_read_asset());
   }
+  ros_was_connected = ros_now_connected;
 }

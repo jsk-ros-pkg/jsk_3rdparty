@@ -20,41 +20,18 @@
 const int image_width = 139;
 const int image_height = 139;
 
-EyeManagerIO eye = EyeManagerIO();
+EyeManager eye = EyeManager();
 
-#if defined(USE_ROS) // defien callback
-//ros::Subscriber<geometry_msgs::Point> sub_point("~look_at", [&](const geometry_msgs::Point &msg){eye.set_gaze_direction((float)msg.x, (float)msg.y);});
-//ros::Subscriber<std_msgs::String> sub_eye_status("~eye_status", [&](const std_msgs::String &msg){eye.set_emotion(msg.data);});
-#endif
-#if !defined(USE_I2C) && !defined(USE_ROS) // sample code for eye asset without ROS/I2C
-void setup_asset(EyeManager& eye)  // returns initial status
-{
-  std::map<std::string, EyeAsset>& eye_asset_map = eye.eye_asset_map;
-  eye_asset_map["normal"] = EyeAsset();
-  eye_asset_map["normal"].name = "normal";
-  eye_asset_map["normal"].upperlid_position = {9};
-  eye_asset_map["normal"].direction = 1;
-  eye_asset_map["normal"].direction = true;
+std::string eye_asset_text =
+  "eye_asset_names: normal, blink, happy\n"
+  "eye_asset_position: normal: upperlid: 9\n"
+  "eye_asset_position: blink: upperlid: 9, 9, 130, 130, 9, 9\n"
+  "eye_asset_image_path: happy: iris: /white.jpg\n"
+  "eye_asset_image_path: happy: pupil: /white.jpg\n"
+  "eye_asset_image_path: happy: reflex: /white.jpg\n"
+  "eye_asset_image_path: happy: upperlid: /reflex_happy.jpg\n"
+  "eye_asset_position: happy: upperlid: 130, 131, 132, 133, 134, 135\n";
 
-  eye_asset_map["blink"] = EyeAsset();
-  eye_asset_map["blink"].name = "blink";
-  eye_asset_map["blink"].upperlid_position = {9, 9, 130, 130, 9, 9};
-  eye_asset_map["blink"].direction = 1;
-  eye_asset_map["blink"].direction = true;
-
-  eye_asset_map["happy"] = EyeAsset();
-  eye_asset_map["happy"].name = "happy";
-  eye_asset_map["happy"].path_iris = "/white.jpg";
-  eye_asset_map["happy"].path_pupil = "/white.jpg";
-  eye_asset_map["happy"].path_reflex = "/white.jpg";
-  eye_asset_map["happy"].path_upperlid = "/reflex_happy.jpg";
-  eye_asset_map["happy"].upperlid_position = {130, 131, 132, 133, 134, 135};
-  eye_asset_map["happy"].direction = 1;
-  eye_asset_map["happy"].direction = true;
-
-  eye.set_emotion("happy");
-}
-#endif
 
 void setup()
 {
@@ -64,23 +41,22 @@ void setup()
   SPIFFS.begin();
   Serial.begin(115200);
 
-  // initialize eye manager with current eye asset
-  eye.init();
-  // draw eye image
-  eye.update_look();
-
 #if defined(USE_ROS)  // USE_ROS
   setup_ros();
+#elif defined(USE_I2C)
+  setup_i2c();
 #endif
 
+  // initialize eye manager with current eye asset
+  eye.init();
   // initialize eye_asset_map and set current_eye_status
-  setup_asset(eye);
+  eye.setup_asset(eye_asset_text);
+
   // draw eye image
   eye.update_look();
 
-#if defined(USE_I2C)
-  setup_i2c();
-#endif
+  unsigned long next_time = eye.update_next_time();
+  loginfo("[%8ld] setup() done: next_time = %ld", next_time);
 }
 
 void loop()
@@ -88,15 +64,15 @@ void loop()
 #if defined(USE_ROS)  // USE_ROS
   reconnect_ros(eye);
 #endif
-  delay(100);
+  long sleep_time = eye.delay_next_time();
 
   // update emotion, this calls update_look to display
   int frame = eye.update_emotion();
 
 #if defined(USE_ROS)
   nh.spinOnce();
-  nh.loginfo("Eye status: %s (%d)", eye.get_emotion().c_str(), frame);
 #endif
+  loginfo("[%8ld] Eye status: %s (%d) (sleep %ld ms)", millis(), eye.get_emotion().c_str(), frame, sleep_time);
 
 #if !defined(USE_I2C) && !defined(USE_ROS) // sample code for eye asset
   static float look_x = 0;

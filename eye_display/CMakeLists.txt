@@ -9,4 +9,5 @@ include_directories()
 
 catkin_install_python(PROGRAMS
   node_scripts/build.py node_scripts/demo_move_eye.py node_scripts/pub_eye_status.py
+  node_scripts/ros_to_i2c.py node_scripts/asset_param_list.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts)
