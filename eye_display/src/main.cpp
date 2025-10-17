@@ -33,9 +33,6 @@ std::string eye_asset_text =
   "eye_asset_position: happy: upperlid: 130, 131, 132, 133, 134, 135\n";
 
 
-unsigned long interval_time = 150;  // this will reproduce delay(100)
-unsigned long next_time = millis() + interval_time;
-
 void setup()
 {
   pinMode(TFT_BL, OUTPUT);
@@ -58,7 +55,7 @@ void setup()
   // draw eye image
   eye.update_look();
 
-  next_time = millis() + interval_time;
+  unsigned long next_time = eye.update_next_time();
   loginfo("[%8ld] setup() done: next_time = %ld", next_time);
 }
 
@@ -67,11 +64,7 @@ void loop()
 #if defined(USE_ROS)  // USE_ROS
   reconnect_ros(eye);
 #endif
-  long sleep_time = next_time - millis();
-  if ( sleep_time > 0 ) {
-    delay(sleep_time);
-  }
-  next_time += interval_time;
+  long sleep_time = eye.delay_next_time();
 
   // update emotion, this calls update_look to display
   int frame = eye.update_emotion();

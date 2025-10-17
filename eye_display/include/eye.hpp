@@ -93,6 +93,8 @@ private:
   int image_width = 139;
   int image_height = 139;
 
+  unsigned long interval_time = 150;  // this will reproduce delay(100)
+  unsigned long next_time = millis() + interval_time;
   int frame = 0;
 
   void load_eye_images();
@@ -114,6 +116,8 @@ public:
                    int dx_upperlid, int dy_upperlid, float dtheta_upperlid, float dzoom_upperlid,
                    std::vector<int> dx_extra, std::vector<int> dy_extra, std::vector<int> dtheta_extra, std::vector<float> dzoom_extra,
                    float random_scale);
+  unsigned long  update_next_time();
+  long delay_next_time();
 };
 
 
@@ -397,6 +401,9 @@ void EyeManager::set_emotion(const std::string eye_status_name) {
   }
   current_eye_asset_name = it->first;
   load_eye_images();
+
+  // reset internal clock time, aligned to the nearest multiple of interval_time
+  next_time = (millis()+interval_time/2)/interval_time * interval_time;
   loginfo("[%8ld] Status updated: %s", millis(), it->first.c_str());
 }
 
@@ -838,4 +845,20 @@ int EyeManager::setup_asset(std::string eye_asset_text) {
     logwarn("Faile to initialize emotion, use default asset");
   }
   return 0;
+}
+
+unsigned long EyeManager::update_next_time()
+{
+  next_time = millis() + interval_time;
+  return next_time;
+}
+
+long EyeManager::delay_next_time()
+{
+  long sleep_time = next_time - millis();
+  if ( sleep_time > 0 ) {
+    delay(sleep_time);
+  }
+  next_time += interval_time;
+  return sleep_time;
 }
