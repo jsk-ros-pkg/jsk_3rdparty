@@ -83,7 +83,12 @@ Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.
   - [Connection problem](#connecting-usb-serial-troubleshooter) does not occur
 - Disadvantages compared with USB-Serial troubleshooter:
   - Power switching is slower
-  - Some devices are hard to be powered off (e.g., [arbitrary power recovering problem](https://github.com/mvp/uhubctl?tab=readme-ov-file#power-comes-back-on-after-few-seconds-on-linux))
+  - Some devices show unexpected behavior after you command your hub to power off them
+    - [Power comes back on after few seconds](https://github.com/mvp/uhubctl?tab=readme-ov-file#power-comes-back-on-after-few-seconds-on-linux)
+    - Power comes back on when the device is accessed.
+      This behavior was observed when webcams were used on Ubuntu 20.04 (not observed on Ubuntu 24.04).
+      This behavior is slightly different from the first behavior because the first behavior depends on no external access.
+      The workarounds for the first behavior on Ubuntu 20.04 (i.e., Linux 5.x) mentioned in the document do not work for the second behavior
 
 ### Preparation
 
