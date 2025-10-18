@@ -1,6 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(voice_text)
 
+# voice_text requires C++ 11
+if(CMAKE_VERSION VERSION_LESS "3.1")
+  if(NOT CMAKE_CXX_FLAGS MATCHES "-std=")
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag("-std=c++11" HAS_CXX11_FLAG)
+    if(HAS_CXX11_FLAG)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    else()
+      check_cxx_compiler_flag("-std=gnu++11" HAS_GNUXX11_FLAG)
+      if(HAS_GNUXX11_FLAG)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+      endif()
+    endif()
+  endif()
+endif()
+if("$ENV{ROS_DISTRO}" STREQUAL "kinetic")
+  add_compile_options(-std=c++11)
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
