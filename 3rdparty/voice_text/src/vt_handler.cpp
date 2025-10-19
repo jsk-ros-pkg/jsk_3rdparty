@@ -137,11 +137,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path,
     // Load engine
     if (enable_custom_engine_info){
         ROS_INFO("[ReadSpeaker API] Add new custom engine");
-        char *speaker_char_, *type_char_, *lang_char_, *gender_char_, *iso_code_char_, *vendor_char_;
-        speaker_char_ = (char*)calloc(std::strlen(speaker.c_str())+1, sizeof(char));
-        std::strcpy(speaker_char_, speaker.c_str());
-        type_char_ = (char*)calloc(std::strlen(type.c_str())+1, sizeof(char));
-        std::strcpy(type_char_, type.c_str());
+        char *lang_char_, *gender_char_, *iso_code_char_, *vendor_char_;
         lang_char_ = (char*)calloc(std::strlen(lang.c_str())+1, sizeof(char));
         std::strcpy(lang_char_, lang.c_str());
         gender_char_ = (char*)calloc(std::strlen(gender.c_str())+1, sizeof(char));
@@ -160,8 +156,6 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path,
                                                iso_code_char_,
                                                vendor_char_,
                                                sampling_rate);
-        free(speaker_char_);
-        free(type_char_);
         free(lang_char_);
         free(gender_char_);
         free(iso_code_char_);
@@ -291,7 +285,6 @@ bool VTHandler::VTH_TextToFile(const int pitch, const int speed, const int volum
 
     free(text_char_);
     free(wave_path_char_);
-
-  return success_;
   }
+  return success_;
 }
