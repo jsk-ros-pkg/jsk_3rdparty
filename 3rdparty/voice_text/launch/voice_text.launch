@@ -8,18 +8,22 @@
   <machine if="$(arg use_machine)" name="localhost" address="localhost" />
 
   <arg name="sound_play_respawn" default="true" />
+  <arg name="license_path" default="/usr/vt/sayaka/M16/data-common/verify/verification.txt" />
+  <arg name="db_path" default="/usr/vt/sayaka/M16" />
+  <arg name="enable_custom_engine_info" default="false" />
+  <arg name="device" default="" />
 
   <node name="voice_text" pkg="voice_text" type="voice_text"
         output="screen" respawn="true" respawn_delay="10"
         machine="$(arg voice_text_machine)">
     <remap from="text_to_speech" to="voice_text/text_to_speech" />
-    <rosparam>
-      # db_path: /usr/vt/sayaka/M16  # Commented out to support other speakers than SAYAKA
-      pitch: 100
-      speed: 100
-      volume: 100
-      pause: 800
-    </rosparam>
+    <param name="db_path" value="$(arg db_path)" />
+    <param name="license_path" value="$(arg license_path)" />
+    <param name="enable_custom_engine_info" value="$(arg enable_custom_engine_info)" />
+    <param name="pitch" value="100" />
+    <param name="speed" value="100" />
+    <param name="volume" value="100" />
+    <param name="pause" value="800" />
   </node>
 
   <node pkg="sound_play" type="soundplay_node.py" name="sound_play_jp"
@@ -27,6 +31,7 @@
         machine="$(arg sound_play_machine)">
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
+    <param name="device" value="$(arg device)"/>
     <env name="PATH" value="$(find voice_text)/bin:$(env PATH)" />
   </node>
 </launch>
