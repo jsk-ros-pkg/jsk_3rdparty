@@ -16,7 +16,7 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path,
                      const std::string iso_code,
                      const std::string vendor,
                      const int sampling_rate){
-  glob_t sdk_old_gbuf_{}, sdk_new_gbuf_{}, api_gbuf_{};
+  glob_t sdk_old_gbuf_{}, sdk_new_gbuf_{}, api_gbuf_{}, db_path_gbuf_{}, license_path_gbuf_{};
   std::string lib_file_;
   char *dl_err_, *db_path_char_, *license_path_char_;
   bool sym_status_;
@@ -79,18 +79,38 @@ VTHandler::VTHandler(const std::string license_path, const std::string db_path,
 
   // Initialize VT Handler
   // db_path is for backward compatibility
-  db_path_char_ = (char*)calloc(std::strlen(db_path.c_str())+1, sizeof(char));
-  std::strcpy(db_path_char_, db_path.c_str());
+  std::string resolved_db_path = db_path;
+  if (resolved_db_path.empty()) {
+    if (glob("/usr/vt/*/*", GLOB_ONLYDIR, nullptr, &db_path_gbuf_) == 0 &&
+      db_path_gbuf_.gl_pathc > 0) {
+      resolved_db_path = db_path_gbuf_.gl_pathv[0];
+    }
+    globfree(&db_path_gbuf_);
+    if (resolved_db_path.empty()) {
+      ROS_FATAL("[VT] Could not resolve db_path under /usr/vt/*/*");
+      return;
+    }
+  }
+  db_path_char_ = static_cast<char*>(calloc(resolved_db_path.size() + 1, sizeof(char)));
+  std::strcpy(db_path_char_, resolved_db_path.c_str());
+  ROS_INFO("Loading db at: %s", db_path_char_);
 
   // Load license file
-  license_path_char_ = NULL;
-  if(!license_path.empty()){
-    license_path_char_ = (char*)calloc(std::strlen(license_path.c_str())+1, sizeof(char));
-    std::strcpy(license_path_char_, license_path.c_str());
-  }else{
-    ROS_FATAL("Please set license file");
-    return;
+  std::string resolved_license_path = license_path;
+  if (resolved_license_path.empty()) {
+    if (glob("/usr/vt/*/*/data-common/verify/verification.txt", 0, nullptr, &license_path_gbuf_) == 0 &&
+      license_path_gbuf_.gl_pathc > 0) {
+      resolved_license_path = license_path_gbuf_.gl_pathv[0];  // copy later
+    }
+    globfree(&license_path_gbuf_);
+    if (resolved_license_path.empty()) {
+      ROS_FATAL("[VT] Could not find license file under /usr/vt/*/*/data-common/verify/");
+      return;
+    }
   }
+  license_path_char_ = static_cast<char*>(calloc(resolved_license_path.size() + 1, sizeof(char)));
+  std::strcpy(license_path_char_, resolved_license_path.c_str());
+  ROS_INFO("Resolved license file: %s", license_path_char_);
 
   // Load license file
   if(this->vt_type == VT_SDK){
