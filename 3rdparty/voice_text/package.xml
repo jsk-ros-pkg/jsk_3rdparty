@@ -1,14 +1,16 @@
 <package>
   <name>voice_text</name>
   <version>2.1.31</version>
-  <description>voice_text (www.voicetext.jp)</description>
+  <description>The ROS package for VoiceText, ReadSpeaker (https://readspeaker.jp/)</description>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <maintainer email="obinata@jsk.imi.i.u-tokyo.ac.jp">Yoshiki Obinata</maintainer>
 
   <license>HOYA License</license>
 
   <url type="website">http://ros.org/wiki/voice_text</url>
 
   <author>Kei Okada</author>
+  <author>Yoshiki Obinata</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
