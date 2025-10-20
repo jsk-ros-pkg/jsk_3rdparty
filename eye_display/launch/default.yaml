@@ -1,0 +1,71 @@
+names: [normal, blink, surprised, sleepy, angry, sad, happy]
+normal:
+  path_outline: "/outline.jpg"
+  path_iris: "/iris.jpg"
+  path_pupil: "/pupil.jpg"
+  path_reflex: "/reflex.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9]
+blink:
+  path_outline: "/outline.jpg"
+  path_iris: "/iris.jpg"
+  path_pupil: "/pupil.jpg"
+  path_reflex: "/reflex.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+surprised:
+  path_outline: "/outline.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_theta: 0
+  path_iris: "/iris_surprised.jpg"
+  path_pupil: "/pupil_surprised.jpg"
+  path_reflex: "/reflex_surprised.jpg"
+  upperlid_position: [9, 9, 9, 9, 130, 130, 9, 9, 9, 9, 130, 9, 9, 130, 9, 9]
+  upperlid_default_pos_y: 8
+sleepy:
+  path_outline: "/outline.jpg"
+  path_iris: "/iris.jpg"
+  path_pupil: "/pupil.jpg"
+  path_reflex: "/reflex.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_theta: 0
+  upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]
+  upperlid_default_pos_y: 8
+angry:
+  path_outline: "/outline.jpg"
+  path_iris: "/iris.jpg"
+  path_pupil: "/pupil.jpg"
+  path_reflex: "/reflex.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_position: [0]
+  upperlid_default_pos_x: 50
+  upperlid_default_pos_y: 40
+  upperlid_default_theta: -30
+sad:
+  path_outline: "/outline.jpg"
+  path_iris: "/iris.jpg"
+  path_pupil: "/pupil.jpg"
+  path_reflex: "/reflex.jpg"
+  path_upperlid: "/upperlid.jpg"
+  upperlid_position: [0]
+  upperlid_default_pos_x: 100
+  upperlid_default_pos_y: 40
+  upperlid_default_theta: 30
+happy:
+  path_outline: "/outline.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/white.jpg"
+  path_upperlid: "/reflex_happy.jpg"
+  upperlid_position: [130, 131, 132, 133, 134, 135]
