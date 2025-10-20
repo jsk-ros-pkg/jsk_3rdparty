@@ -8,8 +8,8 @@
   <machine if="$(arg use_machine)" name="localhost" address="localhost" />
 
   <arg name="sound_play_respawn" default="true" />
-  <arg name="license_path" default="/usr/vt/sayaka/M16/data-common/verify/verification.txt" />
-  <arg name="db_path" default="/usr/vt/sayaka/M16" />
+  <arg name="license_path" default="" />
+  <arg name="db_path" default="" />
   <arg name="enable_custom_engine_info" default="false" />
   <arg name="device" default="" />
 
