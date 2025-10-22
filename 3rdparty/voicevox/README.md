@@ -2,6 +2,34 @@
 
 ROS Interface for [VOICEVOX](https://voicevox.hiroshiba.jp/) (AI speech synthesis)
 
+## Quick Start
+
+Choose the deployment pattern that best fits your needs:
+
+```bash
+# Pattern A: Direct Docker + ROS client (Multi-machine) | 直接Docker + ROSクライアント（マルチマシン）
+# Server machine:
+docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+# Client machine:
+roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
+
+# Pattern B: ROS-managed Docker + ROS client (Multi-machine) | ROS管理Docker + ROSクライアント（マルチマシン）
+# Server machine:
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
+# Client machine:
+roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
+
+# Pattern C: All-in-one (Docker + ROS on same machine) | オールインワン（同一マシンでDocker+ROS）
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
+
+# Pattern D: Local VOICEVOX without Docker (CPU only) | ローカルVOICEVOX（Dockerなし、CPU版）
+# VOICEVOX engine is automatically installed during catkin build
+roslaunch voicevox voicevox_texttospeech.launch
+```
+
+Patterns A-C provide GPU acceleration support through Docker. Pattern D runs locally with CPU only.
+パターンA-CはDockerを通じたGPUによる高速な音声合成をサポート。パターンDはCPUのみでローカル実行。
+
 ## TERM
 
 [VOICEVOX](https://voicevox.hiroshiba.jp/) is basically free to use, but please check the terms of use below.
@@ -54,6 +82,74 @@ Build this package.
 cd /path/to/catkin_workspace
 catkin build voicevox
 ```
+
+### Optional (Using Docker with GPU acceleration)
+
+VOICEVOX supports Docker deployment with GPU acceleration, which enables significantly faster speech synthesis compared to CPU-only processing.
+
+#### Prerequisites
+
+First, install the NVIDIA Container Toolkit:
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+#### Setup
+
+Pull the GPU-enabled VOICEVOX Docker image:
+
+```bash
+docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+Start the Docker container with GPU support:
+
+```bash
+docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+#### Usage with use_docker option
+
+Launch the ROS node with Docker backend using the `use_docker:=true` option:
+
+```bash
+# For local Docker container
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
+
+# For remote Docker container
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true host:=<Docker PC IP>
+```
+
+#### Docker-only mode
+
+If you want to launch only the Docker container without the ROS sound_play node, use the `docker_only:=true` option:
+
+```bash
+# Launch Docker container only (local)
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
+
+# Launch Docker container only with custom port
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true port:=50022
+```
+
+#### Connect to existing Docker container
+
+To connect to an existing Docker container running on a different machine:
+
+```bash
+# Connect to remote Docker container
+roslaunch voicevox voicevox_texttospeech.launch host:=<Docker PC IP> port:=<Docker Port>
+
+# Example: Connect to Docker container at 192.168.1.100:50021
+roslaunch voicevox voicevox_texttospeech.launch host:=192.168.1.100 port:=50021
+```
+
+The `use_docker` and `docker_only` options allow you to:
+- **use_docker**: Run Docker container and ROS node together
+- **docker_only**: Launch only the Docker container (useful for server deployment)
+- Utilize GPU acceleration for faster speech synthesis
+- Run VOICEVOX engine in an isolated container environment
+- Easily deploy on different machines without local installation
+
 
 ## Usage
 
