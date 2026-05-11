@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+# Now you can use `run.py` directory. This is just for backward compatibility
+exec rosrun voicevox run.py "$0"

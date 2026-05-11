@@ -25,6 +25,7 @@
         output="screen" >
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
+    <param name="device" value="$(arg device)" />
     <env name="VOICEVOX_DEFAULT_SPEAKER_ID" value="$(arg default_speaker)" />
     <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(arg host)" />
     <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(arg port)" />

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Original arguments
 args=("$@")
@@ -12,5 +12,15 @@ for arg in "${args[@]}"; do
   filtered_args+=("$arg")
 done
 
+cd @ENGINE_PATH@/voicevox_engine/
 # Now use "${filtered_args[@]}" instead of "$@"
-exec rosrun voicevox python3 @ENGINE_PATH@/voicevox_engine/run.py ${filtered_args[@]}
+exec @VENV_PATH@/bin/python - "${filtered_args[@]}" <<- EOF
+import re
+import sys
+
+from setproctitle import setproctitle
+
+program_path = "./run.py"
+setproctitle(' '.join(["run.py"] + sys.argv[1:]))
+exec(open(program_path).read())
+EOF

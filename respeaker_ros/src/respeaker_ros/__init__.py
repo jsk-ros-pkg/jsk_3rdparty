@@ -232,7 +232,7 @@ class RespeakerInterface(object):
 
 
 class RespeakerAudio(object):
-    def __init__(self, on_audio, channel=0, suppress_error=True):
+    def __init__(self, on_audio, channel=0, suppress_error=True, sample_duration=None):
         self.on_audio = on_audio
         with ignore_stderr(enable=suppress_error):
             self.pyaudio = pyaudio.PyAudio()
@@ -242,6 +242,10 @@ class RespeakerAudio(object):
         self.rate = 16000
         self.bitwidth = 2
         self.bitdepth = 16
+        if sample_duration is not None:
+            frames_per_buffer = int(sample_duration * self.rate)
+        else:
+            frames_per_buffer = 1024
 
         # find device
         count = self.pyaudio.get_device_count()
@@ -272,7 +276,7 @@ class RespeakerAudio(object):
             format=pyaudio.paInt16,
             channels=self.channels,
             rate=self.rate,
-            frames_per_buffer=1024,
+            frames_per_buffer=frames_per_buffer,
             stream_callback=self.stream_callback,
             input_device_index=self.device_index,
         )

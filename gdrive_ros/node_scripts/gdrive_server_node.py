@@ -35,7 +35,7 @@ if sys.version_info.major < 3 and \
 class GDriveServerNode(object):
     folder_mime_type = 'application/vnd.google-apps.folder'
     folder_url_format = 'https://drive.google.com/drive/folders/{}'
-    file_url_format = 'https://drive.google.com/uc?id={}'
+    file_url_format = 'https://drive.usercontent.google.com/download?id={}&authuser=0'
 
     def __init__(self):
         settings_yaml = rospy.get_param('~settings_yaml', None)
