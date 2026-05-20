@@ -282,6 +282,11 @@ Notes:
 
   Seconds the interim transcript must remain unchanged before a result is treated as final, in addition to Google's own `is_final` signal. Lower values commit faster but may cut off slow speakers.
   This is valid only if `~engine` is `GoogleCloudStream`.
+
+* `~log_interim_results` (`Bool`, default: `True`)
+
+  If `True`, the interim transcript is also written to `rospy.loginfo` (deduplicated — only logged when the text actually changes). Set to `False` to silence the interim log line on noisy environments.
+  This is valid only if `~engine` is `GoogleCloudStream`.
   
 * `~bing_key` (`String`, default: `None`)
 

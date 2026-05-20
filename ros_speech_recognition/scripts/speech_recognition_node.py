@@ -241,6 +241,7 @@ class ROSSpeechRecognition(object):
         self._stream_thread = None
         self._stream_stop_evt = None
         self.pub_interim = None
+        self._log_interim = rospy.get_param("~log_interim_results", True)
 
         # dynamic_reconfigure (ROS1) or ROS2 parameters with Config.defaults
         # (cfg/ros2/SpeechRecognitionConfig.py)
@@ -459,6 +460,7 @@ class ROSSpeechRecognition(object):
         sr = self.audio.SAMPLE_RATE
         chunk_bytes = sr * 2 * 100 // 1000  # 100 ms of S16 mono
         was_canceling = False
+        last_logged_interim = ""
         with self.audio as src:
             while (not rospy.is_shutdown()
                    and not self._stream_stop_evt.is_set()
@@ -489,10 +491,15 @@ class ROSSpeechRecognition(object):
                         self.pub.publish(SpeechRecognitionCandidates(
                             transcript=[text], confidence=[1.0]))
                         self.play_sound("success", 0.1)
+                    last_logged_interim = ""
                 else:
                     interim = self._stream_recognizer.get_result(None)
-                    if interim and self.pub_interim is not None:
-                        self.pub_interim.publish(String(data=interim))
+                    if interim:
+                        if self.pub_interim is not None:
+                            self.pub_interim.publish(String(data=interim))
+                        if self._log_interim and interim != last_logged_interim:
+                            rospy.loginfo("Interim: %s", interim)
+                            last_logged_interim = interim
 
     def on_shutdown(self):
         self.stop_speech_recognition()
