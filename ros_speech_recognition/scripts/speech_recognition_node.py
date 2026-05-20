@@ -6,6 +6,7 @@ from ros_speech_recognition.compat import ros_compat
 from ros_speech_recognition.compat import ROS_VERSION
 import speech_recognition as SR
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
+from ros_speech_recognition.streaming_google_cloud import GoogleCloudStreamingRecognizer
 import ros_speech_recognition.recognize_vosk
 import json
 import array
@@ -13,8 +14,12 @@ import os
 import sys
 from threading import Lock
 from threading import Thread
+from threading import Event
+
+import numpy as np
 
 from audio_common_msgs.msg import AudioData
+from std_msgs.msg import String
 if ROS_VERSION == 2:
     from sound_play_msgs.msg import SoundRequest
     from sound_play_msgs.action import SoundRequest as SoundRequestAction
@@ -228,6 +233,15 @@ class ROSSpeechRecognition(object):
                         .format(tts_action_name))
                 self.tts_timer = ros_compat.create_timer(node, 0.1, self.tts_timer_cb)
 
+        # GoogleCloudStream backend state — lazy-initialised in config_callback.
+        # These MUST be set before dyn_srv = Server(...) because Server.__init__
+        # synchronously fires config_callback once, and that callback reads
+        # self._stream_recognizer.
+        self._stream_recognizer = None
+        self._stream_thread = None
+        self._stream_stop_evt = None
+        self.pub_interim = None
+
         # dynamic_reconfigure (ROS1) or ROS2 parameters with Config.defaults
         # (cfg/ros2/SpeechRecognitionConfig.py)
         self.dyn_srv = ros_compat.create_reconfigure_server(node,
@@ -243,6 +257,9 @@ class ROSSpeechRecognition(object):
             self.pub = ros_compat.create_publisher(node, ros_compat.get_param(node, "~voice_topic", "speech_to_text"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
+            self.pub_interim = rospy.Publisher(
+                rospy.get_param("~voice_interim_topic", "speech_to_text/interim"),
+                String, queue_size=10)
             self.start_srv = ros_compat.create_service(node,
                 "speech_recognition/start",
                 Empty, self.speech_recogniton_start_srv_cb)
@@ -261,6 +278,21 @@ class ROSSpeechRecognition(object):
         if self.engine != config.engine:
             self.args = {}
             self.engine = config.engine
+            # Lazy-build the streaming GCP wrapper when first selected.
+            if (self.engine == Config.SpeechRecognition_GoogleCloudStream
+                    and self._stream_recognizer is None):
+                creds = rospy.get_param("~google_cloud_credentials_json", None)
+                if creds and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+                    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds
+                self._stream_recognizer = GoogleCloudStreamingRecognizer(
+                    sample_rate=self.audio.SAMPLE_RATE,
+                    language_code=self.language,
+                    model=rospy.get_param("~google_cloud_model", ""),
+                    endpoint_stable_s=rospy.get_param(
+                        "~google_cloud_endpoint_stable_s", 1.0),
+                )
+                rospy.loginfo("GoogleCloudStream recognizer ready (lang=%s)",
+                              self.language)
 
         # config for adaptive thresholding
         self.dynamic_energy_threshold = config.dynamic_energy_threshold
@@ -394,6 +426,13 @@ class ROSSpeechRecognition(object):
         self.play_sound("timeout", 0.1)
 
     def start_speech_recognition(self):
+        if self.engine == Config.SpeechRecognition_GoogleCloudStream:
+            self.play_sound("start", 0.1)
+            self._stream_stop_evt = Event()
+            self._stream_thread = Thread(target=self._streaming_loop, daemon=True)
+            self._stream_thread.start()
+            rospy.on_shutdown(self.on_shutdown)
+            return
         if self.dynamic_energy_threshold:
             with self.audio as src:
                 self.recognizer.adjust_for_ambient_noise(src)
@@ -405,8 +444,55 @@ class ROSSpeechRecognition(object):
         ros_compat.on_shutdown(self.node, self.on_shutdown)
 
     def stop_speech_recognition(self):
+        if self._stream_stop_evt is not None:
+            self._stream_stop_evt.set()
+            if self._stream_thread is not None:
+                self._stream_thread.join(timeout=2.0)
+            self._stream_thread = None
+            self._stream_stop_evt = None
+            if self._stream_recognizer is not None:
+                self._stream_recognizer.stop_stream()
         if self.stop_fn is not None:
             self.stop_fn()
+
+    def _streaming_loop(self):
+        sr = self.audio.SAMPLE_RATE
+        chunk_bytes = sr * 2 * 100 // 1000  # 100 ms of S16 mono
+        was_canceling = False
+        with self.audio as src:
+            while (not rospy.is_shutdown()
+                   and not self._stream_stop_evt.is_set()
+                   and self.enable_audio_cb):
+                chunk = src.stream.read(chunk_bytes)
+                if not chunk:
+                    continue
+                # Tear the gRPC stream down while the robot is speaking;
+                # accept_waveform() lazily reopens it once is_canceling clears.
+                if self.is_canceling:
+                    if not was_canceling:
+                        self._stream_recognizer.stop_stream()
+                        was_canceling = True
+                    continue
+                was_canceling = False
+                arr = np.frombuffer(chunk, dtype=np.int16).astype(np.float32) / 32768.0
+                try:
+                    self._stream_recognizer.accept_waveform(sr, arr)
+                except Exception as e:
+                    rospy.logerr("streaming accept_waveform failed: %s", e)
+                    continue
+                if self._stream_recognizer.is_endpoint(None):
+                    text = self._stream_recognizer.get_result(None)
+                    self._stream_recognizer.reset(None)
+                    if text and text.strip():
+                        self.play_sound("recognized", 0.05)
+                        rospy.loginfo("Result: %s", text)
+                        self.pub.publish(SpeechRecognitionCandidates(
+                            transcript=[text], confidence=[1.0]))
+                        self.play_sound("success", 0.1)
+                else:
+                    interim = self._stream_recognizer.get_result(None)
+                    if interim and self.pub_interim is not None:
+                        self.pub_interim.publish(String(data=interim))
 
     def on_shutdown(self):
         self.stop_speech_recognition()

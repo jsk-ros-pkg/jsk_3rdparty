@@ -53,6 +53,31 @@ ros2 topic echo /speech_to_text
 ros2 launch ros_speech_recognition parrotry.launch.xml
 ```
 
+### Streaming recognition with Google Cloud (`GoogleCloudStream`)
+
+In addition to the request/response `GoogleCloud` engine, a streaming engine
+`GoogleCloudStream` is available. It uses the bidirectional gRPC
+`StreamingRecognize` API and publishes interim hypotheses on
+`~voice_interim_topic` while the user is still speaking, then publishes the
+finalised utterance on `~voice_topic` as usual.
+
+```bash
+roslaunch ros_speech_recognition speech_recognition.launch \
+    engine:=GoogleCloudStream \
+    language:=ja-JP \
+    google_cloud_credentials_json:=/path/to/credentials.json
+```
+
+Notes:
+
+* Endpointing combines Google's own `is_final` flag with a stability timer
+  controlled by `~google_cloud_endpoint_stable_s` (default: 1.0 s).
+* The gRPC session has a 305 s server-side limit; the recognizer reconnects
+  lazily on the next audio chunk, so long-running nodes are safe.
+* When `~self_cancellation` is enabled, the streaming session is torn down
+  while a `~tts_action_names` action is active and reopened automatically
+  afterwards to avoid recognising the robot's own voice.
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
@@ -62,6 +87,13 @@ ros2 launch ros_speech_recognition parrotry.launch.xml
   Speech recognition candidates topic name.
 
   Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
+
+* `~voice_interim_topic` (`std_msgs/String`)
+
+  Interim (non-final) transcript published while the user is still speaking.
+  Only valid when `~engine` is `GoogleCloudStream`.
+
+  Topic name is set by parameter `~voice_interim_topic`, and default value is `speech_to_text/interim`.
 
 * `sound_play` (`sound_play/SoundRequestAction`)
 
@@ -233,12 +265,23 @@ ros2 launch ros_speech_recognition parrotry.launch.xml
 * `~google_cloud_credentials_json` (`String`, default: `None`)
 
   Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
-  This is valid only if `~engine` is `GoogleCloud`.
-  
+  This is valid if `~engine` is `GoogleCloud` or `GoogleCloudStream`.
+  If the environment variable `GOOGLE_APPLICATION_CREDENTIALS` is already set, this parameter is ignored.
+
 * `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
 
   Preferred phrases parameters.
   This is valid only if `~engine` is `GoogleCloud`.
+
+* `~google_cloud_model` (`String`, default: `""`)
+
+  Recognition model name passed to the Google Cloud Speech API (e.g. `latest_long`, `latest_short`, `default`). Leave empty to use the API default.
+  This is valid only if `~engine` is `GoogleCloudStream`.
+
+* `~google_cloud_endpoint_stable_s` (`Double`, default: `1.0`)
+
+  Seconds the interim transcript must remain unchanged before a result is treated as final, in addition to Google's own `is_final` signal. Lower values commit faster but may cut off slow speakers.
+  This is valid only if `~engine` is `GoogleCloudStream`.
   
 * `~bing_key` (`String`, default: `None`)
 
