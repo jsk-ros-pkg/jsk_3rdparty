@@ -107,7 +107,7 @@ class ROSAudio(SR.AudioSource):
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array.array(dtype, chan_data).tostring()
+                self.buffer += array.array(dtype, chan_data).tobytes()
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
