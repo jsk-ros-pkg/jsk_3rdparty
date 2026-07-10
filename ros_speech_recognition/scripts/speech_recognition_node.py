@@ -9,6 +9,7 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import os
 import sys
 from threading import Lock
 
@@ -24,6 +25,20 @@ from std_srvs.srv import EmptyResponse
 
 from dynamic_reconfigure.server import Server
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
+
+
+def resolve_sound_signal_path(path):
+    if os.path.exists(path):
+        return path
+    attempted_paths = [path]
+    base, ext = os.path.splitext(path)
+    if ext == ".ogg":
+        oga_path = base + ".oga"
+        if os.path.exists(oga_path):
+            return oga_path
+        attempted_paths.append(oga_path)
+    raise IOError("Sound signal file not found: {}".format(
+        " or ".join(attempted_paths)))
 
 
 class ROSAudio(SR.AudioSource):
@@ -144,7 +159,11 @@ class ROSSpeechRecognition(object):
             "timeout": rospy.get_param("~timeout_signal",
                                        "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
         }
-
+        if self.act_sound is not None:
+            self.signals = {
+                key: resolve_sound_signal_path(path)
+                for key, path in self.signals.items()
+            }
 
         # ignore voice input while the robot is speaking
         self.self_cancellation = rospy.get_param("~self_cancellation", True)
