@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="credential" />
+    <node name="dialogflow_intent_client"
+        pkg="dialogflow_task_executive" type="dialogflow_intent_node.py"
+        output="screen">
+      <rosparam subst_value="true">
+        google_cloud_credentials_json: $(arg credential)
+      </rosparam>
+    </node>
+</launch>
