@@ -27,6 +27,15 @@ from dynamic_reconfigure.server import Server
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
 
 
+if hasattr(array.array, 'tobytes'):
+    def array_to_bytes(arr):
+        return arr.tobytes()
+else:
+    # Python 2.7
+    def array_to_bytes(arr):
+        return arr.tostring()
+
+
 def resolve_sound_signal_path(path):
     if os.path.exists(path):
         return path
@@ -122,7 +131,7 @@ class ROSAudio(SR.AudioSource):
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array.array(dtype, chan_data).tobytes()
+                self.buffer += array_to_bytes(array.array(dtype, chan_data))
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
