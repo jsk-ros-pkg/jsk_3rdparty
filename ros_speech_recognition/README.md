@@ -161,19 +161,27 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
   
 * `~start_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/bell.ogg`)
 
-  Path to sound file for bell on the start of audio caption
+  Path to sound file for bell on the start of audio caption.
+
+  If `*.ogg` is not found, `*.oga` is searched for.
   
 * `~recognized_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message.ogg`)
 
-  Path to sound file for bell on the end of audio caption
+  Path to sound file for bell on the end of audio caption.
+
+  If `*.ogg` is not found, `*.oga` is searched for.
   
 * `~success_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg`)
 
-  Path to sound file for bell on getting successful recognition result
+  Path to sound file for bell on getting successful recognition result.
+
+  If `*.ogg` is not found, `*.oga` is searched for.
   
 * `~timeout_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg`)
 
-  Path to sound file for bell on timeout for recognition
+  Path to sound file for bell on timeout for recognition.
+
+  If `*.ogg` is not found, `*.oga` is searched for.
   
 * `~continuous` (`Bool`, default: False)
 
