@@ -1,0 +1,11 @@
+# Define the goal
+string keyword # Keywords or a phrase to search for in the article title and body
+string[] sources # A string list of identifiers for the news sources or blogs you want headlines from
+string category # Find sources that display news of this category. Choose from business entertainment general health science sports technology
+---
+# Define the result
+newsapi_ros/News[] news_list
+bool done
+---
+# Define the feedback message
+string status
