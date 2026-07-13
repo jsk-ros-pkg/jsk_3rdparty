@@ -1,0 +1,10 @@
+<launch>
+  <arg name="robot_name" />
+  <arg name="video_topic_name" default="/head_camera_fetch_recorder/rgb/image_rect_color" />
+
+  <include file="$(find gdrive_recorder)/launch/gdrive_recorder.launch">
+    <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="robot_type" value="fetch" />
+    <arg name="video_topic_name" value="$(arg video_topic_name)" />
+  </include>
+</launch>
