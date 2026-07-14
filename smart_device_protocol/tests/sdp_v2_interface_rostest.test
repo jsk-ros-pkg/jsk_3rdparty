@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="rosbag" type="play" name="$(anon rosbag_play)" args="--clock $(find smart_device_protocol)/tests/test_topics.bag"/>
+    <test test-name="test_sdp_interface" pkg="smart_device_protocol" type="test_sdp_interface.py"/>
+</launch>
