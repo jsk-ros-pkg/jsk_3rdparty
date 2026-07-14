@@ -1,0 +1,14 @@
+<launch>
+    <!-- Launch the force_torque_sensor_driver node -->
+    <node pkg="touchence_force_sensor_ros" type="touchence_ros_driver.py" name="force_torque_sensor_driver" output="screen">
+        <!-- ROS parameters for SensorDriver -->
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud" value="230400" />
+        <param name="offset_calib_sample_number" value="300" />
+        <param name="sensor_frame_id" value="world" />
+        <param name="debug" value="false" />
+    </node>
+
+    <!-- Launch RViz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find touchence_force_sensor_ros)/config/rviz/default.rviz" output="screen" />
+</launch>
