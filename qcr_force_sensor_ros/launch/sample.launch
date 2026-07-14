@@ -1,0 +1,27 @@
+<launch>
+
+  <arg name="driver_name" default="qcr_force_sensor_driver" />
+  <arg name="port" default="/dev/ttyUSB0" />
+  <arg name="baud" default="115200" />
+  <arg name="n_per_hz" default="0.0000286" />
+  <arg name="offset_calib_sample_number" default="300" />
+  <arg name="sensor_frame_id" default="qcr_force_sensor" />
+  <arg name="rviz" default="true" />
+
+  <include file="$(find qcr_force_sensor_ros)/launch/sensor_driver.launch">
+    <arg name="driver_name" value="$(arg driver_name)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="n_per_hz" default="$(arg n_per_hz)" />
+    <arg name="offset_calib_sample_number" default="$(arg offset_calib_sample_number)" />
+    <arg name="sensor_frame_id" default="$(arg sensor_frame_id)" />
+  </include>
+
+  <group if="$(arg rviz)">
+    <node name="rviz"
+          pkg="rviz" type="rviz"
+          args="-d $(find qcr_force_sensor_ros)/config/rviz/sample.rviz">
+    </node>
+  </group>
+
+</launch>
