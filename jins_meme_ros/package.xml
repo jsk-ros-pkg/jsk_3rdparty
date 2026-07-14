@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>jins_meme_ros</name>
+  <version>0.0.0</version>
+  <description>The jins_meme_ros package</description>
+
+  <maintainer email="sktometometo@todo.todo">sktometometo</maintainer>
+
+  <license>TODO</license>
+
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <export>
+  </export>
+</package>
