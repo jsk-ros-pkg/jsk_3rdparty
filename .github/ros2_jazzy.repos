@@ -1,0 +1,10 @@
+repositories:
+  audio_common:
+    type: git
+    url: https://github.com/ros-drivers/audio_common.git
+    version: af901dfa2632e43b0db95bc1d4c50b7ec333f187
+  jsk_common_msgs:
+    type: git
+    url: https://github.com/wep21/jsk_common_msgs.git
+    # ROS 2 support from https://github.com/jsk-ros-pkg/jsk_common_msgs/pull/33
+    version: ba45aeed5658cb0e4d41615d9e7ae14a6d35c4d4

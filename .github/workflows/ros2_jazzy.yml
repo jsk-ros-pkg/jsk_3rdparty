@@ -1,0 +1,46 @@
+name: ROS 2 Jazzy CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  industrial_ci:
+    name: Jazzy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ruff check
+        uses: astral-sh/ruff-action@v4.1.0
+        with:
+          version: "0.15.21"
+          src: ros_speech_recognition
+
+      - name: Build and test
+        uses: ros-industrial/industrial_ci@master
+        env:
+          ROS_DISTRO: jazzy
+          ROS_REPO: main
+          TARGET_WORKSPACE: >-
+            .
+            -3rdparty
+            -jsk_ros_patch/ee_cart_imped_jsk_patch
+          UPSTREAM_WORKSPACE: >-
+            .github/ros2_jazzy.repos
+            -audio_common/audio_common
+            -audio_common/audio_play
+            -jsk_common_msgs/jsk_common_msgs
+            -jsk_common_msgs/jsk_footstep_msgs
+            -jsk_common_msgs/jsk_gui_msgs
+            -jsk_common_msgs/jsk_hark_msgs
+            -jsk_common_msgs/posedetection_msgs
+          PIP_BREAK_SYSTEM_PACKAGES: "1"
+          AFTER_SETUP_TARGET_WORKSPACE: >-
+            python3 -m pip install
+            -r "$TARGET_REPO_PATH/ros_speech_recognition/requirements.txt"

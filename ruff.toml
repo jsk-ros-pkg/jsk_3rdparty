@@ -1,0 +1,11 @@
+target-version = "py312"
+
+[lint.per-file-ignores]
+# This module extends SpeechRecognition's legacy backend and intentionally
+# retains its wildcard import and compact upstream control flow.
+"ros_speech_recognition/src/ros_speech_recognition/recognize_google_cloud.py" = [
+  "E701",
+  "E712",
+  "F403",
+  "F405",
+]
