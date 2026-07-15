@@ -14,12 +14,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "colcon-common-extensions>=0.3.0",
-    "pytest>=9.1.1",
+    "pytest>=8,<9",
+    "setuptools>=68.1.2",
 ]
-
-[build-system]
-requires = ["setuptools>=68.1.2"]
-build-backend = "setuptools.build_meta"
 
 [tool.uv]
 package = false

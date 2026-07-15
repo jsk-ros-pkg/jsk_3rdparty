@@ -273,7 +273,7 @@ wheels = [
 
 [[package]]
 name = "colcon-core"
-version = "0.21.0"
+version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coloredlogs", marker = "sys_platform == 'win32'" },
@@ -286,9 +286,9 @@ dependencies = [
     { name = "pytest-rerunfailures" },
     { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/10/fcaae3828a5234316eaa3016cd54c59ddb849b3ecc75dac2fea1aaeec892/colcon_core-0.21.0.tar.gz", hash = "sha256:f2d466f2f3cc89f2e17244be634475223f47ad5460ae4903a8d88534d6e9bae7", size = 134696, upload-time = "2026-06-01T22:01:43.908Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/d2/71ee3d79155bd1738a4ee62d17fefb8bd9b2a99e1ed75f290932e962f82a/colcon-core-0.19.0.tar.gz", hash = "sha256:bedddc0fffb4ac6a64a0c08b1db6ef57776d9478c26839777b5f6535045d2797", size = 133394, upload-time = "2025-03-13T20:59:45.064Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/ba/4710fa60e3e6cf1491daba9bde1f208eeeabb3546b989aff6e84bbc414fa/colcon_core-0.21.0-py3-none-any.whl", hash = "sha256:cf08477b14134af85a88575a6acc2549f243c8bc41cdc956476b8b6446d410f2", size = 141541, upload-time = "2026-06-01T22:01:42.65Z" },
+    { url = "https://files.pythonhosted.org/packages/37/b9/2ab93cfcd6d6337349291d52d2acc96a8585fd3e5b02a60c453db1685acb/colcon_core-0.19.0-py3-none-any.whl", hash = "sha256:433d748ba7de931015167cab1fbcb5538869608a1dcd677e4c7043f709745c63", size = 140724, upload-time = "2025-03-13T20:59:43.78Z" },
 ]
 
 [[package]]
@@ -900,7 +900,7 @@ wheels = [
 
 [[package]]
 name = "pytest"
-version = "9.1.1"
+version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -909,9 +909,9 @@ dependencies = [
     { name = "pluggy" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79", size = 365750, upload-time = "2025-09-04T14:34:20.226Z" },
 ]
 
 [[package]]
@@ -1047,7 +1047,7 @@ wheels = [
 
 [[package]]
 name = "ros-speech-recognition"
-version = "0.1.0"
+version = "2.1.31"
 source = { virtual = "." }
 dependencies = [
     { name = "google-api-python-client" },
@@ -1060,6 +1060,7 @@ dependencies = [
 dev = [
     { name = "colcon-common-extensions" },
     { name = "pytest" },
+    { name = "setuptools" },
 ]
 
 [package.metadata]
@@ -1073,7 +1074,8 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "colcon-common-extensions", specifier = ">=0.3.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest", specifier = ">=8,<9" },
+    { name = "setuptools", specifier = ">=68.1.2" },
 ]
 
 [[package]]
@@ -1090,11 +1092,11 @@ wheels = [
 
 [[package]]
 name = "setuptools"
-version = "79.0.1"
+version = "83.0.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/bb/71/b6365e6325b3290e14957b2c3a804a529968c77a049b2ed40c095f749707/setuptools-79.0.1.tar.gz", hash = "sha256:128ce7b8f33c3079fd1b067ecbb4051a66e8526e7b65f6cec075dfc650ddfa88", size = 1367909, upload-time = "2025-04-23T22:20:59.241Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/26/f5d29e25ffdb535afef2d35cdb55b325298f96debd670da4c325e08d70f4/setuptools-83.0.0.tar.gz", hash = "sha256:025bccbbf0fa05b6192bc64ae1e7b16e001fd6d6d4d5de03c97b1c1ade523bef", size = 1154254, upload-time = "2026-07-04T15:31:22.699Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0d/6d/b4752b044bf94cb802d88a888dc7d288baaf77d7910b7dedda74b5ceea0c/setuptools-79.0.1-py3-none-any.whl", hash = "sha256:e147c0549f27767ba362f9da434eab9c5dc0045d5304feb602a0af001089fc51", size = 1256281, upload-time = "2025-04-23T22:20:56.768Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/40/e1e72872c6354b306daef1703549e8e83b4d43cfea356311bf722a043752/setuptools-83.0.0-py3-none-any.whl", hash = "sha256:29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3", size = 1008090, upload-time = "2026-07-04T15:31:20.885Z" },
 ]
 
 [[package]]
