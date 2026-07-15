@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="launch_sound_play" default="true"
+       description="Launch the sound_play action server"/>
+  <arg name="launch_audio_capture" default="true"
+       description="Capture microphone audio"/>
+
+  <arg name="audio_topic" default="/audio"/>
+  <arg name="voice_topic" default="/speech_to_text"/>
+  <arg name="n_channel" default="1"/>
+  <arg name="depth" default="16"/>
+  <arg name="sample_rate" default="16000"/>
+  <arg name="device" default=""/>
+  <arg name="engine" default="Google"/>
+  <arg name="language" default="en-US"/>
+  <arg name="google_cloud_credentials_json" default=""
+       description="Path to a Google Cloud service-account JSON file"/>
+  <arg name="continuous" default="true"/>
+  <arg name="auto_start" default="true"/>
+  <arg name="self_cancellation" default="true"/>
+  <arg name="tts_tolerance" default="1.0"/>
+  <arg name="tts_action_names" default="sound_play"
+       description="Comma-separated sound action names to ignore"/>
+
+  <node name="sound_play" pkg="sound_play" exec="soundplay_node.py"
+        if="$(var launch_sound_play)" respawn="true" output="screen"/>
+
+  <node name="audio_capture" pkg="audio_capture" exec="audio_capture_node"
+        if="$(var launch_audio_capture)" respawn="true" output="screen">
+    <remap from="audio" to="$(var audio_topic)"/>
+    <param name="dst" value="appsink"/>
+    <param name="format" value="wave"/>
+    <param name="channels" value="$(var n_channel)"/>
+    <param name="depth" value="$(var depth)"/>
+    <param name="sample_rate" value="$(var sample_rate)"/>
+    <param name="device" value="$(var device)"/>
+  </node>
+
+  <node name="speech_recognition" pkg="ros_speech_recognition"
+        exec="speech_recognition_node" respawn="true" output="screen">
+    <param name="audio_topic" value="$(var audio_topic)"/>
+    <param name="voice_topic" value="$(var voice_topic)"/>
+    <param name="n_channel" value="$(var n_channel)"/>
+    <param name="depth" value="$(var depth)"/>
+    <param name="sample_rate" value="$(var sample_rate)"/>
+    <param name="engine" value="$(var engine)"/>
+    <param name="language" value="$(var language)"/>
+    <param name="google_cloud_credentials_json"
+           value="$(var google_cloud_credentials_json)"/>
+    <param name="continuous" value="$(var continuous)"/>
+    <param name="auto_start" value="$(var auto_start)"/>
+    <param name="enable_sound_effect" value="$(var launch_sound_play)"/>
+    <param name="self_cancellation" value="$(var self_cancellation)"/>
+    <param name="tts_tolerance" value="$(var tts_tolerance)"/>
+    <param name="tts_action_names" value="$(var tts_action_names)"
+           value-sep=","/>
+  </node>
+
+  <node name="speech_recognition_candidates_to_string"
+        pkg="ros_speech_recognition"
+        exec="speech_recognition_candidates_to_string" output="screen">
+    <remap from="~/input" to="$(var voice_topic)"/>
+  </node>
+</launch>

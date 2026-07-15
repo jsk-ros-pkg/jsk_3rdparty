@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="language" default="en-US"/>
+  <arg name="engine" default="Google"/>
+  <arg name="confidence_threshold" default="0.8"/>
+  <arg name="tts_action_name" default="sound_play"/>
+
+  <include file="$(find-pkg-share ros_speech_recognition)/launch/speech_recognition.launch.xml">
+    <arg name="launch_sound_play" value="true"/>
+    <arg name="language" value="$(var language)"/>
+    <arg name="engine" value="$(var engine)"/>
+    <arg name="continuous" value="true"/>
+    <arg name="voice_topic" value="/speech_to_text"/>
+    <arg name="tts_action_names" value="$(var tts_action_name)"/>
+  </include>
+
+  <node name="parrot_node" pkg="ros_speech_recognition"
+        exec="parrot_node" output="screen">
+    <remap from="~/input" to="/speech_to_text"/>
+    <param name="tts_action_name" value="$(var tts_action_name)"/>
+    <param name="confidence_threshold" value="$(var confidence_threshold)"/>
+  </node>
+</launch>
