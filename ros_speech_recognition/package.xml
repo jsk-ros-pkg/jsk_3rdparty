@@ -6,7 +6,8 @@
   <description>ROS2 wrapper for Python SpeechRecognition library</description>
   <url type="website">https://pypi.python.org/pypi/SpeechRecognition/</url>
 
-  <maintainer email="tsubaki@jsk.t.u-tokyo.ac.jp">Tsubaki Tsubaki</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="tsubaki@jsk.t.u-tokyo.ac.jp">Michitoshi Tsubaki</author>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
   <license>BSD</license>
 

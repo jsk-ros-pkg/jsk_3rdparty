@@ -10,6 +10,7 @@ import time
 from action_msgs.msg import GoalStatus
 from action_msgs.msg import GoalStatusArray
 from audio_common_msgs.msg import AudioData
+from rcl_interfaces.msg import ParameterDescriptor
 from rcl_interfaces.msg import SetParametersResult
 import rclpy
 from rclpy.action import ActionClient
@@ -36,6 +37,20 @@ ENGINES = (
     'IBM',
     'Vosk',
 )
+
+FLOAT_PARAMETERS = {
+    'duration',
+    'energy_threshold',
+    'dynamic_energy_adjustment_damping',
+    'dynamic_energy_ratio',
+    'pause_threshold',
+    'operation_timeout',
+    'listen_timeout',
+    'phrase_time_limit',
+    'phrase_threshold',
+    'non_speaking_duration',
+    'tts_tolerance',
+}
 
 RecognizerEx.recognize_vosk = recognize_vosk
 
@@ -330,11 +345,16 @@ class SpeechRecognitionNode(Node):
             'bing_key': '',
             'vosk_model_path': '',
         }
+        dynamic_descriptor = ParameterDescriptor(dynamic_typing=True)
         for name, default in parameters.items():
-            self.declare_parameter(name, default)
+            descriptor = dynamic_descriptor if name in FLOAT_PARAMETERS else None
+            self.declare_parameter(name, default, descriptor=descriptor)
 
     def _parameter(self, name):
-        return self.get_parameter(name).value
+        value = self.get_parameter(name).value
+        if name in FLOAT_PARAMETERS:
+            return float(value)
+        return value
 
     def _dynamic_parameter_values(self):
         return {name: self._parameter(name) for name in self._DYNAMIC_PARAMETERS}

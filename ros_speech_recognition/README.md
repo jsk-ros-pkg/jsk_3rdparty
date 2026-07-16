@@ -3,26 +3,22 @@
 [![ROS 2 Jazzy CI](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml/badge.svg)](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml)
 
 A ROS 2 package for speech-to-text services.
-This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) as a backend.
+This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) under `uv` python package manager.
 
 ## Tutorials
 
 ### Normal tutorial
 
-1. Install Python dependencies with uv and build this package with colcon
+1. Install Python dependencies with `uv` and build this package with colcon
 
-  Use a clean shell and source only ROS 2 Jazzy. Do not source
-  `/opt/ros/one/setup.bash` in the same shell.
+  Use a clean shell and source only ROS 2 Jazzy.
+  Do not source `/opt/ros/one/setup.bash`(ROS1) in the same shell.
 
   ```bash
-  cd ~/colcon_ws
+  cd <path to your colcon workspace>
   source /opt/ros/jazzy/setup.bash
-  if env | grep -q '/opt/ros/one'; then
-    echo 'ERROR: /opt/ros/one is in this shell. Start a clean shell and source only /opt/ros/jazzy/setup.bash.'
-    exit 1
-  fi
-
-  cd src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition
+  
+  cd <path to ros_speech_recognition package>
   uv venv --system-site-packages --python 3.12
   uv sync
 
@@ -31,15 +27,12 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   uv --project src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition run \
     colcon build --symlink-install --packages-up-to ros_speech_recognition
   source install/setup.bash
-
-  # The installed ROS console scripts should use the uv-managed Python in .venv.
-  head -n1 install/ros_speech_recognition/lib/ros_speech_recognition/speech_recognition_node
   ```
 
   Add or update Python dependencies with `uv add` from the package directory:
 
   ```bash
-  cd ~/colcon_ws/src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition
+  cd <path to ros_speech_recognition package>
   uv add PACKAGE
   uv add --dev DEV_PACKAGE
   ```
@@ -57,14 +50,12 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   # you can get the recognition result
   ```
 
-### Parrotry tutorial
-
-Parrotry mean オウム返し in Japanese
+### Parrotry tutorial (オウム返し)
 
 ```bash
-# english
+# English
 ros2 launch ros_speech_recognition parrotry.launch.xml
-# japanese
+# Japanese
 ros2 launch ros_speech_recognition parrotry.launch.xml language:=ja-JP
 ```
 

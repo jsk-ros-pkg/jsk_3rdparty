@@ -17,6 +17,10 @@
        description="Path to a Google Cloud service-account JSON file"/>
   <arg name="continuous" default="true"/>
   <arg name="auto_start" default="true"/>
+  <arg name="energy_threshold" default="300.0"/>
+  <arg name="dynamic_energy_threshold" default="true"/>
+  <arg name="listen_timeout" default="0.0"/>
+  <arg name="phrase_time_limit" default="10.0"/>
   <arg name="self_cancellation" default="true"/>
   <arg name="tts_tolerance" default="1.0"/>
   <arg name="tts_action_names" default="sound_play"
@@ -49,9 +53,16 @@
            value="$(var google_cloud_credentials_json)"/>
     <param name="continuous" value="$(var continuous)"/>
     <param name="auto_start" value="$(var auto_start)"/>
+    <param name="energy_threshold" value="$(var energy_threshold)"
+           type="float"/>
+    <param name="dynamic_energy_threshold"
+           value="$(var dynamic_energy_threshold)"/>
+    <param name="listen_timeout" value="$(var listen_timeout)" type="float"/>
+    <param name="phrase_time_limit" value="$(var phrase_time_limit)"
+           type="float"/>
     <param name="enable_sound_effect" value="$(var launch_sound_play)"/>
     <param name="self_cancellation" value="$(var self_cancellation)"/>
-    <param name="tts_tolerance" value="$(var tts_tolerance)"/>
+    <param name="tts_tolerance" value="$(var tts_tolerance)" type="float"/>
     <param name="tts_action_names" value="$(var tts_action_names)"
            value-sep=","/>
   </node>
