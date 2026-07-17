@@ -51,8 +51,16 @@ Each voice synthesis character has its own rules. Please use this package accord
 Build this package.
 
 ```bash
-cd /path/to/catkin_workspace
-catkin build voicevox
+cd /path/to/colcon_workspace
+source /opt/ros/jazzy/setup.bash
+
+cd src/jsk-ros-pkg/jsk_3rdparty/3rdparty/voicevox
+uv sync
+source .venv/bin/activate
+
+cd /path/to/colcon_workspace
+colcon build --packages-up-to voicevox --symlink-install
+source install/setup.bash
 ```
 
 ## Usage
@@ -60,7 +68,7 @@ catkin build voicevox
 ### Launch sound_play with VOICEVOX Text-to-Speech
 
 ```bash
-roslaunch voicevox voicevox_texttospeech.launch
+ros2 launch voicevox voicevox_texttospeech.launch.xml
 ```
 
 <a id="saysomething"></a>
@@ -69,21 +77,26 @@ roslaunch voicevox voicevox_texttospeech.launch
 #### For python users
 
 ```python
-import rospy
+import time
+
+import rclpy
 from sound_play.libsoundplay import SoundClient
 
-rospy.init_node('say_node')
+rclpy.init()
+node = rclpy.create_node('say_node')
 
-client = SoundClient(sound_action='robotsound_jp', sound_topic='robotsound_jp')
+client = SoundClient(node, sound_action='robotsound_jp', sound_topic='robotsound_jp')
+time.sleep(1)
 
 client.say('こんにちは', voice='四国めたん-あまあま')
+rclpy.shutdown()
 ```
 
 You can change the voice by changing the voice_name.
 You can also specify the speaker id.
 To get available voice name and speaker id, run following command
 ```bash
-rosrun voicevox list_speaker.py
+ros2 run voicevox list_speakers.py
 ```
 
 |  speaker_id  |  voice_name  |
@@ -176,16 +189,31 @@ rosrun voicevox list_speaker.py
 | 85 | 青山龍星-かなしみ |
 | 86 | 青山龍星-囁き |
 
-#### For roseus users
 
-```
+#### For EusLisp users
+
+Currently (As on July 17 2026) `pr2eus` is not migrated to ROS 2, so `speak.l` is temporarily placed in this repository.
+
+```lisp
 $ roseus
-(load "package://pr2eus/speak.l")
+(load "package://voicevox/roseus/speak.l")
 
 (ros::roseus "say_node")
 
 (speak "JSKへようこそ。" :lang "波音リツ" :wait t :topic-name "robotsound_jp")
 ```
+
+The ROS 2 port publishes `sound_play_msgs/msg/SoundRequest` to the requested topic.
+[Caution] `:wait` is accepted for `pr2eus/speak.l` compatibility, but topic transport cannot wait for playback completion.
+
+
+#### For command-line users
+
+```
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest \
+  "{sound: -3, command: 1, volume: 1.0, arg: 'JSKへようこそ。', arg2: '波音リツ'}"
+```
+
 
 ### Tips
 

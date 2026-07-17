@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 from voicevox import Client
@@ -11,8 +11,6 @@ import shutil
 import sys
 import time
 
-import rospy
-import rospkg
 import json
 
 VOICEVOX_DEFAULT_SPEAKER_ID = os.environ.get(
@@ -38,7 +36,25 @@ def convert_to_str(x):
     return x
 
 def get_voicevox_cache_dir():
-    return rospkg.get_ros_home() + '/voicevox/'
+    return os.path.join(
+        os.environ.get('ROS_HOME', os.path.expanduser('~/.ros')),
+        'voicevox')
+
+def get_speakers_cache_path():
+    return os.path.join(get_voicevox_cache_dir(), 'speakers.json')
+
+def load_speakers_cache():
+    path = get_speakers_cache_path()
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
+
+def save_speakers_cache(speaker_id_to_name):
+    if not os.path.exists(get_voicevox_cache_dir()):
+        os.makedirs(get_voicevox_cache_dir())
+    with open(get_speakers_cache_path(), 'w', encoding='utf-8') as f:
+        json.dump(speaker_id_to_name, f, ensure_ascii=False)
 
 async def request_synthesis(
         sentence, output_path, speaker_id='1'):
@@ -68,17 +84,16 @@ if __name__ == '__main__':
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
     # get speaker_id_to_name data from cache or Client()
-    speaker_id_to_name = {}
-    if rospy.has_param('voicevox/speakers') and type(rospy.get_param('voicevox/speakers')) is str:
-        print('[Text2Wave][{}] Loading speaker id from rosparam'.format(time.time()))
-        speaker_id_to_name = json.loads(rospy.get_param('voicevox/speakers'))
+    speaker_id_to_name = load_speakers_cache()
+    if speaker_id_to_name is not None:
+        print('[Text2Wave][{}] Loading speaker id from cache'.format(time.time()))
     else:
         print('[Text2Wave][{}] Loading speaker id from voicevox server'.format(time.time()))
         speaker_id_to_name = asyncio.run(list_speakers())
         # show speaker ids
         for id, name in sorted(speaker_id_to_name.items(), key=lambda x: int(x[0])):
             print('[Text2Wave][{}] {} : {}'.format(time.time(), id, name))
-        rospy.set_param('voicevox/speakers', json.dumps(speaker_id_to_name, ensure_ascii=False))
+        save_speakers_cache(speaker_id_to_name)
 
     with open(args.text, 'rb') as f:
         speech_text = convert_to_str(f.readline())
@@ -111,4 +126,3 @@ if __name__ == '__main__':
 
     if cache_enabled :
         shutil.copy(args.output, cache_filename)
-
