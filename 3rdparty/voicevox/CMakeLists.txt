@@ -164,7 +164,7 @@ configure_file(
 )
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/bin/text2wave" "\
-#!/usr/bin/env bash
+#!/bin/bash
 exec ros2 run voicevox request_synthesis.py \"$@\"
 ")
 file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/bin/text2wave"
