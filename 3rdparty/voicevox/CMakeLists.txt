@@ -217,7 +217,7 @@ install(
 )
 
 install(
-  DIRECTORY roseus
+  DIRECTORY euslisp
   DESTINATION share/${PROJECT_NAME}
   USE_SOURCE_PERMISSIONS
 )
