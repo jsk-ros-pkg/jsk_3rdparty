@@ -34,6 +34,13 @@ jobs:
             -jsk_common_msgs/jsk_hark_msgs
             -jsk_common_msgs/posedetection_msgs
           PIP_BREAK_SYSTEM_PACKAGES: "1"
-          AFTER_SETUP_TARGET_WORKSPACE: >-
-            python3 -m pip install
-            -r "$TARGET_REPO_PATH/ros_speech_recognition/requirements.txt"
+          AFTER_SETUP_TARGET_WORKSPACE_EMBED: >-
+            python3 -m pip install uv &&
+            ros_speech_recognition_dir="$current_ws/src/ros_speech_recognition" &&
+            (
+            cd "$ros_speech_recognition_dir" &&
+            uv venv --allow-existing --system-site-packages --python 3.12 &&
+            uv sync --frozen &&
+            uv run python -c "import googleapiclient.discovery, speech_recognition, vosk"
+            ) &&
+            export ROS_SPEECH_RECOGNITION_PYTHON_EXECUTABLE="$ros_speech_recognition_dir/.venv/bin/python3"
