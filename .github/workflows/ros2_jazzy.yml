@@ -22,9 +22,8 @@ jobs:
           ROS_DISTRO: jazzy
           ROS_REPO: main
           TARGET_WORKSPACE: >-
-            .
-            -3rdparty
-            -jsk_ros_patch/ee_cart_imped_jsk_patch
+            ros_speech_recognition
+            3rdparty/voicevox
           UPSTREAM_WORKSPACE: >-
             .github/ros2_jazzy.repos
             -audio_common/audio_common
