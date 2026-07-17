@@ -22,4 +22,4 @@
 [//]: #
 
 Note: 
-  This package contains non-catkin packages (pure-cmake directory) so that we have to use either 'catkin build ' or 'catkin_make_isolated'. Using 'catkin_make' will not work.
+  This package contains non-colcon packages (pure-cmake directory / catkin packages) so that we have to use `colcon build --packages-select <pacakge-name>` to explicitly designate the target package to build.

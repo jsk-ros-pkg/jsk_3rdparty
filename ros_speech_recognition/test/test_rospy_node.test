@@ -1,3 +1,0 @@
-<launch>
-  <test pkg="ros_speech_recognition" type="test_rospy_node.py" test-name="ros_rospy_node" />
-</launch>

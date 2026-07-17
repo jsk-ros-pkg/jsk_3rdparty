@@ -1,37 +1,41 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>ros_speech_recognition</name>
   <version>2.1.31</version>
-  <description>ROS wrapper for Python SpeechRecognition library</description>
+  <description>ROS2 wrapper for Python SpeechRecognition library</description>
   <url type="website">https://pypi.python.org/pypi/SpeechRecognition/</url>
 
-  <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
-  <license>BSD</license>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="tsubaki@jsk.t.u-tokyo.ac.jp">Michitoshi Tsubaki</author>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
+  <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>ament_cmake_python</build_depend>
+  <build_depend>curl</build_depend>
+  <build_depend>wget</build_depend>
 
-  <build_depend>catkin_virtualenv</build_depend>
-  <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>jsk_data</build_depend>
-  <build_depend>speech_recognition_msgs</build_depend>
-  <build_depend>g++-static</build_depend>
+  <exec_depend>action_msgs</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>audio_capture</exec_depend>
+  <exec_depend>audio_common_msgs</exec_depend>
+  <exec_depend>flac</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>launch_xml</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sound_play</exec_depend>
+  <exec_depend>sound_play_msgs</exec_depend>
+  <exec_depend>sound-theme-freedesktop</exec_depend>
+  <exec_depend>speech_recognition_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
 
-  <run_depend>audio_capture</run_depend>
-  <run_depend>audio_common_msgs</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>flac</run_depend>
-  <run_depend>jsk_data</run_depend>
-  <run_depend>sound_play</run_depend>
-  <run_depend>sound-theme-freedesktop</run_depend>
-  <run_depend>speech_recognition_msgs</run_depend>
-  <run_depend>python3-pycryptodome</run_depend> <!-- melodic requries to install python3-pycryptodome for rosbag with python3 -->
-  <run_depend>python3-gnupg</run_depend>
-
-  <test_depend>rostest</test_depend>
-  <test_depend>roslaunch</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
 
   <export>
-    <pip_requirements>requirements.txt</pip_requirements>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

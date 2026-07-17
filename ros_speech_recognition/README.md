@@ -1,59 +1,79 @@
 # ros\_speech\_recognition
 
-A ROS package for speech-to-text services.  
-This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) as a backend.
+[![ROS 2 Jazzy CI](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml/badge.svg)](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml)
+
+A ROS 2 package for speech-to-text services.
+This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) under `uv` python package manager.
 
 ## Tutorials
 
 ### Normal tutorial
 
-1. Install this package and SpeechReconition
+1. Install Python dependencies with `uv` and build this package with colcon
+
+  Use a clean shell and source only ROS 2 Jazzy.
+  Do not source `/opt/ros/one/setup.bash`(ROS1) in the same shell.
 
   ```bash
-  sudo apt install ros-${ROS_DISTRO}-ros-speech-recognition
+  cd <path to your colcon workspace>
+  source /opt/ros/jazzy/setup.bash
+  
+  cd <path to ros_speech_recognition package>
+  uv sync
+  source .venv/bin/activate
+
+  cd ~/colcon_ws
+  colcon build --symlink-install --packages-up-to ros_speech_recognition
+  source install/setup.bash
+  ```
+
+  Add or update Python dependencies with `uv add` from the package directory:
+
+  ```bash
+  cd <path to ros_speech_recognition package>
+  uv add PACKAGE
+  uv add --dev DEV_PACKAGE
   ```
   
 2. Launch speech recognition node
 
   ```bash
-  roslaunch ros_speech_recognition speech_recognition.launch
+  ros2 launch ros_speech_recognition speech_recognition.launch.xml
   ```
   
 3. Echo `/speech_to_text`
 
   ```bash
-  rostopic echo /speech_to_text
+  ros2 topic echo /speech_to_text
   # you can get the recognition result
   ```
 
-### Parrotry tutorial
-
-Parrotry mean オウム返し in Japanese
+### Parrotry tutorial (オウム返し)
 
 ```bash
-# english
-roslaunch ros_speech_recognition parrotry.launch
-# japanese
-roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
+# English
+ros2 launch ros_speech_recognition parrotry.launch.xml
+# Japanese
+ros2 launch ros_speech_recognition parrotry.launch.xml language:=ja-JP
 ```
 
-## `speech_recognition_node.py` Interface
+## `speech_recognition_node` Interface
 
 ### Publishing Topics
 
-* `~voice_topic` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
+* `~voice_topic` (`speech_recognition_msgs/msg/SpeechRecognitionCandidates`)
 
   Speech recognition candidates topic name.
 
   Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
 
-* `sound_play` (`sound_play/SoundRequestAction`)
+* `sound_play` (`sound_play_msgs/action/SoundRequest`)
 
   Action client to play sound on events. If the action server is not available or `~enable_sound_effect` is `False`, no sound is played.
   
 ### Subscribing Topics
 
-* `~audio_topic` (`audio_common_msgs/AudioData`)
+* `~audio_topic` (`audio_common_msgs/msg/AudioData`)
 
   Audio stream data to be recognized.
 
@@ -61,17 +81,17 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
 ### Advertising Services
 
-* `speech_recognition` (`speech_recognition_msgs/SpeechRecognition`)
+* `speech_recognition` (`speech_recognition_msgs/srv/SpeechRecognition`)
 
   Service for speech recognition
 
-* `speech_recognition/start` (`std_srvs/Empty`)
+* `speech_recognition/start` (`std_srvs/srv/Empty`)
 
   Start service for speech recognition
 
   This service is available when parameter `~contiunous` is `True`.
 
-* `speech_recognition/start` (`std_srvs/Empty`)
+* `speech_recognition/stop` (`std_srvs/srv/Empty`)
 
   Stop service for speech recognition
 
@@ -97,7 +117,7 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
   
 * `~engine` (`Enum[String]`, default: `Google`)
 
-  Speech-to-text engine (To see full options use `dynamic_reconfigure`)
+  Speech-to-text engine. Use `ros2 param describe` to inspect it.
   
 * `~energy_threshold` (`Double`, default: `300`)
 
@@ -218,6 +238,22 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
   This is valid only if `~engine` is `GoogleCloud`.
+
+  Google Cloud client dependencies are managed by uv in `pyproject.toml`:
+
+  ```bash
+  cd ~/colcon_ws/src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition
+  uv sync
+  ```
+
+  Download the service-account JSON file, then pass its path when launching:
+
+  It can also be passed from launch:
+
+  ```bash
+  ros2 launch ros_speech_recognition speech_recognition.launch.xml \
+    engine:=GoogleCloud google_cloud_credentials_json:=/path/to/credentials.json
+  ```
   
 * `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
 
@@ -236,6 +272,13 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
   To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
+
+Runtime-configurable parameters can be updated with standard ROS 2 parameter
+services, for example:
+
+```bash
+ros2 param set /speech_recognition language ja-JP
+```
   
 ## Author
 
