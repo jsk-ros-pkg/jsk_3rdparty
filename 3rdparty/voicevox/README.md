@@ -196,7 +196,7 @@ Currently (As on July 17 2026) `pr2eus` is not migrated to ROS 2, so `speak.l` i
 
 ```lisp
 $ roseus
-(load "package://voicevox/roseus/speak.l")
+(load "package://voicevox/euslisp/speak.l")
 
 (ros::roseus "say_node")
 
