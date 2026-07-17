@@ -553,6 +553,8 @@ class SpeechRecognitionNode(Node):
             self.publisher.publish(message)
         except sr.UnknownValueError:
             self.get_logger().warning('Speech was not understood')
+            self._adjust_for_ambient_noise(
+                self.audio, 'Updated energy threshold to')
             self.play_sound('timeout')
         except sr.RequestError as error:
             self.get_logger().error('Failed to recognize: {}'.format(error))
@@ -562,15 +564,20 @@ class SpeechRecognitionNode(Node):
                 'Unexpected recognition error: {}'.format(sys.exc_info()))
             self.play_sound('timeout')
 
+    def _adjust_for_ambient_noise(self, source, message):
+        if not self.dynamic_energy_threshold:
+            return
+        self.recognizer.adjust_for_ambient_noise(source)
+        self.get_logger().info(
+            '{} {}'.format(message, self.recognizer.energy_threshold))
+
     def start_speech_recognition(self):
         if self.stop_fn is not None:
             return
         if self.dynamic_energy_threshold:
             with self.audio as source:
-                self.recognizer.adjust_for_ambient_noise(source)
-                self.get_logger().info(
-                    'Set minimum energy threshold to {}'.format(
-                        self.recognizer.energy_threshold))
+                self._adjust_for_ambient_noise(
+                    source, 'Set minimum energy threshold to')
         self.play_sound('start')
         self.stop_fn = self.recognizer.listen_in_background(
             self.audio,
@@ -590,10 +597,8 @@ class SpeechRecognitionNode(Node):
             else self.default_duration
         with self.audio as source:
             if self.dynamic_energy_threshold:
-                self.recognizer.adjust_for_ambient_noise(source)
-                self.get_logger().info(
-                    'Set minimum energy threshold to {}'.format(
-                        self.recognizer.energy_threshold))
+                self._adjust_for_ambient_noise(
+                    source, 'Set minimum energy threshold to')
             if not request.quiet:
                 self.play_sound('start')
 
@@ -626,6 +631,8 @@ class SpeechRecognitionNode(Node):
                     return response
                 except sr.UnknownValueError:
                     self.get_logger().warning('Speech was not understood')
+                    self._adjust_for_ambient_noise(
+                        source, 'Set minimum energy threshold to')
                 except sr.RequestError as error:
                     self.get_logger().error(
                         'Failed to recognize: {}'.format(error))

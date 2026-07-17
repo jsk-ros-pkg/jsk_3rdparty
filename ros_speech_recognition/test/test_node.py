@@ -3,6 +3,7 @@ import array
 import pytest
 import rclpy
 from rclpy.parameter import Parameter
+import speech_recognition as sr
 
 from ros_speech_recognition.node import array_to_bytes
 from ros_speech_recognition.node import resolve_sound_signal_path
@@ -88,6 +89,39 @@ def test_google_cloud_credentials(tmp_path):
         assert arguments['user_config']['diarizationConfig'] == {
             'enableSpeakerDiarization': True,
         }
+    finally:
+        node.shutdown()
+        node.destroy_node()
+        rclpy.try_shutdown()
+
+
+def test_unknown_value_recalibrates_dynamic_energy():
+    rclpy.init(args=[
+        '--ros-args',
+        '-p', 'continuous:=true',
+        '-p', 'auto_start:=false',
+        '-p', 'enable_sound_effect:=false',
+        '-p', 'self_cancellation:=false',
+    ])
+    node = SpeechRecognitionNode()
+
+    class Audio:
+        def get_raw_data(self):
+            return b'audio'
+
+    try:
+        adjusted_sources = []
+        node.enable_audio_cb = True
+        node.audio = object()
+        node.recognize = lambda _audio: (_ for _ in ()).throw(
+            sr.UnknownValueError())
+
+        def adjust_for_ambient_noise(source):
+            adjusted_sources.append(source)
+
+        node.recognizer.adjust_for_ambient_noise = adjust_for_ambient_noise
+        node.audio_cb(None, Audio())
+        assert adjusted_sources == [node.audio]
     finally:
         node.shutdown()
         node.destroy_node()
