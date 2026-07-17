@@ -46,8 +46,12 @@ def resolve_sound_signal_path(path):
         if os.path.exists(oga_path):
             return oga_path
         attempted_paths.append(oga_path)
-    raise IOError("Sound signal file not found: {}".format(
-        " or ".join(attempted_paths)))
+    rospy.logwarn(
+        "Sound signal file not found on the machine "
+        "where speech_recognition is running: {}".format(
+            " or ".join(attempted_paths))
+    )
+    return path
 
 
 class ROSAudio(SR.AudioSource):
@@ -159,20 +163,22 @@ class ROSSpeechRecognition(object):
         else:
             self.act_sound = None
         self.signals = {
-            "start": rospy.get_param("~start_signal",
-                                     "/usr/share/sounds/freedesktop/stereo/bell.ogg"),
-            "recognized": rospy.get_param("~recognized_signal",
-                                          "/usr/share/sounds/freedesktop/stereo/message.ogg"),
-            "success": rospy.get_param("~success_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"),
-            "timeout": rospy.get_param("~timeout_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
+            "start": rospy.get_param("~start_signal", None),
+            "recognized": rospy.get_param("~recognized_signal", None),
+            "success": rospy.get_param("~success_signal", None),
+            "timeout": rospy.get_param("~timeout_signal", None),
+        }
+        default_signals = {
+            "start": "/usr/share/sounds/freedesktop/stereo/bell.ogg",
+            "recognized": "/usr/share/sounds/freedesktop/stereo/message.ogg",
+            "success": "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg",
+            "timeout": "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg",
         }
         if self.act_sound is not None:
-            self.signals = {
-                key: resolve_sound_signal_path(path)
-                for key, path in self.signals.items()
-            }
+            for key in self.signals.keys():
+                if self.signals[key] is None:
+                    self.signals[key] = resolve_sound_signal_path(
+                        default_signals[key])
 
         # ignore voice input while the robot is speaking
         self.self_cancellation = rospy.get_param("~self_cancellation", True)
@@ -271,7 +277,14 @@ class ROSSpeechRecognition(object):
             req.volume = 1.0
         req.arg = self.signals[key]
         goal = SoundRequestGoal(sound_request=req)
-        self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
+        status = self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
+        if status == GoalStatus.ABORTED:
+            rospy.logwarn(
+                "Playing %s signal was aborted. "
+                "Does its sound file exist on the machine "
+                "on which sound_play is running?"
+                % key
+            )
 
     def recognize(self, audio):
         recog_func = None
