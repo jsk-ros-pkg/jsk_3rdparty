@@ -5,7 +5,67 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-set(_default_python_executable "${Python3_EXECUTABLE}")
+function(ros_speech_recognition_find_uv out_var)
+  find_program(_uv_executable uv)
+  if(NOT _uv_executable)
+    set(_uv_install_dir "${CMAKE_CURRENT_BINARY_DIR}/uv")
+    find_program(_curl_executable curl)
+    find_program(_wget_executable wget)
+    if(_curl_executable)
+      set(_uv_install_command
+        "${_curl_executable} -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR='${_uv_install_dir}' INSTALLER_NO_MODIFY_PATH=1 sh")
+    elseif(_wget_executable)
+      set(_uv_install_command
+        "${_wget_executable} -qO- https://astral.sh/uv/install.sh | env UV_INSTALL_DIR='${_uv_install_dir}' INSTALLER_NO_MODIFY_PATH=1 sh")
+    else()
+      message(FATAL_ERROR "uv was not found and neither curl nor wget is available")
+    endif()
+    message(STATUS "uv was not found; installing uv into ${_uv_install_dir}")
+    execute_process(
+      COMMAND bash -c "${_uv_install_command}"
+      RESULT_VARIABLE _uv_install_result
+      OUTPUT_VARIABLE _uv_install_output
+      ERROR_VARIABLE _uv_install_error
+    )
+    if(NOT _uv_install_result EQUAL 0)
+      message(FATAL_ERROR
+        "Failed to install uv:\n${_uv_install_output}\n${_uv_install_error}")
+    endif()
+    if(EXISTS "${_uv_install_dir}/uv")
+      set(_uv_executable "${_uv_install_dir}/uv")
+    elseif(EXISTS "${_uv_install_dir}/bin/uv")
+      set(_uv_executable "${_uv_install_dir}/bin/uv")
+    else()
+      message(FATAL_ERROR "uv installer completed but uv executable was not found")
+    endif()
+  endif()
+  set(${out_var} "${_uv_executable}" PARENT_SCOPE)
+endfunction()
+
+function(ros_speech_recognition_run_uv)
+  execute_process(
+    COMMAND "${UV_EXECUTABLE}" ${ARGN}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    RESULT_VARIABLE _uv_result
+    OUTPUT_VARIABLE _uv_output
+    ERROR_VARIABLE _uv_error
+  )
+  if(NOT _uv_result EQUAL 0)
+    message(FATAL_ERROR "uv ${ARGN} failed:\n${_uv_output}\n${_uv_error}")
+  endif()
+endfunction()
+
+ros_speech_recognition_find_uv(UV_EXECUTABLE)
+set(_venv_dir "${CMAKE_CURRENT_SOURCE_DIR}/.venv")
+ros_speech_recognition_run_uv(
+  venv --system-site-packages --python "${Python3_EXECUTABLE}"
+  --allow-existing "${_venv_dir}"
+)
+ros_speech_recognition_run_uv(
+  sync --python "${_venv_dir}/bin/python3"
+)
+
+set(_default_python_executable "${_venv_dir}/bin/python3")
 if(DEFINED ENV{ROS_SPEECH_RECOGNITION_PYTHON_EXECUTABLE})
   set(_default_python_executable "$ENV{ROS_SPEECH_RECOGNITION_PYTHON_EXECUTABLE}")
 endif()
@@ -82,5 +142,14 @@ ros_speech_recognition_install_script(
   speech_recognition_node
   ros_speech_recognition.node
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(test_node test/test_node.py
+    PYTHON_EXECUTABLE "${_venv_dir}/bin/python3"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    ENV PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+  )
+endif()
 
 ament_package()
