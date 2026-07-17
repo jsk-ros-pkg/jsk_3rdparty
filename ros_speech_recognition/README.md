@@ -19,13 +19,11 @@ This package uses Python package [SpeechRecognition](https://pypi.python.org/pyp
   source /opt/ros/jazzy/setup.bash
   
   cd <path to ros_speech_recognition package>
-  uv venv --system-site-packages --python 3.12
   uv sync
+  source .venv/bin/activate
 
   cd ~/colcon_ws
-  export ROS_SPEECH_RECOGNITION_PYTHON_EXECUTABLE="$PWD/src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition/.venv/bin/python3"
-  uv --project src/jsk-ros-pkg/jsk_3rdparty/ros_speech_recognition run \
-    colcon build --symlink-install --packages-up-to ros_speech_recognition
+  colcon build --symlink-install --packages-up-to ros_speech_recognition
   source install/setup.bash
   ```
 
