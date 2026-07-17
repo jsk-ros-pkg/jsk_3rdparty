@@ -5,26 +5,33 @@
 <package format="3">
   <name>voicevox</name>
   <version>2.1.31</version>
-  <description>VOICEVOX: AI speech synthesis</description>
-  <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
-
+  <description>VOICEVOX: ROS2AI speech synthesis</description>
+  <maintainer email="tsubaki@jsk.t.u-tokyo.ac.jp">Michitoshi Tsubaki</maintainer>
+  <author email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</author>
   <license>MIT</license>
 
-  <url type="website">http://ros.org/wiki/voicevox</url>
+  <url type="website">https://voicevox.hiroshiba.jp/</url>
 
-  <author>Iori Yanokura</author>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>catkin_virtualenv</build_depend>
-
+  <build_depend>curl</build_depend>
+  <build_depend>git</build_depend>
+  <build_depend>roseus</build_depend>
+  <build_depend>sound_play_msgs</build_depend>
   <build_depend>unzip</build_depend>
   <build_depend>wget</build_depend>
 
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>launch_xml</exec_depend>
   <exec_depend>python3</exec_depend>
+  <exec_depend>roseus</exec_depend>
   <exec_depend>sound_play</exec_depend>
+  <exec_depend>sound_play_msgs</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
 
   <export>
-    <pip_requirements>requirements.txt</pip_requirements>
+    <build_type>ament_cmake</build_type>
   </export>
-
 </package>

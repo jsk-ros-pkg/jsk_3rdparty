@@ -40,7 +40,7 @@ jobs:
             (
             cd "$ros_speech_recognition_dir" &&
             uv venv --allow-existing --system-site-packages --python 3.12 &&
-            uv sync --frozen &&
-            uv run python -c "import googleapiclient.discovery, speech_recognition, vosk"
+            if [ -f pyproject.toml ]; then uv sync --frozen; else uv pip install --python .venv/bin/python3 -r requirements.txt; fi &&
+            .venv/bin/python3 -c "import googleapiclient.discovery, speech_recognition, vosk"
             ) &&
             export ROS_SPEECH_RECOGNITION_PYTHON_EXECUTABLE="$ros_speech_recognition_dir/.venv/bin/python3"

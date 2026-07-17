@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Original arguments
 args=("$@")
@@ -18,9 +18,13 @@ exec @VENV_PATH@/bin/python - "${filtered_args[@]}" <<- EOF
 import re
 import sys
 
-from setproctitle import setproctitle
+try:
+    from setproctitle import setproctitle
+except ImportError:
+    setproctitle = None
 
 program_path = "./run.py"
-setproctitle(' '.join(["run.py"] + sys.argv[1:]))
+if setproctitle is not None:
+    setproctitle(' '.join(["run.py"] + sys.argv[1:]))
 exec(open(program_path).read())
 EOF
