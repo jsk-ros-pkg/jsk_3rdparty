@@ -1,6 +1,6 @@
 # ros\_speech\_recognition
 
-[![ROS 2 Jazzy CI](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml/badge.svg)](https://github.com/jsk-ros-pkg/jsk_3rdparty/actions/workflows/ros2_jazzy.yml)
+[![ROS 2 Jazzy CI](https://github.com/Michi-Tsubaki/jsk_3rdparty/actions/workflows/ros2_jazzy.yml/badge.svg)](https://github.com/Michi-Tsubaki/jsk_3rdparty/actions/workflows/ros2_jazzy.yml)
 
 A ROS 2 package for speech-to-text services.
 This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) under `uv` python package manager.
