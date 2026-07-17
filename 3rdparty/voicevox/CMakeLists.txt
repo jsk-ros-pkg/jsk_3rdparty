@@ -3,7 +3,7 @@ project(voicevox)
 
 find_package(ament_cmake REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
-find_package(roseus REQUIRED)
+find_package(roseus QUIET)
 find_package(sound_play_msgs REQUIRED)
 
 function(voicevox_find_uv out_var)
