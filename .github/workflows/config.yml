@@ -118,7 +118,12 @@ jobs:
 
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
-        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+        run: |
+          apt-get update && apt-get install -y software-properties-common && apt-get update
+          # ppa:git-core queries Launchpad's API, which occasionally fails
+          # transiently with "user or team does not exist" under CI load.
+          for i in 1 2 3 4 5; do add-apt-repository -y ppa:git-core/ppa && break || { echo "add-apt-repository failed, retrying ($i/5)"; sleep 15; }; done
+          apt-get update && apt-get install -y git
       - name: Checkout
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
