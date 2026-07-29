@@ -1,0 +1,16 @@
+<launch>
+  <arg name="port" />
+  <arg name="baud" default="57600" />
+  <arg name="mode_right" default="true" />
+  <arg name="direction" default="0" />
+  <arg name="debug" default="false"/>
+
+  <include file="$(find eye_display)/launch/demo.launch" >
+    <arg name="eye_asset_file" value="$(find eye_display)/launch/denden.yaml" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="mode_right" value="$(arg mode_right)" />
+    <arg name="direction" value="$(arg direction)" />
+    <arg name="debug" value="$(arg debug)" />
+  </include>
+</launch>
