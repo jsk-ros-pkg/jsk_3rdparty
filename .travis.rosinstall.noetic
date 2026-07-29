@@ -2,3 +2,7 @@
 - git:
     local-name: catkin_virtualenv
     uri: https://github.com/locusrobotics/catkin_virtualenv
+# waiting for depth_image_publisher to be released in apt server
+- git:
+    local-name: jsk_recognition 
+    uri: https://github.com/jsk-ros-pkg/jsk_recognition
