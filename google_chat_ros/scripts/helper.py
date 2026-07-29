@@ -18,6 +18,7 @@ class GoogleChatROSHelper(object):
         # Get configuration params
         self.to_dialogflow_task_executive = rospy.get_param("~to_dialogflow_client")
         self.sound_play_jp = rospy.get_param("~debug_sound")
+        self.send_dialogflow_response_to_google_chat = rospy.get_param("~send_dialogflow_response_to_google_chat", True)
         self._message_sub = rospy.Subscriber("google_chat_ros/message_activity", MessageEvent, callback=self._message_cb)
         self.recent_message_event = None
 
@@ -59,13 +60,14 @@ class GoogleChatROSHelper(object):
         thread_name = data.message.thread_name
         text = data.message.argument_text
         if self.to_dialogflow_task_executive:
-            chat_goal = SendMessageGoal()
-            chat_goal.space = space
-            chat_goal.thread_name = thread_name
             dialogflow_res = self.dialogflow_action_client(text)
-            content = "<{}> {}".format(sender_id, dialogflow_res.response.response)
-            chat_goal.text = content
-            self.send_chat_client(chat_goal)
+            if self.send_dialogflow_response_to_google_chat:
+                chat_goal = SendMessageGoal()
+                chat_goal.space = space
+                chat_goal.thread_name = thread_name
+                content = "<{}> {}".format(sender_id, dialogflow_res.response.response)
+                chat_goal.text = content
+                self.send_chat_client(chat_goal)
         if self.sound_play_jp:
             sound_goal = SoundRequestGoal()
             sound_goal.sound_request.sound = sound_goal.sound_request.SAY
