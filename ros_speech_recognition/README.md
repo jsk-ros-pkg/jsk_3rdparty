@@ -159,21 +159,29 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Maximum buffer size to store audio data for speech recognition
   
-* `~start_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/bell.ogg`)
+* `~start_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on the start of audio caption
+  Path to sound file for bell on the start of audio caption.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/bell.ogg` or `/usr/share/sounds/freedesktop/stereo/bell.oga` is used.
   
-* `~recognized_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message.ogg`)
+* `~recognized_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on the end of audio caption
+  Path to sound file for bell on the end of audio caption.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message.ogg` or `/usr/share/sounds/freedesktop/stereo/message.oga` is used.
   
-* `~success_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg`)
+* `~success_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on getting successful recognition result
+  Path to sound file for bell on getting successful recognition result.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg` or `/usr/share/sounds/freedesktop/stereo/message-new-instant.oga` is used.
   
-* `~timeout_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg`)
+* `~timeout_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on timeout for recognition
+  Path to sound file for bell on timeout for recognition.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg` or `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.oga` is used.
   
 * `~continuous` (`Bool`, default: False)
 

@@ -9,6 +9,7 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import os
 import sys
 from threading import Lock
 
@@ -24,6 +25,33 @@ from std_srvs.srv import EmptyResponse
 
 from dynamic_reconfigure.server import Server
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
+
+
+if hasattr(array.array, 'tobytes'):
+    def array_to_bytes(arr):
+        return arr.tobytes()
+else:
+    # Python 2.7
+    def array_to_bytes(arr):
+        return arr.tostring()
+
+
+def resolve_sound_signal_path(path):
+    if os.path.exists(path):
+        return path
+    attempted_paths = [path]
+    base, ext = os.path.splitext(path)
+    if ext == ".ogg":
+        oga_path = base + ".oga"
+        if os.path.exists(oga_path):
+            return oga_path
+        attempted_paths.append(oga_path)
+    rospy.logwarn(
+        "Sound signal file not found on the machine "
+        "where speech_recognition is running: {}".format(
+            " or ".join(attempted_paths))
+    )
+    return path
 
 
 class ROSAudio(SR.AudioSource):
@@ -107,7 +135,7 @@ class ROSAudio(SR.AudioSource):
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array.array(dtype, chan_data).tostring()
+                self.buffer += array_to_bytes(array.array(dtype, chan_data))
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
@@ -135,16 +163,22 @@ class ROSSpeechRecognition(object):
         else:
             self.act_sound = None
         self.signals = {
-            "start": rospy.get_param("~start_signal",
-                                     "/usr/share/sounds/freedesktop/stereo/bell.ogg"),
-            "recognized": rospy.get_param("~recognized_signal",
-                                          "/usr/share/sounds/freedesktop/stereo/message.ogg"),
-            "success": rospy.get_param("~success_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"),
-            "timeout": rospy.get_param("~timeout_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
+            "start": rospy.get_param("~start_signal", None),
+            "recognized": rospy.get_param("~recognized_signal", None),
+            "success": rospy.get_param("~success_signal", None),
+            "timeout": rospy.get_param("~timeout_signal", None),
         }
-
+        default_signals = {
+            "start": "/usr/share/sounds/freedesktop/stereo/bell.ogg",
+            "recognized": "/usr/share/sounds/freedesktop/stereo/message.ogg",
+            "success": "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg",
+            "timeout": "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg",
+        }
+        if self.act_sound is not None:
+            for key in self.signals.keys():
+                if self.signals[key] is None:
+                    self.signals[key] = resolve_sound_signal_path(
+                        default_signals[key])
 
         # ignore voice input while the robot is speaking
         self.self_cancellation = rospy.get_param("~self_cancellation", True)
@@ -243,7 +277,14 @@ class ROSSpeechRecognition(object):
             req.volume = 1.0
         req.arg = self.signals[key]
         goal = SoundRequestGoal(sound_request=req)
-        self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
+        status = self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
+        if status == GoalStatus.ABORTED:
+            rospy.logwarn(
+                "Playing %s signal was aborted. "
+                "Does its sound file exist on the machine "
+                "on which sound_play is running?"
+                % key
+            )
 
     def recognize(self, audio):
         recog_func = None
