@@ -1,5 +1,5 @@
 click<=6.7
-gdown==4.4.0
+gdown==4.7.3
 google-api-core[grpc]==2.16.2
 google-api-python-client==2.117.0
 google-auth-httplib2==0.1.0
