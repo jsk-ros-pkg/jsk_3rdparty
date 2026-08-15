@@ -1,0 +1,10 @@
+{
+    "device_name": "SDP Switchbot",
+    "wifi_ssid": "",
+    "wifi_password": "",
+    "switchbot_token": "",
+    "switchbot_secret": "",
+    "switchbot_device_id": "",
+    "uwb_id": -1,
+    "comment": "this is configuration for sdp_switchbot_lock"
+}

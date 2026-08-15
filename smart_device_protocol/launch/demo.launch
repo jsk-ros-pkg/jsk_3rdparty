@@ -1,0 +1,17 @@
+<launch>
+    <arg name="port"/>
+    <arg name="tag_id" default="10" />
+
+    <node
+        pkg="rosserial_python"
+        type="serial_node.py"
+        name="smart_device_protocol"
+        output="screen"
+        >
+        <rosparam subst_value="true">
+            port: $(arg port)
+            baud: 57600
+            tag_id: $(arg tag_id)
+        </rosparam>
+    </node>
+</launch>

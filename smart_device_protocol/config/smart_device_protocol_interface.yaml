@@ -1,0 +1,8 @@
+- smart_device_protocol:
+    description: sample
+    format_specifier: "S"
+  ros:
+    subtopic: "sample"
+    msg_type: "std_msgs/String"
+  input_conversion: "rostype(data=d[0])"
+  output_conversion: "[m.data]"
