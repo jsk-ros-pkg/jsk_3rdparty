@@ -1,0 +1,30 @@
+<launch>
+    <arg name="port" />
+    <arg name="baud" default="57600" />
+    <arg name="mode_right" default="true" />
+    <arg name="direction" default="1" />
+    <arg name="eye_asset_file" default="$(find eye_display)/launch/default.yaml" />
+    <arg name="debug" default="false"/>
+
+    <node
+        pkg="rosserial_python"
+        type="serial_node.py"
+        name="eye_display"
+        output="screen"
+        >
+        <param name="port" value="$(arg port)" />
+        <param name="baud" value="$(arg baud)" />
+        <param name="mode_right" value="$(arg mode_right)" />
+        <param name="direction" value="$(arg direction)" />
+        <rosparam command="load" ns="eye_asset" file="$(arg eye_asset_file)" />
+    </node>
+
+    <group if="$(arg debug)">
+      <node
+          pkg="rosservice"
+          type="rosservice"
+          name="set_debug_mode"
+          args="call --wait /eye_display/set_logger_level rosout DEBUG"
+          />
+    </group>
+</launch>
