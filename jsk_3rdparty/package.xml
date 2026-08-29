@@ -30,6 +30,7 @@
   <run_depend>respeaker_ros</run_depend>
   <run_depend>ros_google_cloud_language</run_depend>
   <run_depend>ros_speech_recognition</run_depend>
+  <run_depend>ros_translator</run_depend>
   <run_depend>rospatlite</run_depend>
   <run_depend>rosping</run_depend>
   <run_depend>rostwitter</run_depend>
