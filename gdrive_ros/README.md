@@ -22,7 +22,7 @@ catkin build
 If you use 18.04 and python2.7, please install following versions.
 `
 ```bash
-pip install oauth2client==4.1.3 rsa==4.5 pydrive==1.3.1
+pip install oauth2client==4.1.3 rsa==4.5 PyDrive2==1.4.14
 ```
 
 ### Do authentication of Google Drive API
