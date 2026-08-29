@@ -1,0 +1,8 @@
+# For detail, see https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/m5stack_ros/README.md#unique-device-file-name-by-udev-rules
+# You can access your device via /dev/[Device name] file
+
+# M5Stack Gray
+KERNEL=="ttyUSB*",  ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="[Serial number of your device]" SYMLINK+="[Device name]"
+
+# M5 TimerCam
+KERNEL=="ttyUSB*",  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="[Serial number of your device]" SYMLINK+="[Device name]"

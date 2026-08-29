@@ -1,0 +1,12 @@
+[Unit]
+Description=Execute $ rfcomm bind command according to the yaml file
+Before=m5stack_ros.service
+
+[Service]
+Type=simple
+Restart=on-success
+Environment=M5STACK_ROS_WS=/home/ubuntu/m5stack_ros_ws
+ExecStart=/bin/bash -c ". ${M5STACK_ROS_WS}/devel/setup.bash && roslaunch jsk_robot_startup rfcomm_bind.launch rfcomm_devices:=$(rospack find m5stack_ros)/config/rfcomm_devices.yaml"
+
+[Install]
+WantedBy=multi-user.target
