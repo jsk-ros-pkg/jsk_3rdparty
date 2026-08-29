@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>gdown</name>
+  <version>2.0.19</version>
+  <description>Wget for files at Google Drive</description>
+  <maintainer email="www.kentaro.wada@gmail.com">Kentaro Wada</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/wkentaro/gdown</url>
+  <url type="bugtracker">https://github.com/wkentaro/gdown/issues</url>
+  <author email="www.kentaro.wada@gmail.com">Kentaro Wada</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>python-requests</run_depend>
+</package>
