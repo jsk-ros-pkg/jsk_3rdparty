@@ -1,0 +1,12 @@
+[Unit]
+Description=JSK Fetch15 gdrive recorder 
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=shingo
+Group=shingo
+ExecStart=/bin/bash -c "source /home/shingo/ros/kinetic/devel/setup.bash && rossetip && rossetmaster fetch15 && rosrun jsk_tools roscore_regardless.py --respawn --timeout 3 --ping-trials 1 --sigint-timeout 5 --sigterm-timeout 5 rosrun gdrive_recorder gdrive_recorder.py _video_path:=/mnt/hdd3/data/gdrive_recorder/fetch15_recorder _database:=fetch15 _timezone:=Asia/Tokyo _robot_type:=fetch _robot_name:=fetch15 _video_topic_name:=/head_camera_fetch_recorder/rgb/image_rect_color _upload_dest:=quasar"
+
+[Install]
+WantedBy=multi-user.target
