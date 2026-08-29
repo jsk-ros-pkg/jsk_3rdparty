@@ -1,0 +1,6 @@
+bayesian_network/LinearGaussianNode[] nodes # structured graph
+bayesian_network/Evidence[] evidences # partial evidences
+string node_name # node name predicted
+---
+string node_name
+float64[] predicted_values

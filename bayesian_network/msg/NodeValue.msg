@@ -1,0 +1,3 @@
+string name
+string discrete_value
+float64 continuous_value

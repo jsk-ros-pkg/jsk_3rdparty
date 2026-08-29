@@ -1,0 +1,4 @@
+<launch>
+  <node name="bayesian_network_server" pkg="bayesian_network" type="server.py"
+        output="screen" />
+</launch>
