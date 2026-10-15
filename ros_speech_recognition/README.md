@@ -62,6 +62,38 @@ Notes:
   while a `~tts_action_names` action is active and reopened automatically
   afterwards to avoid recognising the robot's own voice.
 
+Example:
+
+The following is an example of speech recognition using `GoogleCloudStream`.
+`Interim:` shows intermediate recognition results, while `Result:` shows the final recognition result after the speaker finishes speaking.
+
+```bash
+[INFO] [1792069200.711352]: Interim: こんにちは。
+[INFO] [1792069201.701424]: Result: こんにちは。
+[INFO] [1792069218.021376]: Interim: 今日？
+[INFO] [1792069218.196229]: Interim:  今日は！
+[INFO] [1792069218.621582]: Interim: 今日はいい？
+[INFO] [1792069218.710931]: Interim: 今日はいい天気。
+[INFO] [1792069219.011066]: Interim: 今日はいい天気です。
+[INFO] [1792069219.221464]: Interim: 今日はいい天気ですね。
+[INFO] [1792069219.911446]: Interim: 今日はいい天気ですね。外
+[INFO] [1792069220.090884]: Interim: 今日はいい天気ですね。外で。
+[INFO] [1792069220.211304]: Interim: 今日はいい天気ですね。外で遊び。
+[INFO] [1792069220.510955]: Interim: 今日はいい天気ですね。外で遊びませ。
+[INFO] [1792069220.595351]: Interim: 今日はいい天気ですね。外で遊びません。
+[INFO] [1792069220.814139]: Interim: 今日はいい天気ですね。外で遊びませんか？
+[INFO] [1792069221.795355]: Result: 今日はいい天気ですね。外で遊びませんか？
+[INFO] [1792069237.912371]: Interim:  ぜひ！
+[INFO] [1792069238.089007]: Interim:  ぜひ 外！
+[INFO] [1792069238.422502]: Interim:  ぜひ 外で！
+[INFO] [1792069238.596863]: Interim:  ぜひ 外で遊び！
+[INFO] [1792069238.691785]: Interim:  外で遊び！
+[INFO] [1792069238.900729]: Interim: ぜひ 外で遊びましょう。
+[INFO] [1792069239.021404]: Interim:  外で遊びましょう。
+[INFO] [1792069239.503002]: Interim: ぜひ 外で遊びましょう。
+[INFO] [1792069240.221812]: Result: ぜひ 外で遊びましょう。
+```
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
