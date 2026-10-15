@@ -37,6 +37,63 @@ roslaunch ros_speech_recognition parrotry.launch
 roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 ```
 
+### Streaming recognition with Google Cloud (`GoogleCloudStream`)
+
+In addition to the request/response `GoogleCloud` engine, a streaming engine
+`GoogleCloudStream` is available. It uses the bidirectional gRPC
+`StreamingRecognize` API and publishes interim hypotheses on
+`~voice_interim_topic` while the user is still speaking, then publishes the
+finalised utterance on `~voice_topic` as usual.
+
+```bash
+roslaunch ros_speech_recognition speech_recognition.launch \
+    engine:=GoogleCloudStream \
+    language:=ja-JP \
+    google_cloud_credentials_json:=/path/to/credentials.json
+```
+
+Notes:
+
+* Endpointing combines Google's own `is_final` flag with a stability timer
+  controlled by `~google_cloud_endpoint_stable_s` (default: 1.0 s).
+* The gRPC session has a 305 s server-side limit; the recognizer reconnects
+  lazily on the next audio chunk, so long-running nodes are safe.
+* When `~self_cancellation` is enabled, the streaming session is torn down
+  while a `~tts_action_names` action is active and reopened automatically
+  afterwards to avoid recognising the robot's own voice.
+
+Example:
+
+The following is an example of speech recognition using `GoogleCloudStream`.
+`Interim:` shows intermediate recognition results, while `Result:` shows the final recognition result after the speaker finishes speaking.
+
+```bash
+[INFO] [1792069200.711352]: Interim: こんにちは。
+[INFO] [1792069201.701424]: Result: こんにちは。
+[INFO] [1792069218.021376]: Interim: 今日？
+[INFO] [1792069218.196229]: Interim:  今日は！
+[INFO] [1792069218.621582]: Interim: 今日はいい？
+[INFO] [1792069218.710931]: Interim: 今日はいい天気。
+[INFO] [1792069219.011066]: Interim: 今日はいい天気です。
+[INFO] [1792069219.221464]: Interim: 今日はいい天気ですね。
+[INFO] [1792069219.911446]: Interim: 今日はいい天気ですね。外
+[INFO] [1792069220.090884]: Interim: 今日はいい天気ですね。外で。
+[INFO] [1792069220.211304]: Interim: 今日はいい天気ですね。外で遊び。
+[INFO] [1792069220.510955]: Interim: 今日はいい天気ですね。外で遊びませ。
+[INFO] [1792069220.595351]: Interim: 今日はいい天気ですね。外で遊びません。
+[INFO] [1792069220.814139]: Interim: 今日はいい天気ですね。外で遊びませんか？
+[INFO] [1792069221.795355]: Result: 今日はいい天気ですね。外で遊びませんか？
+[INFO] [1792069237.912371]: Interim:  ぜひ！
+[INFO] [1792069238.089007]: Interim:  ぜひ 外！
+[INFO] [1792069238.422502]: Interim:  ぜひ 外で！
+[INFO] [1792069238.596863]: Interim:  ぜひ 外で遊び！
+[INFO] [1792069238.691785]: Interim:  外で遊び！
+[INFO] [1792069238.900729]: Interim: ぜひ 外で遊びましょう。
+[INFO] [1792069239.021404]: Interim:  外で遊びましょう。
+[INFO] [1792069239.503002]: Interim: ぜひ 外で遊びましょう。
+[INFO] [1792069240.221812]: Result: ぜひ 外で遊びましょう。
+```
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
@@ -46,6 +103,13 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
   Speech recognition candidates topic name.
 
   Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
+
+* `~voice_interim_topic` (`std_msgs/String`)
+
+  Interim (non-final) transcript published while the user is still speaking.
+  Only valid when `~engine` is `GoogleCloudStream`.
+
+  Topic name is set by parameter `~voice_interim_topic`, and default value is `speech_to_text/interim`.
 
 * `sound_play` (`sound_play/SoundRequestAction`)
 
@@ -217,12 +281,28 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 * `~google_cloud_credentials_json` (`String`, default: `None`)
 
   Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
-  This is valid only if `~engine` is `GoogleCloud`.
-  
+  This is valid if `~engine` is `GoogleCloud` or `GoogleCloudStream`.
+  If the environment variable `GOOGLE_APPLICATION_CREDENTIALS` is already set, this parameter is ignored.
+
 * `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
 
   Preferred phrases parameters.
   This is valid only if `~engine` is `GoogleCloud`.
+
+* `~google_cloud_model` (`String`, default: `""`)
+
+  Recognition model name passed to the Google Cloud Speech API (e.g. `latest_long`, `latest_short`, `default`). Leave empty to use the API default.
+  This is valid only if `~engine` is `GoogleCloudStream`.
+
+* `~google_cloud_endpoint_stable_s` (`Double`, default: `1.0`)
+
+  Seconds the interim transcript must remain unchanged before a result is treated as final, in addition to Google's own `is_final` signal. Lower values commit faster but may cut off slow speakers.
+  This is valid only if `~engine` is `GoogleCloudStream`.
+
+* `~log_interim_results` (`Bool`, default: `True`)
+
+  If `True`, the interim transcript is also written to `rospy.loginfo` (deduplicated — only logged when the text actually changes). Set to `False` to silence the interim log line on noisy environments.
+  This is valid only if `~engine` is `GoogleCloudStream`.
   
 * `~bing_key` (`String`, default: `None`)
 
