@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>newsapi_ros</name>
+  <version>0.0.0</version>
+  <description>The ROS package for news API</description>
+
+  <maintainer email="obinata@jsk.imi.i.u-tokyo.ac.jp">Yoshiki Obinata</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+
+  <author email="obinata@jsk.imi.u-tokyo.ac.jp">Yoshiki Obinata</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>catkin_virtualenv</build_depend>
+
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
+</package>
