@@ -11,9 +11,11 @@ import shutil
 import sys
 import time
 
-import rospy
-import rospkg
 import json
+ROS2 = os.environ.get('ROS_VERSION') == '2'
+if not ROS2:
+    import rospy
+    import rospkg
 
 VOICEVOX_DEFAULT_SPEAKER_ID = os.environ.get(
     'VOICEVOX_DEFAULT_SPEAKER_ID', 2)
@@ -38,6 +40,8 @@ def convert_to_str(x):
     return x
 
 def get_voicevox_cache_dir():
+    if ROS2:  # same as rospkg.get_ros_home()
+        return os.environ.get('ROS_HOME', os.path.expanduser('~/.ros')) + '/voicevox/'
     return rospkg.get_ros_home() + '/voicevox/'
 
 async def request_synthesis(
@@ -69,7 +73,11 @@ if __name__ == '__main__':
         os.makedirs(cache_dir)
     # get speaker_id_to_name data from cache or Client()
     speaker_id_to_name = {}
-    if rospy.has_param('voicevox/speakers') and type(rospy.get_param('voicevox/speakers')) is str:
+    speakers_cache = cache_dir + 'speakers.json'  # ROS 2 has no global parameter server
+    if ROS2 and os.path.exists(speakers_cache):
+        print('[Text2Wave][{}] Loading speaker id from cache'.format(time.time()))
+        speaker_id_to_name = json.load(open(speakers_cache, encoding='utf-8'))
+    elif not ROS2 and rospy.has_param('voicevox/speakers') and type(rospy.get_param('voicevox/speakers')) is str:
         print('[Text2Wave][{}] Loading speaker id from rosparam'.format(time.time()))
         speaker_id_to_name = json.loads(rospy.get_param('voicevox/speakers'))
     else:
@@ -78,7 +86,10 @@ if __name__ == '__main__':
         # show speaker ids
         for id, name in sorted(speaker_id_to_name.items(), key=lambda x: int(x[0])):
             print('[Text2Wave][{}] {} : {}'.format(time.time(), id, name))
-        rospy.set_param('voicevox/speakers', json.dumps(speaker_id_to_name, ensure_ascii=False))
+        if ROS2:
+            json.dump(speaker_id_to_name, open(speakers_cache, 'w', encoding='utf-8'), ensure_ascii=False)
+        else:
+            rospy.set_param('voicevox/speakers', json.dumps(speaker_id_to_name, ensure_ascii=False))
 
     with open(args.text, 'rb') as f:
         speech_text = convert_to_str(f.readline())

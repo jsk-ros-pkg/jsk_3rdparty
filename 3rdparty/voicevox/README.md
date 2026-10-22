@@ -2,6 +2,9 @@
 
 ROS Interface for [VOICEVOX](https://voicevox.hiroshiba.jp/) (AI speech synthesis)
 
+This package supports both ROS 1 and ROS 2 with the same launch arguments and environment variables.
+For ROS 2, read `roslaunch voicevox voicevox_texttospeech.launch` as `ros2 launch voicevox voicevox_texttospeech.launch.xml` and `rosrun` as `ros2 run`.
+
 ## Quick Start
 
 Choose the deployment pattern that best fits your needs:
@@ -81,6 +84,13 @@ Build this package.
 ```bash
 cd /path/to/catkin_workspace
 catkin build voicevox
+```
+
+For ROS 2 (Python 3.12 or newer is required; python packages are installed with [uv](https://docs.astral.sh/uv/))
+
+```bash
+cd /path/to/colcon_workspace
+colcon build --packages-up-to voicevox
 ```
 
 ### Optional (Using Docker with GPU acceleration)
@@ -175,11 +185,28 @@ client = SoundClient(sound_action='robotsound_jp', sound_topic='robotsound_jp')
 client.say('こんにちは', voice='四国めたん-あまあま')
 ```
 
+For ROS 2
+
+```python
+import time
+
+import rclpy
+from sound_play.libsoundplay import SoundClient
+
+rclpy.init()
+node = rclpy.create_node('say_node')
+
+client = SoundClient(node, sound_action='robotsound_jp', sound_topic='robotsound_jp')
+time.sleep(1)
+
+client.say('こんにちは', voice='四国めたん-あまあま')
+```
+
 You can change the voice by changing the voice_name.
 You can also specify the speaker id.
 To get available voice name and speaker id, run following command
 ```bash
-rosrun voicevox list_speaker.py
+rosrun voicevox list_speakers.py
 ```
 
 |  speaker_id  |  voice_name  |

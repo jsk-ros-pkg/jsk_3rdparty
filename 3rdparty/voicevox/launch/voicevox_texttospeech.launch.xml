@@ -1,0 +1,48 @@
+<launch>
+
+  <arg name="device" default="" />
+  <arg name="launch_sound_play" default="true" />
+  <arg name="sound_play_respawn" default="true"
+       description="Respawn sound_play node or not (default: true)" />
+  <arg name="default_speaker" default="$(env VOICEVOX_DEFAULT_SPEAKER_ID 2)"
+       description="Default speaker for VOICEVOX" />
+  <arg name="host" default="$(env VOICEVOX_TEXTTOSPEECH_URL localhost)" />
+  <arg name="port" default="$(env VOICEVOX_TEXTTOSPEECH_PORT 50021)" />
+  <arg name="cpu_num_threads" default="1"
+       description="Number of cpu threads" />
+  <arg name="use_docker" default="false"
+       description="Use docker or not (default: false)" />
+  <arg name="docker_only" default="false"
+       description="Launch only docker container without sound_play node (default: false)" />
+  <arg name="remote_only" default="false"
+       description="Connect to remote server without starting local server (default: false)" />
+
+  <node name="voicevox_server"
+        pkg="voicevox" exec="run-voicevox"
+        args="--voicelib_dir=$(find-pkg-share voicevox)/voicevox_core --host 0.0.0.0 --port $(var port) --cpu_num_threads=$(var cpu_num_threads) --load_all_models --"
+        respawn="$(var sound_play_respawn)"
+        output="screen"
+        unless="$(eval &quot;'$(var use_docker)' == 'true' or '$(var docker_only)' == 'true' or '$(var remote_only)' == 'true' or '$(var host)' not in ('localhost', '127.0.0.1')&quot;)" />
+
+  <node name="voicevox_docker_server"
+        pkg="voicevox" exec="run-voicevox-docker"
+        args="--host $(var host) --port $(var port) --cpu_num_threads=$(var cpu_num_threads) --"
+        respawn="$(var sound_play_respawn)"
+        output="screen"
+        if="$(eval &quot;'$(var use_docker)' == 'true' or '$(var docker_only)' == 'true'&quot;)" />
+
+  <node name="sound_play_jp"
+        pkg="sound_play" exec="soundplay_node.py"
+        respawn="$(var sound_play_respawn)"
+        output="screen"
+        if="$(eval &quot;'$(var launch_sound_play)' == 'true' and '$(var docker_only)' != 'true'&quot;)" >
+    <remap from="robotsound" to="robotsound_jp"/>
+    <remap from="sound_play" to="robotsound_jp"/>
+    <param name="device" value="$(var device)" />
+    <env name="VOICEVOX_DEFAULT_SPEAKER_ID" value="$(var default_speaker)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(var host)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(var port)" />
+    <env name="PATH" value="$(find-pkg-share voicevox)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+  </node>
+</launch>

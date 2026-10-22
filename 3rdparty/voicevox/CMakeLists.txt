@@ -1,9 +1,23 @@
+# Fall back to ROS1 when $ROS_VERSION is unset (pre-ros_environment distros,
+# e.g. indigo); every ROS2 environment always sets it via ros_environment.
+if("$ENV{ROS_VERSION}" STREQUAL "")
+  set(ENV{ROS_VERSION} 1)
+endif()
+
+if("$ENV{ROS_VERSION}" EQUAL 1)
 cmake_minimum_required(VERSION 2.8.3)
+else()
+cmake_minimum_required(VERSION 3.19)
+endif()
 project(voicevox)
 
+if("$ENV{ROS_VERSION}" EQUAL 1)
 find_package(catkin REQUIRED COMPONENTS catkin_virtualenv)
 
 catkin_package()
+else()
+find_package(ament_cmake REQUIRED)
+endif()
 
 execute_process(COMMAND bash -c "gcc -dumpmachine" OUTPUT_VARIABLE gcc_dump_machine OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("-- gcc dumpmachine returns ${gcc_dump_machine}")
@@ -42,6 +56,7 @@ else()
 
 endif()
 
+if("$ENV{ROS_VERSION}" EQUAL 1)
 catkin_generate_virtualenv(
   INPUT_REQUIREMENTS ${REQUIREMENTS_FILE}
   PYTHON_INTERPRETER python3
@@ -50,6 +65,20 @@ catkin_generate_virtualenv(
   )
 
 set(VOICEVOX_TARGET_DIR ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
+else()
+# ROS2: create virtualenv from pyproject.toml/uv.lock with uv (installed locally if not found)
+find_program(UV_EXECUTABLE uv)
+if(NOT UV_EXECUTABLE)
+  execute_process(COMMAND bash -c "wget -qO- https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=${CMAKE_CURRENT_BINARY_DIR}/uv INSTALLER_NO_MODIFY_PATH=1 sh" COMMAND_ERROR_IS_FATAL ANY)
+  set(UV_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/uv/uv)
+endif()
+set(VENV_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.venv)
+execute_process(COMMAND ${UV_EXECUTABLE} venv --system-site-packages --python ${Python3_EXECUTABLE} --allow-existing ${VENV_PATH}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND ${UV_EXECUTABLE} sync --python ${VENV_PATH}/bin/python3
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
+set(VOICEVOX_TARGET_DIR ${CMAKE_CURRENT_BINARY_DIR}/voicevox)
+endif()
 include(ExternalProject)
 ExternalProject_Add(voicevox_engine
   GIT_REPOSITORY    https://github.com/VOICEVOX/voicevox_engine
@@ -83,6 +112,7 @@ ExternalProject_Add(voicevox_core
   INSTALL_COMMAND   ${CMAKE_COMMAND} -E copy_directory ./ ${VOICEVOX_TARGET_DIR}/voicevox_core
   )
 
+if("$ENV{ROS_VERSION}" EQUAL 1)
 # deb build environment set CATKIN_BUILD_BINARY_PACKAGE
 if("${voicevox_INSTALL_PREFIX}" OR "${CATKIN_BUILD_BINARY_PACKAGE}")
   set(ENGINE_PATH ${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
@@ -114,3 +144,27 @@ install(DIRECTORY
   ${VOICEVOX_TARGET_DIR}/voicevox_engine ${VOICEVOX_TARGET_DIR}/voicevox_core
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
+
+else()
+set(ENGINE_PATH ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+foreach(_script run-voicevox run-voicevox-docker)
+  configure_file(bin/${_script}.in ${CMAKE_CURRENT_BINARY_DIR}/bin/${_script} @ONLY)
+endforeach()
+# `ros2 run voicevox <script>` runs executables in lib/voicevox
+foreach(_script request_synthesis.py list_speakers.py)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/${_script}
+    "#!${VENV_PATH}/bin/python3\nimport runpy\nrunpy.run_path('${ENGINE_PATH}/node_scripts/${_script}', run_name='__main__')\n")
+endforeach()
+install(PROGRAMS
+  ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/request_synthesis.py ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/list_speakers.py
+  ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox-docker
+  DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS bin/text2wave ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox-docker
+  DESTINATION share/${PROJECT_NAME}/bin)
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME} FILES_MATCHING PATTERN "*.launch.xml")
+install(DIRECTORY node_scripts ${VOICEVOX_TARGET_DIR}/voicevox_engine ${VOICEVOX_TARGET_DIR}/voicevox_core
+  DESTINATION share/${PROJECT_NAME}
+  USE_SOURCE_PERMISSIONS)
+
+ament_package()
+endif()
