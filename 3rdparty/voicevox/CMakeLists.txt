@@ -69,14 +69,19 @@ else()
 # ROS2: create virtualenv from pyproject.toml/uv.lock with uv (installed locally if not found)
 find_program(UV_EXECUTABLE uv)
 if(NOT UV_EXECUTABLE)
-  execute_process(COMMAND bash -c "wget -qO- https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=${CMAKE_CURRENT_BINARY_DIR}/uv INSTALLER_NO_MODIFY_PATH=1 sh" COMMAND_ERROR_IS_FATAL ANY)
+  execute_process(COMMAND bash -c "wget -qO- https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL=${CMAKE_CURRENT_BINARY_DIR}/uv sh" COMMAND_ERROR_IS_FATAL ANY)
   set(UV_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/uv/uv)
 endif()
-set(VENV_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.venv)
-execute_process(COMMAND ${UV_EXECUTABLE} venv --system-site-packages --python ${Python3_EXECUTABLE} --allow-existing ${VENV_PATH}
+set(VENV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/venv)
+set(VENV_PATH ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/venv)
+set(UV_ENV env UV_CACHE_DIR=${CMAKE_CURRENT_BINARY_DIR}/uv_cache UV_PYTHON_DOWNLOADS=never UV_PROJECT_ENVIRONMENT=${VENV_BUILD_PATH})
+execute_process(COMMAND ${UV_ENV} ${UV_EXECUTABLE} venv --relocatable --system-site-packages --python ${Python3_EXECUTABLE} --allow-existing ${VENV_BUILD_PATH}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${UV_EXECUTABLE} sync --python ${VENV_PATH}/bin/python3
+execute_process(COMMAND ${UV_ENV} ${UV_EXECUTABLE} sync --frozen --no-dev
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND ${VENV_BUILD_PATH}/bin/python3 -c "import pyopenjtalk; pyopenjtalk.g2p('a')"
+  COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND find ${VENV_BUILD_PATH} -name "*.so*" -type f -exec ${CMAKE_STRIP} --strip-unneeded {} +)
 set(VOICEVOX_TARGET_DIR ${CMAKE_CURRENT_BINARY_DIR}/voicevox)
 endif()
 include(ExternalProject)
@@ -165,6 +170,10 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME} FILES_MATCHING PATTER
 install(DIRECTORY node_scripts ${VOICEVOX_TARGET_DIR}/voicevox_engine ${VOICEVOX_TARGET_DIR}/voicevox_core
   DESTINATION share/${PROJECT_NAME}
   USE_SOURCE_PERMISSIONS)
+install(DIRECTORY ${VENV_BUILD_PATH}/
+  DESTINATION share/${PROJECT_NAME}/venv
+  USE_SOURCE_PERMISSIONS
+  PATTERN ".lock" EXCLUDE)
 
 ament_package()
 endif()

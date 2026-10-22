@@ -20,6 +20,7 @@
 
   <build_depend condition="$ROS_VERSION == 1">catkin_virtualenv</build_depend>
   <build_depend condition="$ROS_VERSION == 2">git</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">python3-dev</build_depend>
   <build_depend>unzip</build_depend>
   <build_depend>wget</build_depend>
 
