@@ -7,6 +7,7 @@
   <version>2.1.31</version>
   <description>VOICEVOX: AI speech synthesis</description>
   <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
+  <maintainer email="tsubaki@jsk.t.u-tokyo.ac.jp">Michitoshi Tsubaki</maintainer>
 
   <license>MIT</license>
 
@@ -14,16 +15,22 @@
 
   <author>Iori Yanokura</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>catkin_virtualenv</build_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
+  <build_depend condition="$ROS_VERSION == 1">catkin_virtualenv</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">git</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">python3-dev</build_depend>
   <build_depend>unzip</build_depend>
   <build_depend>wget</build_depend>
 
   <exec_depend>python3</exec_depend>
   <exec_depend>sound_play</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">sound_play_msgs</exec_depend>
 
   <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
     <pip_requirements>requirements.txt</pip_requirements>
   </export>
 
