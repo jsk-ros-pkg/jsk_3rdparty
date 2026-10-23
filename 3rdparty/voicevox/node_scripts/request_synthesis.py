@@ -60,12 +60,99 @@ async def list_speakers():
     return speaker_id_to_name
 
 
+async def ros2_synthesize(args):
+    """Retry unavailable engines, but fail invalid requests without hiding them."""
+    import httpx
+    import io
+    import tempfile
+    import wave
+
+    text = open(args.text, encoding='utf-8').read()
+    speaker = (args.evaluate or '').strip('()') or str(VOICEVOX_DEFAULT_SPEAKER_ID)
+    if speaker == 'voice_kal_diphone':
+        speaker = str(VOICEVOX_DEFAULT_SPEAKER_ID)
+    cache_dir = get_voicevox_cache_dir()
+    os.makedirs(cache_dir, exist_ok=True)
+
+    def valid_wav(data):
+        try:
+            with wave.open(io.BytesIO(data)) as wav:
+                return wav.getnframes() > 0 and len(wav.readframes(wav.getnframes())) > 0
+        except (wave.Error, EOFError):
+            return False
+
+    def atomic_write(path, data):
+        fd, temporary = tempfile.mkstemp(dir=os.path.dirname(os.path.abspath(path)))
+        try:
+            with os.fdopen(fd, 'wb') as output:
+                output.write(data)
+            os.replace(temporary, path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+    timeout = float(os.environ.get('VOICEVOX_REQUEST_TIMEOUT', '120'))
+    retry_interval = float(os.environ.get('VOICEVOX_RETRY_INTERVAL', '1'))
+    base_url = 'http://' + VOICEVOX_TEXTTOSPEECH_URL + ':' + VOICEVOX_TEXTTOSPEECH_PORT
+    async with httpx.AsyncClient(base_url=base_url, timeout=httpx.Timeout(timeout, connect=2)) as client:
+        async def request(method, path, **kwargs):
+            response = await client.request(method, path, **kwargs)
+            response.raise_for_status()
+            return response
+
+        attempts = 0
+        while True:
+            try:
+                if not speaker.isdigit():
+                    response = await request('GET', '/speakers')
+                    matches = [str(style['id']) for item in response.json()
+                               for style in item['styles']
+                               if (item['name'] + '-' + style['name']).startswith(speaker)]
+                    if not matches:
+                        raise ValueError('Unknown speaker: ' + speaker)
+                    speaker = matches[0]
+                cache_path = os.path.join(cache_dir, hashlib.md5(text.encode()).hexdigest() + '--' + speaker + '.wav')
+                if cache_enabled and os.path.exists(cache_path):
+                    data = open(cache_path, 'rb').read()
+                    if valid_wav(data):
+                        atomic_write(args.output, data)
+                        print('[VOICEVOX] Using cached audio', flush=True)
+                        return
+                response = await request('POST', '/audio_query', params={'text': text, 'speaker': speaker})
+                response = await request('POST', '/synthesis', params={'speaker': speaker}, json=response.json())
+                data = response.content
+                if not valid_wav(data):
+                    raise ValueError('VOICEVOX returned invalid or empty WAV audio')
+                atomic_write(args.output, data)
+                if cache_enabled:
+                    atomic_write(cache_path, data)
+                print('[VOICEVOX] Synthesis complete', flush=True)
+                return
+            except (httpx.TransportError, httpx.HTTPStatusError) as error:
+                if isinstance(error, httpx.HTTPStatusError) and error.response.status_code < 500:
+                    raise
+                attempts += 1
+                if attempts == 1 or attempts % 10 == 0:
+                    print('[VOICEVOX] Waiting/retrying engine at %s: %s' % (base_url, error), flush=True)
+                await asyncio.sleep(retry_interval)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-eval', '--evaluate')
     parser.add_argument('-o', '--output')
     parser.add_argument('text')
     args = parser.parse_args()
+
+    if ROS2:
+        try:
+            asyncio.run(asyncio.wait_for(
+                ros2_synthesize(args),
+                timeout=float(os.environ.get('VOICEVOX_STARTUP_TIMEOUT', '300'))))
+        except Exception as error:
+            print('[VOICEVOX] Synthesis failed: %s: %s' % (type(error).__name__, error), file=sys.stderr, flush=True)
+            sys.exit(1)
+        sys.exit(0)
 
     # check cache_dir
     cache_dir = get_voicevox_cache_dir()
