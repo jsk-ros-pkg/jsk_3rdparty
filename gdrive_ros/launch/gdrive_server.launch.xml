@@ -1,0 +1,11 @@
+<launch>
+  <!-- ROS2 version of gdrive_server.launch -->
+  <arg name="settings_yaml" default="$(env GOOGLE_DRIVE_SETTINGS_YAML /var/lib/robot/pydrive_settings.yaml)" />
+  <arg name="respawn" default="false" />
+  <arg name="node_name" default="gdrive_server" />
+
+  <node name="$(var node_name)" pkg="gdrive_ros" exec="gdrive_server_node.py"
+        output="screen" respawn="$(var respawn)">
+    <param name="settings_yaml" value="$(var settings_yaml)" />
+  </node>
+</launch>

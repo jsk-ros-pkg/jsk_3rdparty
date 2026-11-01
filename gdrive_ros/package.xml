@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="1">
+<package format="3">
   <name>gdrive_ros</name>
   <version>2.1.31</version>
   <description>Google drive upload and download package</description>
@@ -12,18 +12,33 @@
   <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
   <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>catkin_virtualenv</build_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">rosidl_default_generators</buildtool_depend>
+  <build_depend condition="$ROS_VERSION == 1">rospy</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">message_generation</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">catkin_virtualenv</build_depend>
 
-  <run_depend>rospy</run_depend>
-  <run_depend>message_runtime</run_depend>
+  <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">message_runtime</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rosidl_default_runtime</exec_depend>
+  <!-- catkin_virtualenv (requirements.txt) has no ROS2 port -->
+  <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;
+       ROS1 falls back to rospy when it is not available -->
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
+  <!-- jsk_ros1_ros2_compat_install_python()/_generate_uv_venv() in CMakeLists.txt -->
+  <buildtool_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</buildtool_depend>
 
-  <test_depend>rostest</test_depend>
-  <test_depend>roslaunch</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">rostest</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">roslaunch</test_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
     <pip_requirements>requirements.txt</pip_requirements>
   </export>
 </package>
