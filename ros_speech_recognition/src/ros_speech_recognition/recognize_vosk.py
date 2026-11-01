@@ -11,8 +11,12 @@ except ImportError as e:
     print(bold_red + str(e)+'\nvsok is not installed try "pip install vosk"' + reset)
 import json
 import os.path as osp
-import rospkg
 from ros_speech_recognition.compat import ros_compat
+from ros_speech_recognition.compat import ROS_VERSION
+if ROS_VERSION == 2:
+    from ament_index_python.packages import get_package_share_directory
+else:
+    import rospkg
 
 def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
 
@@ -21,8 +25,11 @@ def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
     if not hasattr(self, 'vosk_model'):
         if model_path is None:
             PKG = 'ros_speech_recognition'
-            rp = rospkg.RosPack()
-            data_path = osp.join(rp.get_path(PKG), 'trained_data')
+            if ROS_VERSION == 2:
+                data_path = osp.join(get_package_share_directory(PKG), 'trained_data')
+            else:
+                rp = rospkg.RosPack()
+                data_path = osp.join(rp.get_path(PKG), 'trained_data')
             if language == 'en-US':
                 model_path = osp.join(data_path, 'vosk-model-small-en-us-0.15')
             elif language == 'ja':
