@@ -246,6 +246,9 @@ class ROSSpeechRecognition(object):
 
         # config for adaptive thresholding
         self.dynamic_energy_threshold = config.dynamic_energy_threshold
+        # also stop the recognizer's own adjustment in listen() when disabled,
+        # which was always enabled before (from Michi-Tsubaki's ROS2 port)
+        self.recognizer.dynamic_energy_threshold = self.dynamic_energy_threshold
         if self.dynamic_energy_threshold:
             config.energy_threshold = self.recognizer.energy_threshold
         else:
