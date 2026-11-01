@@ -421,12 +421,21 @@ class ROSSpeechRecognition(object):
 
                 try:
                     result = self.recognize(audio)
+                    confidence = 1.0
+                    # recognize_google() returns all the alternatives
+                    # (show_all=True), so take the best one as audio_cb()
+                    # does; this failed before (from Michi-Tsubaki's ROS2 port)
+                    if self.engine == Config.SpeechRecognition_Google:
+                        if len(result) == 0:
+                            raise SR.UnknownValueError()
+                        confidence = result['alternative'][0].get('confidence', 1.0)
+                        result = result['alternative'][0]['transcript']
                     ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
                     res.result = SpeechRecognitionCandidates(
                         transcript=[result],
-                        confidence=[1.0],
+                        confidence=[confidence],
                     )
                     return res
                 except SR.UnknownValueError:
