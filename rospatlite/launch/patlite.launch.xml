@@ -1,0 +1,8 @@
+<launch>
+  <arg name="IP" default="10.68.0.10" />
+  <node name="patlite" pkg="rospatlite" exec="patlite_node.py" output="screen">
+    <param name="host" value="$(var IP)"/>
+    <param name="port" value="10000"/>
+    <param name="timeout" value="0.5"/>
+  </node>
+</launch>
