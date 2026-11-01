@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <!-- ROS2 version of sample_emotion_analyzer.launch -->
+  <arg name="api_key" default="" />
+  <arg name="device" default="" />
+
+  <include file="$(find-pkg-share audio_capture)/launch/capture_wave.launch.xml">
+    <arg name="device" value="$(var device)" />
+  </include>
+
+  <include file="$(find-pkg-share emotion_analyzer)/launch/emotion_analyzer.launch.xml">
+    <arg name="api_key" value="$(var api_key)" />
+    <arg name="input_audio" value="/audio/audio" />
+  </include>
+</launch>
