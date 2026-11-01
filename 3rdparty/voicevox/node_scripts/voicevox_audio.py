@@ -12,6 +12,7 @@ import wave
 
 import rclpy
 from rclpy.node import Node
+from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 from rclpy.qos import DurabilityPolicy, QoSProfile
 from audio_common_msgs.msg import AudioData, AudioInfo
 from std_msgs.msg import String
@@ -112,15 +113,7 @@ class VoicevoxAudio(Node):
 
 def main():
     rclpy.init()
-    node = VoicevoxAudio()
-    try:
-        rclpy.spin(node)
-    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
-        pass
-    finally:
-        node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
+    ros_compat.spin_and_shutdown(VoicevoxAudio())
 
 
 if __name__ == '__main__':

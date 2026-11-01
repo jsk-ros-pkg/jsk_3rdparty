@@ -64,24 +64,19 @@ catkin_generate_virtualenv(
   CHECK_VENV FALSE  # Default TRUE
   )
 
+set(SHARE_DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 set(VOICEVOX_TARGET_DIR ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
 else()
-# ROS2: create virtualenv from pyproject.toml/uv.lock with uv (installed locally if not found)
-find_program(UV_EXECUTABLE uv)
-if(NOT UV_EXECUTABLE)
-  execute_process(COMMAND bash -c "wget -qO- https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL=${CMAKE_CURRENT_BINARY_DIR}/uv sh" COMMAND_ERROR_IS_FATAL ANY)
-  set(UV_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/uv/uv)
-endif()
-set(VENV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/venv)
-set(VENV_PATH ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/venv)
-set(UV_ENV env UV_CACHE_DIR=${CMAKE_CURRENT_BINARY_DIR}/uv_cache UV_PYTHON_DOWNLOADS=never UV_PROJECT_ENVIRONMENT=${VENV_BUILD_PATH})
-execute_process(COMMAND ${UV_ENV} ${UV_EXECUTABLE} venv --relocatable --system-site-packages --python ${Python3_EXECUTABLE} --allow-existing ${VENV_BUILD_PATH}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${UV_ENV} ${UV_EXECUTABLE} sync --frozen --no-dev
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${VENV_BUILD_PATH}/bin/python3 -c "import pyopenjtalk; pyopenjtalk.g2p('a')"
+# ROS2: create virtualenv from pyproject.toml/uv.lock (catkin_virtualenv has
+# no ROS2 port), installed to share/voicevox/venv
+find_package(jsk_ros1_ros2_compat REQUIRED)
+jsk_ros1_ros2_compat_generate_uv_venv(PYTHON_INTERPRETER ${Python3_EXECUTABLE} STRIP)
+# pyopenjtalk downloads its dictionary on first use, which the installed
+# (read-only) venv can not do, so do it at build time
+execute_process(COMMAND ${voicevox_VENV_DIR}/bin/python3 -c "import pyopenjtalk; pyopenjtalk.g2p('a')"
   COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND find ${VENV_BUILD_PATH} -name "*.so*" -type f -exec ${CMAKE_STRIP} --strip-unneeded {} +)
+
+set(SHARE_DESTINATION share/${PROJECT_NAME})
 set(VOICEVOX_TARGET_DIR ${CMAKE_CURRENT_BINARY_DIR}/voicevox)
 endif()
 include(ExternalProject)
@@ -126,55 +121,45 @@ else()
   set(ENGINE_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
   set(VENV_PATH ${${PROJECT_NAME}_VENV_DEVEL_DIR})
 endif()
+else()
+set(ENGINE_PATH ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+set(VENV_PATH ${voicevox_VENV_INSTALL_DIR})
+endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox.in
-  ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox
+  ${VOICEVOX_TARGET_DIR}/bin/run-voicevox
   @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox-docker.in
-  ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox-docker
+  ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
   @ONLY)
 
-
+if("$ENV{ROS_VERSION}" EQUAL 1)
 catkin_install_python(
   PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
+else()
+# `ros2 run voicevox <script>` runs executables in lib/voicevox
+jsk_ros1_ros2_compat_install_python(
+  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
+  USE_VENV)
+jsk_ros1_ros2_compat_install_python(PROGRAMS node_scripts/voicevox_audio.py)
+install(PROGRAMS
+  ${VOICEVOX_TARGET_DIR}/bin/run-voicevox ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
+  DESTINATION lib/${PROJECT_NAME})
+endif()
+
 install(
-  PROGRAMS bin/text2wave ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/bin/run-voicevox-docker
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin)
+  PROGRAMS bin/text2wave ${VOICEVOX_TARGET_DIR}/bin/run-voicevox ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
+  DESTINATION ${SHARE_DESTINATION}/bin)
 
 install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION ${SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
 
 install(DIRECTORY
   ${VOICEVOX_TARGET_DIR}/voicevox_engine ${VOICEVOX_TARGET_DIR}/voicevox_core
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION ${SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
 
-else()
-set(ENGINE_PATH ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
-foreach(_script run-voicevox run-voicevox-docker)
-  configure_file(bin/${_script}.in ${CMAKE_CURRENT_BINARY_DIR}/bin/${_script} @ONLY)
-endforeach()
-# `ros2 run voicevox <script>` runs executables in lib/voicevox
-foreach(_script request_synthesis.py list_speakers.py)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/${_script}
-    "#!${VENV_PATH}/bin/python3\nimport runpy\nrunpy.run_path('${ENGINE_PATH}/node_scripts/${_script}', run_name='__main__')\n")
-endforeach()
-install(PROGRAMS
-  node_scripts/voicevox_audio.py
-  ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/request_synthesis.py ${CMAKE_CURRENT_BINARY_DIR}/node_scripts/list_speakers.py
-  ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox-docker
-  DESTINATION lib/${PROJECT_NAME})
-install(PROGRAMS bin/text2wave ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox ${CMAKE_CURRENT_BINARY_DIR}/bin/run-voicevox-docker
-  DESTINATION share/${PROJECT_NAME}/bin)
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME} FILES_MATCHING PATTERN "*.launch.xml")
-install(DIRECTORY node_scripts ${VOICEVOX_TARGET_DIR}/voicevox_engine ${VOICEVOX_TARGET_DIR}/voicevox_core
-  DESTINATION share/${PROJECT_NAME}
-  USE_SOURCE_PERMISSIONS)
-install(DIRECTORY ${VENV_BUILD_PATH}/
-  DESTINATION share/${PROJECT_NAME}/venv
-  USE_SOURCE_PERMISSIONS
-  PATTERN ".lock" EXCLUDE)
-
+if("$ENV{ROS_VERSION}" EQUAL 2)
 ament_package()
 endif()
