@@ -338,3 +338,11 @@ You can change the url and port by setting values for `VOICEVOX_TEXTTOSPEECH_URL
 
 You can also set the default character by setting `VOICEVOX_DEFAULT_SPEAKER_ID`.
 Please refer to [here](#saysomething) for the speaker id.
+
+With `output_type:=audio`, you can change the volume by `volume_scale` (default: `1.0`).
+For example, Unitree G1 needs about `volume_scale:=10.0` because its default volume is low.
+
+```bash
+roslaunch voicevox voicevox_texttospeech.launch output_type:=audio volume_scale:=10.0
+ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio volume_scale:=10.0
+```
