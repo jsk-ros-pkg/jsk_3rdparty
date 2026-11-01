@@ -17,8 +17,7 @@
   <arg name="remote_only" default="false"
        doc="Connect to remote server without starting local server (default: false)" />
 
-  <node unless="$(arg use_docker)"
-        name="voicevox_server"
+  <node name="voicevox_server"
         pkg="voicevox" type="run-voicevox"
         args="--voicelib_dir=$(find voicevox)/voicevox_core --host 0.0.0.0 --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --load_all_models --"
         respawn="$(arg sound_play_respawn)"
