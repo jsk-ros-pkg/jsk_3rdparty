@@ -1,0 +1,16 @@
+# ROS2 only: python dependencies installed into
+# share/ros_speech_recognition/venv by
+# jsk_ros1_ros2_compat_generate_uv_venv() (ROS1 uses catkin_virtualenv
+# with requirements.txt, keep the versions in sync). Update uv.lock with
+# `uv lock`.
+[project]
+name = "ros-speech-recognition"
+version = "2.1.31"
+requires-python = ">=3.10"
+dependencies = [
+    "SpeechRecognition==3.9.0",
+    "vosk==0.3.45",
+]
+
+[tool.uv]
+package = false
