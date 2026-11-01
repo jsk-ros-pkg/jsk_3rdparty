@@ -14,7 +14,7 @@ except ImportError:
     ROS_VERSION = 1
 
     class ros_compat(object):
-        init_node = staticmethod(lambda name, anonymous=False: rospy.init_node(name, anonymous=anonymous))
+        init_node = staticmethod(lambda name, anonymous=False, multi_threaded=False: rospy.init_node(name, anonymous=anonymous))
         spin = staticmethod(lambda node: rospy.spin())
         get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
         has_param = staticmethod(lambda node, name: rospy.has_param(name))

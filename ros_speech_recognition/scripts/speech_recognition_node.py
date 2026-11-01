@@ -12,6 +12,7 @@ import array
 import os
 import sys
 from threading import Lock
+from threading import Thread
 
 from audio_common_msgs.msg import AudioData
 if ROS_VERSION == 2:
@@ -484,7 +485,12 @@ class ROSSpeechRecognition(object):
 
     def spin(self):
         if self.continuous and self.auto_start:
-            self.start_speech_recognition()
+            # in a thread, as it waits for the audio topic, which is received
+            # only while spinning on ROS2 (Michi-Tsubaki's ROS2 port starts it
+            # from a timer for the same reason)
+            start_thread = Thread(target=self.start_speech_recognition)
+            start_thread.daemon = True
+            start_thread.start()
         ros_compat.spin(self.node)
 
     def tts_timer_cb(self, event):
@@ -512,6 +518,9 @@ class ROSSpeechRecognition(object):
 
 
 if __name__ == '__main__':
-    node = ros_compat.init_node("speech_recognition")
+    # the recognition service callback waits for the audio topic and the
+    # sound_play action (on ROS2, a MultiThreadedExecutor and reentrant
+    # callbacks, as in Michi-Tsubaki's ROS2 port of this node)
+    node = ros_compat.init_node("speech_recognition", multi_threaded=True)
     rec = ROSSpeechRecognition(node)
     rec.spin()
