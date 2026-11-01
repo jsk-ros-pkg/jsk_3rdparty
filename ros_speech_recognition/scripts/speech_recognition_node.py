@@ -18,12 +18,15 @@ if ROS_VERSION == 2:
     from sound_play_msgs.msg import SoundRequest
     from sound_play_msgs.action import SoundRequest as SoundRequestAction
     SoundRequestGoal = SoundRequestAction.Goal
-    from action_msgs.msg import GoalStatus
+    from action_msgs.msg import GoalStatus, GoalStatusArray
+    # status topic of an action and state of an executing goal
+    TTS_STATUS_TOPIC, TTS_STATUS_ACTIVE = '/_action/status', GoalStatus.STATUS_EXECUTING
     # rclpy requires a depth (ros_compat's default 1 may drop audio)
     AUDIO_QUEUE_SIZE = 10
 else:
     from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
-    from actionlib_msgs.msg import GoalStatus
+    from actionlib_msgs.msg import GoalStatus, GoalStatusArray
+    TTS_STATUS_TOPIC, TTS_STATUS_ACTIVE = '/status', GoalStatus.ACTIVE
     AUDIO_QUEUE_SIZE = None
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from speech_recognition_msgs.srv import SpeechRecognition
@@ -204,12 +207,20 @@ class ROSSpeechRecognition(object):
         self.last_tts = None
         self.is_canceling = False
         self.tts_actions = []
+        # the goal states of tts_actions come from their status topics, since
+        # ROS2 action clients do not keep the goals of other clients
+        # (actionlib's action_client.last_status_msg)
+        self.tts_status = {}
         if self.self_cancellation:
             for tts_action_name in tts_action_names:
                 tts_action = ros_compat.create_simple_action_client(node,
                     tts_action_name, SoundRequestAction)
                 if tts_action.wait_for_server(5.0):
                     self.tts_actions.append(tts_action)
+                    ros_compat.create_subscription(node,
+                        tts_action_name + TTS_STATUS_TOPIC, GoalStatusArray,
+                        lambda msg, a=tts_action: self.tts_status.__setitem__(a, msg),
+                        queue_size=1, latch=True)
                 else:
                     ros_compat.logerr(node,
                         "action '{}' is not initialized."
@@ -480,8 +491,9 @@ class ROSSpeechRecognition(object):
         stamp = ros_compat.now_sec(self.node)
         active = False
         for tts_action in self.tts_actions:
-            for st in tts_action.action_client.last_status_msg.status_list:
-                if st.status == GoalStatus.ACTIVE:
+            status = self.tts_status.get(tts_action)
+            for st in (status.status_list if status else []):
+                if st.status == TTS_STATUS_ACTIVE:
                     active = True
                     break
             if active:
