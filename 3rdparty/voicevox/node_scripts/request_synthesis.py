@@ -19,6 +19,11 @@ VOICEVOX_TEXTTOSPEECH_URL = os.environ.get(
     'VOICEVOX_TEXTTOSPEECH_URL', 'localhost')
 VOICEVOX_TEXTTOSPEECH_PORT = os.environ.get(
     'VOICEVOX_TEXTTOSPEECH_PORT', '50021')
+# wait for the engine (e.g. still starting up) for up to this many seconds
+VOICEVOX_STARTUP_TIMEOUT = float(os.environ.get(
+    'VOICEVOX_STARTUP_TIMEOUT', 300))
+VOICEVOX_RETRY_INTERVAL = float(os.environ.get(
+    'VOICEVOX_RETRY_INTERVAL', 1))
 cache_enabled = os.environ.get(
     'ROS_VOICEVOX_TEXTTOSPEECH_CACHE_ENABLED', True)
 cache_enabled = cache_enabled is True \
@@ -61,6 +66,27 @@ async def list_speakers():
     return speaker_id_to_name
 
 
+def run_with_retry(coroutine_function, *args):
+    """asyncio.run(coroutine_function(*args)), retrying while the engine can
+    not be reached (e.g. it is still starting up) for up to
+    VOICEVOX_STARTUP_TIMEOUT seconds. Errors from the engine itself (an
+    invalid request) are raised at once."""
+    import httpx
+    deadline = time.time() + VOICEVOX_STARTUP_TIMEOUT
+    retry = 0
+    while True:
+        try:
+            return asyncio.run(coroutine_function(*args))
+        except httpx.TransportError as e:
+            if time.time() >= deadline:
+                raise
+            if retry % 10 == 0:
+                print('[Text2Wave][{}] Waiting for VOICEVOX engine at {}:{}: {}'.format(
+                    time.time(), VOICEVOX_TEXTTOSPEECH_URL, VOICEVOX_TEXTTOSPEECH_PORT, e))
+            retry += 1
+            time.sleep(VOICEVOX_RETRY_INTERVAL)
+
+
 def get_speaker_id_to_name():
     # check cache_dir
     cache_dir = get_voicevox_cache_dir()
@@ -77,7 +103,7 @@ def get_speaker_id_to_name():
             speaker_id_to_name = json.load(f)
     else:
         print('[Text2Wave][{}] Loading speaker id from voicevox server'.format(time.time()))
-        speaker_id_to_name = asyncio.run(list_speakers())
+        speaker_id_to_name = run_with_retry(list_speakers)
         # show speaker ids
         for id, name in sorted(speaker_id_to_name.items(), key=lambda x: int(x[0])):
             print('[Text2Wave][{}] {} : {}'.format(time.time(), id, name))
@@ -119,10 +145,9 @@ def synthesize(speech_text, speaker_id, output_path,
 
     # cehck cache
     print('[Text2Wave][{}] speak {} with ({})'.format(time.time(),speech_text, speaker_id))
-    asyncio.run(request_synthesis(speech_text,
-                                  output_path,
-                                  speaker_id,
-                                  sample_rate, volume_scale))
+    run_with_retry(request_synthesis,
+                   speech_text, output_path, speaker_id,
+                   sample_rate, volume_scale)
 
     if cache_enabled :
         shutil.copy(output_path, cache_filename)
@@ -148,10 +173,14 @@ def run_audio_node():
         # ~speaker is read for each message, so that it can be changed at runtime
         speaker_id = get_speaker_id(
             ros_compat.get_param(node, '~speaker', VOICEVOX_DEFAULT_SPEAKER_ID))
-        with tempfile.NamedTemporaryFile(suffix='.wav') as f:
-            synthesize(msg.data, speaker_id, f.name, sample_rate, volume_scale)
-            with wave.open(f.name, 'rb') as w:
-                pcm = w.readframes(w.getnframes())
+        try:
+            with tempfile.NamedTemporaryFile(suffix='.wav') as f:
+                synthesize(msg.data, speaker_id, f.name, sample_rate, volume_scale)
+                with wave.open(f.name, 'rb') as w:
+                    pcm = w.readframes(w.getnframes())
+        except Exception as e:
+            ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(msg.data, e))
+            return
         # publish in 0.1 sec chunks at the playback speed
         chunk_bytes = sample_rate // 10 * 2
         start = time.time()
