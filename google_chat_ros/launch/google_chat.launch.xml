@@ -1,0 +1,53 @@
+<launch>
+  <!-- ROS2 version of google_chat.launch -->
+  <arg name="receiving_mode" default="url" description="Google Chat API settings. Choose from url, dialogflow, pubsub, none."/>
+  <arg name="gdrive_upload_service" default="/gdrive_server/upload" description="The ROS service name of gdrive_ros upload"/>
+  <arg name="upload_data_timeout" default="20" />
+  <arg name="download_data" default="true" />
+  <arg name="download_data_timeout" default="10" />
+  <arg name="download_directory" default="/tmp" />
+  <arg name="download_avatar" default="false" />
+  <arg name="google_cloud_credentials_json" default="" />
+  <arg name="use_yaml" default="false" description="Whether you use yaml file or not."/>
+  <arg name="yaml_file" default="" description="Yaml file of web settings (ROS2 parameter file format)."/>
+  <arg name="respawn" default="true" />
+  <!-- For https mode -->
+  <arg name="host" default="localhost" />
+  <arg name="port" default="443" />
+  <arg name="ssl_certfile" default="default" />
+  <arg name="ssl_keyfile" default="default" />
+  <!-- For pubsub mode -->
+  <arg name="project_id" default="default" />
+  <arg name="subscription_id" default="default" />
+
+  <!-- params for helper -->
+  <arg name="use_helper" default="true" />
+  <arg name="to_dialogflow_client" default="false" />
+  <arg name="debug_sound" default="false" />
+
+  <node name="google_chat_ros" pkg="google_chat_ros" exec="google_chat_ros_node.py"
+        respawn="$(var respawn)" output="screen">
+    <param name="receiving_mode" value="$(var receiving_mode)" />
+    <param name="gdrive_upload_service" value="$(var gdrive_upload_service)" />
+    <param name="upload_data_timeout" value="$(var upload_data_timeout)" />
+    <param name="download_data_timeout" value="$(var download_data_timeout)" />
+    <param name="download_data" value="$(var download_data)" />
+    <param name="download_directory" value="$(var download_directory)" />
+    <param name="download_avatar" value="$(var download_avatar)" />
+    <param name="google_cloud_credentials_json" value="$(var google_cloud_credentials_json)" />
+    <param name="host" value="$(var host)" />
+    <param name="port" value="$(var port)" />
+    <param name="ssl_certfile" value="$(var ssl_certfile)" />
+    <param name="ssl_keyfile" value="$(var ssl_keyfile)" />
+    <param name="project_id" value="$(var project_id)" />
+    <param name="subscription_id" value="$(var subscription_id)" />
+    <!-- <param from="..."/> takes no if=, so load an empty file unless use_yaml -->
+    <param from="$(eval &quot;'$(var yaml_file)' if '$(var use_yaml)' == 'true' else '$(find-pkg-share google_chat_ros)/launch/empty_params.yaml'&quot;)" />
+  </node>
+
+  <node name="google_chat_ros_helper" pkg="google_chat_ros" exec="helper.py"
+        respawn="$(var respawn)" output="screen" if="$(var use_helper)">
+    <param name="to_dialogflow_client" value="$(var to_dialogflow_client)" />
+    <param name="debug_sound" value="$(var debug_sound)" />
+  </node>
+</launch>
