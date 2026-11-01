@@ -141,7 +141,6 @@ else()
 jsk_ros1_ros2_compat_install_python(
   PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
   USE_VENV)
-jsk_ros1_ros2_compat_install_python(PROGRAMS node_scripts/voicevox_audio.py)
 install(PROGRAMS
   ${VOICEVOX_TARGET_DIR}/bin/run-voicevox ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
   DESTINATION lib/${PROJECT_NAME})
