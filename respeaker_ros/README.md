@@ -113,6 +113,24 @@ Though it will be rare case, the configuration file can be updated as followings
 1. You will see the updated configuration file at `$(rospack find respeaker_ros)/cfg/Respeaker.cfg`.
 
 
+## ROS2
+
+The same scripts run on ROS2 (built with `colcon build`). Each keeps its
+original rospy code (`RespeakerNode`, `SpeechToText`, ...), used on ROS1
+without [jsk_ros1_ros2_compat](https://github.com/jsk-ros-pkg/jsk_common/tree/master/jsk_ros1_ros2_compat)
+(jsk_common < 3.0), next to a version written with jsk_ros1_ros2_compat
+(`RespeakerNodeCompat`, `SpeechToTextCompat`, ...), used on ROS2 and on ROS1
+with jsk_ros1_ros2_compat:
+
+```bash
+ros2 launch respeaker_ros sample_respeaker.launch.xml
+ros2 param set /respeaker_node AGCGAIN 5.5   # instead of dynamic_reconfigure
+```
+
+- SpeechRecognition, pyusb and pixel-ring are installed into a venv (`share/respeaker_ros/venv`) from `pyproject.toml`/`uv.lock` at build time (`jsk_ros1_ros2_compat_generate_uv_venv()`), since catkin_virtualenv has no ROS2 port. Run `uv lock` after changing `pyproject.toml`.
+- dynamic_reconfigure has no ROS2 port, so the device parameters of `cfg/Respeaker.cfg` are ROS2 parameters of `respeaker_node` (read from the device at start, written to it on `ros2 param set`).
+- `scripts/respeaker_gencfg.py` and the rostests are ROS1 only.
+
 ## Author
 
 Yuki Furuta <<furushchev@jsk.imi.i.u-tokyo.ac.jp>>

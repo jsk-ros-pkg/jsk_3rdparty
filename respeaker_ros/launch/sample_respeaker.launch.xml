@@ -1,0 +1,37 @@
+<!-- ROS2 version of sample_respeaker.launch -->
+<launch>
+  <!-- publish tf of respeaker -->
+  <arg name="publish_tf" default="true"/>
+  <!-- launch respeaker -->
+  <arg name="launch_respeaker" default="true"/>
+  <!-- launch sound_play node -->
+  <arg name="launch_soundplay" default="true"/>
+  <!-- input speech topic of speech_to_text.py -->
+  <arg name="audio" default="speech_audio"/>
+  <!-- output text topic of speech_to_text.py -->
+  <arg name="speech_to_text" default="speech_to_text"/>
+  <!-- langage used in speech_to_text.py -->
+  <arg name="language" default="en-US"/>
+  <!-- self cancellation -->
+  <arg name="self_cancellation" default="true"/>
+
+  <node if="$(var publish_tf)"
+        name="static_transformer" pkg="tf2_ros" exec="static_transform_publisher"
+        args="--frame-id map --child-frame-id respeaker_base"/>
+
+  <node if="$(var launch_respeaker)"
+        name="respeaker_node" pkg="respeaker_ros" exec="respeaker_node.py"
+        respawn="true" respawn_delay="10" />
+
+  <node if="$(var launch_soundplay)"
+        name="sound_play" pkg="sound_play" exec="soundplay_node.py"/>
+
+  <node name="speech_to_text" pkg="respeaker_ros" exec="speech_to_text.py"
+        output="screen">
+    <remap from="audio" to="$(var audio)"/>
+    <remap from="speech_to_text" to="$(var speech_to_text)"/>
+    <param name="language" value="$(var language)"/>
+    <param name="self_cancellation" value="$(var self_cancellation)"/>
+    <param name="tts_tolerance" value="0.5"/>
+  </node>
+</launch>
