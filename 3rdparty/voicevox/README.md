@@ -163,10 +163,19 @@ The `use_docker` and `docker_only` options allow you to:
 
 ## Usage
 
-### ROS 2: speak through an existing `/audio` playback node
+### Publish the speech on an audio topic instead of playing it with sound_play
+
+With `output_type:=audio`, `request_synthesis.py --output-type audio` runs
+instead of sound_play: it subscribes text (`std_msgs/String`) on
+`robotsound_jp` and publishes the synthesized speech as raw PCM (mono,
+S16LE, `sample_rate`) on `audio` (`audio_common_msgs/AudioData`), so that it
+is played by e.g. [audio_common](https://github.com/ros-drivers/audio_common)'s
+`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another
+machine. `~speaker` (id or name) can be changed at runtime.
 
 ```bash
-ros2 launch voicevox voicevox_audio.launch.xml
+ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio
+ros2 run audio_play audio_play_node --ros-args -p format:=wave -p sample_rate:=16000
 ```
 
 Send Japanese text from another terminal:

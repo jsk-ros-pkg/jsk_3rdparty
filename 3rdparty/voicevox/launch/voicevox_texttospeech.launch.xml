@@ -16,6 +16,12 @@
        description="Launch only docker container without sound_play node (default: false)" />
   <arg name="remote_only" default="false"
        description="Connect to remote server without starting local server (default: false)" />
+  <arg name="output_type" default="wav"
+       description="wav: play the speech with sound_play (robotsound_jp action). audio: publish it as raw PCM on audio (audio_common_msgs/AudioData) for e.g. audio_play (format:=wave), for text (std_msgs/String) on robotsound_jp (default: wav)" />
+  <arg name="sample_rate" default="16000"
+       description="Sample rate of the audio topic (output_type:=audio)" />
+  <arg name="volume_scale" default="1.0"
+       description="Volume of the audio topic (output_type:=audio)" />
 
   <node name="voicevox_server"
         pkg="voicevox" exec="run-voicevox"
@@ -35,7 +41,7 @@
         pkg="sound_play" exec="soundplay_node.py"
         respawn="$(var sound_play_respawn)"
         output="screen"
-        if="$(eval &quot;'$(var launch_sound_play)' == 'true' and '$(var docker_only)' != 'true'&quot;)" >
+        if="$(eval &quot;'$(var launch_sound_play)' == 'true' and '$(var docker_only)' != 'true' and '$(var output_type)' == 'wav'&quot;)" >
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
     <param name="device" value="$(var device)" />
@@ -43,6 +49,21 @@
     <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(var host)" />
     <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(var port)" />
     <env name="PATH" value="$(find-pkg-share voicevox)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+  </node>
+
+  <node name="voicevox_audio"
+        pkg="voicevox" exec="request_synthesis.py"
+        args="--output-type audio"
+        respawn="$(var sound_play_respawn)"
+        output="screen"
+        if="$(eval &quot;'$(var docker_only)' != 'true' and '$(var output_type)' == 'audio'&quot;)" >
+    <remap from="text" to="robotsound_jp"/>
+    <param name="speaker" value="$(var default_speaker)" type="str" />
+    <param name="sample_rate" value="$(var sample_rate)" type="int" />
+    <param name="volume_scale" value="$(var volume_scale)" type="float" />
+    <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(var host)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(var port)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
   </node>
 </launch>
