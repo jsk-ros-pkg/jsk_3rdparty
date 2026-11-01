@@ -63,6 +63,17 @@ catkin_generate_virtualenv(
   USE_SYSTEM_PACKAGES FALSE
   CHECK_VENV FALSE  # Default TRUE
   )
+# catkin_virtualenv (>= 0.19) preinstalls setuptools 82 in the venv for
+# python >= 3.12, which has no pkg_resources any more (pyworld imports it),
+# and pip-compile drops the setuptools pin of ${REQUIREMENTS_FILE}, so put
+# back setuptools < 81 in the devel/install venvs it generates
+if(NOT Python3_VERSION VERSION_LESS "3.12")
+  add_custom_command(TARGET ${PROJECT_NAME}_generate_virtualenv POST_BUILD
+    COMMAND ${${PROJECT_NAME}_VENV_DEVEL_DIR}/bin/python -m pip install -qq "setuptools<81"
+    COMMAND ${CMAKE_BINARY_DIR}/install/venv/bin/python -m pip install -qq "setuptools<81"
+    COMMENT "Install setuptools<81 (with pkg_resources) to the virtualenvs"
+    VERBATIM)
+endif()
 
 set(SHARE_DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 set(VOICEVOX_TARGET_DIR ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION})
