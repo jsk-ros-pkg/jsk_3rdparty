@@ -4,7 +4,7 @@
 
 from dynamic_reconfigure.client import Client
 import rospy
-from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+from ros_speech_recognition.compat import ros_compat
 from speech_recognition_msgs.srv import SpeechRecognition
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+from ros_speech_recognition.compat import ros_compat
 from sound_play.libsoundplay import SoundClient
 
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates

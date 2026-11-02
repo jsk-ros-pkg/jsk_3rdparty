@@ -12,7 +12,7 @@ except ImportError as e:
 import json
 import os.path as osp
 import rospkg
-from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+from ros_speech_recognition.compat import ros_compat
 
 def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
 

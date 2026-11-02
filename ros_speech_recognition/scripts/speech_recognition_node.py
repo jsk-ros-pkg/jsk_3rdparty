@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
-from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
-from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+from ros_speech_recognition.compat import ros_compat
+from ros_speech_recognition.compat import ROS_VERSION
 import speech_recognition as SR
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
