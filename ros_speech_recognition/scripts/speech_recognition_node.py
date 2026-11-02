@@ -19,9 +19,12 @@ if ROS_VERSION == 2:
     from sound_play_msgs.action import SoundRequest as SoundRequestAction
     SoundRequestGoal = SoundRequestAction.Goal
     from action_msgs.msg import GoalStatus
+    # rclpy requires a depth (ros_compat's default 1 may drop audio)
+    AUDIO_QUEUE_SIZE = 10
 else:
     from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
     from actionlib_msgs.msg import GoalStatus
+    AUDIO_QUEUE_SIZE = None
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from speech_recognition_msgs.srv import SpeechRecognition
 from std_srvs.srv import Empty
@@ -111,7 +114,7 @@ class ROSAudio(SR.AudioSource):
             self.n_channel = n_channel
             self.target_channel = min(self.n_channel - 1, max(0, target_channel))
             self.sub_audio = ros_compat.create_subscription(node,
-                topic_name, AudioData, self.audio_cb)
+                topic_name, AudioData, self.audio_cb, queue_size=AUDIO_QUEUE_SIZE)
             self.type_code = {}
             for code in ['b', 'h', 'i', 'l']:
                 self.type_code[array.array(code).itemsize] = code
@@ -129,7 +132,10 @@ class ROSAudio(SR.AudioSource):
 
         def close(self):
             try:
-                self.sub_audio.unregister()
+                if ROS_VERSION == 2:
+                    self.node.destroy_subscription(self.sub_audio)
+                else:
+                    self.sub_audio.unregister()
             except:
                 pass
             self.buffer = bytes()
