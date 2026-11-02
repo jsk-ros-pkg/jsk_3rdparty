@@ -12,7 +12,7 @@ except ImportError as e:
 import json
 import os.path as osp
 import rospkg
-import rospy
+from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 
 def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
 
@@ -28,9 +28,9 @@ def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
             elif language == 'ja':
                 model_path = osp.join(data_path, 'vosk-model-small-ja-0.22')
             else:
-                rospy.logerr("Unsupported language: {0}.\n Please download the model from https://alphacephei.com/vosk/models and specify its path as 'vosk_model_path'.".format(language))
+                ros_compat.logerr(None, "Unsupported language: {0}.\n Please download the model from https://alphacephei.com/vosk/models and specify its path as 'vosk_model_path'.".format(language))
                 exit (1)
-        rospy.loginfo("Loading model from {}".format(model_path))
+        ros_compat.loginfo(None, "Loading model from {}".format(model_path))
         self.vosk_model = Model(model_path)
     rec = KaldiRecognizer(self.vosk_model, 16000);
 

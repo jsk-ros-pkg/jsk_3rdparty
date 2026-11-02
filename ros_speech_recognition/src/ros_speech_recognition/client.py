@@ -4,6 +4,7 @@
 
 from dynamic_reconfigure.client import Client
 import rospy
+from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 from speech_recognition_msgs.srv import SpeechRecognition
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
 
@@ -40,7 +41,7 @@ class SpeechRecognitionClient(object):
     @energy_threshold.setter
     def energy_threshold(self, value):
         if self.dynamic_energy_threshold:
-            rospy.logerr("Dynamic energy thresholding is enabled")
+            ros_compat.logerr(None, "Dynamic energy thresholding is enabled")
         else:
             self._cfg.update_configuration({
                 "energy_threshold": value

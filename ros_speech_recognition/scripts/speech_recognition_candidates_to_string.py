@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy
+from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 
 from jsk_topic_tools import ConnectionBasedTransport
 
@@ -9,12 +9,13 @@ from std_msgs.msg import String
 
 
 class SpeechRecognitionCandidatesToString(ConnectionBasedTransport):
-    def __init__(self):
+    def __init__(self, node=None):
+        self.node = node
         super(SpeechRecognitionCandidatesToString, self).__init__()
         self.pub = self.advertise('~output', String, queue_size=1)
 
     def subscribe(self):
-        self.sub = rospy.Subscriber(
+        self.sub = ros_compat.create_subscription(self.node,
             '~input', SpeechRecognitionCandidates, self._cb)
 
     def unsubscribe(self):
@@ -27,6 +28,6 @@ class SpeechRecognitionCandidatesToString(ConnectionBasedTransport):
 
 
 if __name__ == '__main__':
-    rospy.init_node('speech_recognition_candidates_to_string')
-    app = SpeechRecognitionCandidatesToString()
-    rospy.spin()
+    node = ros_compat.init_node('speech_recognition_candidates_to_string')
+    app = SpeechRecognitionCandidatesToString(node)
+    ros_compat.spin(node)
