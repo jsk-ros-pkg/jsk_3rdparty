@@ -227,7 +227,8 @@ You can change the voice by changing the voice_name.
 You can also specify the speaker id.
 To get available voice name and speaker id, run following command
 ```bash
-rosrun voicevox list_speakers.py
+rosrun voicevox list_speakers.py  # ROS 1
+ros2 run voicevox list_speakers.py  # ROS 2
 ```
 
 |  speaker_id  |  voice_name  |
