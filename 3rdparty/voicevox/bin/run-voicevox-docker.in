@@ -83,6 +83,35 @@ if [[ "$host" == "localhost" || "$host" == "127.0.0.1" ]]; then
     docker pull "$image"
   fi
 
+  # Warm up the GPU engine in the background (the first synthesis is slow)
+  if [[ "$use_gpu" == "true" ]]; then
+    (
+      warmup_start=$(date +%s)
+      ready=false
+      for _ in $(seq 1 180); do
+        if curl -s --connect-timeout 2 --max-time 5 \
+             "http://localhost:$port/version" > /dev/null 2>&1; then
+          ready=true
+          break
+        fi
+        sleep 2
+      done
+      if [[ "$ready" != true ]]; then
+        echo "[warmup] VOICEVOX engine did not become ready on port $port"
+        exit 0
+      fi
+      speaker="${VOICEVOX_DEFAULT_SPEAKER_ID:-2}"
+      query=$(curl -s --max-time 180 -X POST --get \
+        --data-urlencode "text=ウォームアップ" \
+        "http://localhost:$port/audio_query?speaker=$speaker")
+      code=$(curl -s --max-time 180 -X POST \
+        -H 'Content-Type: application/json' -d "$query" \
+        -o /dev/null -w '%{http_code}' \
+        "http://localhost:$port/synthesis?speaker=$speaker")
+      echo "[warmup] VOICEVOX warmup finished: HTTP $code, $(( $(date +%s) - warmup_start ))s since start"
+    ) &
+  fi
+
   # Run VOICEVOX Docker container
   if [[ "$use_gpu" == "true" ]]; then
     echo "Starting VOICEVOX Docker container on port $port with GPU ($image)..."
