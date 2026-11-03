@@ -40,6 +40,7 @@
     <build_type condition="$ROS_VERSION == 1">catkin</build_type>
     <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
     <pip_requirements>requirements.txt</pip_requirements>
+    <sound_play plugin="${prefix}/plugin/sound_play_plugin.yaml" />
   </export>
 
 </package>

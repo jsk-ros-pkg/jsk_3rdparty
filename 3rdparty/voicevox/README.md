@@ -205,6 +205,7 @@ client.say('こんにちは', voice='四国めたん-あまあま')
 | `launch_sound_play` | `true` | Launch `sound_play_jp` and `text_to_sound_request_jp` (`output_type:=wav`) |
 | `sound_play_respawn` | `true` | Respawn the nodes |
 | `device` | `""` | Audio output device of sound_play |
+| `use_plugin` | `false` | ROS 1: synthesize in `sound_play_jp` with the `voicevox/voicevox_plugin` sound_play plugin |
 
 ### Nodes
 
@@ -213,7 +214,8 @@ client.say('こんにちは', voice='四国めたん-あまあま')
   for a remote `host`, waits for and monitors it.
 - `sound_play_jp` (sound_play's `soundplay_node.py`), `output_type:=wav`: action server and subscriber
   `robotsound_jp` (`sound_play/SoundRequest`; ROS 2: `sound_play_msgs/msg/SoundRequest`, action
-  `sound_play_msgs/action/SoundRequest`). It synthesizes `SAY` requests with `bin/text2wave` of this package.
+  `sound_play_msgs/action/SoundRequest`). It synthesizes `SAY` requests with `bin/text2wave` of this package,
+  or, with `use_plugin:=true`, inside the node without starting `text2wave` for each utterance.
 - `text_to_sound_request_jp` (`text_to_sound_request.py`), `output_type:=wav`
   - Subscribes `robotsound_jp/text` (`std_msgs/String`), publishes `robotsound_jp` (`SoundRequest`, `SAY`).
   - Parameter `~speaker` (id or name, default `""`: `default_speaker`), read for each message.

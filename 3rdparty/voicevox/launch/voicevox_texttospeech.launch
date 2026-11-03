@@ -24,6 +24,8 @@
        doc="Volume of the audio topic (output_type:=audio)" />
   <arg name="use_gpu" default="false"
        doc="Use GPU for the docker container (default: false)" />
+  <arg name="use_plugin" default="false"
+       doc="Use the voicevox sound_play plugin instead of text2wave (default: false)" />
 
   <node name="voicevox_server"
         pkg="voicevox" type="run-voicevox"
@@ -49,11 +51,13 @@
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
     <param name="device" value="$(arg device)" />
+    <param name="plugin" value="$(eval 'voicevox/voicevox_plugin' if arg('use_plugin') else 'sound_play/festival_plugin')" />
     <env name="VOICEVOX_DEFAULT_SPEAKER_ID" value="$(arg default_speaker)" />
     <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(arg host)" />
     <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(arg port)" />
     <env name="PATH" value="$(find voicevox)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
+    <env name="PYTHONPATH" value="$(find voicevox)/plugin:$(optenv PYTHONPATH)" />
   </node>
 
   <node if="$(eval arg('launch_sound_play') and not arg('docker_only') and arg('output_type') == 'wav')"
