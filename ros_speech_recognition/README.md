@@ -37,6 +37,22 @@ roslaunch ros_speech_recognition parrotry.launch
 roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 ```
 
+### ROS2
+
+The same nodes run on ROS2 (built with colcon; SpeechRecognition and vosk
+are installed into a venv of this package with uv at build time).
+The dynamic reconfigure parameters (see [Parameters](#parameters)) are ROS2
+parameters, e.g. `ros2 param set /speech_recognition language ja-JP`.
+The vosk models are downloaded into the installed share directory by
+`colcon build` (with jsk_data, as on ROS1).
+
+```bash
+ros2 launch ros_speech_recognition speech_recognition.launch.xml
+ros2 topic echo /speech_to_text
+# parrotry (julius and aques_talk are not available, use engine:=... and sound_play)
+ros2 launch ros_speech_recognition parrotry.launch.xml
+```
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
