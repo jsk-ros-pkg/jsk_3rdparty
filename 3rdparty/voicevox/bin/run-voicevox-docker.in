@@ -16,6 +16,7 @@ done
 host="localhost"
 port="50021"
 cpu_num_threads="1"
+use_gpu="false"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -30,6 +31,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --cpu_num_threads)
       cpu_num_threads="$2"
+      shift 2
+      ;;
+    --use_gpu)
+      use_gpu="$2"
       shift 2
       ;;
     --)
@@ -56,19 +61,68 @@ if [[ "$host" == "localhost" || "$host" == "127.0.0.1" ]]; then
   # Remove any existing stopped container with the same name
   docker rm -f "$container_name" 2>/dev/null || true
 
+  case "$use_gpu" in
+    true|false)
+      ;;
+    *)
+      echo "Invalid --use_gpu value: '$use_gpu' (use true or false)" >&2
+      exit 1
+      ;;
+  esac
+  if [[ "$use_gpu" == "true" ]]; then
+    image="voicevox/voicevox_engine:nvidia-ubuntu20.04-latest"
+    gpu_args=(--gpus all)
+  else
+    image="voicevox/voicevox_engine:cpu-ubuntu20.04-latest"
+    gpu_args=()
+  fi
+
   # Check if voicevox image exists, if not pull it
-  if ! docker images | grep -q "voicevox/voicevox_engine"; then
-    echo "Pulling VOICEVOX Docker image..."
-    docker pull voicevox/voicevox_engine:latest
+  if ! docker image inspect "$image" > /dev/null 2>&1; then
+    echo "Pulling VOICEVOX Docker image $image ..."
+    docker pull "$image"
+  fi
+
+  # Warm up the GPU engine in the background (the first synthesis is slow)
+  if [[ "$use_gpu" == "true" ]]; then
+    (
+      warmup_start=$(date +%s)
+      ready=false
+      for _ in $(seq 1 180); do
+        if curl -s --connect-timeout 2 --max-time 5 \
+             "http://localhost:$port/version" > /dev/null 2>&1; then
+          ready=true
+          break
+        fi
+        sleep 2
+      done
+      if [[ "$ready" != true ]]; then
+        echo "[warmup] VOICEVOX engine did not become ready on port $port"
+        exit 0
+      fi
+      speaker="${VOICEVOX_DEFAULT_SPEAKER_ID:-2}"
+      query=$(curl -s --max-time 180 -X POST --get \
+        --data-urlencode "text=ウォームアップ" \
+        "http://localhost:$port/audio_query?speaker=$speaker")
+      code=$(curl -s --max-time 180 -X POST \
+        -H 'Content-Type: application/json' -d "$query" \
+        -o /dev/null -w '%{http_code}' \
+        "http://localhost:$port/synthesis?speaker=$speaker")
+      echo "[warmup] VOICEVOX warmup finished: HTTP $code, $(( $(date +%s) - warmup_start ))s since start"
+    ) &
   fi
 
   # Run VOICEVOX Docker container
-  echo "Starting VOICEVOX Docker container on port $port with $cpu_num_threads CPU threads..."
-  exec docker run --rm \
+  if [[ "$use_gpu" == "true" ]]; then
+    echo "Starting VOICEVOX Docker container on port $port with GPU ($image)..."
+  else
+    echo "Starting VOICEVOX Docker container on port $port with $cpu_num_threads CPU threads ($image)..."
+  fi
+  exec docker run --rm "${gpu_args[@]}" \
     --name "$container_name" \
     -p "$port:50021" \
     -e CPU_NUM_THREADS="$cpu_num_threads" \
-    voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    "$image"
 else
   # Remote Docker container mode - just wait for connection
   echo "Connecting to remote VOICEVOX Docker container at $host:$port"

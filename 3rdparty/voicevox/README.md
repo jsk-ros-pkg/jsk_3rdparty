@@ -141,6 +141,16 @@ roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
 roslaunch voicevox voicevox_texttospeech.launch docker_only:=true port:=50022
 ```
 
+#### GPU / CPU selection
+
+With `use_docker` or `docker_only`, the container uses the CPU image by default. Set `use_gpu:=true` to use the GPU image:
+
+```bash
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true use_gpu:=true
+```
+
+With `use_gpu:=true`, a short synthesis is sent once in the background after the container starts (warm-up) because the first synthesis can take tens of seconds.
+
 #### Connect to existing Docker container
 
 To connect to an existing Docker container running on a different machine:
