@@ -176,12 +176,15 @@ The `use_docker` and `docker_only` options allow you to:
 ### Publish the speech on an audio topic instead of playing it with sound_play
 
 With `output_type:=audio`, `request_synthesis.py --output-type audio` runs
-instead of sound_play: it subscribes text (`std_msgs/String`) on
-`robotsound_jp` and publishes the synthesized speech as raw PCM (mono,
-S16LE, `sample_rate`) on `audio` (`audio_common_msgs/AudioData`), so that it
-is played by e.g. [audio_common](https://github.com/ros-drivers/audio_common)'s
+instead of sound_play: it subscribes `SoundRequest` on `robotsound_jp` (as
+sound_play does, e.g. from `SoundClient.say()`, see [Say something](#saysomething))
+and text (`std_msgs/String`) on `robotsound_jp/text`, and publishes the
+synthesized speech as raw PCM (mono, S16LE, `sample_rate`) on `audio`
+(`audio_common_msgs/AudioData`), so that it is played by e.g.
+[audio_common](https://github.com/ros-drivers/audio_common)'s
 `audio_play` (`format:=wave`, the same `sample_rate`), possibly on another
 machine. `~speaker` (id or name) can be changed at runtime.
+The `robotsound_jp` action (`SoundClient(blocking=True)`) is only served by sound_play.
 
 ```bash
 ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio
@@ -191,7 +194,8 @@ ros2 run audio_play audio_play_node --ros-args -p format:=wave -p sample_rate:=1
 Send Japanese text from another terminal:
 
 ```bash
-ros2 topic pub --once /robotsound_jp std_msgs/msg/String "{data: 'こんにちは。音声テストです。'}"
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは。音声テストです。'}"
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは。音声テストです。', arg2: ''}"
 ```
 
 ### Launch sound_play with VOICEVOX Text-to-Speech
@@ -202,6 +206,31 @@ roslaunch voicevox voicevox_texttospeech.launch
 
 <a id="saysomething"></a>
 ### Say something
+
+Both `output_type:=wav` (default) and `output_type:=audio` speak
+`SoundRequest` (sound_play's `SoundClient`) on `robotsound_jp`
+and text (`std_msgs/String`) on `robotsound_jp/text`.
+
+#### From the command line
+
+Text (`std_msgs/String`):
+
+```bash
+rostopic pub --once /robotsound_jp/text std_msgs/String "data: 'こんにちは'"  # ROS 1
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは'}"  # ROS 2
+```
+
+`SoundRequest` (`sound: -3` is `SAY`, `command: 1` is `PLAY_ONCE`, `arg2` is the voice):
+
+```bash
+rostopic pub --once /robotsound_jp sound_play/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 1
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 2
+```
+
+With `output_type:=wav`, the voice of the text is `~speaker` of `text_to_sound_request_jp`
+(default: `default_speaker`), e.g. `rosparam set /text_to_sound_request_jp/speaker 四国めたん-あまあま`
+(ROS 2: `ros2 param set /text_to_sound_request_jp speaker 四国めたん-あまあま`).
+With `output_type:=audio`, it is `~speaker` of `voicevox_audio`.
 
 #### For python users
 
