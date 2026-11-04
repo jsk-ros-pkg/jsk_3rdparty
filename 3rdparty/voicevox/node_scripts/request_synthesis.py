@@ -160,7 +160,7 @@ def run_audio_node():
     format:=wave, instead of writing a wav file for sound_play"""
     import tempfile
     import wave
-    from audio_common_msgs.msg import AudioData
+    from audio_common_msgs.msg import AudioData, AudioInfo
     from std_msgs.msg import String
     from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 
@@ -168,6 +168,15 @@ def run_audio_node():
     sample_rate = ros_compat.get_param(node, '~sample_rate', 16000)
     volume_scale = ros_compat.get_param(node, '~volume_scale', 1.0)
     pub_audio = ros_compat.create_publisher(node, 'audio', AudioData, queue_size=10)
+    pub_audio_info = ros_compat.create_publisher(
+        node, 'audio_info', AudioInfo, queue_size=1, latch=True)
+    audio_info = AudioInfo(
+        channels=1,
+        sample_rate=sample_rate,
+        sample_format='S16LE',
+        bitrate=sample_rate * 16,
+        coding_format='wave')
+    pub_audio_info.publish(audio_info)
 
     def callback(msg):
         # ~speaker is read for each message, so that it can be changed at runtime
@@ -181,6 +190,10 @@ def run_audio_node():
         except Exception as e:
             ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(msg.data, e))
             return
+        # Metadata and PCM use separate topics. Publish metadata again before
+        # each utterance so a newly connected subscriber sees it first.
+        pub_audio_info.publish(audio_info)
+        time.sleep(0.2)
         # publish in 0.1 sec chunks at the playback speed
         chunk_bytes = sample_rate // 10 * 2
         start = time.time()
