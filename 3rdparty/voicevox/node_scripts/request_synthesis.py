@@ -190,10 +190,6 @@ def run_audio_node():
         except Exception as e:
             ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(msg.data, e))
             return
-        # Metadata and PCM use separate topics. Publish metadata again before
-        # each utterance so a newly connected subscriber sees it first.
-        pub_audio_info.publish(audio_info)
-        time.sleep(0.2)
         # publish in 0.1 sec chunks at the playback speed
         chunk_bytes = sample_rate // 10 * 2
         start = time.time()
