@@ -17,11 +17,6 @@ class AutoPowerCycle(object):
         self.is_topic_sub = False
         self.limit_tm = None
 
-        self.mon_topic_sub = rospy.Subscriber(
-            '~monitored_topic',
-            rospy.AnyMsg,
-            self._mon_topic_cb,
-        )
         srv_name = '~power_cycle'
         rospy.logwarn(
             '[{}] Waiting for power cycle service...'.format(
@@ -33,6 +28,11 @@ class AutoPowerCycle(object):
         self.pwr_cyc_srv = rospy.ServiceProxy(srv_name, Trigger)
         if self.is_init_cyc:
             res = self.pwr_cyc_srv()
+        self.mon_topic_sub = rospy.Subscriber(
+            '~monitored_topic',
+            rospy.AnyMsg,
+            self._mon_topic_cb,
+        )
         self.monitoring_timer = rospy.Timer(
             rospy.Duration(1.0 / (self.expt_hz * 10)), self._monitoring_cb)
 
