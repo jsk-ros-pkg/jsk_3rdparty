@@ -1,0 +1,6 @@
+# python3 only (python2 uses python-webrtcvad-pip)
+# webrtcvad 2.0.10 imports pkg_resources, which the setuptools catkin_virtualenv
+# installs for Python >= 3.10 does not have; webrtcvad-wheels (the same
+# webrtcvad module) does not need it.
+webrtcvad==2.0.10 ; python_version < "3.10"
+webrtcvad-wheels==2.0.14.post1 ; python_version >= "3.10"
