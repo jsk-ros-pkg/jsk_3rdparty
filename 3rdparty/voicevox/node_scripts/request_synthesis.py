@@ -155,6 +155,7 @@ def synthesize(speech_text, speaker_id, output_path,
 
 def run_audio_node():
     """ROS node that speaks the text it subscribes on text (std_msgs/String)
+    or robotsound (sound_play's SoundRequest, e.g. from SoundClient.say())
     by publishing the synthesized speech as raw PCM (mono S16LE) on audio
     (audio_common_msgs/AudioData), for e.g. audio_common's audio_play with
     format:=wave, instead of writing a wav file for sound_play"""
@@ -163,6 +164,10 @@ def run_audio_node():
     from audio_common_msgs.msg import AudioData, AudioInfo
     from std_msgs.msg import String
     from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    if ros_compat.ROS_VERSION == 1:
+        from sound_play.msg import SoundRequest
+    else:
+        from sound_play_msgs.msg import SoundRequest
 
     node = ros_compat.init_node('voicevox_audio')
     sample_rate = ros_compat.get_param(node, '~sample_rate', 16000)
@@ -178,17 +183,17 @@ def run_audio_node():
         coding_format='wave')
     pub_audio_info.publish(audio_info)
 
-    def callback(msg):
+    def speak(text, speaker=''):
         # ~speaker is read for each message, so that it can be changed at runtime
         speaker_id = get_speaker_id(
-            ros_compat.get_param(node, '~speaker', VOICEVOX_DEFAULT_SPEAKER_ID))
+            speaker or ros_compat.get_param(node, '~speaker', VOICEVOX_DEFAULT_SPEAKER_ID))
         try:
             with tempfile.NamedTemporaryFile(suffix='.wav') as f:
-                synthesize(msg.data, speaker_id, f.name, sample_rate, volume_scale)
+                synthesize(text, speaker_id, f.name, sample_rate, volume_scale)
                 with wave.open(f.name, 'rb') as w:
                     pcm = w.readframes(w.getnframes())
         except Exception as e:
-            ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(msg.data, e))
+            ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(text, e))
             return
         # publish in 0.1 sec chunks at the playback speed
         chunk_bytes = sample_rate // 10 * 2
@@ -199,8 +204,15 @@ def run_audio_node():
             pub_audio.publish(AudioData(data=pcm[offset:offset + chunk_bytes]))
             time.sleep(max(0, start + (offset + chunk_bytes) / (sample_rate * 2.0) - time.time()))
         ros_compat.loginfo(node, 'Published {:.2f} sec of speech'.format(len(pcm) / (sample_rate * 2.0)))
+
+    def sound_request_callback(msg):
+        # arg2 is the voice of SoundClient.say(text, voice=...)
+        if msg.sound == SoundRequest.SAY and msg.command == SoundRequest.PLAY_ONCE:
+            speak(msg.arg, msg.arg2)
     ros_compat.create_subscription(
-        node, 'text', String, callback, queue_size=10)
+        node, 'text', String, lambda msg: speak(msg.data), queue_size=10)
+    ros_compat.create_subscription(
+        node, 'robotsound', SoundRequest, sound_request_callback, queue_size=10)
     ros_compat.spin(node)
 
 
@@ -218,8 +230,9 @@ if __name__ == '__main__':
         '--output-type', choices=['wav', 'audio'], default='wav',
         help='wav: write the speech of TEXT (file) to the wav file OUTPUT, '
         'as text2wave for sound_play (default). audio: run as a ROS node '
-        'that publishes the speech of the text (std_msgs/String) it '
-        'subscribes on text as raw PCM on audio (audio_common_msgs/AudioData)')
+        'that publishes the speech of the text it subscribes on text '
+        '(std_msgs/String) or robotsound (SoundRequest) as raw PCM on audio '
+        '(audio_common_msgs/AudioData)')
     parser.add_argument('-eval', '--evaluate')
     parser.add_argument('-o', '--output')
     parser.add_argument('text')
