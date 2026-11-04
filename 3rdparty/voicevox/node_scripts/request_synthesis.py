@@ -199,7 +199,8 @@ def run_audio_node():
             pub_audio.publish(AudioData(data=pcm[offset:offset + chunk_bytes]))
             time.sleep(max(0, start + (offset + chunk_bytes) / (sample_rate * 2.0) - time.time()))
         ros_compat.loginfo(node, 'Published {:.2f} sec of speech'.format(len(pcm) / (sample_rate * 2.0)))
-    ros_compat.create_subscription(node, 'text', String, callback)
+    ros_compat.create_subscription(
+        node, 'text', String, callback, queue_size=10)
     ros_compat.spin(node)
 
 
