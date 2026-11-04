@@ -22,6 +22,8 @@
        description="Sample rate of the audio topic (output_type:=audio)" />
   <arg name="volume_scale" default="1.0"
        description="Volume of the audio topic (output_type:=audio)" />
+  <arg name="use_gpu" default="false"
+       description="Use GPU for the docker container (default: false)" />
 
   <node name="voicevox_server"
         pkg="voicevox" exec="run-voicevox"
@@ -32,7 +34,7 @@
 
   <node name="voicevox_docker_server"
         pkg="voicevox" exec="run-voicevox-docker"
-        args="--host $(var host) --port $(var port) --cpu_num_threads=$(var cpu_num_threads) --"
+        args="--host $(var host) --port $(var port) --cpu_num_threads=$(var cpu_num_threads) --use_gpu $(var use_gpu) --"
         respawn="$(var sound_play_respawn)"
         output="screen"
         if="$(eval &quot;'$(var use_docker)' == 'true' or '$(var docker_only)' == 'true'&quot;)" />
