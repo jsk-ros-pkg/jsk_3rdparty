@@ -2,7 +2,7 @@ string DEVICEMODE_PRESS     = "pressMode"
 string DEVICEMODE_SWITCH    = "switchMode"
 string DEVICEMODE_CUSTOMIZE = "customizeMode"
 
-Header  header       # timestamp
+std_msgs/Header  header  # timestamp
 
 float64 battery      # the current battery level, 0-100
 

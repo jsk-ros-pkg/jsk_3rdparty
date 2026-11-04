@@ -1,0 +1,17 @@
+# ROS2 only: python dependencies installed into share/emotion_analyzer/venv
+# by jsk_ros1_ros2_compat_generate_uv_venv() (ROS1 uses catkin_virtualenv
+# with requirements.in). Update uv.lock with `uv lock`.
+[project]
+name = "emotion-analyzer"
+version = "2.1.31"
+requires-python = ">=3.10"
+dependencies = [
+    # the scripts use the legacy HumeStreamClient, removed in hume 0.7
+    "hume[stream]<0.7",
+    # also in the venv, as the scripts run with its python (the wheel
+    # bundles libsndfile)
+    "soundfile",
+]
+
+[tool.uv]
+package = false

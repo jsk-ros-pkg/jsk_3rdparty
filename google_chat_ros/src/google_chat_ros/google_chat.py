@@ -7,7 +7,13 @@ from httplib2 import Http
 import http.server as s
 import json
 from oauth2client.service_account import ServiceAccountCredentials
-import rospy # for logging
+try:
+    # rospy-style free-standing log functions, also usable under ROS2
+    # once the node calls log_utils.set_node()
+    from jsk_ros1_ros2_compat import log_utils as rospy # for logging
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only
+    import rospy # for logging
 import socket
 import ssl
 
@@ -68,7 +74,15 @@ class GoogleChatHTTPSServer():
 
     def run(self):
         self._httpd = s.HTTPServer((self._host, self._port), self.__handler)
-        self._httpd.socket = ssl.wrap_socket(self._httpd.socket, certfile=self._certfile, keyfile=self._keyfile)
+        if hasattr(ssl, 'wrap_socket'):
+            self._httpd.socket = ssl.wrap_socket(self._httpd.socket, certfile=self._certfile, keyfile=self._keyfile)
+        else:  # ssl.wrap_socket() is removed in Python 3.12
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
+            self._httpd.socket = context.wrap_socket(self._httpd.socket, server_side=True)
+        # return from handle_request() every second to check self.__RUN, so
+        # that kill() (on rospy/rclpy shutdown) stops the loop without a request
+        self._httpd.timeout = 1.0
         while self.__RUN:
             self._httpd.handle_request()
 

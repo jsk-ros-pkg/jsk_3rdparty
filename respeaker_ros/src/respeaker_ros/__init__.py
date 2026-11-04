@@ -5,16 +5,26 @@ import usb.util
 import pyaudio
 import math
 import numpy as np
-import tf.transformations as T
+try:
+    import tf.transformations as T
+except ImportError:
+    import tf_transformations as T  # ROS2
 import os
-import rospy
 import struct
 import sys
 import time
 from audio_common_msgs.msg import AudioData
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool, Int32, ColorRGBA
-from dynamic_reconfigure.server import Server
+
+try:
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+except ImportError:
+    ros_compat = None  # jsk_common < 3.0 (ROS1 only): use the original rospy code
+
+if ros_compat is None:
+    import rospy
+    from dynamic_reconfigure.server import Server
 
 # https://stackoverflow.com/questions/21367320/searching-for-equivalent-of-filenotfounderror-in-python-2
 try:
@@ -24,14 +34,21 @@ except NameError:
 try:
     from pixel_ring import usb_pixel_ring_v2
 except (IOError, FileNotFoundError) as e:
-    rospy.logerr(e)
+    if ros_compat is None:
+        rospy.logerr(e)
+    else:
+        ros_compat.logerr(None, str(e))
     raise RuntimeError("Check the device is connected and recognized")
 
 try:
     from respeaker_ros.cfg import RespeakerConfig
 except Exception as e:
-    rospy.logerr(e)
-    raise RuntimeError("Need to run respeaker_gencfg.py first")
+    if ros_compat is None:
+        rospy.logerr(e)
+        raise RuntimeError("Need to run respeaker_gencfg.py first")
+    # ROS2 has no dynamic_reconfigure .cfg: RespeakerNodeCompat declares
+    # the parameters from PARAMETERS instead
+    RespeakerConfig = None
 
 # suppress error messages from ALSA
 # https://stackoverflow.com/questions/7088672/pyaudio-working-but-spits-out-error-messages-each-time
@@ -231,6 +248,70 @@ class RespeakerInterface(object):
         usb.util.dispose_resources(self.dev)
 
 
+class RespeakerInterfaceCompat(RespeakerInterface):
+    """RespeakerInterface written with jsk_ros1_ros2_compat (ROS1/ROS2):
+    only the methods that log or shut down differ."""
+
+    def __init__(self, node=None):
+        self.node = node
+        self.dev = usb.core.find(idVendor=self.VENDOR_ID,
+                                 idProduct=self.PRODUCT_ID)
+        if not self.dev:
+            raise RuntimeError("Failed to find Respeaker device")
+        ros_compat.loginfo(self.node, "Initializing Respeaker device")
+        try:
+            self.dev.reset()
+        except usb.core.USBError:
+            ros_compat.logerr(self.node,
+                "You may have to give the right permission on respeaker device. "
+                "Please run the command as followings to register udev rules.\n"
+                "$ roscd respeaker_ros \n"
+                "$ sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules \n"
+                "$ sudo systemctl restart udev \n"
+                "You may find further details at https://github.com/jsk-ros-pkg/jsk_3rdparty/blob/master/respeaker_ros/README.md"
+            ) # NOQA
+            raise
+        self.pixel_ring = usb_pixel_ring_v2.PixelRing(self.dev)
+        self.set_led_think()
+        time.sleep(5)  # it will take 5 seconds to re-recognize as audio device
+        self.set_led_trace()
+        ros_compat.loginfo(self.node, "Respeaker device initialized (Version: %s)" % self.version)
+
+    def read(self, name):
+        try:
+            data = PARAMETERS[name]
+        except KeyError:
+            return
+
+        id = data[0]
+
+        cmd = 0x80 | data[1]
+        if data[2] == 'int':
+            cmd |= 0x40
+
+        length = 8
+
+        try:
+            response = self.dev.ctrl_transfer(
+                usb.util.CTRL_IN | usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE,
+                0, cmd, id, length, self.TIMEOUT)
+        except usb.core.USBError as e:
+            ros_compat.logerr(self.node, str(e))
+            ros_compat.signal_shutdown(self.node, 'Shutdown this node because of USBError')
+
+        if sys.version_info.major == 2:
+            response = struct.unpack(b'ii', response.tostring())
+        else:
+            response = struct.unpack(b'ii', response.tobytes())
+
+        if data[2] == 'int':
+            result = response[0]
+        else:
+            result = response[0] * (2.**response[1])
+
+        return result
+
+
 class RespeakerAudio(object):
     def __init__(self, on_audio, channel=0, suppress_error=True, sample_duration=None):
         self.on_audio = on_audio
@@ -313,3 +394,56 @@ class RespeakerAudio(object):
             self.stream.stop_stream()
 
 
+class RespeakerAudioCompat(RespeakerAudio):
+    """RespeakerAudio written with jsk_ros1_ros2_compat (ROS1/ROS2): only
+    __init__, which logs, differs."""
+
+    def __init__(self, on_audio, channel=0, suppress_error=True, sample_duration=None, node=None):
+        self.node = node
+        self.on_audio = on_audio
+        with ignore_stderr(enable=suppress_error):
+            self.pyaudio = pyaudio.PyAudio()
+        self.channels = None
+        self.channel = channel
+        self.device_index = None
+        self.rate = 16000
+        self.bitwidth = 2
+        self.bitdepth = 16
+        if sample_duration is not None:
+            frames_per_buffer = int(sample_duration * self.rate)
+        else:
+            frames_per_buffer = 1024
+
+        # find device
+        count = self.pyaudio.get_device_count()
+        ros_compat.logdebug(self.node, "%d audio devices found" % count)
+        for i in range(count):
+            info = self.pyaudio.get_device_info_by_index(i)
+            name = info["name"].encode("utf-8")
+            chan = info["maxInputChannels"]
+            ros_compat.logdebug(self.node, " - %d: %s" % (i, name))
+            if name.lower().find(b"respeaker") >= 0:
+                self.channels = chan
+                self.device_index = i
+                ros_compat.loginfo(self.node, "Found %d: %s (channels: %d)" % (i, name, chan))
+                break
+        if self.device_index is None:
+            ros_compat.logwarn(self.node, "Failed to find respeaker device by name. Using default input")
+            info = self.pyaudio.get_default_input_device_info()
+            self.channels = info["maxInputChannels"]
+            self.device_index = info["index"]
+
+        if self.channels != 6:
+            ros_compat.logwarn(self.node, "%d channel is found for respeaker" % self.channels)
+            ros_compat.logwarn(self.node, "You may have to update firmware.")
+        self.channel = min(self.channels - 1, max(0, self.channel))
+
+        self.stream = self.pyaudio.open(
+            input=True, start=False,
+            format=pyaudio.paInt16,
+            channels=self.channels,
+            rate=self.rate,
+            frames_per_buffer=frames_per_buffer,
+            stream_callback=self.stream_callback,
+            input_device_index=self.device_index,
+        )

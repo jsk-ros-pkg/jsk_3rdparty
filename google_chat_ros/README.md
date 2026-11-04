@@ -75,6 +75,11 @@ rosdep install --ignore-src --from-paths . -y -r
 cd ..
 catkin build
 ```
+
+On ROS2, build it with `colcon build` instead and use `ros2 launch google_chat_ros google_chat.launch.xml`.
+catkin_virtualenv is not available on ROS2, so the python dependencies (`requirements.in.python3.12`) are installed into a venv (`share/google_chat_ros/venv`) from `pyproject.toml`/`uv.lock` at build time instead (`jsk_ros1_ros2_compat_generate_uv_venv()`). Run `uv lock` after changing `pyproject.toml`.
+`to_dialogflow_client` of the helper needs dialogflow_task_executive, which is not available on ROS2 yet.
+
 ### 1.4 Launch the node
 #### HTTPS mode
 You have to set rosparams `receiving_mode=https`, `google_cloud_credentials_json`, `host`, `port`, `ssl_certfile`, `ssl_keyfile`.
