@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-exec rosrun voicevox request_synthesis.py $@
+if [ "${ROS_VERSION}" = "2" ]; then
+  exec ros2 run voicevox request_synthesis.py "$@"
+else
+  exec rosrun voicevox request_synthesis.py $@
+fi

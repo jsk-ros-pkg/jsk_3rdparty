@@ -16,9 +16,16 @@
        doc="Launch only docker container without sound_play node (default: false)" />
   <arg name="remote_only" default="false"
        doc="Connect to remote server without starting local server (default: false)" />
+  <arg name="output_type" default="wav"
+       doc="wav: play the speech with sound_play (robotsound_jp action). audio: publish it as raw PCM on audio (audio_common_msgs/AudioData) for e.g. audio_play (format:=wave), for SoundRequest on robotsound_jp. Both also speak text (std_msgs/String) on robotsound_jp/text; needs jsk_ros1_ros2_compat (default: wav)" />
+  <arg name="sample_rate" default="16000"
+       doc="Sample rate of the audio topic (output_type:=audio)" />
+  <arg name="volume_scale" default="1.0"
+       doc="Volume of the audio topic (output_type:=audio)" />
+  <arg name="use_gpu" default="false"
+       doc="Use GPU for the docker container (default: false)" />
 
-  <node unless="$(arg use_docker)"
-        name="voicevox_server"
+  <node name="voicevox_server"
         pkg="voicevox" type="run-voicevox"
         args="--voicelib_dir=$(find voicevox)/voicevox_core --host 0.0.0.0 --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --load_all_models --"
         respawn="$(arg sound_play_respawn)"
@@ -28,13 +35,13 @@
 
   <node name="voicevox_docker_server"
         pkg="voicevox" type="run-voicevox-docker"
-        args="--host $(arg host) --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --"
+        args="--host $(arg host) --port $(arg port) --cpu_num_threads=$(arg cpu_num_threads) --use_gpu $(arg use_gpu) --"
         respawn="$(arg sound_play_respawn)"
         output="screen"
         if="$(eval arg('use_docker') or arg('docker_only'))">
   </node>
 
-  <node if="$(eval arg('launch_sound_play') and not arg('docker_only'))"
+  <node if="$(eval arg('launch_sound_play') and not arg('docker_only') and arg('output_type') == 'wav')"
         name="sound_play_jp"
         pkg="sound_play" type="soundplay_node.py"
         respawn="$(arg sound_play_respawn)"
@@ -46,6 +53,31 @@
     <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(arg host)" />
     <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(arg port)" />
     <env name="PATH" value="$(find voicevox)/bin:$(env PATH)" />
+    <env name="PYTHONIOENCODING" value="utf-8" />
+  </node>
+
+  <node if="$(eval arg('launch_sound_play') and not arg('docker_only') and arg('output_type') == 'wav')"
+        name="text_to_sound_request_jp"
+        pkg="voicevox" type="text_to_sound_request.py"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+    <remap from="text" to="robotsound_jp/text"/>
+    <remap from="robotsound" to="robotsound_jp"/>
+  </node>
+
+  <node if="$(eval not arg('docker_only') and arg('output_type') == 'audio')"
+        name="voicevox_audio"
+        pkg="voicevox" type="request_synthesis.py"
+        args="--output-type audio"
+        respawn="$(arg sound_play_respawn)"
+        output="screen" >
+    <remap from="text" to="robotsound_jp/text"/>
+    <remap from="robotsound" to="robotsound_jp"/>
+    <param name="speaker" value="$(arg default_speaker)" type="str" />
+    <param name="sample_rate" value="$(arg sample_rate)" />
+    <param name="volume_scale" value="$(arg volume_scale)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_URL" value="$(arg host)" />
+    <env name="VOICEVOX_TEXTTOSPEECH_PORT" value="$(arg port)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
   </node>
 </launch>
