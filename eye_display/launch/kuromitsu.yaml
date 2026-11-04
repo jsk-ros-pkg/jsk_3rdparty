@@ -1,0 +1,132 @@
+names: [normal, blink, sleepy, sad, troubled, delighted, heart, shine1, shine2, boring, regret1, regret2, serious]
+normal:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_normal.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9]
+blink:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_normal.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+sleepy:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_iris: "/outline.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_normal.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+sad:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_normal.png"
+  path_upperlid: "/krmt_upperlid_sad.png"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+troubled:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_troubled.png"
+  path_upperlid: "/white.jpg"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+delighted:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_upperlid_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_delighted.png"
+  path_upperlid: "/white.jpg"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+heart:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_heart.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+shine1:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_shine1.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+shine2:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_shine2.png"
+  path_upperlid: "/krmt_upperlid_normal.png"
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+boring:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_upperlid_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_boring.png"
+  path_upperlid: "/white.jpg"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+regret1:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_upperlid_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_regret1.png"
+  path_upperlid: "/white.jpg"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+regret2:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_upperlid_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_regret2.png"
+  path_upperlid: "/white.jpg"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+serious:
+  path_outline: "/outline.jpg"
+  path_iris: "/krmt_iris_normal.png"
+  path_pupil: "/white.jpg"
+  path_reflex: "/krmt_reflex_normal.png"
+  path_upperlid: "/krmt_upperlid_serious.png"
+  upperlid_position: [130]
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
