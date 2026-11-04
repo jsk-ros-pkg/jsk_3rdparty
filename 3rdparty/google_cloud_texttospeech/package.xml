@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="1">
+<package format="3">
   <name>google_cloud_texttospeech</name>
   <version>2.1.31</version>
   <description>The google_cloud_texttospeech package</description>
@@ -13,10 +13,12 @@
   <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <run_depend version_lte="1.0.1">python-google-cloud-texttospeech-pip</run_depend>
-  <run_depend>sound_play</run_depend>
+  <build_depend condition="$ROS_PYTHON_VERSION == 3">catkin_virtualenv</build_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION != 3" version_lte="1.0.1">python-google-cloud-texttospeech-pip</exec_depend>
+  <exec_depend>sound_play</exec_depend>
 
   <export>
+    <pip_requirements>requirements.txt</pip_requirements>
   </export>
 
 </package>
