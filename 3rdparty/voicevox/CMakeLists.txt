@@ -145,12 +145,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bin/run-voicevox-docker.in
 
 if("$ENV{ROS_VERSION}" EQUAL 1)
 catkin_install_python(
-  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
+  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py node_scripts/text_to_sound_request.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/node_scripts/)
 else()
 # `ros2 run voicevox <script>` runs executables in lib/voicevox
 jsk_ros1_ros2_compat_install_python(
-  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py
+  PROGRAMS node_scripts/request_synthesis.py node_scripts/list_speakers.py node_scripts/text_to_sound_request.py
   USE_VENV)
 install(PROGRAMS
   ${VOICEVOX_TARGET_DIR}/bin/run-voicevox ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
