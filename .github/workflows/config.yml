@@ -95,8 +95,24 @@ jobs:
           xhost +local:root
         shell: bash
 
+      - name: Unhide AMENT_IGNORE'd packages for rosdep
+        run: |
+          set -x
+          # AMENT_IGNORE marks packages not yet ported to ROS2, so colcon
+          # skips them -- but rosdep's own package discovery treats
+          # AMENT_IGNORE the same as CATKIN_IGNORE and skips them too, while
+          # catkin (the actual ROS1 build here) does not and builds them
+          # anyway. This job is ROS1-only, so unhide them for rosdep.
+          find "$GITHUB_WORKSPACE" -name AMENT_IGNORE -exec rm -f {} \;
+        shell: bash
+
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
+        env:
+          # indigo predates the ros_environment package, so $ROS_VERSION is
+          # never set there; package.xml tags conditioned on
+          # "$ROS_VERSION == 1" would otherwise silently evaluate false.
+          ROS_VERSION: ${{ matrix.ROS_DISTRO == 'indigo' && '1' || '' }}
         with:
           # darty hack, jsk_travis runs catkin build --make-args $ROS_PARALLEL_JOBS --
           ROS_PARALLEL_JOBS : ${{ matrix.ROS_PARALLEL_JOBS }} LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -131,6 +147,17 @@ jobs:
           cd $GITHUB_WORKSPACE
           git checkout -qf $GITHUB_SHA || (git fetch -q origin +$GITHUB_REF; git checkout -qf FETCH_HEAD)
           git submodule update --init .travis
+      - name: Unhide AMENT_IGNORE'd packages for rosdep
+        run: |
+          set -x
+          # AMENT_IGNORE marks packages not yet ported to ROS2, so colcon
+          # skips them -- but rosdep's own package discovery treats
+          # AMENT_IGNORE the same as CATKIN_IGNORE and skips them too, while
+          # catkin (the actual ROS1 build here) does not and builds them
+          # anyway. This job is ROS1-only, so unhide them for rosdep.
+          find "$GITHUB_WORKSPACE" -name AMENT_IGNORE -exec rm -f {} \;
+        shell: bash
+
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
@@ -165,7 +192,7 @@ jobs:
           path: ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
       - name: Skip packagse
         run: |
-          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && for name in ffha libsiftfast nlopt downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && find . -name AMENT_IGNORE -exec rm -f {} \; && for name in ffha libsiftfast nlopt downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
       - name: Run commands
         run: |
           cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
@@ -283,6 +310,8 @@ jobs:
           mkdir -p ~/ws/src
           cd ~/ws/src
           ln -sf $GITHUB_WORKSPACE .
+          # unhide AMENT_IGNORE'd (not yet ported to ROS2) packages for rosdep
+          find $GITHUB_WORKSPACE -name AMENT_IGNORE -exec rm -f {} \;
           rosdep install -qq -r -y --from-path . --ignore-src || echo "OK"
           # check all system packages are able to install, because ROS-O build deb files that needs all packages
           PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install -qq --simulate -y --from-path . --ignore-src -t exec -t buildtool_export -t buildtool -t build -t build_export | tee rosdep-install.sh

@@ -1,3 +1,47 @@
+if("$ENV{ROS_VERSION}" EQUAL 2)
+  cmake_minimum_required(VERSION 3.8)
+  project(google_chat_ros)
+
+  # NOTE: the euslisp client stays ROS1-only.
+  find_package(ament_cmake REQUIRED)
+  find_package(ament_cmake_python REQUIRED)
+  find_package(rosidl_default_generators REQUIRED)
+  find_package(std_msgs REQUIRED)
+
+  file(GLOB _msg_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    ${_msg_files}
+    action/SendMessage.action
+    DEPENDENCIES std_msgs
+  )
+
+  # rosidl_generate_interfaces() already installs the generated python
+  # package `google_chat_ros` with ament_python_install_package(), so
+  # merge src/google_chat_ros/ into it instead of a second one.
+  install(DIRECTORY src/${PROJECT_NAME}/
+    DESTINATION ${PYTHON_INSTALL_DIR}/${PROJECT_NAME}
+    PATTERN "*.pyc" EXCLUDE
+  )
+
+  # The python dependencies (google api, pubsub, gdown, ...) are not all
+  # available from apt, and catkin_virtualenv has no ROS2 port, so the node
+  # runs in a uv venv made from pyproject.toml/uv.lock (same versions as
+  # requirements.in.python3.12). helper.py needs none of them.
+  find_package(jsk_ros1_ros2_compat REQUIRED)
+  jsk_ros1_ros2_compat_generate_uv_venv(
+    CHECK_IMPORTS gdown googleapiclient google.cloud.pubsub_v1 oauth2client.client)
+  jsk_ros1_ros2_compat_install_python(PROGRAMS scripts/google_chat_ros_node.py USE_VENV)
+  jsk_ros1_ros2_compat_install_python(PROGRAMS scripts/helper.py)
+
+  install(DIRECTORY launch
+    DESTINATION share/${PROJECT_NAME}
+    FILES_MATCHING PATTERN "*.launch.xml" PATTERN "*.yaml"
+  )
+
+  ament_export_dependencies(rosidl_default_runtime)
+  ament_package()
+
+else() # if("$ENV{ROS_VERSION}" EQUAL 2)
 cmake_minimum_required(VERSION 2.8.3)
 project(google_chat_ros)
 
@@ -84,3 +128,5 @@ if(CATKIN_ENABLE_TESTING)
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
 endif()
+
+endif() # if("$ENV{ROS_VERSION}" EQUAL 2)
