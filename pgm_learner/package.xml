@@ -11,7 +11,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
   <build_depend>message_generation</build_depend>
-  <exec_depend>python-libpgm-pip</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-libpgm-pip</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-scipy</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-scipy</exec_depend>
