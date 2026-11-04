@@ -35,13 +35,35 @@
 
 # Author: Ayaka Fujii <a-fujii@jsk.imi.i.u-tokyo.ac.jp>
 
-import rospy
-import rospkg
 from std_msgs.msg import String
 import requests
 import json
 import sys
 import re
+
+try:
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only:
+    # forward ros_compat.xxx(node, ...) to rospy.xxx(...)
+    import rospy
+    ROS_VERSION = 1
+    class ros_compat(object):
+        create_publisher = staticmethod(lambda node, *args, **kwargs: rospy.Publisher(*args, **kwargs))
+        create_subscription = staticmethod(lambda node, *args, **kwargs: rospy.Subscriber(*args, **kwargs))
+        get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
+        init_node = staticmethod(lambda name, **kwargs: rospy.init_node(name, **kwargs))
+        spin = staticmethod(lambda node: rospy.spin())
+        loginfo = staticmethod(lambda node, *args, **kwargs: rospy.loginfo(*args, **kwargs))
+        logerr = staticmethod(lambda node, *args, **kwargs: rospy.logerr(*args, **kwargs))
+        logdebug = staticmethod(lambda node, *args, **kwargs: rospy.logdebug(*args, **kwargs))
+
+if ROS_VERSION == 2:
+    from ament_index_python.packages import get_package_share_directory
+else:
+    import rospy
+    import rospkg
 
 if sys.version_info.major == 2:
     reload(sys)
@@ -50,32 +72,36 @@ if sys.version_info.major == 2:
 
 class ChaplusROS(object):
 
-    def __init__(self):
+    def __init__(self, node=None):
 
-        self.chatbot_engine = rospy.get_param("~chatbot_engine", "Mebo")
-        self.use_sample = rospy.get_param("~use_sample", True)
+        self.node = node
+        self.chatbot_engine = ros_compat.get_param(node, "~chatbot_engine", "Mebo")
+        self.use_sample = ros_compat.get_param(node, "~use_sample", True)
         # please write your apikey to chaplus_ros/apikey.json
-        r = rospkg.RosPack()
-        apikey_path = rospy.get_param(
-            "~chaplus_apikey_file", r.get_path('chaplus_ros')+"/apikey.json")
+        if ROS_VERSION == 2:
+            package_path = get_package_share_directory('chaplus_ros')
+        else:
+            package_path = rospkg.RosPack().get_path('chaplus_ros')
+        apikey_path = ros_compat.get_param(
+            node, "~chaplus_apikey_file", package_path+"/apikey.json")
         try:
             with open(apikey_path) as j:
                 apikey_json = json.loads(j.read())
         except Exception as e:
-            rospy.logerr('Could not find {}'.format(apikey_path))
-            rospy.logerr('please add your API keys to chaplus, for example')
-            rospy.logerr(
+            ros_compat.logerr(self.node, 'Could not find {}'.format(apikey_path))
+            ros_compat.logerr(self.node, 'please add your API keys to chaplus, for example')
+            ros_compat.logerr(self.node,
                 "echo '{\"apikey\": \00000000\"}' > `rospack find chaplus_ros`/apikey.json")
             sys.exit(e)
 
         if self.use_sample==True:
-            communication_sample_path=rospy.get_param(
-                "~communication_sample_file", r.get_path('chaplus_ros')+"/communication_sample.json")
+            communication_sample_path=ros_compat.get_param(
+                node, "~communication_sample_file", package_path+"/communication_sample.json")
             try:
                 with open(communication_sample_path) as j2:
                     self.communication_sample_json = json.loads(j2.read(), strict=False)
             except Exception as e:
-                rospy.logerr('Could not find {}'.format(communication_sample_path))
+                ros_compat.logerr(self.node, 'Could not find {}'.format(communication_sample_path))
                 sys.exit(e)
 
         if self.chatbot_engine=="Chaplus":
@@ -95,18 +121,19 @@ class ChaplusROS(object):
             self.uid = apikey_json['uid_mebo']
 
         else:
-            rospy.logerr("please use chatbot_engine Chaplus or A3RT")
+            ros_compat.logerr(self.node, "please use chatbot_engine Chaplus or A3RT")
             sys.exit(1)
 
         # define pub/sub
-        self.pub = rospy.Publisher('response', String, queue_size=1)
-        rospy.Subscriber("request", String, self.topic_cb)
+        self.pub = ros_compat.create_publisher(node, 'response', String, queue_size=1)
+        ros_compat.create_subscription(node, "request", String, self.topic_cb)
 
     def topic_cb(self, msg):
+        response_json = None
         # use chaplus
         if self.chatbot_engine=="Chaplus":
             try:
-                rospy.loginfo("received {}".format(msg.data))
+                ros_compat.loginfo(self.node, "received {}".format(msg.data))
 
                 if self.use_sample==True:
                     self.data =json.dumps(
@@ -124,16 +151,16 @@ class ChaplusROS(object):
                 else:
                     best_response = response_json['bestResponse']['utterance']
             except Exception as e:
-                rospy.logerr("Failed to reqeust url={}, headers={}, data={}".format(
+                ros_compat.logerr(self.node, "Failed to reqeust url={}, headers={}, data={}".format(
                     self.url, self.headers, self.data))
-                rospy.logerr(e)
+                ros_compat.logerr(self.node, str(e))
                 best_response = "ごめんなさい、よくわからないです"
-            rospy.loginfo("chaplus: returns best response {}".format(best_response))
+            ros_compat.loginfo(self.node, "chaplus: returns best response {}".format(best_response))
 
         #use A3RT
         elif self.chatbot_engine=="A3RT":
             try:
-                rospy.loginfo("received {}".format(msg.data))
+                ros_compat.loginfo(self.node, "received {}".format(msg.data))
                 params = {"apikey": self.apikey, "query": msg.data,}
                 response = requests.post(self.endpoint, params)
                 response_json = response.json()
@@ -142,16 +169,16 @@ class ChaplusROS(object):
                 else:
                     best_response = response_json["results"][0]["reply"]
             except Exception as e:
-                rospy.logerr("Failed to reqeust url={}, data={}".format(
+                ros_compat.logerr(self.node, "Failed to reqeust url={}, data={}".format(
                     self.endpoint, msg.data))
-                rospy.logerr(e)
+                ros_compat.logerr(self.node, str(e))
                 best_response = "ごめんなさい、よくわからないです"
-            rospy.loginfo("a3rt: returns best response {}".format(best_response))
+            ros_compat.loginfo(self.node, "a3rt: returns best response {}".format(best_response))
 
         #use Mebo
         elif self.chatbot_engine == "Mebo":
             try:
-                rospy.loginfo("received {}".format(msg.data))
+                ros_compat.loginfo(self.node, "received {}".format(msg.data))
                 self.data = json.dumps(
                     {'api_key': self.apikey,
                      'agent_id': self.agentid,
@@ -165,27 +192,27 @@ class ChaplusROS(object):
                 else:
                     best_response = response_json['bestResponse']['utterance']
             except Exception as e:
-                rospy.logerr("Failed to reqeust url={}, headers={}, data={}".format(
+                ros_compat.logerr(self.node, "Failed to reqeust url={}, headers={}, data={}".format(
                     self.url, self.headers, self.data))
-                rospy.logerr(e)
+                ros_compat.logerr(self.node, str(e))
                 best_response = "ごめんなさい、よくわからないです"
-            rospy.loginfo("mebo: returns best response {}".format(best_response))
+            ros_compat.loginfo(self.node, "mebo: returns best response {}".format(best_response))
         else:
-            rospy.logerr("please use chatbot_engine Chaplus or A3RT or Mebo")
+            ros_compat.logerr(self.node, "please use chatbot_engine Chaplus or A3RT or Mebo")
 
         if response_json is not None:
             # convert to string for print out
             if sys.version_info.major == 2:
-                rospy.logdebug(str(json.dumps(response_json, indent=2,
+                ros_compat.logdebug(self.node, str(json.dumps(response_json, indent=2,
                                               ensure_ascii=False, encoding='unicode-escape')))
             else:  # pytyon3
-                rospy.logdebug(json.dumps(
+                ros_compat.logdebug(self.node, json.dumps(
                     response_json, indent=2, ensure_ascii=False))
 
         #publish response
-        self.pub.publish(String(best_response))
+        self.pub.publish(String(data=best_response))
 
 if __name__ == '__main__':
-    rospy.init_node('chaplus_ros')
-    ChaplusROS()
-    rospy.spin()
+    node = ros_compat.init_node('chaplus_ros')
+    ChaplusROS(node)
+    ros_compat.spin(node)

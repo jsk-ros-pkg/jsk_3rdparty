@@ -148,7 +148,7 @@ class Patlite(object):
         if state is None:
             state = self.state
         try:
-            self.sock.sendall(self.WRITE_HEADER + state.state)
+            self.sock.sendall((self.WRITE_HEADER + state.state).encode('latin-1'))
             ret = self.sock.recv(self.bufsize)
         except socket.timeout:
             print("timeout")
@@ -158,7 +158,7 @@ class Patlite(object):
 
     def read(self):
         try:
-            self.sock.sendall(self.READ)
+            self.sock.sendall(self.READ.encode('latin-1'))
             tmp_state = PatliteState(self.sock.recv(self.bufsize))
         except socket.timeout:
             print("timeout")
@@ -168,7 +168,7 @@ class Patlite(object):
     def clear(self):
         ret = None
         try:
-            self.sock.sendall(self.CLEAR)
+            self.sock.sendall(self.CLEAR.encode('latin-1'))
             ret = self.sock.recv(self.bufsize)
         except socket.timeout:
             print("timeout")

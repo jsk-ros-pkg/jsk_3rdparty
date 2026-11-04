@@ -9,27 +9,51 @@
 
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">rosidl_default_generators</buildtool_depend>
   <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-setuptools</buildtool_depend>
   <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
 
-  <build_depend>message_generation</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">message_generation</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>actionlib_msgs</build_depend>
-  <build_depend>catkin_virtualenv</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">actionlib_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">catkin_virtualenv</build_depend>
   <build_export_depend>std_msgs</build_export_depend>
-  <build_export_depend>actionlib_msgs</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">actionlib_msgs</build_export_depend>
+  <depend condition="$ROS_VERSION == 2">action_msgs</depend>
 
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">message_runtime</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rosidl_default_runtime</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <!-- upload of images on cards -->
   <exec_depend>gdrive_ros</exec_depend>
-  <exec_depend>dialogflow_task_executive</exec_depend>
+  <!-- helper.py's to_dialogflow_client; dialogflow_task_executive is not
+       ported to ROS2 yet, where helper.py skips it with a warning -->
+  <exec_depend condition="$ROS_VERSION == 1">dialogflow_task_executive</exec_depend>
+  <!-- helper.py's debug_sound: sound_play's messages are in sound_play_msgs on ROS2 -->
+  <exec_depend condition="$ROS_VERSION == 1">sound_play</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">sound_play_msgs</exec_depend>
+  <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;
+       ROS1 falls back to rospy when it is not available -->
+  <!-- >= 3.0.2 for create_simple_action_client/server, on_shutdown -->
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
+  <!-- jsk_ros1_ros2_compat_install_python()/_generate_uv_venv() in
+       CMakeLists.txt; the python dependencies are in pyproject.toml/uv.lock
+       on ROS2 (ROS1 installs them with catkin_virtualenv) -->
+  <buildtool_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</buildtool_depend>
 
-  <test_depend>catkin_virtualenv</test_depend>
-  <test_depend>rostest</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">catkin_virtualenv</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">rostest</test_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
     <pip_requirements>requirements.txt</pip_requirements>
   </export>
 </package>

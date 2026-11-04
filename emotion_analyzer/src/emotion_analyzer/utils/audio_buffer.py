@@ -16,12 +16,25 @@ from hume.models.config import ProsodyConfig
 from hume import StreamSocket
 import numpy as np
 from pydub import AudioSegment
-import rospy
 import soundfile as sf
+
+try:
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only:
+    # forward ros_compat.xxx(node, ...) to rospy.xxx(...)
+    import rospy
+    ROS_VERSION = 1
+    class ros_compat(object):
+        create_subscription = staticmethod(lambda node, *args, **kwargs: rospy.Subscriber(*args, **kwargs))
+        get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
+        is_shutdown = staticmethod(lambda node, *args, **kwargs: rospy.is_shutdown(*args, **kwargs))
+        sleep = staticmethod(lambda node, *args, **kwargs: rospy.sleep(*args, **kwargs))
 
 class AudioBuffer(object):
 
-    def __init__(self, topic_name='~audio',
+    def __init__(self, node=None, topic_name='~audio',
                  input_sample_rate=16000,
                  window_size=10.0,
                  bitdepth=16,
@@ -29,6 +42,7 @@ class AudioBuffer(object):
                  get_latest_data=False,
                  discard_data=False,
                  auto_start=False):
+        self.node = node
         self.is_subscribing = True
         self.get_latest_data = get_latest_data
         self.discard_data = discard_data
@@ -69,12 +83,12 @@ class AudioBuffer(object):
             self.audio_buffer = np.array([], dtype=self.dtype)
 
     @staticmethod
-    def from_rosparam(**kwargs):
-        n_channel = rospy.get_param('~n_channel', 1)
-        target_channel = rospy.get_param('~target_channel', 0)
-        mic_sampling_rate = rospy.get_param('~mic_sampling_rate', 16000)
-        bitdepth = rospy.get_param('~bitdepth', 16)
-        return AudioBuffer(input_sample_rate=mic_sampling_rate,
+    def from_rosparam(node=None, **kwargs):
+        n_channel = ros_compat.get_param(node, '~n_channel', 1)
+        target_channel = ros_compat.get_param(node, '~target_channel', 0)
+        mic_sampling_rate = ros_compat.get_param(node, '~mic_sampling_rate', 16000)
+        bitdepth = ros_compat.get_param(node, '~bitdepth', 16)
+        return AudioBuffer(node=node, input_sample_rate=mic_sampling_rate,
                            bitdepth=bitdepth,
                            n_channel=n_channel,
                            target_channel=target_channel,
@@ -82,11 +96,14 @@ class AudioBuffer(object):
 
     def subscribe(self):
         self.audio_buffer = np.array([], dtype=self.dtype)
-        self.sub_audio = rospy.Subscriber(
-            self.topic_name, AudioData, self.audio_cb)
+        self.sub_audio = ros_compat.create_subscription(
+            self.node, self.topic_name, AudioData, self.audio_cb)
 
     def unsubscribe(self):
-        self.sub_audio.unregister()
+        if ROS_VERSION == 2:
+            self.node.destroy_subscription(self.sub_audio)
+        else:
+            self.sub_audio.unregister()
 
     def _read(self, size, normalize=False):
         with self.lock:
@@ -107,13 +124,13 @@ class AudioBuffer(object):
         if size is None:
             size = int(self.audio_buffer_len)
         while wait is True \
-                and not rospy.is_shutdown() and len(self.audio_buffer) < size:
-            rospy.sleep(0.001)
+                and not ros_compat.is_shutdown(self.node) and len(self.audio_buffer) < size:
+            ros_compat.sleep(self.node, 0.001)
         return self._read(size, normalize=normalize)
 
     def close(self):
         try:
-            self.sub_audio.unregister()
+            self.unsubscribe()
         except Exception:
             pass
         self.audio_buffer = np.array([], dtype=self.dtype)

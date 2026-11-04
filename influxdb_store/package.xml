@@ -10,17 +10,28 @@
   <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
   <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-setuptools</buildtool_depend>
   <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
 
-  <exec_depend>pr2_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">pr2_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
+  <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;
+       ROS1 falls back to rospy when it is not available -->
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
+  <!-- jsk_ros1_ros2_compat_install_python() in CMakeLists.txt -->
+  <buildtool_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</buildtool_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-influxdb</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-influxdb</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-tz</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-tz</exec_depend>
 
   <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
   </export>
 </package>

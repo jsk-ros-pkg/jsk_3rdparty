@@ -1,0 +1,16 @@
+<launch>
+  <!-- ROS2 version of emotion_analyzer.launch -->
+  <!-- check the audio topic -->
+  <arg name="input_audio" default="/audio/audio" />
+
+  <!-- set API key from the command line -->
+  <arg name="api_key" default="" />
+
+  <node name="analyze_text_service" pkg="emotion_analyzer" exec="analyze_text_service.py" output="screen" >
+    <param name="hume_api_key" value="$(var api_key)" />
+  </node>
+  <node name="analyze_audio_service" pkg="emotion_analyzer" exec="analyze_audio_service.py" output="screen" >
+    <param name="hume_api_key" value="$(var api_key)" />
+    <remap from="~/audio" to="$(var input_audio)" />
+  </node>
+</launch>

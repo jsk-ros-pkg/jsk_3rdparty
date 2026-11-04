@@ -8,87 +8,131 @@ from requests.exceptions import Timeout
 from requests.exceptions import ConnectionError
 
 # ROS libraries
-import actionlib
 import ast
-from dialogflow_task_executive.msg import DialogResponse
-from gdrive_ros.srv import *
+try:
+    from dialogflow_task_executive.msg import DialogResponse
+except ImportError:
+    # dialogflow_task_executive is not ported to ROS2 yet; only used by
+    # dialogflow_cb() (receiving_mode: dialogflow)
+    DialogResponse = None
 from google_chat_ros.google_chat import GoogleChatRESTClient
 from google_chat_ros.google_chat import GoogleChatHTTPSServer
 from google_chat_ros.google_chat import GoogleChatPubSubClient
 from google_chat_ros.msg import *
-import rospy
+
+try:
+    from jsk_ros1_ros2_compat import log_utils
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only:
+    # forward ros_compat.xxx(node, ...) to rospy.xxx(...)
+    import rospy
+    ROS_VERSION = 1
+    import actionlib
+    class log_utils(object):
+        set_node = staticmethod(lambda node: None)
+    class ros_compat(object):
+        create_publisher = staticmethod(lambda node, *args, **kwargs: rospy.Publisher(*args, **kwargs))
+        create_simple_action_server = staticmethod(lambda node, name, action_type, execute_cb: actionlib.SimpleActionServer(name, action_type, execute_cb, auto_start=False))
+        get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
+        init_node = staticmethod(lambda name, **kwargs: rospy.init_node(name, **kwargs))
+        spin = staticmethod(lambda node, executor=None: rospy.spin())
+        logdebug = staticmethod(lambda node, *args, **kwargs: rospy.logdebug(*args, **kwargs))
+        loginfo = staticmethod(lambda node, *args, **kwargs: rospy.loginfo(*args, **kwargs))
+        logwarn = staticmethod(lambda node, *args, **kwargs: rospy.logwarn(*args, **kwargs))
+        logerr = staticmethod(lambda node, *args, **kwargs: rospy.logerr(*args, **kwargs))
+        on_shutdown = staticmethod(lambda node, callback: rospy.on_shutdown(callback))
+        Rate = staticmethod(lambda node, hz: rospy.Rate(hz))
+if ROS_VERSION == 2:
+    import threading
+    from rclpy.callback_groups import ReentrantCallbackGroup
+    from rclpy.executors import MultiThreadedExecutor
+    from google_chat_ros.action import SendMessage as SendMessageAction
+    from gdrive_ros.srv import Upload
+    SendMessageResult = SendMessageAction.Result
+    SendMessageFeedback = SendMessageAction.Feedback
+    # rest_cb() waits for the gdrive_ros upload service from an executor
+    # callback (see _ros2_upload_file())
+    make_executor = MultiThreadedExecutor
+else:
+    import threading
+    import actionlib
+    import rospy
+    from gdrive_ros.srv import *
+    make_executor = lambda: None
 
 
 class GoogleChatROS(object):
     """
     Send request to Google Chat REST API via ROS
     """
-    def __init__(self):
+    def __init__(self, node=None):
+        self.node = node
         # rosparams
-        receiving_chat_mode = rospy.get_param('~receiving_mode') # select from 'url', 'pubsub', 'none'
-        google_credentials = rospy.get_param('~google_cloud_credentials_json')
-        self.gdrive_ros_srv = rospy.get_param('~gdrive_upload_service', "/gdrive_ros/upload")
-        self.upload_data_timeout = rospy.get_param('~upload_data_timeout', 30)
-        self.download_data = rospy.get_param('~download_data', True)
-        self.download_directory = rospy.get_param('~download_directory', "/tmp")
-        self.download_avatar = rospy.get_param('~download_avatar', False)
-        self.upload_parents_path = rospy.get_param(
-            '~upload_parents_path', 'chat_notification')
+        receiving_chat_mode = ros_compat.get_param(node, '~receiving_mode') # select from 'url', 'pubsub', 'none'
+        google_credentials = ros_compat.get_param(node, '~google_cloud_credentials_json')
+        self.gdrive_ros_srv = ros_compat.get_param(node, '~gdrive_upload_service', "/gdrive_ros/upload")
+        self.upload_data_timeout = ros_compat.get_param(node, '~upload_data_timeout', 30)
+        self.download_data = ros_compat.get_param(node, '~download_data', True)
+        self.download_directory = ros_compat.get_param(node, '~download_directory', "/tmp")
+        self.download_avatar = ros_compat.get_param(node, '~download_avatar', False)
+        self.upload_parents_path = ros_compat.get_param(
+            node, '~upload_parents_path', 'chat_notification')
 
         # For sending message
         self._client = GoogleChatRESTClient(google_credentials)
-        rospy.loginfo("Starting Google Chat REST service...")
+        ros_compat.loginfo(self.node, "Starting Google Chat REST service...")
         try:
             self._client.build_service() # Start google chat authentication and service
-            rospy.loginfo("Succeeded in starting Google Chat REST service")
+            ros_compat.loginfo(self.node, "Succeeded in starting Google Chat REST service")
             # ROS ActionLib
-            self._as = actionlib.SimpleActionServer(
-                '~send', SendMessageAction,
-                execute_cb=self.rest_cb, auto_start=False
-        )
+            self._as = ros_compat.create_simple_action_server(
+                node, '~send', SendMessageAction,
+                self.rest_cb)
             self._as.start()
         except Exception as e:
-            rospy.logwarn("Failed to start Google Chat REST service")
-            rospy.logerr(e)
+            ros_compat.logwarn(self.node, "Failed to start Google Chat REST service")
+            ros_compat.logerr(self.node, str(e))
 
         # For receiving message
         if receiving_chat_mode in ("url", "dialogflow", "pubsub"):
             # ROS publisher
-            self._message_activity_pub = rospy.Publisher("~message_activity", MessageEvent, queue_size=1)
-            self._space_activity_pub = rospy.Publisher("~space_activity", SpaceEvent, queue_size=1)
-            self._card_activity_pub = rospy.Publisher("~card_activity", CardEvent, queue_size=1)
+            self._message_activity_pub = ros_compat.create_publisher(node, "~message_activity", MessageEvent, queue_size=1)
+            self._space_activity_pub = ros_compat.create_publisher(node, "~space_activity", SpaceEvent, queue_size=1)
+            self._card_activity_pub = ros_compat.create_publisher(node, "~card_activity", CardEvent, queue_size=1)
 
             if receiving_chat_mode == "url":
-                rospy.loginfo("Expected to get Google Chat Bot URL request")
-                rospy.loginfo("Starting Google Chat HTTPS server...")
-                self.host = rospy.get_param('~host')
-                self.port = int(rospy.get_param('~port'))
-                self.ssl_certfile = rospy.get_param('~ssl_certfile')
-                self.ssl_keyfile = rospy.get_param('~ssl_keyfile')
+                ros_compat.loginfo(self.node, "Expected to get Google Chat Bot URL request")
+                ros_compat.loginfo(self.node, "Starting Google Chat HTTPS server...")
+                self.host = ros_compat.get_param(node, '~host')
+                self.port = int(ros_compat.get_param(node, '~port'))
+                self.ssl_certfile = ros_compat.get_param(node, '~ssl_certfile')
+                self.ssl_keyfile = ros_compat.get_param(node, '~ssl_keyfile')
                 try:
                     self._server = GoogleChatHTTPSServer(
                         self.host, self.port, self.ssl_certfile, self.ssl_keyfile, callback=self.event_cb, user_agent='Google-Dynamite')
-                    rospy.on_shutdown(self.killhttpd) # shutdown https server TODO is this okay in try ?
+                    ros_compat.on_shutdown(self.node, self.killhttpd) # shutdown https server TODO is this okay in try ?
                     self._server.run()
                 except ConnectionError as e:
-                    rospy.logwarn("The error occurred while starting HTTPS server")
-                    rospy.logerr(e)
+                    ros_compat.logwarn(self.node, "The error occurred while starting HTTPS server")
+                    ros_compat.logerr(self.node, str(e))
             elif receiving_chat_mode == "pubsub":
-                rospy.loginfo("Expected to use Google Cloud Pub Sub service")
-                self.project_id = rospy.get_param("~project_id")
-                self.subscription_id = rospy.get_param("~subscription_id")
-                rospy.loginfo("      project_id : {}".format(self.project_id))
-                rospy.loginfo(" subscription_id : {}".format(self.subscription_id ))
+                ros_compat.loginfo(self.node, "Expected to use Google Cloud Pub Sub service")
+                self.project_id = ros_compat.get_param(node, "~project_id")
+                self.subscription_id = ros_compat.get_param(node, "~subscription_id")
+                ros_compat.loginfo(self.node, "      project_id : {}".format(self.project_id))
+                ros_compat.loginfo(self.node, " subscription_id : {}".format(self.subscription_id ))
                 self._pubsub_client = GoogleChatPubSubClient(
                     self.project_id, self.subscription_id, self.event_cb, google_credentials)
-                rospy.on_shutdown(self.killpubsub)
+                ros_compat.on_shutdown(self.node, self.killpubsub)
                 self._pubsub_client.run()
 
         elif receiving_chat_mode == "none":
-            rospy.logwarn("You cannot recieve Google Chat event because HTTPS server or Google Cloud Pub/Sub is not running.")
+            ros_compat.logwarn(self.node, "You cannot recieve Google Chat event because HTTPS server or Google Cloud Pub/Sub is not running.")
 
         else:
-            rospy.logerr("Please choose receiving_mode param from dialogflow, url, pubsub, none.")
+            ros_compat.logerr(self.node, "Please choose receiving_mode param from dialogflow, url, pubsub, none.")
 
     def killhttpd(self):
         self._server.kill()
@@ -103,7 +147,7 @@ class GoogleChatROS(object):
         """
         feedback = SendMessageFeedback()
         result = SendMessageResult()
-        r = rospy.Rate(1)
+        r = ros_compat.Rate(self.node, 1)
         success = True
 
         json_body = {}
@@ -148,8 +192,8 @@ class GoogleChatROS(object):
                 json_body['cards'].append(card_body)
 
         try:
-            rospy.logdebug("Send json")
-            rospy.logdebug(str(json_body))
+            ros_compat.logdebug(self.node, "Send json")
+            ros_compat.logdebug(self.node, str(json_body))
             self._client.build_service()
             res = self._client.message_create(
                 space=goal.space,
@@ -159,7 +203,7 @@ class GoogleChatROS(object):
             # TODO add the result of what card was sent
             # result.cards_result =
         except Exception as e:
-            rospy.logerr(str(e))
+            ros_compat.logerr(self.node, str(e))
             feedback.status = str(e)
             success = False
         finally:
@@ -176,8 +220,8 @@ class GoogleChatROS(object):
         See https://developers.google.com/chat/api/guides/message-formats/events#event_fields for details.
         :rtype: ros message
         """
-        rospy.logdebug("GOOGLE CHAT ORIGINAL JSON EVENT")
-        rospy.logdebug(json.dumps(event, indent=2))
+        ros_compat.logdebug(self.node, "GOOGLE CHAT ORIGINAL JSON EVENT")
+        ros_compat.logdebug(self.node, json.dumps(event, indent=2))
         # GET EVENT TYPE
         # event/eventTime
         event_time = event.get('eventTime', '')
@@ -232,7 +276,7 @@ class GoogleChatROS(object):
             return msg
 
         else:
-            rospy.logerr("Got unknown event type.")
+            ros_compat.logerr(self.node, "Got unknown event type.")
             return
 
     def dialogflow_cb(self, msg):
@@ -309,7 +353,7 @@ class GoogleChatROS(object):
                 json_body.append({'buttons':buttons})
 
             if (is_text & is_image) | (is_image & is_keyval) | (is_keyval & is_text):
-                rospy.logerr("Error happened when making widgetMarkup json. Please fill in one of the text_paragraph, image, key_value. Do not fill in more than two at the same time.")
+                ros_compat.logerr(self.node, "Error happened when making widgetMarkup json. Please fill in one of the text_paragraph, image, key_value. Do not fill in more than two at the same time.")
             elif is_text:
                 json_body.append({'textParagraph':{'text':msg.text_paragraph}})
             elif is_image:
@@ -354,7 +398,7 @@ class GoogleChatROS(object):
         """
         json_body = {}
         if on_click_msg.action.action_method_name and on_click_msg.open_link_url:
-            rospy.logerr("Error happened when making onClick json. Please fill in one of the action, open_link_url. Do not fill in more than two at the same time.")
+            ros_compat.logerr(self.node, "Error happened when making onClick json. Please fill in one of the action, open_link_url. Do not fill in more than two at the same time.")
         elif on_click_msg.action.action_method_name:
             action = {}
             action['actionMethodName'] = on_click_msg.action.action_method_name
@@ -375,15 +419,15 @@ class GoogleChatROS(object):
         """
         json_body = {}
         if button_msg.text_button_name and button_msg.image_button_name:
-            rospy.logerr("Error happened when making Button json. Please fill in one of the text_button_name or image_button_name. Do not fill in more than two at the same time.")
+            ros_compat.logerr(self.node, "Error happened when making Button json. Please fill in one of the text_button_name or image_button_name. Do not fill in more than two at the same time.")
         elif button_msg.text_button_name:
-            rospy.loginfo("Build text button:{}".format(button_msg.text_button_name))
+            ros_compat.loginfo(self.node, "Build text button:{}".format(button_msg.text_button_name))
             text_button = {}
             text_button['text'] = button_msg.text_button_name
             text_button['onClick'] = self._make_on_click_json(button_msg.text_button_on_click)
             json_body['textButton'] = text_button
         elif button_msg.image_button_name:
-            rospy.loginfo("Build image button:{}".format(button_msg.image_button_name))
+            ros_compat.loginfo(self.node, "Build image button:{}".format(button_msg.image_button_name))
             image_button = {}
             image_button['onClick'] = self._make_on_click_json(button_msg.image_button_on_click)
             if button_msg.icon:
@@ -414,6 +458,8 @@ class GoogleChatROS(object):
         :returns: URL file exists
         :rtype: string
         """
+        if ROS_VERSION == 2:
+            return self._ros2_upload_file(filepath, return_id, timestamp)
         # ROS service client
         try:
             rospy.wait_for_service(self.gdrive_ros_srv, timeout=self.upload_data_timeout)
@@ -446,6 +492,43 @@ class GoogleChatROS(object):
                 rospy.loginfo("Google drive URL:{}".format(url))
                 return url
 
+    def _ros2_upload_file(self, filepath, return_id=False, timestamp=None):
+        """ROS2 version of _upload_file(). This runs in rest_cb(), i.e. in an
+        executor callback, so the service response is waited for with a
+        reentrant callback group instead of ros_compat.call_service(),
+        which spins the node itself."""
+        if getattr(self, '_gdrive_upload', None) is None:
+            self._gdrive_upload = self.node.create_client(
+                Upload, self.gdrive_ros_srv,
+                callback_group=ReentrantCallbackGroup())
+        if not self._gdrive_upload.wait_for_service(
+                timeout_sec=self.upload_data_timeout):
+            self.node.get_logger().error("No Google Drive ROS upload service was found. Please check gdrive_ros is correctly launched and service name is correct.")
+            return
+        # upload
+        if timestamp is None:
+            parents_path = self.upload_parents_path
+        else:
+            parents_path = '{}/{}'.format(
+                self.upload_parents_path, timestamp)
+        done = threading.Event()
+        future = self._gdrive_upload.call_async(Upload.Request(
+            file_path=filepath,
+            parents_path=parents_path,
+            use_timestamp_folder=False,
+        ))
+        future.add_done_callback(lambda _: done.set())
+        if not done.wait(self.upload_data_timeout) or future.result() is None:
+            self.node.get_logger().error("Failed to call Google Drive upload service")
+            return
+        res = future.result()
+        if return_id:
+            self.node.get_logger().info("Google drive ID:{}".format(res.file_id))
+            return res.file_id
+        else:
+            self.node.get_logger().info("Google drive URL:{}".format(res.file_url))
+            return res.file_url
+
     def _get_attachment(self, item):
         attachment = Attachment()
         attachment.name = item.get('name', '')
@@ -467,10 +550,10 @@ class GoogleChatROS(object):
         try:
             img = requests.get(uri, timeout=10).content
         except Timeout:
-            rospy.logerr("Exceeded timeout when downloading {}.".format(uri))
+            ros_compat.logerr(self.node, "Exceeded timeout when downloading {}.".format(uri))
         except Exception as e:
-            rospy.logwarn("Failed to get image from {}".format(uri))
-            rospy.logerr(e)
+            ros_compat.logwarn(self.node, "Failed to get image from {}".format(uri))
+            ros_compat.logerr(self.node, str(e))
         else:
             return img
 
@@ -483,14 +566,21 @@ class GoogleChatROS(object):
                 path = os.path.join(self.download_directory, filename)
                 gdown.download(url=uri, output=path)
         except Exception as e:
-            rospy.logwarn("Failed to download the attatched file.")
-            rospy.logerr(e)
+            ros_compat.logwarn(self.node, "Failed to download the attatched file.")
+            ros_compat.logerr(self.node, str(e))
         else:
-            rospy.loginfo("Suceeded in downloading the attached file. Saved at {}".format(path))
+            ros_compat.loginfo(self.node, "Suceeded in downloading the attached file. Saved at {}".format(path))
         finally:
             return path
 
 if __name__ == '__main__':
-    rospy.init_node('google_chat')
-    node = GoogleChatROS()
-    rospy.spin()
+    node = ros_compat.init_node('google_chat')
+    log_utils.set_node(node)
+    # GoogleChatROS() blocks in url/pubsub receiving mode, so run it in a
+    # daemon thread and spin here: rclpy handles SIGINT/SIGTERM only when
+    # spinning in the main thread, and the receiving server stops with the
+    # process.
+    app_thread = threading.Thread(target=GoogleChatROS, args=(node,))
+    app_thread.daemon = True
+    app_thread.start()
+    ros_compat.spin(node, make_executor())

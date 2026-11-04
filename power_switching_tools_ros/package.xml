@@ -10,13 +10,24 @@
 
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-serial</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-serial</exec_depend>
-  <exec_depend>rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
+  <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;
+       ROS1 runs the original rospy code when it is not available.
+       >= 3.0.2 for init_node/spin/get_response_class/logfatal/... -->
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
+  <!-- jsk_ros1_ros2_compat_install_python() in CMakeLists.txt -->
+  <buildtool_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</buildtool_depend>
   <exec_depend>std_srvs</exec_depend>
   <exec_depend>uhubctl</exec_depend>
 
   <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
   </export>
 </package>

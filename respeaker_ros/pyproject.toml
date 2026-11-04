@@ -1,0 +1,17 @@
+# ROS2 only: python dependencies installed into share/respeaker_ros/venv by
+# jsk_ros1_ros2_compat_generate_uv_venv() (ROS1 uses catkin_virtualenv
+# with requirements.txt). Update uv.lock with `uv lock`.
+# numpy and pyaudio come from apt (rosdep) instead: rclpy's message
+# typesupport is built against the system numpy.
+[project]
+name = "respeaker-ros"
+version = "2.1.31"
+requires-python = ">=3.10"
+dependencies = [
+    "SpeechRecognition",
+    "pyusb",
+    "pixel-ring",
+]
+
+[tool.uv]
+package = false

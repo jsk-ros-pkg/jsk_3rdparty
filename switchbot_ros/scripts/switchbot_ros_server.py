@@ -1,26 +1,53 @@
 #!/usr/bin/env python
 
-import actionlib
 import os.path
 from requests import ConnectionError
-import rospy
-from switchbot_ros.msg import SwitchBotCommandAction
-from switchbot_ros.msg import SwitchBotCommandFeedback
-from switchbot_ros.msg import SwitchBotCommandResult
 from switchbot_ros.msg import Device
 from switchbot_ros.msg import DeviceArray
 from switchbot_ros.switchbot import SwitchBotAPIClient
 from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
+
+try:
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only:
+    # forward ros_compat.xxx(node, ...) to rospy.xxx(...)
+    import actionlib
+    import rospy
+    ROS_VERSION = 1
+    class ros_compat(object):
+        Rate = staticmethod(lambda node, *args, **kwargs: rospy.Rate(*args, **kwargs))
+        create_publisher = staticmethod(lambda node, *args, **kwargs: rospy.Publisher(*args, **kwargs))
+        create_simple_action_server = staticmethod(lambda node, *args: actionlib.SimpleActionServer(*args, auto_start=False))
+        get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
+        init_node = staticmethod(lambda name, **kwargs: rospy.init_node(name, **kwargs))
+        spin_once = staticmethod(lambda node, timeout_sec=0.1: rospy.sleep(timeout_sec))
+        shutdown = staticmethod(lambda node: None)
+        is_shutdown = staticmethod(lambda node, *args, **kwargs: rospy.is_shutdown(*args, **kwargs))
+        loginfo = staticmethod(lambda node, *args, **kwargs: rospy.loginfo(*args, **kwargs))
+        logerr = staticmethod(lambda node, *args, **kwargs: rospy.logerr(*args, **kwargs))
+        logwarn_once = staticmethod(lambda node, *args, **kwargs: rospy.logwarn_once(*args, **kwargs))
+if ROS_VERSION == 2:
+    from switchbot_ros.action import SwitchBotCommand as SwitchBotCommandAction
+    SwitchBotCommandFeedback = SwitchBotCommandAction.Feedback
+    SwitchBotCommandResult = SwitchBotCommandAction.Result
+else:
+    import rospy
+    from switchbot_ros.msg import SwitchBotCommandAction
+    from switchbot_ros.msg import SwitchBotCommandFeedback
+    from switchbot_ros.msg import SwitchBotCommandResult
 
 
 class SwitchBotAction:
     """
     Control your switchbot with ROS and SwitchBot API
     """
-    def __init__(self):
+    def __init__(self, node=None):
+        self.node = node
         # SwitchBot configs
         # '~token' can be file path or raw characters
-        token = rospy.get_param('~token')
+        token = ros_compat.get_param(node, '~token')
         if os.path.exists(token):
             with open(token) as f:
                 self.token = f.read().replace('\n', '')
@@ -28,7 +55,7 @@ class SwitchBotAction:
             self.token = token
 
         # Switchbot API v1.1 needs secret key
-        secret = rospy.get_param('~secret', None )
+        secret = ros_compat.get_param(node, '~secret', None )
         if secret is not None and os.path.exists(secret):
             with open(secret, 'r', encoding='utf-8') as f:
                 self.secret = f.read().replace('\n', '')
@@ -41,28 +68,27 @@ class SwitchBotAction:
         self.print_devices()
         self.print_scenes()
         # Actionlib
-        self._as = actionlib.SimpleActionServer(
-            '~switch', SwitchBotCommandAction,
-            execute_cb=self.execute_cb, auto_start=False)
+        self._as = ros_compat.create_simple_action_server(
+            node, '~switch', SwitchBotCommandAction,
+            self.execute_cb)
         self._as.start()
         # Topic
-        self.pub = rospy.Publisher('~devices', DeviceArray, queue_size=1, latch=True)
+        self.pub = ros_compat.create_publisher(node, '~devices', DeviceArray, queue_size=1, latch=True)
         self.published = False
-        rospy.loginfo('Ready.')
+        ros_compat.loginfo(node, 'Ready.')
 
     def get_switchbot_client(self):
         try:
             client = SwitchBotAPIClient(token=self.token, secret=self.secret)
-            rospy.loginfo('Switchbot API Client initialized.')
+            ros_compat.loginfo(self.node, 'Switchbot API Client initialized.')
             return client
         except ConnectionError:  # If the machine is not connected to the internet
-            rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
+            ros_compat.logwarn_once(self.node, 'Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
             return None
 
     def spin(self):
-        rate = rospy.Rate(1)
-        while not rospy.is_shutdown():
-            rate.sleep()
+        while not ros_compat.is_shutdown(self.node):
+            ros_compat.spin_once(self.node, 1.0)
             if self.bots is None:
                 self.bots = self.get_switchbot_client()
             elif not self.published:
@@ -75,7 +101,7 @@ class SwitchBotAction:
         
         apiversion_str = 'Using SwitchBot API ';
         apiversion_str += self.bots.api_version;
-        rospy.loginfo(apiversion_str)        
+        ros_compat.loginfo(self.node, apiversion_str)
         
 
     def print_devices(self):
@@ -92,7 +118,7 @@ class SwitchBotAction:
             device_list_str += ', deviceID: ' + str(device.get('deviceId'))
             device_list_str += ', deviceType: ' + str(device.get('deviceType'))
             device_list_str += '\n'
-        rospy.loginfo(device_list_str)
+        ros_compat.loginfo(self.node, device_list_str)
         
         remote_list_str = 'Switchbot Remote List:\n'
         infrared_remote_list = sorted(
@@ -104,7 +130,7 @@ class SwitchBotAction:
             remote_list_str += ', deviceID: ' + str(infrared_remote.get('deviceId'))
             remote_list_str += ', remoteType: ' + str(infrared_remote.get('remoteType'))
             remote_list_str += '\n'
-        rospy.loginfo(remote_list_str)
+        ros_compat.loginfo(self.node, remote_list_str)
         
 
     def print_scenes(self):
@@ -120,7 +146,7 @@ class SwitchBotAction:
             scene_list_str += 'sceneName: ' + str(scene.get('sceneName'))
             scene_list_str += ', sceneID: ' + str(scene.get('sceneId'))
             scene_list_str += '\n'
-        rospy.loginfo(scene_list_str)
+        ros_compat.loginfo(self.node, scene_list_str)
         
 
     def publish_devices(self):
@@ -152,7 +178,7 @@ class SwitchBotAction:
     def execute_cb(self, goal):
         feedback = SwitchBotCommandFeedback()
         result = SwitchBotCommandResult()
-        r = rospy.Rate(1)
+        r = ros_compat.Rate(self.node, 1)
         success = True
         # start executing the action
         parameter, command_type = goal.parameter, goal.command_type
@@ -171,7 +197,7 @@ class SwitchBotAction:
                     device_name=goal.device_name
                 ))
         except (DeviceError, SwitchBotAPIError, KeyError) as e:
-            rospy.logerr(str(e))
+            ros_compat.logerr(self.node, str(e))
             feedback.status = str(e)
             success = False
         finally:
@@ -182,6 +208,7 @@ class SwitchBotAction:
 
 
 if __name__ == '__main__':
-    rospy.init_node('switchbot')
-    server = SwitchBotAction()
+    node = ros_compat.init_node('switchbot')
+    server = SwitchBotAction(node)
     server.spin()
+    ros_compat.shutdown(node)

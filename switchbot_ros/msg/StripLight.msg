@@ -1,4 +1,4 @@
-Header  header       # timestamp
+std_msgs/Header  header  # timestamp
 
 bool    power        # ON/OFF state True/False
 

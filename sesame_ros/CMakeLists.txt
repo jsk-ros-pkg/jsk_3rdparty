@@ -1,3 +1,24 @@
+if("$ENV{ROS_VERSION}" EQUAL 2)
+  cmake_minimum_required(VERSION 3.8)
+  project(sesame_ros)
+
+  find_package(ament_cmake REQUIRED)
+  find_package(rosidl_default_generators REQUIRED)
+
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    srv/Command.srv
+    srv/Status.srv
+  )
+
+  # ROS2 uses the system python3-requests instead of catkin_virtualenv.
+  # The installed ROS2 copies get a python3 shebang (ROS2 base images ship
+  # no bare `python`), keeping the source shared with ROS1.
+  find_package(jsk_ros1_ros2_compat REQUIRED)
+  jsk_ros1_ros2_compat_install_python(PROGRAMS node_scripts/sesame_server.py scripts/list_sesames.py)
+
+  ament_package()
+
+else() # if("$ENV{ROS_VERSION}" EQUAL 2)
 cmake_minimum_required(VERSION 2.8.3)
 project(sesame_ros)
 
@@ -67,3 +88,5 @@ if(CATKIN_ENABLE_TESTING)
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
 endif()
+
+endif() # if("$ENV{ROS_VERSION}" EQUAL 2)

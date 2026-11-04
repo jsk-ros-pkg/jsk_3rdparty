@@ -1,0 +1,16 @@
+# ROS2 only: python dependencies installed into share/gdrive_ros/venv by
+# jsk_ros1_ros2_compat_generate_uv_venv() (ROS1 uses catkin_virtualenv
+# with requirements.txt). Update uv.lock with `uv lock`.
+[project]
+name = "gdrive-ros"
+version = "2.1.31"
+requires-python = ">=3.10"
+dependencies = [
+    "PyDrive",
+    # oauth2client uses pyOpenSSL when importable: keep it in the venv
+    # too, since the system one does not match the venv's cryptography
+    "pyOpenSSL",
+]
+
+[tool.uv]
+package = false
