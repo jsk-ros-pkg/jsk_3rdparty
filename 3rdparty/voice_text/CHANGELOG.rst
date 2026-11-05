@@ -2,6 +2,59 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into ros2-google-cloud-stream
+* Merge pull request #542 from jsk-ros-pkg/fix_hoya
+  license of voice_text is HOYA
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into power_switching_tools_ros
+* Merge pull request #559 from mqcmd196/voice-text-backward
+  [voice_text] Load db_path, license_path at library binary path by default
+* [voice_text] make text2wave.py executable
+* [voice_text] keep backward compatibility by setting default db_path, license_path
+* Merge pull request #395 from mqcmd196/PR/merge_vtapi_vtsdk
+  [voice_text] Support new ReadSpeaker API and load libraries dynamically
+* [voice_text] fix double freeing and return value
+* [voice_text] requires C++ 11
+* [voice_text] Dynamically load voice_text library for releasing
+  [voice_text] Fix logging style
+  [voice_text] Update README
+  [voice_text] Set C++11, remove unnecessary headers
+  [voice_text] Skip indigo test, for requiring cmake>=3. It can be
+  installed with apt install cmake3. Fix logging content
+  [voice_text] update README, drop support of not-supported architecture
+  fetch example
+  fix gh
+  fix for aarch64 env
+  [voice_text] support loading custom path vt library and support noetic
+  [voice_text] clean up files
+* license of voice_text is HOYA
+* Contributors: Iori Yanokura, Kei Okada, Shun Hasegawa, Yoshiki Obinata
+
 2.1.31 (2025-05-13)
 -------------------
 * add LICENSE files

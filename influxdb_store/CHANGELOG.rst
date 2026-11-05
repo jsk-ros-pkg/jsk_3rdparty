@@ -2,6 +2,68 @@
 Changelog for package influxdb_store
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
+  Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
+* [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
+  The buildfarm builds each package with only its own build dependencies,
+  so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes
+  the ROS1 branch (same as jsk_common#1835). voicevox also guesses
+  ROS_VERSION from AMENT_PREFIX_PATH when it is unset.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* AMENT_IGNORE: do not add AMENT_IGNORE to packages already ported to ROS2
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite,
+  sesame_ros and switchbot_ros are already ROS2 packages on master, so
+  this PR must not AMENT_IGNORE them. Also remove
+  ros_speech_recognition/AMENT_IGNORE, as this PR ports it to ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* AMENT_IGNORE packages ported to ROS2 in jsk-ros-pkg/jsk_3rdparty#575
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, rospatlite, sesame_ros and
+  switchbot_ros are ROS1 only here, so the ROS2 CI skips them until #575.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [influxdb_store] add ROS2 support
+  Single package.xml/CMakeLists.txt branched on $ROS_VERSION, same as
+  chaplus_ros and jsk_common's ROS2-ported packages.
+  - CMakeLists.txt: the ROS2 block is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (no re-indentation). The
+  influxdb_store python package is installed with
+  ament_python_install_package(), and the installed ROS2 copies of the
+  ported node scripts get a python3 shebang.
+  - joint_states_logger.py/network_states_logger.py: use
+  jsk_ros1_ros2_compat's rospy_rclpy_compat (get_param, log*,
+  create_subscription/timer, stamp_now), keeping the ROS1 structure
+  as-is. jsk_ros1_ros2_compat is only released with jsk_common >= 3.0,
+  so it is a ROS2-only dependency and the scripts fall back to
+  forwarding ros_compat.xxx(node, ...) to rospy.xxx(...) when it is not
+  importable.
+  - utils.timestamp_to_influxdb_time(): accept ROS2 builtin_interfaces
+  Time via rospy_rclpy_compat.stamp_to_sec() (falls back to to_sec()).
+  - __init_\_.py: TransformLogger imports rospy, so import it only when
+  available.
+  - Stay ROS1-only for now: base/map_transform_logger.py
+  (TransformLogger uses the ROS1 tf2_ros buffer_server's ~tf2_frames
+  service and rospy.TimerEvent), pr2/fetch_battery_states_logger.py
+  (pr2_msgs/power_msgs), and the ROS1 launch files. pr2_msgs is now a
+  ROS1-only dependency.
+  - The ROS2 scripts are installed with jsk_ros1_ros2_compat's
+  jsk_ros1_ros2_compat_install_python() (python3 shebang), from
+  jsk-ros-pkg/jsk_common#1832, as a ROS2-only buildtool_depend
+  (>= 3.0.2) that stays off rosidl's build dependencies.
+  joint_states_logger.py / network_states_logger.py: main with
+  ros_compat.init_node()/spin() instead of the ROS_VERSION branch, no
+  explicit private_name(). Uses jsk-ros-pkg/jsk_common#1831 (>= 3.0.2 on
+  ROS2); the ROS1 fallback forwards the new functions to rospy.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 2.1.31 (2025-05-13)
 -------------------
 

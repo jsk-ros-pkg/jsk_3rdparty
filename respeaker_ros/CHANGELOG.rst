@@ -2,6 +2,100 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
+  Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
+* [ros_speech_recognition, respeaker_ros] remove flac binaries bundled with SpeechRecognition from the uv venv
+  The 32bit flac-linux-x86 fails dh_shlibdeps of the buildfarm binary job.
+  SpeechRecognition uses the flac in PATH first, which is an exec_depend.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
+  The buildfarm builds each package with only its own build dependencies,
+  so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes
+  the ROS1 branch (same as jsk_common#1835). voicevox also guesses
+  ROS_VERSION from AMENT_PREFIX_PATH when it is unset.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* AMENT_IGNORE: do not add AMENT_IGNORE to packages already ported to ROS2
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite,
+  sesame_ros and switchbot_ros are already ROS2 packages on master, so
+  this PR must not AMENT_IGNORE them. Also remove
+  ros_speech_recognition/AMENT_IGNORE, as this PR ports it to ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [respeaker_ros] add ROS2 support
+  Single package.xml/CMakeLists.txt branched on $ROS_VERSION, same as the
+  other ROS2-ported packages in this repository.
+  - CMakeLists.txt: the ROS2 block is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (no re-indentation). SpeechRecognition,
+  pyusb and pixel-ring are not available from apt and catkin_virtualenv has
+  no ROS2 port, so they go into a uv venv made from pyproject.toml/uv.lock
+  with jsk_ros1_ros2_compat_generate_uv_venv(), and respeaker_node.py/
+  speech_to_text.py are installed with
+  jsk_ros1_ros2_compat_install_python(... USE_VENV). numpy and pyaudio stay
+  on apt (rclpy's message typesupport is built against the system numpy).
+  - package.xml: $ROS_VERSION conditions; ROS2 adds rclpy, tf_transformations
+  (for tf.transformations), action_msgs/sound_play_msgs (speech_to_text.py)
+  and jsk_ros1_ros2_compat >= 3.0.2 (jsk-ros-pkg/jsk_common#1831).
+  - Python: the original rospy code is kept as is for its ROS1 users
+  (RespeakerInterface, RespeakerAudio, RespeakerNode, SpeechToText and the
+  __main_\_ blocks, used when jsk_ros1_ros2_compat, i.e. jsk_common >= 3.0,
+  is not available), and a version written with jsk_ros1_ros2_compat's
+  rospy_rclpy_compat is added next to each of them, used on ROS2 and on
+  ROS1 with jsk_ros1_ros2_compat. Only the imports that do not exist on
+  ROS2 (rospy, dynamic_reconfigure, actionlib, tf, sound_play) and the
+  __main_\_ conditions of the original lines change.
+  - src/respeaker_ros: RespeakerInterfaceCompat/RespeakerAudioCompat
+  override only the methods that log or shut down (log*,
+  signal_shutdown).
+  - respeaker_node.py: RespeakerNodeCompat (init_node, get_param,
+  create_publisher(latch=True), create_subscription, create_timer,
+  on_shutdown, now_sec/stamp_now, spin). dynamic_reconfigure is
+  ros_compat.create_reconfigure_server(): on ROS2 the device parameters
+  are node parameters declared from the same PARAMETERS table
+  respeaker_gencfg.py generates cfg/Respeaker.cfg from, set to the
+  values read from the device at start, and written to the device on
+  `ros2 param set`. The one-shot LED timer is a self-cancelling timer.
+  on_config()/on_audio() are shared with RespeakerNode.
+  - speech_to_text.py: SpeechToTextCompat; the sound_play action clients
+  come from ros_compat.create_simple_action_client() (sound_play_msgs on
+  ROS2). ROS2 action clients do not track other clients' goals, so its
+  self-cancellation watches the action's status topic (status /
+  _action/status) instead of actionlib's last_status_msg.
+  - launch/sample_respeaker.launch.xml: ROS2 version of the sample launch.
+  ROS1 only: respeaker_gencfg.py (dynamic_reconfigure generator) and the
+  rostests.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into power_switching_tools_ros
+* Merge pull request #560 from sawada10/change-audio-frames-per-buffer
+* [respeaker_ros] change frames_per_buffer for webrtcvad
+* Contributors: Kei Okada, Shun Hasegawa, sawada10
+
 2.1.31 (2025-05-13)
 -------------------
 

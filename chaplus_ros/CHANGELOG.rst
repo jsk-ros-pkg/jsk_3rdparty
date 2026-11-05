@@ -2,6 +2,60 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
+  Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
+* [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
+  The buildfarm builds each package with only its own build dependencies,
+  so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes
+  the ROS1 branch (same as jsk_common#1835). voicevox also guesses
+  ROS_VERSION from AMENT_PREFIX_PATH when it is unset.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* AMENT_IGNORE: do not add AMENT_IGNORE to packages already ported to ROS2
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite,
+  sesame_ros and switchbot_ros are already ROS2 packages on master, so
+  this PR must not AMENT_IGNORE them. Also remove
+  ros_speech_recognition/AMENT_IGNORE, as this PR ports it to ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* AMENT_IGNORE packages ported to ROS2 in jsk-ros-pkg/jsk_3rdparty#575
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, rospatlite, sesame_ros and
+  switchbot_ros are ROS1 only here, so the ROS2 CI skips them until #575.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [chaplus_ros] add ROS2 support
+  Single package.xml/CMakeLists.txt branched on $ROS_VERSION, same as
+  jsk_common's ROS2-ported packages.
+  - CMakeLists.txt: the ROS2 block is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (no re-indentation). The installed
+  ROS2 copy of chaplus_ros.py gets a python3 shebang, since ROS2 base
+  images ship no bare `python`. apikey.json/communication_sample.json
+  are installed to share/ since ROS2 has no rospack source lookup.
+  - chaplus_ros.py: uses jsk_ros1_ros2_compat's rospy_rclpy_compat
+  (get_param, log*, create_publisher/subscription), keeping the ROS1
+  structure as-is.
+  - jsk_ros1_ros2_compat is only released with jsk_common >= 3.0 (not
+  in noetic/ROS-O yet), so it is a ROS2-only dependency and the script
+  falls back to forwarding ros_compat.xxx(node, ...) to rospy.xxx(...)
+  when it is not importable.
+  - Initialize response_json in topic_cb(); it was unbound when the HTTP
+  request raised, which rospy only logged but kills the rclpy node.
+  - The ROS2 scripts are installed with jsk_ros1_ros2_compat's
+  jsk_ros1_ros2_compat_install_python() (python3 shebang), from
+  jsk-ros-pkg/jsk_common#1832, as a ROS2-only buildtool_depend
+  (>= 3.0.2) that stays off rosidl's build dependencies.
+  main: ros_compat.init_node()/spin() instead of the ROS_VERSION branch
+  (jsk-ros-pkg/jsk_common#1831; ROS1 fallback forwards them to rospy).
+  ROS2 exec_depend on jsk_ros1_ros2_compat >= 3.0.2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 2.1.31 (2025-05-13)
 -------------------
 

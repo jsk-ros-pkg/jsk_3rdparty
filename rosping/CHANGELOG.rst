@@ -2,6 +2,48 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into power_switching_tools_ros
+* Merge pull request #568 from k-okada/k-okada/add_ga_test
+  Enable CI test runs and fix a few test failures
+* [rosping] skip test when raw ICMP privilege is unavailable
+  test-rosping.test launched the node under an extra "sudo -n" prefix on
+  top of the setuid-root binary CMakeLists.txt already installs; sudo -n
+  fails wherever passwordless sudo isn't configured, even though the
+  setuid bit alone is sufficient (rpath is baked in, so the LD_LIBRARY_PATH
+  passthrough sudo -E was carrying is unnecessary too).
+  Replace the generic hztest declaration with test-rosping.py, which
+  checks the installed rosping binary for setuid-root (or euid==0) and
+  raises unittest.SkipTest when neither holds, instead of failing outright
+  in environments where the binary hasn't been granted raw-socket
+  privilege.
+* Contributors: Kei Okada, Shun Hasegawa
+
 2.1.31 (2025-05-13)
 -------------------
 

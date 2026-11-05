@@ -2,6 +2,53 @@
 Changelog for package google_cloud_texttospeech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge branch 'master' into ros2-support
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #578 from k-okada/ros-o-pip-virtualenv
+  Fix ROS-O CI: install the dropped ``python-*-pip`` deps with catkin_virtualenv (webrtcvad_ros, pgm_learner, google_cloud_texttospeech)
+* [google_cloud_texttospeech] install google-cloud-texttospeech with catkin_virtualenv
+  rosdistro dropped python-google-cloud-texttospeech-pip
+  (ros/rosdistro#51720), so rosdep fails on it on python3 (ROS-O CI). Install
+  google-cloud-texttospeech into a catkin_virtualenv on python3 instead,
+  from a pinned requirements.txt: the direct dependency first, then its
+  dependencies frozen with uv pip compile --universal --python-version 3.8.
+  python2 keeps python-google-cloud-texttospeech-pip (package.xml format 3
+  for the conditions). bin/text2wave is already installed with
+  catkin_install_python, which runs it in the virtualenv; in the devel
+  space that wrapper is in <devel>/share/google_cloud_texttospeech/bin,
+  not in $(find google_cloud_texttospeech)/bin (the source directory), so
+  an env hook exports GOOGLE_CLOUD_TEXTTOSPEECH_BIN_DIR, which the launch
+  file puts first in PATH.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 2.1.31 (2025-05-13)
 -------------------
 
