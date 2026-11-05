@@ -16,6 +16,12 @@ if("$ENV{ROS_VERSION}" EQUAL 2)
   # cfg/Respeaker.cfg, and respeaker_gencfg.py is ROS1 only.
   find_package(jsk_ros1_ros2_compat REQUIRED)
   jsk_ros1_ros2_compat_generate_uv_venv(CHECK_IMPORTS speech_recognition usb)
+  # SpeechRecognition bundles flac binaries (e.g. the 32bit flac-linux-x86),
+  # which break dh_shlibdeps of the buildfarm; the apt flac is used instead.
+  file(GLOB _flac ${${PROJECT_NAME}_VENV_DIR}/lib/python*/site-packages/speech_recognition/flac-*)
+  if(_flac)
+    file(REMOVE ${_flac})
+  endif()
   jsk_ros1_ros2_compat_install_python(PROGRAMS scripts/respeaker_node.py scripts/speech_to_text.py USE_VENV)
 
   install(DIRECTORY config launch
