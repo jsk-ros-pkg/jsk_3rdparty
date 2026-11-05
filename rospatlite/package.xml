@@ -11,6 +11,7 @@
   <url>http://ros.org/wiki/rospatlite</url>
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ros_environment</buildtool_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend condition="$ROS_VERSION == 1">rospy</build_depend>
   <exec_depend>std_msgs</exec_depend>
