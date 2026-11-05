@@ -2,35 +2,74 @@
 # -*- coding: utf-8 -*-
 # Copyright: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
-import actionlib
-import rospy
+from ros_speech_recognition.compat import ros_compat
+from ros_speech_recognition.compat import ROS_VERSION
 import speech_recognition as SR
 from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import os
 import sys
 from threading import Lock
+from threading import Thread
 
 from audio_common_msgs.msg import AudioData
-from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
-
-from actionlib_msgs.msg import GoalStatus
+if ROS_VERSION == 2:
+    from sound_play_msgs.msg import SoundRequest
+    from sound_play_msgs.action import SoundRequest as SoundRequestAction
+    SoundRequestGoal = SoundRequestAction.Goal
+    from action_msgs.msg import GoalStatus, GoalStatusArray
+    # status topic of an action and state of an executing goal
+    TTS_STATUS_TOPIC, TTS_STATUS_ACTIVE = '/_action/status', GoalStatus.STATUS_EXECUTING
+    # rclpy requires a depth (ros_compat's default 1 may drop audio)
+    AUDIO_QUEUE_SIZE = 10
+else:
+    from sound_play.msg import SoundRequest, SoundRequestAction, SoundRequestGoal
+    from actionlib_msgs.msg import GoalStatus, GoalStatusArray
+    TTS_STATUS_TOPIC, TTS_STATUS_ACTIVE = '/status', GoalStatus.ACTIVE
+    AUDIO_QUEUE_SIZE = None
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from speech_recognition_msgs.srv import SpeechRecognition
-from speech_recognition_msgs.srv import SpeechRecognitionResponse
 from std_srvs.srv import Empty
-from std_srvs.srv import EmptyResponse
 
-from dynamic_reconfigure.server import Server
 from ros_speech_recognition.cfg import SpeechRecognitionConfig as Config
+
+
+if hasattr(array.array, 'tobytes'):
+    def array_to_bytes(arr):
+        return arr.tobytes()
+else:
+    # Python 2.7
+    def array_to_bytes(arr):
+        return arr.tostring()
+
+
+def resolve_sound_signal_path(path):
+    if os.path.exists(path):
+        return path
+    attempted_paths = [path]
+    base, ext = os.path.splitext(path)
+    if ext == ".ogg":
+        oga_path = base + ".oga"
+        if os.path.exists(oga_path):
+            return oga_path
+        attempted_paths.append(oga_path)
+    ros_compat.logwarn(None,
+        "Sound signal file not found on the machine "
+        "where speech_recognition is running: {}".format(
+            " or ".join(attempted_paths))
+    )
+    return path
 
 
 class ROSAudio(SR.AudioSource):
     def __init__(self, topic_name="audio", depth=16, n_channel=1,
-                 sample_rate=16000, chunk_size=1024, buffer_size=10240):
+                 sample_rate=16000, chunk_size=1024, buffer_size=10240,
+                 node=None):
         assert buffer_size > chunk_size
 
+        self.node = node
         self.topic_name = topic_name
         self.buffer_size = buffer_size
 
@@ -55,7 +94,7 @@ class ROSAudio(SR.AudioSource):
             self.stream = None
         self.stream = ROSAudio.AudioStream(
             self.topic_name, self.buffer_size, depth=self.SAMPLE_WIDTH*8,
-            n_channel=self.n_channel)
+            n_channel=self.n_channel, node=self.node)
         return self
 
     def close(self):
@@ -70,15 +109,16 @@ class ROSAudio(SR.AudioSource):
 
     class AudioStream(object):
         def __init__(self, topic_name, buffer_size=10240, depth=16,
-                     n_channel=1, target_channel=0):
+                     n_channel=1, target_channel=0, node=None):
+            self.node = node
             self.buffer_size = buffer_size
             self.lock = Lock()
             self.buffer = bytes()
             self.depth = depth
             self.n_channel = n_channel
             self.target_channel = min(self.n_channel - 1, max(0, target_channel))
-            self.sub_audio = rospy.Subscriber(
-                topic_name, AudioData, self.audio_cb)
+            self.sub_audio = ros_compat.create_subscription(node,
+                topic_name, AudioData, self.audio_cb, queue_size=AUDIO_QUEUE_SIZE)
             self.type_code = {}
             for code in ['b', 'h', 'i', 'l']:
                 self.type_code[array.array(code).itemsize] = code
@@ -90,13 +130,16 @@ class ROSAudio(SR.AudioSource):
                 return buf
 
         def read(self, size):
-            while not rospy.is_shutdown() and len(self.buffer) < size:
-                rospy.sleep(0.001)
+            while not ros_compat.is_shutdown(self.node) and len(self.buffer) < size:
+                ros_compat.sleep(self.node, 0.001)
             return self.read_once(size)
 
         def close(self):
             try:
-                self.sub_audio.unregister()
+                if ROS_VERSION == 2:
+                    self.node.destroy_subscription(self.sub_audio)
+                else:
+                    self.sub_audio.unregister()
             except:
                 pass
             self.buffer = bytes()
@@ -107,90 +150,108 @@ class ROSAudio(SR.AudioSource):
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array.array(dtype, chan_data).tostring()
+                self.buffer += array_to_bytes(array.array(dtype, chan_data))
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
 
 
 class ROSSpeechRecognition(object):
-    def __init__(self):
-        self.default_duration = rospy.get_param("~duration", 10.0)
+    def __init__(self, node=None):
+        self.node = node
+        self.default_duration = ros_compat.get_param(node, "~duration", 10.0)
         self.engine = None
         self.recognizer = RecognizerEx() # Use custom Recognizer to support exteded API
-        self.audio = ROSAudio(topic_name=rospy.get_param("~audio_topic", "audio"),
-                              depth=rospy.get_param("~depth", 16),
-                              n_channel=rospy.get_param("~n_channel", 1),
-                              sample_rate=rospy.get_param("~sample_rate", 16000),
-                              buffer_size=rospy.get_param("~buffer_size", 10240))
+        self.audio = ROSAudio(topic_name=ros_compat.get_param(node, "~audio_topic", "audio"),
+                              depth=ros_compat.get_param(node, "~depth", 16),
+                              n_channel=ros_compat.get_param(node, "~n_channel", 1),
+                              sample_rate=ros_compat.get_param(node, "~sample_rate", 16000),
+                              buffer_size=ros_compat.get_param(node, "~buffer_size", 10240),
+                              node=node)
 
         # initialize sound play client
-        if rospy.get_param('~enable_sound_effect', True):
-            self.act_sound = actionlib.SimpleActionClient(
+        if ros_compat.get_param(node, '~enable_sound_effect', True):
+            self.act_sound = ros_compat.create_simple_action_client(node,
                 "sound_play", SoundRequestAction)
-            if not self.act_sound.wait_for_server(rospy.Duration(5.0)):
-                rospy.logwarn("Failed to find sound_play action. "
+            if not self.act_sound.wait_for_server(5.0):
+                ros_compat.logwarn(node, "Failed to find sound_play action. "
                               "Disabled sound effect on recognition.")
                 self.act_sound = None
         else:
             self.act_sound = None
         self.signals = {
-            "start": rospy.get_param("~start_signal",
-                                     "/usr/share/sounds/freedesktop/stereo/bell.ogg"),
-            "recognized": rospy.get_param("~recognized_signal",
-                                          "/usr/share/sounds/freedesktop/stereo/message.ogg"),
-            "success": rospy.get_param("~success_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg"),
-            "timeout": rospy.get_param("~timeout_signal",
-                                       "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg"),
+            "start": ros_compat.get_param(node, "~start_signal", None),
+            "recognized": ros_compat.get_param(node, "~recognized_signal", None),
+            "success": ros_compat.get_param(node, "~success_signal", None),
+            "timeout": ros_compat.get_param(node, "~timeout_signal", None),
         }
-
+        default_signals = {
+            "start": "/usr/share/sounds/freedesktop/stereo/bell.ogg",
+            "recognized": "/usr/share/sounds/freedesktop/stereo/message.ogg",
+            "success": "/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg",
+            "timeout": "/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg",
+        }
+        if self.act_sound is not None:
+            for key in self.signals.keys():
+                if self.signals[key] is None:
+                    self.signals[key] = resolve_sound_signal_path(
+                        default_signals[key])
 
         # ignore voice input while the robot is speaking
-        self.self_cancellation = rospy.get_param("~self_cancellation", True)
+        self.self_cancellation = ros_compat.get_param(node, "~self_cancellation", True)
         # time to assume as SPEAKING after tts service is finished
-        self.tts_tolerance = rospy.Duration.from_sec(
-            rospy.get_param("~tts_tolerance", 1.0))
-        tts_action_names = rospy.get_param(
+        self.tts_tolerance = ros_compat.get_param(node, "~tts_tolerance", 1.0)  # sec
+        tts_action_names = ros_compat.get_param(node,
             '~tts_action_names', ['sound_play'])
 
         self.tts_action = None
         self.last_tts = None
         self.is_canceling = False
         self.tts_actions = []
+        # the goal states of tts_actions come from their status topics, since
+        # ROS2 action clients do not keep the goals of other clients
+        # (actionlib's action_client.last_status_msg)
+        self.tts_status = {}
         if self.self_cancellation:
             for tts_action_name in tts_action_names:
-                tts_action = actionlib.SimpleActionClient(
+                tts_action = ros_compat.create_simple_action_client(node,
                     tts_action_name, SoundRequestAction)
-                if tts_action.wait_for_server(rospy.Duration(5.0)):
+                if tts_action.wait_for_server(5.0):
                     self.tts_actions.append(tts_action)
+                    ros_compat.create_subscription(node,
+                        tts_action_name + TTS_STATUS_TOPIC, GoalStatusArray,
+                        lambda msg, a=tts_action: self.tts_status.__setitem__(a, msg),
+                        queue_size=1, latch=True)
                 else:
-                    rospy.logerr(
+                    ros_compat.logerr(node,
                         "action '{}' is not initialized."
                         .format(tts_action_name))
-                self.tts_timer = rospy.Timer(rospy.Duration(0.1), self.tts_timer_cb)
+                self.tts_timer = ros_compat.create_timer(node, 0.1, self.tts_timer_cb)
 
-        self.dyn_srv = Server(Config, self.config_callback)
+        # dynamic_reconfigure (ROS1) or ROS2 parameters with Config.defaults
+        # (cfg/ros2/SpeechRecognitionConfig.py)
+        self.dyn_srv = ros_compat.create_reconfigure_server(node,
+            Config, self.config_callback, Config.defaults)
 
         self.stop_fn = None
-        self.continuous = rospy.get_param("~continuous", False)
-        self.auto_start = rospy.get_param("~auto_start", True)
+        self.continuous = ros_compat.get_param(node, "~continuous", False)
+        self.auto_start = ros_compat.get_param(node, "~auto_start", True)
         self.enable_audio_cb = self.auto_start
         if self.continuous:
-            rospy.loginfo("Enabled continuous mode")
-            rospy.loginfo("Auto start: {}".format(self.auto_start))
-            self.pub = rospy.Publisher(rospy.get_param("~voice_topic", "speech_to_text"),
+            ros_compat.loginfo(node, "Enabled continuous mode")
+            ros_compat.loginfo(node, "Auto start: {}".format(self.auto_start))
+            self.pub = ros_compat.create_publisher(node, ros_compat.get_param(node, "~voice_topic", "speech_to_text"),
                                        SpeechRecognitionCandidates,
                                        queue_size=1)
-            self.start_srv = rospy.Service(
+            self.start_srv = ros_compat.create_service(node,
                 "speech_recognition/start",
                 Empty, self.speech_recogniton_start_srv_cb)
-            self.stop_srv = rospy.Service(
+            self.stop_srv = ros_compat.create_service(node,
                 "speech_recognition/stop",
                 Empty, self.speech_recogniton_stop_srv_cb)
         else:
-            rospy.loginfo("Disabled continuous mode, waiting for speech_recognition service")
-            self.srv = rospy.Service("speech_recognition",
+            ros_compat.loginfo(node, "Disabled continuous mode, waiting for speech_recognition service")
+            self.srv = ros_compat.create_service(node, "speech_recognition",
                                      SpeechRecognition,
                                      self.speech_recognition_srv_cb)
 
@@ -203,6 +264,9 @@ class ROSSpeechRecognition(object):
 
         # config for adaptive thresholding
         self.dynamic_energy_threshold = config.dynamic_energy_threshold
+        # also stop the recognizer's own adjustment in listen() when disabled,
+        # which was always enabled before (from Michi-Tsubaki's ROS2 port)
+        self.recognizer.dynamic_energy_threshold = self.dynamic_energy_threshold
         if self.dynamic_energy_threshold:
             config.energy_threshold = self.recognizer.energy_threshold
         else:
@@ -243,27 +307,37 @@ class ROSSpeechRecognition(object):
             req.volume = 1.0
         req.arg = self.signals[key]
         goal = SoundRequestGoal(sound_request=req)
-        self.act_sound.send_goal_and_wait(goal, rospy.Duration(timeout))
+        self.act_sound.send_goal_and_wait(goal, timeout)
+        # ros_compat's send_goal_and_wait() returns whether the goal finished,
+        # not its state, and ROS2's client has no get_state()
+        if hasattr(self.act_sound, 'get_state') and \
+           self.act_sound.get_state() == GoalStatus.ABORTED:
+            ros_compat.logwarn(self.node,
+                "Playing %s signal was aborted. "
+                "Does its sound file exist on the machine "
+                "on which sound_play is running?"
+                % key
+            )
 
     def recognize(self, audio):
         recog_func = None
         if self.engine == Config.SpeechRecognition_Google:
             if not self.args:
-                self.args = {'key': rospy.get_param("~google_key", None),
+                self.args = {'key': ros_compat.get_param(self.node, "~google_key", None),
                              'show_all': True}
             recog_func = self.recognizer.recognize_google
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
-                credentials_path = rospy.get_param("~google_cloud_credentials_json", None)
+                credentials_path = ros_compat.get_param(self.node, "~google_cloud_credentials_json", None)
                 if credentials_path is not None:
                     with open(credentials_path) as j:
                         credentials_json = j.read()
                 else:
                     credentials_json = None
                 self.args = {'credentials_json': credentials_json,
-                             'preferred_phrases': rospy.get_param('~google_cloud_preferred_phrases', None)}
-                if rospy.has_param('~diarizationConfig') :
-                    self.args.update({'user_config': {'diarizationConfig': rospy.get_param('~diarizationConfig') }})
+                             'preferred_phrases': ros_compat.get_param(self.node, '~google_cloud_preferred_phrases', None)}
+                if ros_compat.has_param(self.node, '~diarizationConfig') :
+                    self.args.update({'user_config': {'diarizationConfig': ros_compat.get_param(self.node, '~diarizationConfig') }})
             recog_func = self.recognizer.recognize_google_cloud
         elif self.engine == Config.SpeechRecognition_Sphinx:
             recog_func = self.recognizer.recognize_sphinx
@@ -271,7 +345,7 @@ class ROSSpeechRecognition(object):
             recog_func = self.recognizer.recognize_wit
         elif self.engine == Config.SpeechRecognition_Bing:
             if not self.args:
-                self.args = {'key': rospy.get_param("~bing_key")}
+                self.args = {'key': ros_compat.get_param(self.node, "~bing_key")}
             recog_func = self.recognizer.recognize_bing
         elif self.engine == Config.SpeechRecognition_Houndify:
             recog_func = self.recognizer.recognize_houndify
@@ -279,7 +353,7 @@ class ROSSpeechRecognition(object):
             recog_func = self.recognizer.recognize_ibm
         elif self.engine == Config.SpeechRecognition_Vosk:
             if not self.args:
-                self.args = {'model_path': rospy.get_param('~vosk_model_path', None)}
+                self.args = {'model_path': ros_compat.get_param(self.node, '~vosk_model_path', None)}
             recog_func = self.recognizer.recognize_vosk
 
         return recog_func(audio_data=audio, language=self.language, **self.args)
@@ -288,10 +362,10 @@ class ROSSpeechRecognition(object):
         if not self.enable_audio_cb:
             return
         if self.is_canceling:
-            rospy.loginfo("Robot is speaking now, so recognition is cancelled")
+            ros_compat.loginfo(self.node, "Robot is speaking now, so recognition is cancelled")
             return
         try:
-            rospy.logdebug("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
+            ros_compat.logdebug(self.node, "Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
             confidence = 1.0
             if len(result) == 0: return
@@ -299,7 +373,7 @@ class ROSSpeechRecognition(object):
                 confidence = result['alternative'][0]['confidence']
                 result = result['alternative'][0]['transcript']
             self.play_sound("recognized", 0.05)
-            rospy.loginfo("Result: %s" % result.encode('utf-8'))
+            ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
             self.play_sound("success", 0.1)
             msg = SpeechRecognitionCandidates(
                 transcript=[result],
@@ -310,25 +384,25 @@ class ROSSpeechRecognition(object):
         except SR.UnknownValueError as e:
             if self.dynamic_energy_threshold:
                 self.recognizer.adjust_for_ambient_noise(self.audio)
-                rospy.loginfo("Updated energy threshold to %f" % self.recognizer.energy_threshold)
+                ros_compat.loginfo(self.node, "Updated energy threshold to %f" % self.recognizer.energy_threshold)
         except SR.RequestError as e:
-            rospy.logerr("Failed to recognize: %s" % str(e))
+            ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except SR.UnknownValueError as e:
-            rospy.logerr("Failed to recognize: %s" % str(e))
+            ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except:
-            rospy.logerr("Unexpected error: %s" % str(sys.exc_info()))
+            ros_compat.logerr(self.node, "Unexpected error: %s" % str(sys.exc_info()))
         self.play_sound("timeout", 0.1)
 
     def start_speech_recognition(self):
         if self.dynamic_energy_threshold:
             with self.audio as src:
                 self.recognizer.adjust_for_ambient_noise(src)
-                rospy.loginfo("Set minimum energy threshold to {}".format(
+                ros_compat.loginfo(self.node, "Set minimum energy threshold to {}".format(
                     self.recognizer.energy_threshold))
         self.play_sound("start", 0.1)
         self.stop_fn = self.recognizer.listen_in_background(
             self.audio, self.audio_cb, phrase_time_limit=self.phrase_time_limit)
-        rospy.on_shutdown(self.on_shutdown)
+        ros_compat.on_shutdown(self.node, self.on_shutdown)
 
     def stop_speech_recognition(self):
         if self.stop_fn is not None:
@@ -337,9 +411,7 @@ class ROSSpeechRecognition(object):
     def on_shutdown(self):
         self.stop_speech_recognition()
 
-    def speech_recognition_srv_cb(self, req):
-        res = SpeechRecognitionResponse()
-
+    def speech_recognition_srv_cb(self, req, res):
         duration = req.duration
         if duration <= 0.0:
             duration = self.default_duration
@@ -347,42 +419,51 @@ class ROSSpeechRecognition(object):
         with self.audio as src:
             if self.dynamic_energy_threshold:
                 self.recognizer.adjust_for_ambient_noise(src)
-                rospy.loginfo("Set minimum energy threshold to %f" % self.recognizer.energy_threshold)
+                ros_compat.loginfo(self.node, "Set minimum energy threshold to %f" % self.recognizer.energy_threshold)
 
             if not req.quiet:
                 self.play_sound("start", 0.1)
 
-            start_time = rospy.Time.now()
-            while (rospy.Time.now() - start_time).to_sec() < duration:
-                rospy.loginfo("Waiting for speech...")
+            start_time = ros_compat.now_sec(self.node)
+            while ros_compat.now_sec(self.node) - start_time < duration:
+                ros_compat.loginfo(self.node, "Waiting for speech...")
                 try:
                     audio = self.recognizer.listen(
                         src, timeout=self.listen_timeout, phrase_time_limit=self.phrase_time_limit)
                 except SR.WaitTimeoutError as e:
-                    rospy.logwarn(e)
+                    ros_compat.logwarn(self.node, str(e))
                     break
                 if not req.quiet:
                     self.play_sound("recognized", 0.05)
-                rospy.loginfo("Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
+                ros_compat.loginfo(self.node, "Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
 
                 try:
                     result = self.recognize(audio)
-                    rospy.loginfo("Result: %s" % result.encode('utf-8'))
+                    confidence = 1.0
+                    # recognize_google() returns all the alternatives
+                    # (show_all=True), so take the best one as audio_cb()
+                    # does; this failed before (from Michi-Tsubaki's ROS2 port)
+                    if self.engine == Config.SpeechRecognition_Google:
+                        if len(result) == 0:
+                            raise SR.UnknownValueError()
+                        confidence = result['alternative'][0].get('confidence', 1.0)
+                        result = result['alternative'][0]['transcript']
+                    ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
                     res.result = SpeechRecognitionCandidates(
                         transcript=[result],
-                        confidence=[1.0],
+                        confidence=[confidence],
                     )
                     return res
                 except SR.UnknownValueError:
                     if self.dynamic_energy_threshold:
                         self.recognizer.adjust_for_ambient_noise(src)
-                        rospy.loginfo("Set minimum energy threshold to %f" % self.recognizer.energy_threshold)
+                        ros_compat.loginfo(self.node, "Set minimum energy threshold to %f" % self.recognizer.energy_threshold)
                 except SR.RequestError as e:
-                    rospy.logerr("Failed to recognize: %s" % str(e))
-                rospy.sleep(0.1)
-                if rospy.is_shutdown():
+                    ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
+                ros_compat.sleep(self.node, 0.1)
+                if ros_compat.is_shutdown(self.node):
                     break
 
             # Timeout
@@ -390,47 +471,56 @@ class ROSSpeechRecognition(object):
                 self.play_sound("timeout", 0.1)
             return res
 
-    def speech_recogniton_start_srv_cb(self, req):
+    def speech_recogniton_start_srv_cb(self, req, res):
         self.enable_audio_cb = True
         self.start_speech_recognition()
-        rospy.loginfo("Start continuous mode")
-        return EmptyResponse()
+        ros_compat.loginfo(self.node, "Start continuous mode")
+        return res
 
-    def speech_recogniton_stop_srv_cb(self, req):
+    def speech_recogniton_stop_srv_cb(self, req, res):
         self.enable_audio_cb = False
         self.stop_speech_recognition()
-        rospy.loginfo("Stop continuous mode")
-        return EmptyResponse()
+        ros_compat.loginfo(self.node, "Stop continuous mode")
+        return res
 
     def spin(self):
         if self.continuous and self.auto_start:
-            self.start_speech_recognition()
-        rospy.spin()
+            # in a thread, as it waits for the audio topic, which is received
+            # only while spinning on ROS2 (Michi-Tsubaki's ROS2 port starts it
+            # from a timer for the same reason)
+            start_thread = Thread(target=self.start_speech_recognition)
+            start_thread.daemon = True
+            start_thread.start()
+        ros_compat.spin(self.node)
 
     def tts_timer_cb(self, event):
-        stamp = event.current_real
+        stamp = ros_compat.now_sec(self.node)
         active = False
         for tts_action in self.tts_actions:
-            for st in tts_action.action_client.last_status_msg.status_list:
-                if st.status == GoalStatus.ACTIVE:
+            status = self.tts_status.get(tts_action)
+            for st in (status.status_list if status else []):
+                if st.status == TTS_STATUS_ACTIVE:
                     active = True
                     break
             if active:
                 break
         if active:
             if not self.is_canceling:
-                rospy.logdebug("START CANCELLATION")
+                ros_compat.logdebug(self.node, "START CANCELLATION")
                 self.is_canceling = True
                 self.last_tts = None
         elif self.is_canceling:
             if self.last_tts is None:
                 self.last_tts = stamp
             if stamp - self.last_tts > self.tts_tolerance:
-                rospy.logdebug("END CANCELLATION")
+                ros_compat.logdebug(self.node, "END CANCELLATION")
                 self.is_canceling = False
 
 
 if __name__ == '__main__':
-    rospy.init_node("speech_recognition")
-    rec = ROSSpeechRecognition()
+    # the recognition service callback waits for the audio topic and the
+    # sound_play action (on ROS2, a MultiThreadedExecutor and reentrant
+    # callbacks, as in Michi-Tsubaki's ROS2 port of this node)
+    node = ros_compat.init_node("speech_recognition", multi_threaded=True)
+    rec = ROSSpeechRecognition(node)
     rec.spin()

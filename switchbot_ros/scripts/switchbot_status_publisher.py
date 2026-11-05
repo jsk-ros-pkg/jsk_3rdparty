@@ -2,20 +2,45 @@
 
 import os.path
 from requests import ConnectionError
-import rospy
 from switchbot_ros.switchbot import SwitchBotAPIClient
 from switchbot_ros.switchbot import DeviceError, SwitchBotAPIError
 from switchbot_ros.msg import Meter, PlugMini, Hub2, Bot, StripLight, MeterProCO2
+
+try:
+    from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
+    from jsk_ros1_ros2_compat.rospy_rclpy_compat import ROS_VERSION
+except ImportError:
+    # jsk_common < 3.0 has no jsk_ros1_ros2_compat, so this is ROS1 only:
+    # forward ros_compat.xxx(node, ...) to rospy.xxx(...)
+    import rospy
+    ROS_VERSION = 1
+    class ros_compat(object):
+        Rate = staticmethod(lambda node, *args, **kwargs: rospy.Rate(*args, **kwargs))
+        create_publisher = staticmethod(lambda node, *args, **kwargs: rospy.Publisher(*args, **kwargs))
+        get_param = staticmethod(lambda node, *args, **kwargs: rospy.get_param(*args, **kwargs))
+        init_node = staticmethod(lambda name, **kwargs: rospy.init_node(name, **kwargs))
+        shutdown = staticmethod(lambda node: None)
+        is_shutdown = staticmethod(lambda node, *args, **kwargs: rospy.is_shutdown(*args, **kwargs))
+        loginfo = staticmethod(lambda node, *args, **kwargs: rospy.loginfo(*args, **kwargs))
+        logerr = staticmethod(lambda node, *args, **kwargs: rospy.logerr(*args, **kwargs))
+        logwarn_once = staticmethod(lambda node, *args, **kwargs: rospy.logwarn_once(*args, **kwargs))
+        stamp_now = staticmethod(lambda node: rospy.Time.now())
+if ROS_VERSION == 2:
+    InterruptException = KeyboardInterrupt
+else:
+    import rospy
+    InterruptException = rospy.ROSInterruptException
 
 
 class SwitchBotStatusPublisher:
     """
     Publissh your switchbot status with ROS and SwitchBot API
     """
-    def __init__(self):
+    def __init__(self, node=None):
+        self.node = node
         # SwitchBot configs
         # '~token' can be file path or raw characters
-        token = rospy.get_param('~token')
+        token = ros_compat.get_param(node, '~token')
         if os.path.exists(token):
             with open(token) as f:
                 self.token = f.read().replace('\n', '')
@@ -23,7 +48,7 @@ class SwitchBotStatusPublisher:
             self.token = token
 
         # Switchbot API v1.1 needs secret key
-        secret = rospy.get_param('~secret', None)
+        secret = ros_compat.get_param(node, '~secret', None)
         if secret is not None and os.path.exists(secret):
             with open(secret, 'r', encoding='utf-8') as f:
                 self.secret = f.read().replace('\n', '')
@@ -35,14 +60,14 @@ class SwitchBotStatusPublisher:
         self.print_apiversion()
         
         # Get parameters for publishing
-        self.rate = rospy.get_param('~rate', 0.1)
-        rospy.loginfo('Rate: ' + str(self.rate))
+        self.rate = ros_compat.get_param(node, '~rate', 0.1)
+        ros_compat.loginfo(self.node, 'Rate: ' + str(self.rate))
         
-        device_name = rospy.get_param('~device_name')
+        device_name = ros_compat.get_param(node, '~device_name')
         if device_name:
             self.device_name = device_name
         else:
-            rospy.logerr('No Device Name')
+            ros_compat.logerr(self.node, 'No Device Name')
             return
         
         self.device_type = None
@@ -55,9 +80,9 @@ class SwitchBotStatusPublisher:
                 self.device_type = str(device.get('deviceType'))
 
         if self.device_type:
-            rospy.loginfo('deviceName: ' + self.device_name + ' / deviceType: ' + self.device_type)
+            ros_compat.loginfo(self.node, 'deviceName: ' + self.device_name + ' / deviceType: ' + self.device_type)
         else:
-            rospy.logerr('Invalid Device Name: ' + self.device_name)
+            ros_compat.logerr(self.node, 'Invalid Device Name: ' + self.device_name)
             return
         
         topic_name = '~' + self.device_name
@@ -65,7 +90,7 @@ class SwitchBotStatusPublisher:
         
         # Publisher Message Class for each device type
         if self.device_type == 'Remote':
-            rospy.logerr('Device Type: "' + self.device_type + '" has no status in specifications.')
+            ros_compat.logerr(self.node, 'Device Type: "' + self.device_type + '" has no status in specifications.')
             return
         else:
             if self.device_type == 'Meter':
@@ -87,28 +112,30 @@ class SwitchBotStatusPublisher:
             elif self.device_type == 'MeterPro(CO2)':
                 self.msg_class = MeterProCO2
             else:
-                rospy.logerr('No publisher process for "' + self.device_type + '" in switchbot_status_publisher.py')
+                ros_compat.logerr(self.node, 'No publisher process for "' + self.device_type + '" in switchbot_status_publisher.py')
                 return
             
-            self.status_pub = rospy.Publisher(topic_name, self.msg_class, queue_size=1, latch=True)
+            self.status_pub = ros_compat.create_publisher(node, topic_name, self.msg_class, queue_size=1, latch=True)
         
-        rospy.loginfo('Ready: SwitchBot Status Publisher for ' + self.device_name)
+        ros_compat.loginfo(self.node, 'Ready: SwitchBot Status Publisher for ' + self.device_name)
 
 
     def get_switchbot_client(self):
         try:
             client = SwitchBotAPIClient(token=self.token, secret=self.secret)
-            rospy.loginfo('Switchbot API Client initialized.')
+            ros_compat.loginfo(self.node, 'Switchbot API Client initialized.')
             return client
         except ConnectionError:  # If the machine is not connected to the internet
-            rospy.logwarn_once('Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
+            ros_compat.logwarn_once(self.node, 'Failed to connect to the switchbot server. The client would try connecting to it when subscribes the ActionGoal topic.')
             return None
 
 
     def spin(self):
-        rate = rospy.Rate(self.rate)
-        while not rospy.is_shutdown():
+        rate = ros_compat.Rate(self.node, self.rate)
+        while not ros_compat.is_shutdown(self.node):
             rate.sleep()
+            if ros_compat.is_shutdown(self.node):  # shut down while sleeping
+                break
             if self.bots is None:
                 self.bots = self.get_switchbot_client()
             
@@ -118,30 +145,30 @@ class SwitchBotStatusPublisher:
                 status = self.get_device_status(device_name=self.device_name)
                 
                 if status:
-                    time = rospy.get_rostime()
+                    time = ros_compat.stamp_now(self.node)
                     if self.msg_class == Meter:
                         msg = Meter()
                         msg.header.stamp = time
-                        msg.temperature  = status['temperature']
-                        msg.humidity     = status['humidity']
-                        msg.battery      = status['battery']
+                        msg.temperature  = float(status['temperature'])
+                        msg.humidity     = float(status['humidity'])
+                        msg.battery      = float(status['battery'])
                     elif self.msg_class == Hub2:
                         msg = Hub2()
                         msg.header.stamp = time
-                        msg.temperature  = status['temperature']
-                        msg.humidity     = status['humidity']
+                        msg.temperature  = float(status['temperature'])
+                        msg.humidity     = float(status['humidity'])
                         msg.light_level  = status['lightLevel']
                     elif self.msg_class == PlugMini:
                         msg = PlugMini()
                         msg.header.stamp = time
-                        msg.voltage      = status['voltage']
-                        msg.weight       = status['weight']
-                        msg.current      = status['electricCurrent']
+                        msg.voltage      = float(status['voltage'])
+                        msg.weight       = float(status['weight'])
+                        msg.current      = float(status['electricCurrent'])
                         msg.minutes_day  = status['electricityOfDay']
                     elif self.msg_class == Bot:
                         msg = Bot()
                         msg.header.stamp = time
-                        msg.battery      = status['battery']
+                        msg.battery      = float(status['battery'])
                         if status['power'] == 'on':
                             msg.power    = True
                         else:
@@ -163,9 +190,9 @@ class SwitchBotStatusPublisher:
                     elif self.msg_class == MeterProCO2:
                         msg = MeterProCO2()
                         msg.header.stamp = time
-                        msg.temperature  = status['temperature']
-                        msg.humidity     = status['humidity']
-                        msg.battery      = status['battery']
+                        msg.temperature  = float(status['temperature'])
+                        msg.humidity     = float(status['humidity'])
+                        msg.battery      = float(status['battery'])
                         msg.co2ppm       = status['CO2']
                     else:
                         return
@@ -190,13 +217,14 @@ class SwitchBotStatusPublisher:
         
         apiversion_str = 'Using SwitchBot API ';
         apiversion_str += self.bots.api_version;
-        rospy.loginfo(apiversion_str)
+        ros_compat.loginfo(self.node, apiversion_str)
 
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('switchbot_status_publisher')
-        ssp = SwitchBotStatusPublisher()
+        node = ros_compat.init_node('switchbot_status_publisher')
+        ssp = SwitchBotStatusPublisher(node)
         ssp.spin()
-    except rospy.ROSInterruptException:
+    except InterruptException:
         pass
+    ros_compat.shutdown(node)

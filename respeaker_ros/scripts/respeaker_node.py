@@ -16,6 +16,7 @@ class RespeakerNode(object):
         self.speech_continuation = rospy.get_param("~speech_continuation", 0.5)
         self.speech_max_duration = rospy.get_param("~speech_max_duration", 7.0)
         self.speech_min_duration = rospy.get_param("~speech_min_duration", 0.1)
+        self.sample_duration = rospy.get_param("~sample_duration", None)  # sec
         suppress_pyaudio_error = rospy.get_param("~suppress_pyaudio_error", True)
         #
         self.respeaker = RespeakerInterface()
@@ -34,7 +35,8 @@ class RespeakerNode(object):
         self.config = None
         self.dyn_srv = Server(RespeakerConfig, self.on_config)
         # start
-        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error)
+        self.respeaker_audio = RespeakerAudio(self.on_audio, suppress_error=suppress_pyaudio_error,
+                                              sample_duration=self.sample_duration)
         self.speech_prefetch_bytes = int(
             self.speech_prefetch * self.respeaker_audio.rate * self.respeaker_audio.bitdepth / 8.0)
         self.speech_prefetch_buffer = b""
@@ -138,7 +140,159 @@ class RespeakerNode(object):
                 self.pub_speech_audio.publish(AudioData(data=buf))
 
 
-if __name__ == '__main__':
+def reconfigure_defaults():
+    """ROS2 parameters for the dynamic_reconfigure-like server of
+    jsk_ros1_ros2_compat, generated from PARAMETERS the same way as
+    scripts/respeaker_gencfg.py generates cfg/Respeaker.cfg (read/write
+    ones; 0/1 ints as bool). The actual values are read from the device at
+    start (see on_config). Ignored on ROS1, which uses RespeakerConfig."""
+    defaults = {}
+    for name, val in PARAMETERS.items():
+        type_, max_, min_, rw_ = val[2:6]
+        if rw_ != "rw":
+            continue
+        if type_ == "int" and max_ == 1 and min_ == 0:
+            defaults[name] = False
+        elif type_ == "int":
+            defaults[name] = int(min_)
+        else:
+            defaults[name] = float(min_)
+    return defaults
+
+
+def stop_timer(timer):
+    # rospy.Timer (ROS1) or rclpy's Timer (ROS2)
+    timer.cancel() if hasattr(timer, 'cancel') else timer.shutdown()
+
+
+class RespeakerNodeCompat(RespeakerNode):
+    """RespeakerNode written with jsk_ros1_ros2_compat (ROS1/ROS2);
+    on_config() and on_audio() are shared with RespeakerNode."""
+
+    def __init__(self, node=None):
+        self.node = node
+        ros_compat.on_shutdown(node, self.on_shutdown)
+        self.update_rate = ros_compat.get_param(node, "~update_rate", 10.0)
+        self.sensor_frame_id = ros_compat.get_param(node, "~sensor_frame_id", "respeaker_base")
+        self.doa_xy_offset = ros_compat.get_param(node, "~doa_xy_offset", 0.0)
+        self.doa_yaw_offset = ros_compat.get_param(node, "~doa_yaw_offset", 90.0)
+        self.speech_prefetch = ros_compat.get_param(node, "~speech_prefetch", 0.5)
+        self.speech_continuation = ros_compat.get_param(node, "~speech_continuation", 0.5)
+        self.speech_max_duration = ros_compat.get_param(node, "~speech_max_duration", 7.0)
+        self.speech_min_duration = ros_compat.get_param(node, "~speech_min_duration", 0.1)
+        self.sample_duration = ros_compat.get_param(node, "~sample_duration", None)  # sec
+        suppress_pyaudio_error = ros_compat.get_param(node, "~suppress_pyaudio_error", True)
+        #
+        self.respeaker = RespeakerInterfaceCompat(node)
+        self.speech_audio_buffer = b""
+        self.is_speeching = False
+        self.speech_stopped = 0.0  # sec
+        self.prev_is_voice = None
+        self.prev_doa = None
+        # advertise
+        self.pub_vad = ros_compat.create_publisher(node, "is_speeching", Bool, queue_size=1, latch=True)
+        self.pub_doa_raw = ros_compat.create_publisher(node, "sound_direction", Int32, queue_size=1, latch=True)
+        self.pub_doa = ros_compat.create_publisher(node, "sound_localization", PoseStamped, queue_size=1, latch=True)
+        self.pub_audio = ros_compat.create_publisher(node, "audio", AudioData, queue_size=10)
+        self.pub_speech_audio = ros_compat.create_publisher(node, "speech_audio", AudioData, queue_size=10)
+        # init config
+        self.config = None
+        self.dyn_srv = ros_compat.create_reconfigure_server(
+            node, RespeakerConfig, self.on_config, reconfigure_defaults())
+        # make the parameters show the values read from the device, so
+        # that later changes are diffed against them in on_config()
+        for name in reconfigure_defaults():
+            ros_compat.set_param(node, "~" + name, self.config[name])
+        # start
+        self.respeaker_audio = RespeakerAudioCompat(self.on_audio, suppress_error=suppress_pyaudio_error,
+                                                    sample_duration=self.sample_duration, node=node)
+        self.speech_prefetch_bytes = int(
+            self.speech_prefetch * self.respeaker_audio.rate * self.respeaker_audio.bitdepth / 8.0)
+        self.speech_prefetch_buffer = b""
+        self.respeaker_audio.start()
+        self.info_timer = ros_compat.create_timer(node, 1.0 / self.update_rate,
+                                                  self.on_timer)
+        self.timer_led = None
+        self.sub_led = ros_compat.create_subscription(node, "status_led", ColorRGBA, self.on_status_led)
+
+    def on_shutdown(self):
+        stop_timer(self.info_timer)
+        try:
+            self.respeaker.close()
+        except:
+            pass
+        finally:
+            self.respeaker = None
+        try:
+            self.respeaker_audio.stop()
+        except:
+            pass
+        finally:
+            self.respeaker_audio = None
+
+    def on_status_led(self, msg):
+        self.respeaker.set_led_color(r=msg.r, g=msg.g, b=msg.b, a=msg.a)
+        if self.timer_led:
+            stop_timer(self.timer_led)
+
+        def led_trace(event):
+            stop_timer(self.timer_led)  # oneshot
+            self.respeaker.set_led_trace()
+        self.timer_led = ros_compat.create_timer(self.node, 3.0, led_trace)
+
+    def on_timer(self, event):
+        stamp = ros_compat.now_sec(self.node)
+        is_voice = self.respeaker.is_voice()
+        doa_rad = math.radians(self.respeaker.direction - 180.0)
+        doa_rad = angles.shortest_angular_distance(
+            doa_rad, math.radians(self.doa_yaw_offset))
+        doa = int(math.degrees(doa_rad))
+
+        # vad
+        if is_voice != self.prev_is_voice:
+            self.pub_vad.publish(Bool(data=bool(is_voice)))
+            self.prev_is_voice = is_voice
+
+        # doa
+        if doa != self.prev_doa:
+            self.pub_doa_raw.publish(Int32(data=doa))
+            self.prev_doa = doa
+
+            msg = PoseStamped()
+            msg.header.frame_id = self.sensor_frame_id
+            msg.header.stamp = ros_compat.stamp_now(self.node)
+            ori = T.quaternion_from_euler(math.radians(doa), 0, 0)
+            msg.pose.position.x = self.doa_xy_offset * np.cos(doa_rad)
+            msg.pose.position.y = self.doa_xy_offset * np.sin(doa_rad)
+            msg.pose.orientation.w = ori[0]
+            msg.pose.orientation.x = ori[1]
+            msg.pose.orientation.y = ori[2]
+            msg.pose.orientation.z = ori[3]
+            self.pub_doa.publish(msg)
+
+        # speech audio
+        if is_voice:
+            self.speech_stopped = stamp
+        if stamp - self.speech_stopped < self.speech_continuation:
+            self.is_speeching = True
+        elif self.is_speeching:
+            buf = self.speech_audio_buffer
+            self.speech_audio_buffer = b""
+            self.is_speeching = False
+            duration = 8.0 * len(buf) * self.respeaker_audio.bitwidth
+            duration = duration / self.respeaker_audio.rate / self.respeaker_audio.bitdepth
+            ros_compat.loginfo(self.node, "Speech detected for %.3f seconds" % duration)
+            if self.speech_min_duration <= duration < self.speech_max_duration:
+
+                self.pub_speech_audio.publish(AudioData(data=buf))
+
+
+if __name__ == '__main__' and ros_compat is None:
     rospy.init_node("respeaker_node")
     n = RespeakerNode()
     rospy.spin()
+
+elif __name__ == '__main__':  # with jsk_ros1_ros2_compat (ROS1/ROS2)
+    node = ros_compat.init_node("respeaker_node")
+    n = RespeakerNodeCompat(node)
+    ros_compat.spin(node)

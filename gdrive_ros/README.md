@@ -17,6 +17,15 @@ catkin init
 catkin build
 ```
 
+On ROS2, catkin_virtualenv is not available, so PyDrive is installed into a venv (`share/gdrive_ros/venv`) from `pyproject.toml`/`uv.lock` at build time instead (`jsk_ros1_ros2_compat_generate_uv_venv()`). Run `uv lock` after changing `pyproject.toml`.
+
+```bash
+rosdep install --ignore-src --from-paths . -y -r
+colcon build --packages-up-to gdrive_ros
+ros2 launch gdrive_ros gdrive_server.launch.xml settings_yaml:=/your/settings/yaml/path
+ros2 service call /gdrive_server/upload gdrive_ros/srv/Upload "{file_path: /your/file/path}"
+```
+
 ### Trouble shooting
 
 If you use 18.04 and python2.7, please install following versions.

@@ -1,3 +1,42 @@
+if("$ENV{ROS_VERSION}" EQUAL 2)
+  cmake_minimum_required(VERSION 3.8)
+  project(ros_speech_recognition)
+
+  find_package(ament_cmake REQUIRED)
+  find_package(ament_cmake_python REQUIRED)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+  ament_python_install_package(${PROJECT_NAME} PACKAGE_DIR src/${PROJECT_NAME})
+
+  # dynamic_reconfigure has no ROS2 port: its parameters are ROS2
+  # parameters, see cfg/ros2/SpeechRecognitionConfig.py
+  install(DIRECTORY cfg/ros2/
+    DESTINATION ${PYTHON_INSTALL_DIR}/${PROJECT_NAME}/cfg
+  )
+
+  # SpeechRecognition/vosk are not available from apt, and catkin_virtualenv
+  # has no ROS2 port, so the recognition node runs in a uv venv made from
+  # pyproject.toml/uv.lock (same versions as requirements.txt). The installed
+  # ROS2 copies get a python3 (or the venv's) shebang, keeping the source
+  # shared with ROS1.
+  find_package(jsk_ros1_ros2_compat REQUIRED)
+  jsk_ros1_ros2_compat_generate_uv_venv(CHECK_IMPORTS speech_recognition vosk)
+  jsk_ros1_ros2_compat_install_python(PROGRAMS scripts/speech_recognition_node.py USE_VENV)
+  jsk_ros1_ros2_compat_install_python(PROGRAMS scripts/parrot_node.py scripts/speech_recognition_candidates_to_string.py)
+
+  install(DIRECTORY launch
+    DESTINATION share/${PROJECT_NAME}
+  )
+
+  # download the vosk models of recognize_vosk.py with jsk_data, as the ROS1
+  # ${PROJECT_NAME}_install_trained_data target does, into the installed
+  # share directory: at install time, by an absolute path, as ament_index
+  # does not find this package while it is being built
+  install(CODE "execute_process(COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/install_trained_data.py --data-dir \$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/trained_data)")
+
+  ament_package()
+
+else() # if("$ENV{ROS_VERSION}" EQUAL 2)
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_speech_recognition)
 
@@ -68,3 +107,5 @@ if(CATKIN_ENABLE_TESTING)
     DEPENDENCIES ${PROJECT_NAME}_generate_virtualenv
   )
 endif()
+
+endif() # if("$ENV{ROS_VERSION}" EQUAL 2)

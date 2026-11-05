@@ -56,6 +56,18 @@ Sometimes you need to replace "hw" with "plughw":
 for example, `roslaunch audio_capture capture.launch format:=wave device:=plughw:1,0`.
 When the device is busy, you can try `fuser -v /dev/snd/*` to get PID and kill it by `kill -9 <PID>`.
 
+## ROS2
+
+`catkin_virtualenv` is not available on ROS2, so the Hume SDK is installed into a venv (`share/emotion_analyzer/venv`) from `pyproject.toml`/`uv.lock` at build time instead (`jsk_ros1_ros2_compat_generate_uv_venv()`). Run `uv lock` after changing `pyproject.toml`. The scripts use the legacy streaming API (`HumeStreamClient`), which was removed in hume 0.7, so it is pinned below 0.7.
+
+```bash
+colcon build --packages-up-to emotion_analyzer
+ros2 launch emotion_analyzer emotion_analyzer.launch.xml api_key:=<your_api_key>
+# or, with audio_capture
+ros2 launch emotion_analyzer sample_emotion_analyzer.launch.xml api_key:=<your_api_key>
+ros2 service call /analyze_text emotion_analyzer/srv/AnalyzeText "{text: '<text you want to analyze>'}"
+```
+
 
 
 

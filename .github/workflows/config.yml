@@ -42,14 +42,20 @@ jobs:
 
     container:
       image: ${{ matrix.CONTAINER }}
-      volumes:
-        - /tmp/node20:/__e/node20
 
     steps:
-      - name: Install latest git ( use sudo for ros-ubuntu )
+      - name: Install git
+        shell: bash
         run: |
-          (apt-get update && apt-get install -y sudo) || echo "OK"
-          sudo apt-get update && sudo apt-get install -y software-properties-common && sudo apt-get update && sudo add-apt-repository -y ppa:git-core/ppa && sudo apt-get update && sudo apt-get install -y git
+          set -eux
+          export DEBIAN_FRONTEND=noninteractive
+          if [ "${{ matrix.CONTAINER }}" != "jskrobotics/ros-ubuntu:14.04" ]; then
+            apt-get update
+            apt-get install -y -qq sudo
+          fi
+          sudo apt-get update
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends git ca-certificates
 
       - name: work around permission issue  # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
         run: |
@@ -67,23 +73,14 @@ jobs:
              git config --global --add safe.directory $GITHUB_WORKSPACE
           fi
 
-      - name: Try to replace `node` with an glibc 2.17
+      - name: Checkout repository without Node.js
         shell: bash
         run: |
-          if [ "${{ matrix.CONTAINER }}" = "jskrobotics/ros-ubuntu:14.04" ]; then
-             export USER=$(whoami)
-             sudo chmod 777 -R /__e/node20
-             sudo chown -R $USER /__e/node20
-          fi
-          ls -lar /__e/node20 &&
-          sudo apt-get install -y curl &&
-          curl -Lo /tmp/node.tar.gz https://unofficial-builds.nodejs.org/download/release/v20.17.0/node-v20.17.0-linux-x64-glibc-217.tar.gz &&
-          cd /__e/node20 &&
-          tar -x --strip-components=1 -f /tmp/node.tar.gz &&
-          ls -lar /__e/node20/bin/
-
-      - name: Checkout
-        uses: actions/checkout@v3.0.2
+          set -eux
+          git init .
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git checkout --detach FETCH_HEAD
 
       - name: Start X server
         run: |
@@ -98,8 +95,24 @@ jobs:
           xhost +local:root
         shell: bash
 
+      - name: Unhide AMENT_IGNORE'd packages for rosdep
+        run: |
+          set -x
+          # AMENT_IGNORE marks packages not yet ported to ROS2, so colcon
+          # skips them -- but rosdep's own package discovery treats
+          # AMENT_IGNORE the same as CATKIN_IGNORE and skips them too, while
+          # catkin (the actual ROS1 build here) does not and builds them
+          # anyway. This job is ROS1-only, so unhide them for rosdep.
+          find "$GITHUB_WORKSPACE" -name AMENT_IGNORE -exec rm -f {} \;
+        shell: bash
+
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
+        env:
+          # indigo predates the ros_environment package, so $ROS_VERSION is
+          # never set there; package.xml tags conditioned on
+          # "$ROS_VERSION == 1" would otherwise silently evaluate false.
+          ROS_VERSION: ${{ matrix.ROS_DISTRO == 'indigo' && '1' || '' }}
         with:
           # darty hack, jsk_travis runs catkin build --make-args $ROS_PARALLEL_JOBS --
           ROS_PARALLEL_JOBS : ${{ matrix.ROS_PARALLEL_JOBS }} LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -121,7 +134,12 @@ jobs:
 
     steps:
       - name: Install latest git ( use sudo for ros-ubuntu )
-        run: apt-get update && apt-get install -y software-properties-common && apt-get update && add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git
+        run: |
+          apt-get update && apt-get install -y software-properties-common && apt-get update
+          # ppa:git-core queries Launchpad's API, which occasionally fails
+          # transiently with "user or team does not exist" under CI load.
+          for i in 1 2 3 4 5; do add-apt-repository -y ppa:git-core/ppa && break || { echo "add-apt-repository failed, retrying ($i/5)"; sleep 15; }; done
+          apt-get update && apt-get install -y git
       - name: Checkout
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -129,6 +147,17 @@ jobs:
           cd $GITHUB_WORKSPACE
           git checkout -qf $GITHUB_SHA || (git fetch -q origin +$GITHUB_REF; git checkout -qf FETCH_HEAD)
           git submodule update --init .travis
+      - name: Unhide AMENT_IGNORE'd packages for rosdep
+        run: |
+          set -x
+          # AMENT_IGNORE marks packages not yet ported to ROS2, so colcon
+          # skips them -- but rosdep's own package discovery treats
+          # AMENT_IGNORE the same as CATKIN_IGNORE and skips them too, while
+          # catkin (the actual ROS1 build here) does not and builds them
+          # anyway. This job is ROS1-only, so unhide them for rosdep.
+          find "$GITHUB_WORKSPACE" -name AMENT_IGNORE -exec rm -f {} \;
+        shell: bash
+
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
         with:
@@ -144,7 +173,7 @@ jobs:
 
   ## need to setup runners from https://github.com/jsk-ros-pkg/jsk_3rdparty/settings/actions/runners
   arm:
-    runs-on: ['self-hosted', 'Linux', 'ARM64']
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +192,7 @@ jobs:
           path: ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
       - name: Skip packagse
         run: |
-          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && for name in ffha libsiftfast nlopt downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
+          cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }} && find . -name AMENT_IGNORE -exec rm -f {} \; && for name in ffha libsiftfast nlopt downward assimp_devel google_chat_ros; do echo $name; find -iname $name -exec touch {}/CATKIN_IGNORE \; ; ls -al $(find -iname $name)/; done
       - name: Run commands
         run: |
           cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
@@ -281,6 +310,8 @@ jobs:
           mkdir -p ~/ws/src
           cd ~/ws/src
           ln -sf $GITHUB_WORKSPACE .
+          # unhide AMENT_IGNORE'd (not yet ported to ROS2) packages for rosdep
+          find $GITHUB_WORKSPACE -name AMENT_IGNORE -exec rm -f {} \;
           rosdep install -qq -r -y --from-path . --ignore-src || echo "OK"
           # check all system packages are able to install, because ROS-O build deb files that needs all packages
           PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install -qq --simulate -y --from-path . --ignore-src -t exec -t buildtool_export -t buildtool -t build -t build_export | tee rosdep-install.sh
@@ -294,6 +325,22 @@ jobs:
           source /opt/ros/one/setup.bash
           set -x
           cd ~/ws/
-          catkin build --no-status -sv ${{ matrix.CATKIN_OPTIONS }} --cmake-args -DCATKIN_ENABLE_TESTING=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ${{ matrix.CMAKE_OPTIONS }}
+          catkin build --no-status -sv ${{ matrix.CATKIN_OPTIONS }} --cmake-args -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ${{ matrix.CMAKE_OPTIONS }}
         shell: bash
 
+
+      - name: Test Packages
+        run: |
+          source /opt/ros/one/setup.bash
+          set -x
+          cd ~/ws/
+          catkin run_tests --no-status -sv ${{ matrix.CATKIN_OPTIONS }} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ${{ matrix.CMAKE_OPTIONS }}
+        shell: bash
+
+      - name: Upload rosout/node logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roslogs-${{ matrix.DISTRO }}-${{ matrix.ROS_ONE_VARIANT }}
+          path: ~/.ros/log
+          retention-days: 5

@@ -2,6 +2,37 @@
 
 ROS Interface for [VOICEVOX](https://voicevox.hiroshiba.jp/) (AI speech synthesis)
 
+This package supports both ROS 1 and ROS 2 with the same launch arguments and environment variables.
+For ROS 2, read `roslaunch voicevox voicevox_texttospeech.launch` as `ros2 launch voicevox voicevox_texttospeech.launch.xml` and `rosrun` as `ros2 run`.
+
+## Quick Start
+
+Choose the deployment pattern that best fits your needs:
+
+```bash
+# Pattern A: Direct Docker + ROS client (Multi-machine) | 直接Docker + ROSクライアント（マルチマシン）
+# Server machine:
+docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+# Client machine:
+roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
+
+# Pattern B: ROS-managed Docker + ROS client (Multi-machine) | ROS管理Docker + ROSクライアント（マルチマシン）
+# Server machine:
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
+# Client machine:
+roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
+
+# Pattern C: All-in-one (Docker + ROS on same machine) | オールインワン（同一マシンでDocker+ROS）
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
+
+# Pattern D: Local VOICEVOX without Docker (CPU only) | ローカルVOICEVOX（Dockerなし、CPU版）
+# VOICEVOX engine is automatically installed during catkin build
+roslaunch voicevox voicevox_texttospeech.launch
+```
+
+Patterns A-C provide GPU acceleration support through Docker. Pattern D runs locally with CPU only.
+パターンA-CはDockerを通じたGPUによる高速な音声合成をサポート。パターンDはCPUのみでローカル実行。
+
 ## TERM
 
 [VOICEVOX](https://voicevox.hiroshiba.jp/) is basically free to use, but please check the terms of use below.
@@ -55,7 +86,117 @@ cd /path/to/catkin_workspace
 catkin build voicevox
 ```
 
+For ROS 2 (Python 3.12 or newer is required; python packages are installed with [uv](https://docs.astral.sh/uv/))
+
+```bash
+cd /path/to/colcon_workspace
+colcon build --packages-up-to voicevox
+```
+
+### Optional (Using Docker with GPU acceleration)
+
+VOICEVOX supports Docker deployment with GPU acceleration, which enables significantly faster speech synthesis compared to CPU-only processing.
+
+#### Prerequisites
+
+First, install the NVIDIA Container Toolkit:
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+#### Setup
+
+Pull the GPU-enabled VOICEVOX Docker image:
+
+```bash
+docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+Start the Docker container with GPU support:
+
+```bash
+docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+```
+
+#### Usage with use_docker option
+
+Launch the ROS node with Docker backend using the `use_docker:=true` option:
+
+```bash
+# For local Docker container
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
+
+# For remote Docker container
+roslaunch voicevox voicevox_texttospeech.launch use_docker:=true host:=<Docker PC IP>
+```
+
+#### Docker-only mode
+
+If you want to launch only the Docker container without the ROS sound_play node, use the `docker_only:=true` option:
+
+```bash
+# Launch Docker container only (local)
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
+
+# Launch Docker container only with custom port
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true port:=50022
+```
+
+#### GPU / CPU selection
+
+With `use_docker` or `docker_only`, the container uses the CPU image by default. Set `use_gpu:=true` to use the GPU image:
+
+```bash
+roslaunch voicevox voicevox_texttospeech.launch docker_only:=true use_gpu:=true
+```
+
+With `use_gpu:=true`, a short synthesis is sent once in the background after the container starts (warm-up) because the first synthesis can take tens of seconds.
+
+#### Connect to existing Docker container
+
+To connect to an existing Docker container running on a different machine:
+
+```bash
+# Connect to remote Docker container
+roslaunch voicevox voicevox_texttospeech.launch host:=<Docker PC IP> port:=<Docker Port>
+
+# Example: Connect to Docker container at 192.168.1.100:50021
+roslaunch voicevox voicevox_texttospeech.launch host:=192.168.1.100 port:=50021
+```
+
+The `use_docker` and `docker_only` options allow you to:
+- **use_docker**: Run Docker container and ROS node together
+- **docker_only**: Launch only the Docker container (useful for server deployment)
+- Utilize GPU acceleration for faster speech synthesis
+- Run VOICEVOX engine in an isolated container environment
+- Easily deploy on different machines without local installation
+
+
 ## Usage
+
+### Publish the speech on an audio topic instead of playing it with sound_play
+
+With `output_type:=audio`, `request_synthesis.py --output-type audio` runs
+instead of sound_play: it subscribes `SoundRequest` on `robotsound_jp` (as
+sound_play does, e.g. from `SoundClient.say()`, see [Say something](#saysomething))
+and text (`std_msgs/String`) on `robotsound_jp/text`, and publishes the
+synthesized speech as raw PCM (mono, S16LE, `sample_rate`) on `audio`
+(`audio_common_msgs/AudioData`), so that it is played by e.g.
+[audio_common](https://github.com/ros-drivers/audio_common)'s
+`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another
+machine. `~speaker` (id or name) can be changed at runtime.
+The `robotsound_jp` action (`SoundClient(blocking=True)`) is only served by sound_play.
+
+```bash
+ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio
+ros2 run audio_play audio_play_node --ros-args -p format:=wave -p sample_rate:=16000
+```
+
+Send Japanese text from another terminal:
+
+```bash
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは。音声テストです。'}"
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは。音声テストです。', arg2: ''}"
+```
 
 ### Launch sound_play with VOICEVOX Text-to-Speech
 
@@ -65,6 +206,31 @@ roslaunch voicevox voicevox_texttospeech.launch
 
 <a id="saysomething"></a>
 ### Say something
+
+Both `output_type:=wav` (default) and `output_type:=audio` speak
+`SoundRequest` (sound_play's `SoundClient`) on `robotsound_jp`
+and text (`std_msgs/String`) on `robotsound_jp/text`.
+
+#### From the command line
+
+Text (`std_msgs/String`):
+
+```bash
+rostopic pub --once /robotsound_jp/text std_msgs/String "data: 'こんにちは'"  # ROS 1
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは'}"  # ROS 2
+```
+
+`SoundRequest` (`sound: -3` is `SAY`, `command: 1` is `PLAY_ONCE`, `arg2` is the voice):
+
+```bash
+rostopic pub --once /robotsound_jp sound_play/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 1
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 2
+```
+
+With `output_type:=wav`, the voice of the text is `~speaker` of `text_to_sound_request_jp`
+(default: `default_speaker`), e.g. `rosparam set /text_to_sound_request_jp/speaker 四国めたん-あまあま`
+(ROS 2: `ros2 param set /text_to_sound_request_jp speaker 四国めたん-あまあま`).
+With `output_type:=audio`, it is `~speaker` of `voicevox_audio`.
 
 #### For python users
 
@@ -79,11 +245,29 @@ client = SoundClient(sound_action='robotsound_jp', sound_topic='robotsound_jp')
 client.say('こんにちは', voice='四国めたん-あまあま')
 ```
 
+For ROS 2
+
+```python
+import time
+
+import rclpy
+from sound_play.libsoundplay import SoundClient
+
+rclpy.init()
+node = rclpy.create_node('say_node')
+
+client = SoundClient(node, sound_action='robotsound_jp', sound_topic='robotsound_jp')
+time.sleep(1)
+
+client.say('こんにちは', voice='四国めたん-あまあま')
+```
+
 You can change the voice by changing the voice_name.
 You can also specify the speaker id.
 To get available voice name and speaker id, run following command
 ```bash
-rosrun voicevox list_speaker.py
+rosrun voicevox list_speakers.py  # ROS 1
+ros2 run voicevox list_speakers.py  # ROS 2
 ```
 
 |  speaker_id  |  voice_name  |
@@ -194,3 +378,11 @@ You can change the url and port by setting values for `VOICEVOX_TEXTTOSPEECH_URL
 
 You can also set the default character by setting `VOICEVOX_DEFAULT_SPEAKER_ID`.
 Please refer to [here](#saysomething) for the speaker id.
+
+With `output_type:=audio`, you can change the volume by `volume_scale` (default: `1.0`).
+For example, Unitree G1 needs about `volume_scale:=10.0` because its default volume is low.
+
+```bash
+roslaunch voicevox voicevox_texttospeech.launch output_type:=audio volume_scale:=10.0
+ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio volume_scale:=10.0
+```

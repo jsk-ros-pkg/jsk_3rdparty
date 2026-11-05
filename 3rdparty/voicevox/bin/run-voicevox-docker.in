@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# Original arguments
+args=("$@")
+
+# Filtered arguments (up to first "--")
+filtered_args=()
+for arg in "${args[@]}"; do
+  if [[ "$arg" == -- ]]; then
+    break
+  fi
+  filtered_args+=("$arg")
+done
+
+# Extract arguments for docker run
+host="localhost"
+port="50021"
+cpu_num_threads="1"
+use_gpu="false"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --host)
+      host="$2"
+      shift 2
+      ;;
+    --port)
+      port="$2"
+      shift 2
+      ;;
+    --cpu_num_threads)
+      cpu_num_threads="$2"
+      shift 2
+      ;;
+    --use_gpu)
+      use_gpu="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+# Check if host is localhost (start local container) or remote (just wait)
+if [[ "$host" == "localhost" || "$host" == "127.0.0.1" ]]; then
+  # Local Docker container mode
+  container_name="voicevox-engine-${port}"
+  if docker ps | grep -q "$container_name"; then
+    echo "VOICEVOX Docker container is already running on port $port"
+    # Keep the container running
+    docker logs -f "$container_name"
+    exit 0
+  fi
+
+  # Remove any existing stopped container with the same name
+  docker rm -f "$container_name" 2>/dev/null || true
+
+  case "$use_gpu" in
+    true|false)
+      ;;
+    *)
+      echo "Invalid --use_gpu value: '$use_gpu' (use true or false)" >&2
+      exit 1
+      ;;
+  esac
+  if [[ "$use_gpu" == "true" ]]; then
+    image="voicevox/voicevox_engine:nvidia-ubuntu20.04-latest"
+    gpu_args=(--gpus all)
+  else
+    image="voicevox/voicevox_engine:cpu-ubuntu20.04-latest"
+    gpu_args=()
+  fi
+
+  # Check if voicevox image exists, if not pull it
+  if ! docker image inspect "$image" > /dev/null 2>&1; then
+    echo "Pulling VOICEVOX Docker image $image ..."
+    docker pull "$image"
+  fi
+
+  # Warm up the GPU engine in the background (the first synthesis is slow)
+  if [[ "$use_gpu" == "true" ]]; then
+    (
+      warmup_start=$(date +%s)
+      ready=false
+      for _ in $(seq 1 180); do
+        if curl -s --connect-timeout 2 --max-time 5 \
+             "http://localhost:$port/version" > /dev/null 2>&1; then
+          ready=true
+          break
+        fi
+        sleep 2
+      done
+      if [[ "$ready" != true ]]; then
+        echo "[warmup] VOICEVOX engine did not become ready on port $port"
+        exit 0
+      fi
+      speaker="${VOICEVOX_DEFAULT_SPEAKER_ID:-2}"
+      query=$(curl -s --max-time 180 -X POST --get \
+        --data-urlencode "text=ウォームアップ" \
+        "http://localhost:$port/audio_query?speaker=$speaker")
+      code=$(curl -s --max-time 180 -X POST \
+        -H 'Content-Type: application/json' -d "$query" \
+        -o /dev/null -w '%{http_code}' \
+        "http://localhost:$port/synthesis?speaker=$speaker")
+      echo "[warmup] VOICEVOX warmup finished: HTTP $code, $(( $(date +%s) - warmup_start ))s since start"
+    ) &
+  fi
+
+  # Run VOICEVOX Docker container
+  if [[ "$use_gpu" == "true" ]]; then
+    echo "Starting VOICEVOX Docker container on port $port with GPU ($image)..."
+  else
+    echo "Starting VOICEVOX Docker container on port $port with $cpu_num_threads CPU threads ($image)..."
+  fi
+  exec docker run --rm "${gpu_args[@]}" \
+    --name "$container_name" \
+    -p "$port:50021" \
+    -e CPU_NUM_THREADS="$cpu_num_threads" \
+    "$image"
+else
+  # Remote Docker container mode - just wait for connection
+  echo "Connecting to remote VOICEVOX Docker container at $host:$port"
+  echo "Make sure the Docker container is running on the remote host with:"
+  echo "docker run --rm --gpus all -p '$port:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest"
+  echo ""
+  echo "Waiting for connection to $host:$port..."
+  
+  # Wait for the remote service to be available
+  while true; do
+    if curl -s --connect-timeout 5 "http://$host:$port/docs" > /dev/null 2>&1; then
+      echo "Successfully connected to VOICEVOX engine at $host:$port"
+      break
+    else
+      echo "Waiting for VOICEVOX engine at $host:$port..."
+      sleep 5
+    fi
+  done
+  
+  # Keep the script running
+  echo "VOICEVOX engine is ready at $host:$port"
+  while true; do
+    sleep 30
+    if ! curl -s --connect-timeout 5 "http://$host:$port/docs" > /dev/null 2>&1; then
+      echo "Lost connection to VOICEVOX engine at $host:$port"
+      exit 1
+    fi
+  done
+fi

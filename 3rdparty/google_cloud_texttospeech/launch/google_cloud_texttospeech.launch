@@ -26,7 +26,7 @@
         output="screen" >
     <remap from="robotsound" to="robotsound"/>
     <remap from="sound_play" to="robotsound"/>
-    <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
+    <env name="PATH" value="$(env GOOGLE_CLOUD_TEXTTOSPEECH_BIN_DIR):$(find google_cloud_texttospeech)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
     <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
     <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />
@@ -42,7 +42,7 @@
         output="screen" >
     <remap from="robotsound" to="robotsound_jp"/>
     <remap from="sound_play" to="robotsound_jp"/>
-    <env name="PATH" value="$(find google_cloud_texttospeech)/bin:$(env PATH)" />
+    <env name="PATH" value="$(env GOOGLE_CLOUD_TEXTTOSPEECH_BIN_DIR):$(find google_cloud_texttospeech)/bin:$(env PATH)" />
     <env name="PYTHONIOENCODING" value="utf-8" />
     <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$(arg credential)" />
     <env name="GOOGLE_CLOUD_TEXTTOSPEECH_CACHE_ENABLED" value="$(arg cache)" />

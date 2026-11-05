@@ -37,6 +37,22 @@ roslaunch ros_speech_recognition parrotry.launch
 roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 ```
 
+### ROS2
+
+The same nodes run on ROS2 (built with colcon; SpeechRecognition and vosk
+are installed into a venv of this package with uv at build time).
+The dynamic reconfigure parameters (see [Parameters](#parameters)) are ROS2
+parameters, e.g. `ros2 param set /speech_recognition language ja-JP`.
+The vosk models are downloaded into the installed share directory by
+`colcon build` (with jsk_data, as on ROS1).
+
+```bash
+ros2 launch ros_speech_recognition speech_recognition.launch.xml
+ros2 topic echo /speech_to_text
+# parrotry (julius and aques_talk are not available, use engine:=... and sound_play)
+ros2 launch ros_speech_recognition parrotry.launch.xml
+```
+
 ## `speech_recognition_node.py` Interface
 
 ### Publishing Topics
@@ -159,21 +175,29 @@ roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
 
   Maximum buffer size to store audio data for speech recognition
   
-* `~start_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/bell.ogg`)
+* `~start_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on the start of audio caption
+  Path to sound file for bell on the start of audio caption.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/bell.ogg` or `/usr/share/sounds/freedesktop/stereo/bell.oga` is used.
   
-* `~recognized_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message.ogg`)
+* `~recognized_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on the end of audio caption
+  Path to sound file for bell on the end of audio caption.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message.ogg` or `/usr/share/sounds/freedesktop/stereo/message.oga` is used.
   
-* `~success_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg`)
+* `~success_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on getting successful recognition result
+  Path to sound file for bell on getting successful recognition result.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg` or `/usr/share/sounds/freedesktop/stereo/message-new-instant.oga` is used.
   
-* `~timeout_signal` (`String`, default: `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg`)
+* `~timeout_signal` (`String`, default: `None`)
 
-  Path to sound file for bell on timeout for recognition
+  Path to sound file for bell on timeout for recognition.
+
+  If this is `None`, `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg` or `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.oga` is used.
   
 * `~continuous` (`Bool`, default: False)
 

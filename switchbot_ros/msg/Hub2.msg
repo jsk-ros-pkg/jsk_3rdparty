@@ -1,4 +1,4 @@
-Header  header       # timestamp
+std_msgs/Header  header  # timestamp
 
 float64 temperature  # temperature in celsius
 float64 humidity     # humidity percentage
