@@ -2,6 +2,90 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2026-11-06)
+------------------
+* Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
+  Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
+* [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
+  The buildfarm builds each package with only its own build dependencies,
+  so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes
+  the ROS1 branch (same as jsk_common#1835). voicevox also guesses
+  ROS_VERSION from AMENT_PREFIX_PATH when it is unset.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* AMENT_IGNORE: do not add AMENT_IGNORE to packages already ported to ROS2
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite,
+  sesame_ros and switchbot_ros are already ROS2 packages on master, so
+  this PR must not AMENT_IGNORE them. Also remove
+  ros_speech_recognition/AMENT_IGNORE, as this PR ports it to ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* AMENT_IGNORE packages ported to ROS2 in jsk-ros-pkg/jsk_3rdparty#575
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, rospatlite, sesame_ros and
+  switchbot_ros are ROS1 only here, so the ROS2 CI skips them until #575.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [switchbot_ros] add ROS2 support
+  Single package.xml/CMakeLists.txt branched on $ROS_VERSION, same as
+  chaplus_ros and jsk_common's ROS2-ported packages.
+  - CMakeLists.txt: the ROS2 block is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged. ROS2 generates msg/*.msg and
+  action/SwitchBotCommand.action with rosidl_generate_interfaces(),
+  installs src/switchbot_ros/switchbot.py next to the generated python
+  package (rosidl already does ament_python_install_package() for the
+  same name), and installs switchbot_ros_server.py /
+  switchbot_status_publisher.py with a python3 shebang. ROS2 uses the
+  system python3-requests instead of catkin_virtualenv (ROS1 only).
+  - msg/*.msg: Header -> std_msgs/Header (required by rosidl, equally
+  valid for ROS1).
+  - switchbot_ros_server.py / switchbot_status_publisher.py: use
+  jsk_ros1_ros2_compat's rospy_rclpy_compat (get_param, log*, Rate,
+  is_shutdown, stamp_now), with the same rospy-forwarding fallback as
+  chaplus_ros when jsk_ros1_ros2_compat (jsk_common >= 3.0) is not
+  available. Latched topics use create_publisher/create_subscription
+  (latch=True), and rospy.logwarn_once becomes
+  ros_compat.logwarn_once. The status values from the JSON API are converted with
+  float() for float64 fields, since ROS2 messages reject int there.
+  - launch/switchbot.launch.xml: ROS2 counterpart of switchbot.launch.
+  - The ROS2 scripts are installed with jsk_ros1_ros2_compat's
+  jsk_ros1_ros2_compat_install_python() (python3 shebang), from
+  jsk-ros-pkg/jsk_common#1832, as a ROS2-only buildtool_depend
+  (>= 3.0.2) that stays off rosidl's build dependencies.
+  Make the actionlib parts dual ROS1/ROS2 with jsk_ros1_ros2_compat
+  (>= 3.0.2, jsk-ros-pkg/jsk_common#1831):
+  - switchbot_ros_server.py: ros_compat.create_simple_action_server()
+  (actionlib.SimpleActionServer on ROS1, rclpy ActionServer on ROS2)
+  replaces the ROS2-only ActionServer code, so execute_cb() is the
+  same for both and the same as master except for rospy.Rate/logerr.
+  - switchbot_ros_client.py (SwitchBotROSClient) and control_switchbot.py,
+  ROS1-only so far: ros_compat.create_simple_action_client() (timeouts
+  in seconds on both). SwitchBotROSClient takes an optional node, which
+  on ROS2 has to be spun by another thread; get_devices() waits for the
+  latched (transient local) ~devices topic on ROS2. control_switchbot.py
+  is installed on ROS2 and switchbot_ros_client.py is put into the
+  rosidl-generated python package.
+  - The ImportError fallbacks for jsk_common < 3.0 on ROS1 forward to
+  actionlib.SimpleActionServer and to a small SimpleActionClient
+  subclass taking timeouts in seconds.
+  switchbot.l (roseus client) stays ROS1-only.
+  - Latched ~devices / status topics: ros_compat.create_publisher(...,
+  latch=True) instead of a QoSProfile(TRANSIENT_LOCAL) ROS_VERSION
+  branch; SwitchBotROSClient.get_devices() subscribes with
+  create_subscription(..., latch=True) on both ROS versions.
+  - switchbot_ros_server.py: spin loop with ros_compat.spin_once(); main
+  with init_node()/shutdown(). switchbot_status_publisher.py: main with
+  init_node()/shutdown(), the original '~' + device_name topic name, and
+  a shutdown check after rate.sleep() (it published on an already
+  shut down context on SIGTERM). control_switchbot.py: init_node() and
+  ros_compat.spin() in a thread instead of the ROS_VERSION branch.
+  Uses jsk-ros-pkg/jsk_common#1831 (>= 3.0.2 on ROS2).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 2.1.31 (2025-05-13)
 -------------------
 

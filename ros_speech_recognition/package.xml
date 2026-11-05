@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>ros_speech_recognition</name>
-  <version>2.1.31</version>
+  <version>3.0.0</version>
   <description>ROS wrapper for Python SpeechRecognition library</description>
   <url type="website">https://pypi.python.org/pypi/SpeechRecognition/</url>
 

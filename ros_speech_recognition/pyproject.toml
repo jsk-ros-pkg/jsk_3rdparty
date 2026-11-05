@@ -5,7 +5,7 @@
 # `uv lock`.
 [project]
 name = "ros-speech-recognition"
-version = "2.1.31"
+version = "3.0.0"
 requires-python = ">=3.10"
 dependencies = [
     "SpeechRecognition==3.9.0",

@@ -2,6 +2,112 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2026-11-06)
+------------------
+* Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
+  Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
+* [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
+  The buildfarm builds each package with only its own build dependencies,
+  so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes
+  the ROS1 branch (same as jsk_common#1835). voicevox also guesses
+  ROS_VERSION from AMENT_PREFIX_PATH when it is unset.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* AMENT_IGNORE: do not add AMENT_IGNORE to packages already ported to ROS2
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite,
+  sesame_ros and switchbot_ros are already ROS2 packages on master, so
+  this PR must not AMENT_IGNORE them. Also remove
+  ros_speech_recognition/AMENT_IGNORE, as this PR ports it to ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* AMENT_IGNORE packages ported to ROS2 in jsk-ros-pkg/jsk_3rdparty#575
+  chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros,
+  influxdb_store, power_switching_tools_ros, rospatlite, sesame_ros and
+  switchbot_ros are ROS1 only here, so the ROS2 CI skips them until #575.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [google_chat_ros] add ROS2 support
+  Single package.xml/CMakeLists.txt branched on $ROS_VERSION, same as
+  jsk_common's ROS2-ported packages.
+  - CMakeLists.txt: the ROS2 block is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (no re-indentation). ROS2
+  generates msg/*.msg and SendMessage.action with rosidl, and installs
+  src/google_chat_ros into the python package that
+  rosidl_generate_interfaces() already installs.
+  - package.xml: on ROS2 the python dependencies come from rosdep keys
+  (python3-googleapi, python3-oauth2client, python3-google-cloud-pubsub-pip,
+  python3-gdown-pip, ...) instead of catkin_virtualenv.
+  - google_chat.py: its free-standing rospy.log*() calls go through
+  jsk_ros1_ros2_compat's log_utils (imported as `rospy`). Also fall back
+  to ssl.SSLContext when ssl.wrap_socket() is missing (removed in Python
+  3.12), so the url receiving mode can start on noble/jazzy.
+  - google_chat_ros_node.py: uses rospy_rclpy_compat (get_param, log*,
+  create_publisher, Rate), keeping the ROS1 structure as-is. The send
+  action server uses a small actionlib.SimpleActionServer-like wrapper
+  of rclpy's ActionServer, so rest_cb() is shared. GoogleChatROS() blocks
+  in the url/pubsub receiving modes (rospy spins in its own threads), so
+  on ROS2 the node is spun in a background thread; rospy.on_shutdown()
+  becomes the rclpy context's on_shutdown().
+  - jsk_ros1_ros2_compat is only released with jsk_common >= 3.0 (not
+  in noetic/ROS-O yet), so it is a ROS2-only dependency and the scripts
+  fall back to rospy when it is not importable.
+  - ROS2 python dependencies: a uv venv made from pyproject.toml/uv.lock
+  (the same versions as requirements.in.python3.12) with
+  jsk_ros1_ros2_compat_generate_uv_venv() (jsk-ros-pkg/jsk_common#1831),
+  in place of rosdep keys, two of which were pip keys that bloom can not
+  release. google_chat_ros_node.py runs with the venv's python3
+  (install_python(... USE_VENV)); helper.py needs none of them.
+  oauth2client picks up the system pyOpenSSL together with the system
+  cryptography here (neither is in the venv), so they match.
+  - helper.py is ported too: create_simple_action_client() for
+  google_chat_ros/send, dialogflow_client/text_action and robotsound_jp
+  (sound_play_msgs on ROS2), get_param/create_subscription. On ROS2 the
+  subscription callback only queues the message and a worker thread
+  sends the goals, since waiting for an action result in an executor
+  callback would block the executor. dialogflow_task_executive is not
+  ported to ROS2, so to_dialogflow_client is skipped with a warning when
+  its messages can not be imported; it is a ROS1-only dependency, and so
+  is the unused DialogResponse import of the node.
+  - google_chat_ros_node.py: create_simple_action_server()/on_shutdown()
+  from jsk_ros1_ros2_compat replace the local action
+  server wrapper and shutdown hook. Image upload via gdrive_ros now also
+  works on ROS2 (a client in a reentrant callback group, since it is
+  called from the action execute callback). GoogleChatROS(), which blocks
+  in url/pubsub mode, runs in a daemon thread and the node spins in the
+  main thread: rclpy did not shut down on SIGINT/SIGTERM while spinning in
+  a non-main thread.
+  - google_chat.py: GoogleChatHTTPSServer.run() wakes up every second
+  (httpd.timeout), so kill() stops the url mode server on shutdown
+  without waiting for a request; on ROS1 the node did not exit on
+  rosnode kill either.
+  - launch/google_chat.launch.xml: ROS2 version of google_chat.launch;
+  yaml_file is loaded with <param from>, reading launch/empty_params.yaml
+  unless use_yaml, since <param from> takes no if=.
+  ROS1-only: the euslisp client and the rostests.
+  - google_chat_ros_node.py: main with ros_compat.init_node()/spin()
+  (MultiThreadedExecutor on ROS2, created after init); GoogleChatROS()
+  runs in a daemon thread on both ROS versions. The ROS2-only
+  _ros2_upload_file() uses the node's own logger instead of ros_compat,
+  so that ROS_VERSION branches use plain rospy/rclpy only.
+  - helper.py: the message queue + worker thread is used on both ROS
+  versions, so __init_\_ and main need no ROS_VERSION branch; main with
+  ros_compat.init_node()/spin().
+  Uses jsk-ros-pkg/jsk_common#1831 (>= 3.0.2 on ROS2).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge branch 'master' into power_switching_tools_ros
+* Merge pull request #568 from k-okada/k-okada/add_ga_test
+  Enable CI test runs and fix a few test failures
+* [google_chat_ros] bump gdown to 4.7.3 to drop pkg_resources dependency
+  gdown 4.4.0 imports pkg_resources at module load time, which breaks
+  under Python 3.12 venvs where catkin_virtualenv preinstalls a
+  setuptools version that no longer ships pkg_resources. gdown>=4.5
+  reads its own version as a plain string instead, so this needs no
+  compat shim. gdown.download()'s url/output/id signature is unchanged.
+* Contributors: Kei Okada, Shun Hasegawa
+
 2.1.31 (2025-05-13)
 -------------------
 

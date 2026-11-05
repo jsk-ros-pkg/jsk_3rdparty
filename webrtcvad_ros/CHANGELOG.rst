@@ -2,6 +2,49 @@
 Changelog for package webrtcvad_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2026-11-06)
+------------------
+* Merge branch 'master' into fix_hoya
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge pull request #575 from k-okada/ros2-support
+  Add ROS2 (jazzy) support to chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, rospatlite, sesame_ros, switchbot_ros
+* Merge branch 'master' into voicevox-ros1-ros2
+* Merge branch 'master' into ros2-support
+* Merge branch 'master' into ros2-speech-recognition-only
+* Merge pull request #578 from k-okada/ros-o-pip-virtualenv
+  Fix ROS-O CI: install the dropped ``python-*-pip`` deps with catkin_virtualenv (webrtcvad_ros, pgm_learner, google_cloud_texttospeech)
+* [webrtcvad_ros] python3: install webrtcvad with catkin_virtualenv
+  rosdistro dropped the python3 resolution of python-webrtcvad-pip
+  (ros/rosdistro#51720), so rosdep fails on it (ROS-O CI). Keep it for
+  python2, and install webrtcvad into a catkin_virtualenv on python3 from a
+  pinned requirements.txt (package.xml format 3 for the conditions).
+  webrtcvad 2.0.10 imports pkg_resources, which the setuptools
+  catkin_virtualenv installs for Python >= 3.10 does not have any more, so
+  use webrtcvad-wheels there (same module). The node scripts are installed
+  with catkin_install_python to run in the virtualenv.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* [GA] add ROS2 (jazzy) CI and AMENT_IGNORE packages not yet ported to ROS2
+  - ros2.yaml: industrial_ci on jazzy. The ROS2 ports depend on
+  jsk_ros1_ros2_compat >= 3.0.2 (jsk_common), installed by rosdep from
+  its jazzy release.
+  - AMENT_IGNORE the packages not ported to ROS2 yet.
+  - config.yml: AMENT_IGNORE is treated as CATKIN_IGNORE by rosdep's
+  package discovery, so remove them before rosdep install in the ROS1
+  jobs (same as jsk_common). Also set ROS_VERSION=1 for indigo, which
+  predates ros_environment.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 2.1.31 (2025-05-13)
 -------------------
 

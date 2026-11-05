@@ -3,7 +3,7 @@
 # with requirements.txt). Update uv.lock with `uv lock`.
 [project]
 name = "gdrive-ros"
-version = "2.1.31"
+version = "3.0.0"
 requires-python = ">=3.10"
 dependencies = [
     "PyDrive",
