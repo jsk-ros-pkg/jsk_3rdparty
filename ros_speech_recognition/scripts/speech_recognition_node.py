@@ -15,8 +15,6 @@ from threading import Lock
 from threading import Thread
 from threading import Event
 
-import numpy as np
-
 from audio_common_msgs.msg import AudioData
 from std_msgs.msg import String
 if ROS_VERSION == 2:
@@ -458,6 +456,8 @@ class ROSSpeechRecognition(object):
             self.stop_fn()
 
     def _streaming_loop(self):
+        # imported here, as numpy is not installed in python3 venv on kinetic/melodic
+        import numpy as np
         sr = self.audio.SAMPLE_RATE
         chunk_bytes = sr * 2 * 100 // 1000  # 100 ms of S16 mono
         was_canceling = False
