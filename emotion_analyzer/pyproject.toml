@@ -8,9 +8,8 @@ requires-python = ">=3.10"
 dependencies = [
     # the scripts use the legacy HumeStreamClient, removed in hume 0.7
     "hume[stream]<0.7",
-    # also in the venv, as the scripts run with its python (the wheel
-    # bundles libsndfile)
-    "soundfile",
+    # soundfile comes from apt (python3-soundfile), its numpy wheel
+    # breaks dh_strip of the buildfarm
 ]
 
 [tool.uv]
