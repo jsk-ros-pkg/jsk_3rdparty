@@ -2,8 +2,8 @@
 Changelog for package power_switching_tools_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm
   The buildfarm builds each package with only its own build dependencies,
   so without ros_environment $ROS_VERSION is empty and CMakeLists.txt takes

@@ -3,7 +3,7 @@
 # with requirements.in). Update uv.lock with `uv lock`.
 [project]
 name = "emotion-analyzer"
-version = "2.1.31"
+version = "3.0.0"
 requires-python = ">=3.10"
 dependencies = [
     # the scripts use the legacy HumeStreamClient, removed in hume 0.7

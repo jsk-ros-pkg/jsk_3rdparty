@@ -2,8 +2,8 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * Merge branch 'master' into ros2-google-cloud-stream
 * Merge pull request #542 from jsk-ros-pkg/fix_hoya
   license of voice_text is HOYA

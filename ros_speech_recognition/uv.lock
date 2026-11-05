@@ -647,7 +647,7 @@ wheels = [
 
 [[package]]
 name = "ros-speech-recognition"
-version = "2.1.31"
+version = "3.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "google-cloud-speech" },

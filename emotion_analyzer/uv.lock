@@ -41,7 +41,7 @@ wheels = [
 
 [[package]]
 name = "emotion-analyzer"
-version = "2.1.31"
+version = "3.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "hume" },

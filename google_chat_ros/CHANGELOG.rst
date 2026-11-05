@@ -2,8 +2,8 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
   Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
 * [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm

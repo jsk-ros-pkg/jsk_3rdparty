@@ -2,8 +2,8 @@
 Changelog for package emotion_analyzer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
   Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
 * [emotion_analyzer] use python3-soundfile from apt instead of the uv venv

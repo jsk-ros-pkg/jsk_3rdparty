@@ -2,8 +2,8 @@
 Changelog for package mini_maxwell
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * Merge branch 'master' into fix_hoya
 * Merge branch 'master' into voicevox-ros1-ros2
 * Merge pull request #575 from k-okada/ros2-support

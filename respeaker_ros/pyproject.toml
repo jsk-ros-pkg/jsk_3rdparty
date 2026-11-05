@@ -5,7 +5,7 @@
 # typesupport is built against the system numpy.
 [project]
 name = "respeaker-ros"
-version = "2.1.31"
+version = "3.0.0"
 requires-python = ">=3.10"
 dependencies = [
     "SpeechRecognition",

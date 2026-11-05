@@ -2,8 +2,8 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-11-06)
+------------------
 * Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
   Fix ROS2 buildfarm binary jobs: ros_environment, bundled flac, numpy wheel
 * [ros_speech_recognition, respeaker_ros] remove flac binaries bundled with SpeechRecognition from the uv venv
