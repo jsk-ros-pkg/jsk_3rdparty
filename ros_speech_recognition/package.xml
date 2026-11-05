@@ -23,6 +23,8 @@
   <exec_depend>audio_common_msgs</exec_depend>
   <exec_depend condition="$ROS_VERSION == 1">dynamic_reconfigure</exec_depend>
   <exec_depend>flac</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-numpy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-numpy</exec_depend>
   <exec_depend>jsk_data</exec_depend>
   <exec_depend>sound_play</exec_depend>
   <exec_depend>sound-theme-freedesktop</exec_depend>
@@ -33,7 +35,7 @@
   <exec_depend condition="$ROS_VERSION == 2">action_msgs</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">ament_index_python</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">sound_play_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 2">std_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">std_srvs</exec_depend>
   <!-- catkin_virtualenv (requirements.txt) has no ROS2 port -->
   <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;

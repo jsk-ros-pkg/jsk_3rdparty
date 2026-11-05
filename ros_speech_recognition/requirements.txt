@@ -1,2 +1,4 @@
 SpeechRecognition==3.9.0
 vosk==0.3.45
+# GoogleCloudStream engine, google-cloud-speech requires python >= 3.7 (kinetic and melodic use python 3.5 and 3.6)
+google-cloud-speech==2.26.0 ; python_version >= "3.7"

@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "SpeechRecognition==3.9.0",
     "vosk==0.3.45",
+    "google-cloud-speech==2.26.0",
 ]
 
 [tool.uv]

@@ -2,9 +2,21 @@
 #
 # we need this to pass more config params, like enable_speaker_diarization=True
 # see https://cloud.google.com/speech-to-text/docs/multiple-voices
+#
+# The request is sent with google-cloud-speech (also used by the
+# GoogleCloudStream engine). google-api-python-client + oauth2client, used by
+# SpeechRecognition, are kept only for python < 3.7 (indigo/kinetic/melodic),
+# where google-cloud-speech is not available.
 
 import speech_recognition as SR
 from speech_recognition import *
+
+try:
+    from google.cloud import speech_v1
+    HAS_GOOGLE_CLOUD_SPEECH = True
+except ImportError:
+    HAS_GOOGLE_CLOUD_SPEECH = False
+
 
 class RecognizerEx(SR.Recognizer):
     def recognize_google_cloud(self, audio_data, credentials_json=None, language="en-US", preferred_phrases=None, show_all=False, user_config = {}):
@@ -16,6 +28,8 @@ class RecognizerEx(SR.Recognizer):
         The recognition language is determined by ``language``, which is a BCP-47 language tag like ``"en-US"`` (US English). A list of supported language tags can be found in the `Google Cloud Speech API documentation <https://cloud.google.com/speech/docs/languages>`__.
 
         If ``preferred_phrases`` is an iterable of phrase strings, those given phrases will be more likely to be recognized over similar-sounding alternatives. This is useful for things like keyword/command recognition or adding new phrases that aren't in Google's vocabulary. Note that the API imposes certain `restrictions on the list of phrase strings <https://cloud.google.com/speech/limits#content>`__.
+
+        ``user_config`` is merged into the `RecognitionConfig <https://cloud.google.com/speech-to-text/docs/reference/rest/v1/RecognitionConfig>`__ in its JSON (camelCase) form, e.g. ``{"diarizationConfig": {"enableSpeakerDiarization": True}}``.
 
         Returns the most likely transcription if ``show_all`` is False (the default). Otherwise, returns the raw API response as a JSON dictionary.
 
@@ -34,6 +48,75 @@ class RecognizerEx(SR.Recognizer):
             convert_width=2  # audio samples must be 16-bit
         )
 
+        speech_config = {"encoding": "FLAC", "sampleRateHertz": audio_data.sample_rate, "languageCode": language}
+
+        ###################################
+        ##  Support user defined configs ##
+        ###################################
+        speech_config.update(user_config)
+        ###################################
+        ##                               ##
+        ###################################
+
+        if preferred_phrases is not None:
+            speech_config["speechContexts"] = [{"phrases": list(preferred_phrases)}]
+        if show_all:
+            speech_config["enableWordTimeOffsets"] = True  # some useful extra options for when we want all the output
+
+        if HAS_GOOGLE_CLOUD_SPEECH:
+            response = self._recognize_google_cloud_speech(flac_data, speech_config, credentials_json)
+        else:
+            response = self._recognize_google_api_client(flac_data, speech_config, credentials_json)
+
+        if show_all: return response
+        if "results" not in response or len(response["results"]) == 0: raise UnknownValueError()
+        diarization = speech_config.get("diarizationConfig", {}).get("enableSpeakerDiarization", False)
+        transcript = ""
+        for result in response["results"]:
+            if diarization:
+                # when diariazationConfig is true, use words with speakerTag:
+                speakerTag = None
+                for word in result["alternatives"][0].get("words", []):
+                    if 'speakerTag' in word:
+                        if speakerTag != word['speakerTag']:
+                            speakerTag = word['speakerTag']
+                            transcript += "[{}]".format(speakerTag)
+                        transcript += ' ' + word['word']
+            elif "transcript" in result["alternatives"][0]:
+                transcript += result["alternatives"][0]["transcript"].strip() + " "
+
+        return transcript
+
+    def _recognize_google_cloud_speech(self, flac_data, speech_config, credentials_json):
+        """Send the request with google-cloud-speech, return the response as a REST JSON dict."""
+        from google.api_core import exceptions as gexc
+        from google.auth import exceptions as auth_exc
+        from google.oauth2 import service_account
+        from google.protobuf.json_format import MessageToDict
+        from google.protobuf.json_format import ParseError
+
+        try:
+            config = speech_v1.RecognitionConfig.from_json(json.dumps(speech_config))
+        except ParseError as e:
+            raise RequestError("invalid RecognitionConfig {}: {}".format(speech_config, e))
+        try:
+            if credentials_json is None:
+                client = speech_v1.SpeechClient()
+            else:
+                client = speech_v1.SpeechClient(
+                    credentials=service_account.Credentials.from_service_account_info(
+                        json.loads(credentials_json)))
+            response = client.recognize(
+                config=config,
+                audio=speech_v1.RecognitionAudio(content=flac_data),
+                timeout=self.operation_timeout)
+        except (gexc.GoogleAPIError, auth_exc.GoogleAuthError, ValueError) as e:
+            raise RequestError("{}: {}".format(type(e).__name__, e))
+        # the same camelCase dict as the REST API response
+        return MessageToDict(response._pb)
+
+    def _recognize_google_api_client(self, flac_data, speech_config, credentials_json):
+        """Send the request with google-api-python-client (python < 3.7 only)."""
         try:
             from oauth2client.client import GoogleCredentials
             from googleapiclient.discovery import build
@@ -60,45 +143,11 @@ class RecognizerEx(SR.Recognizer):
         except ImportError:
             raise RequestError("missing google-api-python-client module: ensure that google-api-python-client is set up correctly.")
 
-        speech_config = {"encoding": "FLAC", "sampleRateHertz": audio_data.sample_rate, "languageCode": language}
-
-        ###################################
-        ##  Support user defined configs ##
-        ###################################
-        speech_config.update(user_config)
-        ###################################
-        ##                               ##
-        ###################################
-
-        if preferred_phrases is not None:
-            speech_config["speechContext"] = {"phrases": preferred_phrases}
-        if show_all:
-            speech_config["enableWordTimeOffsets"] = True  # some useful extra options for when we want all the output
         request = speech_service.speech().recognize(body={"audio": {"content": base64.b64encode(flac_data).decode("utf8")}, "config": speech_config})
 
         try:
-            response = request.execute()
+            return request.execute()
         except googleapiclient.errors.HttpError as e:
             raise RequestError(e)
         except URLError as e:
             raise RequestError("recognition connection failed: {0}".format(e.reason))
-
-        if show_all: return response
-        if "results" not in response or len(response["results"]) == 0: raise UnknownValueError()
-        transcript = ""
-        for result in response["results"]:
-            if 'diarizationConfig' in speech_config and \
-               speech_config['diarizationConfig']['enableSpeakerDiarization'] == True:
-                # when diariazationConfig is true, use words with speakerTag:
-                speakerTag = None
-                for word in result["alternatives"][0]["words"]:
-                    if 'speakerTag' in word:
-                        if speakerTag != word['speakerTag']:
-                            speakerTag = word['speakerTag']
-                            transcript += "[{}]".format(speakerTag)
-                        transcript += ' ' + word['word']
-            elif "transcript" in result["alternatives"][0]:
-                print("trasncript?")
-                transcript += result["alternatives"][0]["transcript"].strip() + " "
-
-        return transcript

@@ -7,6 +7,7 @@ ros_compat.create_reconfigure_server(). Keep them the same as
 
 SpeechRecognition_Google = 'Google'
 SpeechRecognition_GoogleCloud = 'GoogleCloud'
+SpeechRecognition_GoogleCloudStream = 'GoogleCloudStream'
 SpeechRecognition_Sphinx = 'Sphinx'
 SpeechRecognition_Wit = 'Wit'
 SpeechRecognition_Bing = 'Bing'
