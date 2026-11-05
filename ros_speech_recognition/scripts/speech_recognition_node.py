@@ -290,6 +290,7 @@ class ROSSpeechRecognition(object):
                     model=ros_compat.get_param(self.node, "~google_cloud_model", ""),
                     endpoint_stable_s=ros_compat.get_param(self.node,
                         "~google_cloud_endpoint_stable_s", 1.0),
+                    logwarn=lambda msg: ros_compat.logwarn(self.node, msg),
                 )
                 ros_compat.loginfo(self.node, "GoogleCloudStream recognizer ready (lang={})"
                                    .format(self.language))
@@ -481,6 +482,14 @@ class ROSSpeechRecognition(object):
                 try:
                     self._stream_recognizer.accept_waveform(sr, arr)
                 except Exception as e:
+                    if self._stream_recognizer.fatal_error is not None:
+                        # reconnecting cannot fix it (e.g. invalid credential)
+                        ros_compat.logerr(self.node,
+                            "{}. Speech recognition stopped; check "
+                            "~google_cloud_credentials_json / "
+                            "GOOGLE_APPLICATION_CREDENTIALS and the Speech-to-Text API "
+                            "of the project".format(e))
+                        break
                     ros_compat.logerr(self.node, "streaming accept_waveform failed: {}".format(e))
                     continue
                 if self._stream_recognizer.is_endpoint(None):

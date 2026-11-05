@@ -9,9 +9,17 @@ import numpy as np
 class GoogleCloudStreamingRecognizer(object):
 
     def __init__(self, sample_rate=16000, language_code="ja-JP", model="",
-                 endpoint_stable_s=1.0):
+                 endpoint_stable_s=1.0, logwarn=None):
+        from google.api_core import exceptions as gexc
         from google.cloud import speech_v1 as speech
         self._speech = speech
+        # called with a message when the gRPC stream fails (e.g. ros_compat.logwarn)
+        self._logwarn = logwarn
+        # errors that reconnecting cannot fix (bad credential, API disabled,
+        # bad config): the stream is not restarted after one of them
+        self._permanent_errors = (gexc.Unauthenticated, gexc.PermissionDenied,
+                                  gexc.InvalidArgument, gexc.NotFound)
+        self.fatal_error = None
         self._client = speech.SpeechClient()
         self._sample_rate = sample_rate
         self._endpoint_stable_s = endpoint_stable_s
@@ -87,16 +95,27 @@ class GoogleCloudStreamingRecognizer(object):
                         if (result.is_final and text.strip()
                                 and text != self._committed_text):
                             self._endpoint = True
-        except Exception:
+        except Exception as e:
+            if self._stop_evt.is_set():
+                return  # closed by stop_stream()
+            if isinstance(e, self._permanent_errors):
+                # accept_waveform() raises this instead of reconnecting
+                self.fatal_error = e
+                return
             # 305s session limit / network glitches — restart lazily on the
             # next accept_waveform().
-            pass
+            if self._logwarn is not None:
+                self._logwarn("GoogleCloudStream stream closed, reconnecting: {}: {}"
+                              .format(type(e).__name__, e))
 
     def create_stream(self):
         self._start_stream()
         return self
 
     def accept_waveform(self, sample_rate, arr_float32):
+        if self.fatal_error is not None:
+            raise RuntimeError("GoogleCloudStream failed: {}: {}".format(
+                type(self.fatal_error).__name__, self.fatal_error))
         if self._thread is None or not self._thread.is_alive():
             self._start_stream()
         pcm = (np.clip(arr_float32, -1, 1) * 32767).astype(np.int16).tobytes()
