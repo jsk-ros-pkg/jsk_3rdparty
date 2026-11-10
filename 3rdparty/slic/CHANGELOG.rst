@@ -2,6 +2,9 @@
 Changelog for package slic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 3.0.0 (2026-11-06)
 ------------------
 * Merge branch 'master' into fix_hoya

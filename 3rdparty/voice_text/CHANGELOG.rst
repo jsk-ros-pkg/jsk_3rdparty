@@ -2,6 +2,9 @@
 Changelog for package voice_text
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 3.0.0 (2026-11-06)
 ------------------
 * Merge branch 'master' into ros2-google-cloud-stream
