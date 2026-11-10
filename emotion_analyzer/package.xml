@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>emotion_analyzer</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>The emotion_analyzer package</description>
 
   <maintainer email="k-okada@jsk.imi.i.u-tokyo.ac.jp">Kei Okada</maintainer>

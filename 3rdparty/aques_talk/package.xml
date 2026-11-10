@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="1">
   <name>aques_talk</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>ROS interface aques_talk demo program
   </description>
   <author email="kei.okada@gmail.com">AQUEST Corp, ROS package maintained by Kei Okada</author>

@@ -2,8 +2,8 @@
 Changelog for package aques_talk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.1 (2026-11-10)
+------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review
   rosdistro#55247 review: rename power_switching_tools_ros to jsk_power_switching_tools, fix licenses
 * use SPDX license identifiers (BSD-3-Clause, Apache-2.0) in package.xml

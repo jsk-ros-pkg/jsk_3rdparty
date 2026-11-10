@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>influxdb_store</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>The influxdb_store package</description>
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
   <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>

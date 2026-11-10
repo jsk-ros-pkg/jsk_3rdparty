@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>slic</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>SLIC-Superpizel ROS Wrapper
   This file contains the class elements of the class Slic. This class is an
   implementation of the SLIC Superpixel algorithm by Achanta et al. [PAMI'12,

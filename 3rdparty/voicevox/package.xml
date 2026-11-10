@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>voicevox</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>VOICEVOX: AI speech synthesis</description>
   <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
   <maintainer email="tsubaki@jsk.t.u-tokyo.ac.jp">Michitoshi Tsubaki</maintainer>
