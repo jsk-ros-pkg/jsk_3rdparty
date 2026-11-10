@@ -6,7 +6,7 @@
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
   <author email="h-ito@jsk.imi.i.u-tokyo.ac.jp">Hideaki Ito</author>
   <url type="website">http://ros.org/wiki/google_cloud_texttospeech</url>
   <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>

@@ -7,7 +7,7 @@
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
 
 
-  <license>Apache License, Version 2.0</license>
+  <license>Apache-2.0</license>
 
 
   <url type="website">https://github.com/eBay/bayesian-belief-networks</url>

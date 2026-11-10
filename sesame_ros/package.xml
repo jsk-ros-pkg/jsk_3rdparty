@@ -8,7 +8,7 @@
   <maintainer email="uchimi@jsk.imi.i.u-tokyo.ac.jp">Yuto Uchimi</maintainer>
   <author email="uchimi@jsk.imi.i.u-tokyo.ac.jp">Yuto Uchimi</author>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/sesame_ros</url>
 

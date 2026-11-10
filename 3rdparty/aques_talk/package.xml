@@ -6,7 +6,7 @@
   </description>
   <author email="kei.okada@gmail.com">AQUEST Corp, ROS package maintained by Kei Okada</author>
   <maintainer email="kei.okada@gmail.com">Kei Okada</maintainer>
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
   <url>http://ros.org/wiki/aques_talk</url>
 
   <buildtool_depend>catkin</buildtool_depend>

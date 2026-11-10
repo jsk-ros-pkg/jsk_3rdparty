@@ -1,6 +1,6 @@
 if("$ENV{ROS_VERSION}" EQUAL 2)
   cmake_minimum_required(VERSION 3.8)
-  project(power_switching_tools_ros)
+  project(jsk_power_switching_tools)
 
   # NOTE: auto_power_cycle.py stays ROS1-only for now: it subscribes to an
   # arbitrary topic with rospy.AnyMsg and calls the power cycle service
@@ -25,7 +25,7 @@ if("$ENV{ROS_VERSION}" EQUAL 2)
 
 else() # if("$ENV{ROS_VERSION}" EQUAL 2)
 cmake_minimum_required(VERSION 2.8.3)
-project(power_switching_tools_ros)
+project(jsk_power_switching_tools)
 
 find_package(catkin REQUIRED)
 

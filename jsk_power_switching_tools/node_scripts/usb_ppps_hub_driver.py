@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from power_switching_tools_ros.power_switching_driver_base import PowerSwitchingDriverBase
-from power_switching_tools_ros.power_switching_driver_base import PowerSwitchingDriverBaseCompat
-from power_switching_tools_ros.power_switching_driver_base import ros_compat
+from jsk_power_switching_tools.power_switching_driver_base import PowerSwitchingDriverBase
+from jsk_power_switching_tools.power_switching_driver_base import PowerSwitchingDriverBaseCompat
+from jsk_power_switching_tools.power_switching_driver_base import ros_compat
 import os
 if ros_compat is None:  # jsk_common < 3.0 (ROS1 only): use the original rospy code
     import rospy

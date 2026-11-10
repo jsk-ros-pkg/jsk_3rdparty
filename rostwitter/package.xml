@@ -6,7 +6,7 @@
 
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">k-okada</maintainer>
 
-  <license>Apache</license>
+  <license>Apache-2.0</license>
 
 
   <buildtool_depend>catkin</buildtool_depend>
