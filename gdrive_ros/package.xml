@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>gdrive_ros</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>Google drive upload and download package</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>

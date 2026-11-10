@@ -3,7 +3,7 @@
 # with requirements.in*). Update uv.lock with `uv lock`.
 [project]
 name = "google-chat-ros"
-version = "3.0.0"
+version = "3.0.1"
 requires-python = ">=3.10"
 # same as requirements.in.python3.12
 dependencies = [

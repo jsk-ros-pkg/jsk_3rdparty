@@ -2,6 +2,9 @@
 Changelog for package julius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2026-11-10)
+------------------
+
 3.0.0 (2026-11-06)
 ------------------
 * Merge branch 'master' into fix_hoya

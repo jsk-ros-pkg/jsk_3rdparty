@@ -2,6 +2,44 @@
 Changelog for package jsk_power_switching_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2026-11-10)
+------------------
+* Merge pull request #583 from k-okada/rosdistro-55247-review
+  rosdistro#55247 review: rename power_switching_tools_ros to jsk_power_switching_tools, fix licenses
+* use SPDX license identifiers (BSD-3-Clause, Apache-2.0) in package.xml
+  BSD -> BSD-3-Clause and Apache / "Apache License, Version 2.0" ->
+  Apache-2.0 in all packages (ros/rosdistro#55247 review). The LICENSE
+  files of all of them are BSD 3-Clause and Apache 2.0 respectively.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* jsk_power_switching_tools: add LICENSE (BSD-3-Clause)
+  package.xml declares BSD, but there was no license text in the package
+  (ros/rosdistro#55247 review). Same BSD 3-Clause text as the other
+  packages of this repository.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* power_switching_tools_ros: rename to jsk_power_switching_tools (REP-144)
+  The ROS2 release review of jsk_3rdparty in ros/rosdistro#55247 says
+  (https://github.com/ros/rosdistro/pull/55247#issuecomment-6757867277):
+  > - [ ] Each package meets REP-144 naming conventions.
+  >   - The 11 names other than `power_switching_tools_ros` have been
+  >     released in noetic (2.1.31-4), so they're grandfathered.
+  >   - `power_switching_tools_ros` is new. The `_ros` suffix is for a
+  >     library wrapper; `jsk_power_switching_tools` would be better.
+  It has never been released (not in noetic either), so rename it now,
+  before anything depends on a released name: the package, the python
+  module (power_switching_tools_ros -> jsk_power_switching_tools) and the
+  references in the launch files, node scripts, udev script, README and
+  the CHANGELOG title. Older CHANGELOG entries are kept as they are.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Merge pull request #571 from pazeshun/handle-slow-power-switch
+  [power_switching_tools_ros] Handle cases where power switching tool is slow
+* [power_switching_tools_ros] Handle cases where power switching tool is slow
+  Response from the power switching tool is very slow in some PCs (e.g., PC with many USB devices).
+  In that case, a message of the monitored topic comes before the first power cycle when init_with_power_cycle is true.
+  Previous implementation gets that message and wrongly considers that it came after the first power cycle.
+  This causes unnecessary power cycle because a next message will not come just after the power cycle and that interval is considered a communication failure.
+  This commit cuts this waste by stopping subscribing the monitored topic before the first power cycle.
+* Contributors: Kei Okada, Shun Hasegawa
+
 3.0.0 (2026-11-06)
 ------------------
 * [voicevox, chaplus_ros, emotion_analyzer, gdrive_ros, google_chat_ros, influxdb_store, power_switching_tools_ros, respeaker_ros, ros_speech_recognition, rospatlite, sesame_ros, switchbot_ros] depend on ros_environment for ROS2 buildfarm

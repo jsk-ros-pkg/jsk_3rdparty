@@ -2,6 +2,17 @@
 Changelog for package bayesian_belief_networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2026-11-10)
+------------------
+* Merge pull request #583 from k-okada/rosdistro-55247-review
+  rosdistro#55247 review: rename power_switching_tools_ros to jsk_power_switching_tools, fix licenses
+* use SPDX license identifiers (BSD-3-Clause, Apache-2.0) in package.xml
+  BSD -> BSD-3-Clause and Apache / "Apache License, Version 2.0" ->
+  Apache-2.0 in all packages (ros/rosdistro#55247 review). The LICENSE
+  files of all of them are BSD 3-Clause and Apache 2.0 respectively.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+* Contributors: Kei Okada
+
 3.0.0 (2026-11-06)
 ------------------
 * Merge branch 'master' into fix_hoya

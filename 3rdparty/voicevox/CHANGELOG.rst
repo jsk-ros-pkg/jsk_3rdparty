@@ -2,6 +2,9 @@
 Changelog for package voicevox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2026-11-10)
+------------------
+
 3.0.0 (2026-11-06)
 ------------------
 * Merge pull request #581 from k-okada/ros2-buildfarm-ros-environment
