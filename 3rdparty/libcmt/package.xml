@@ -5,7 +5,7 @@
   <description>libCMT ROS Wrapper</description>
   <maintainer email="inagaki@jsk.imi.i.u-tokyo.ac.jp">Yuto Inagaki</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <buildtool_depend>cmake</buildtool_depend>
 

@@ -7,7 +7,7 @@
   <author email="nakaokat@gmail.com">Takuya Nakaoka</author>
   <maintainer email="nakaokat@gmail.com">Takuya Nakaoka</maintainer>
   <maintainer email="garaemon@gmail.com">Ryohei Ueda</maintainer>
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
   <url>http://ros.org/wiki/rospatlite</url>
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>

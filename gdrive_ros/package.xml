@@ -7,7 +7,7 @@
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>
   <author email="shingogo.5511@gmail.com">Shingo Kitagawa</author>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
   <url type="website">http://ros.org/wiki/gdrive_ros</url>
   <url type="repository">https://github.com/jsk-ros-pkg/jsk_3rdparty</url>
   <url type="bugtracker">https://github.com/jsk-ros-pkg/jsk_3rdparty/issues</url>

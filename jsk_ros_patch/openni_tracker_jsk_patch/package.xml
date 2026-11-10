@@ -5,7 +5,7 @@
 
   <maintainer email="youhei@jsk.imi.i.u-tokyo.ac.jp">Yohei Kakiuchi</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/openni_tracker_jsk_patch</url>
   <!-- <url type="bugtracker"></url> -->

@@ -3,7 +3,7 @@
   <version>3.0.0</version>
   <description>opt_camera</description>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/opt_camera</url>
   <url type="bugtracker">http://sourceforge.net/tracker/?group_id=324828</url>
