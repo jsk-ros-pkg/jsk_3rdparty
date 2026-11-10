@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>power_switching_tools_ros</name>
+  <name>jsk_power_switching_tools</name>
   <version>3.0.0</version>
   <description>ROS tools for power switching tools</description>
 

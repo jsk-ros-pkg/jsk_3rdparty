@@ -1,4 +1,4 @@
-# power_switching_tools_ros
+# jsk_power_switching_tools
 
 ROS tools for power switching tools.  
 Supported tools are:
@@ -13,7 +13,7 @@ Supported tools are:
 
 This is optional, but we recommend this setting because USB-Serial troubleshooter is sometimes suddenly disconnected and its device file changes.
 ```bash
-rosrun power_switching_tools_ros setup_udev_for_usb_serial_troubleshooter <serial_number> <symlink_name>
+rosrun jsk_power_switching_tools setup_udev_for_usb_serial_troubleshooter <serial_number> <symlink_name>
 # <serial_number> : The serial number of your USB-Serial troubleshooter (e.g., 001A02F2046C). You can check the serial number by "udevadm info --name=/dev/ttyACM* --attribute-walk"
 # <symlink_name> : The name to create as a symbolic link in /dev (e.g., usb_serial_troubleshooter1)
 ```
@@ -33,13 +33,13 @@ If you face this phenomenon, try the following:
 ### Minimal usage: launching driver only
 
 ```bash
-roslaunch power_switching_tools_ros usb_serial_troubleshooter.launch port:=/dev/<symlink_name>
+roslaunch jsk_power_switching_tools usb_serial_troubleshooter.launch port:=/dev/<symlink_name>
 # <symlink_name> : The same as above
 ```
 
 #### Arguments
 
-Check them by `roslaunch power_switching_tools_ros usb_serial_troubleshooter.launch --ros-args`:
+Check them by `roslaunch jsk_power_switching_tools usb_serial_troubleshooter.launch --ros-args`:
 ```
 Required Arguments:
   port: Port connecting with USB-Serial troubleshooter (e.g., '/dev/ttyACM0')
@@ -65,7 +65,7 @@ Optional Arguments:
 ### Advanced usage: automated power cycle of USB
 
 ```bash
-roslaunch power_switching_tools_ros auto_power_cycle.launch troubleshooter_port:=/dev/<symlink_name> monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
+roslaunch jsk_power_switching_tools auto_power_cycle.launch troubleshooter_port:=/dev/<symlink_name> monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
 # <symlink_name> : The same as above
 # <monitored_topic> : Topic monitored for determining health of monitored communication. If this is not published for an unusually long period, power cycle of that communication occurs
 # <monitored_topic_expected_hz> : Expected Hz of monitored topic
@@ -96,7 +96,7 @@ Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.
 
 This is required for running the driver node without `sudo`.
 ```bash
-rosrun power_switching_tools_ros setup_udev_for_usb_ppps_hub
+rosrun jsk_power_switching_tools setup_udev_for_usb_ppps_hub
 # Reboot your PC after this script finishes
 # Note that this script adds your user to dialout group, which means "chmod" becomes unnecessary for accessing some device files (e.g., /dev/ttyACM0)
 ```
@@ -130,7 +130,7 @@ uhubctl -a off -l <hub_location> -p <hub_port>
 # <hub_port> : Port of your hub which you want to power on/off
 uhubctl -a on -l <hub_location> -p <hub_port>
 ```
-If USB power supply to the device is stopped and restarted as expected, `power_switching_tools_ros` can also power on/off the device.
+If USB power supply to the device is stopped and restarted as expected, `jsk_power_switching_tools` can also power on/off the device.
 If not, try the latest version of `uhubctl`:
 ```bash
 cd ~
@@ -147,7 +147,7 @@ If the found workaround requires supplementary options for `uhubctl`, write them
 ### Minimal usage: launching driver only
 
 ```bash
-roslaunch power_switching_tools_ros usb_ppps_hub.launch hub_location:=<hub_location> hub_port:=<hub_port>
+roslaunch jsk_power_switching_tools usb_ppps_hub.launch hub_location:=<hub_location> hub_port:=<hub_port>
 # <hub_location> : Location of your hub
 # <hub_port> : Port of your hub which you want to power on/off
 ```
@@ -155,7 +155,7 @@ If [the previous checking](#check-if-power-switching-works) tells you to use the
 
 #### Arguments
 
-Check them by `roslaunch power_switching_tools_ros usb_ppps_hub.launch --ros-args`:
+Check them by `roslaunch jsk_power_switching_tools usb_ppps_hub.launch --ros-args`:
 ```
 Required Arguments:
   hub_location: Location(s) of USB PPPS hub (e.g., '3-5', '[3-5, 2-2]', , '[3-5, 3-5]')
@@ -182,8 +182,8 @@ Optional Arguments:
 ### Advanced usage: automated power cycle of USB hub port
 
 ```bash
-roslaunch power_switching_tools_ros usb_ppps_hub.launch power_cycle_service:=auto_power_cycle/power_cycle hub_location:=<hub_location> hub_port:=<hub_port>
-roslaunch power_switching_tools_ros auto_power_cycle.launch launch_default_driver:=false monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
+roslaunch jsk_power_switching_tools usb_ppps_hub.launch power_cycle_service:=auto_power_cycle/power_cycle hub_location:=<hub_location> hub_port:=<hub_port>
+roslaunch jsk_power_switching_tools auto_power_cycle.launch launch_default_driver:=false monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
 # <monitored_topic> : Topic monitored for determining health of monitored communication. If this is not published for an unusually long period, power cycle of that communication occurs
 # <monitored_topic_expected_hz> : Expected Hz of monitored topic
 # <monitored_topic_respawn_delay> : For this duration [sec] after power cycle, new power cycle does not occur to wait for topic to be published
