@@ -128,7 +128,9 @@ jobs:
 
 
   kinetic_i386:
-    runs-on: ubuntu-latest
+    # the i386 xenial container cannot resolve any host names on the ubuntu-26.04 runner (ubuntu-latest since
+    # 2026-11), "Temporary failure resolving 'archive.ubuntu.com'", while it works on ubuntu-24.04
+    runs-on: ubuntu-24.04
     name: kinetic_i386
     container: i386/ubuntu:16.04
 
