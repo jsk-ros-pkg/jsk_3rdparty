@@ -22,6 +22,7 @@ if ROS_VERSION == 2:
     from sound_play_msgs.action import SoundRequest as SoundRequestAction
     SoundRequestGoal = SoundRequestAction.Goal
     from action_msgs.msg import GoalStatus, GoalStatusArray
+    from rclpy.qos import qos_profile_sensor_data
     # status topic of an action and state of an executing goal
     TTS_STATUS_TOPIC, TTS_STATUS_ACTIVE = '/_action/status', GoalStatus.STATUS_EXECUTING
     # rclpy requires a depth (ros_compat's default 1 may drop audio)
@@ -205,6 +206,7 @@ class ROSSpeechRecognition(object):
         self.tts_tolerance = ros_compat.get_param(node, "~tts_tolerance", 1.0)  # sec
         tts_action_names = ros_compat.get_param(node,
             '~tts_action_names', ['sound_play'])
+        self.tts_topic_names = ros_compat.get_param(node, '~tts_topic_names', ['audio'])
 
         self.tts_action = None
         self.last_tts = None
@@ -215,6 +217,11 @@ class ROSSpeechRecognition(object):
         # (actionlib's action_client.last_status_msg)
         self.tts_status = {}
         if self.self_cancellation:
+            for tts_topic_name in self.tts_topic_names:
+                ros_compat.create_subscription(node,
+                    tts_topic_name, AudioData,
+                    lambda msg, a=tts_topic_name: self.tts_status.__setitem__(a, len(msg.data)),
+                    queue_size=1, latch=True, qos=qos_profile_sensor_data)
             for tts_action_name in tts_action_names:
                 tts_action = ros_compat.create_simple_action_client(node,
                     tts_action_name, SoundRequestAction)
@@ -599,6 +606,12 @@ class ROSSpeechRecognition(object):
     def tts_timer_cb(self, event):
         stamp = ros_compat.now_sec(self.node)
         active = False
+        for tts_topic_name in self.tts_topic_names:
+            status = self.tts_status.get(tts_topic_name)
+            if status:
+                if status > 0:
+                    active = True
+                    self.tts_status.__setitem__(tts_topic_name, None)  # clear the status
         for tts_action in self.tts_actions:
             status = self.tts_status.get(tts_action)
             for st in (status.status_list if status else []):
