@@ -14,6 +14,8 @@
   <arg name="language" default="en-US" description="Speech to text language. For Japanese, set ja-JP." />
   <arg name="continuous" default="true" description="If false, /speech_recognition service is published. If true, /speech_to_text topic is published." />
   <arg name="auto_start" default="true" description="Whether speech_recognition starts automatically or not. This parameter works when continuous is true" />
+  <arg name="energy_threshold" default="300.0" description="Minimum audio energy to consider for recording speech. Raise it if noise is taken for speech, lower it if quiet speech is missed" />
+  <arg name="dynamic_energy_threshold" default="true" description="Raise energy_threshold automatically to follow the background noise. Set false to keep energy_threshold fixed, e.g. when the noise lifts it above normal speech" />
 
   <arg name="self_cancellation" default="true" description="Do not recognize the audio when robot is speaking or not." />
   <arg name="tts_tolerance" default="1.0" description="Tolerance second for recognizing whether robot is speaking or not" />
@@ -52,6 +54,8 @@
     <param name="language" value="$(var language)" />
     <param name="continuous" value="$(var continuous)" />
     <param name="auto_start" value="$(var auto_start)" />
+    <param name="energy_threshold" value="$(var energy_threshold)" />
+    <param name="dynamic_energy_threshold" value="$(var dynamic_energy_threshold)" />
     <param name="enable_sound_effect" value="$(var launch_sound_play)" />
     <param name="self_cancellation" value="$(var self_cancellation)" />
     <param name="tts_tolerance" value="$(var tts_tolerance)" />
