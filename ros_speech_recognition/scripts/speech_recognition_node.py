@@ -397,6 +397,9 @@ class ROSSpeechRecognition(object):
         if self.is_canceling:
             ros_compat.loginfo(self.node, "Robot is speaking now, so recognition is cancelled")
             return
+        if self.began_while_speaking(audio):
+            ros_compat.loginfo(self.node, "The phrase began while the robot was speaking, so recognition is cancelled")
+            return
         try:
             ros_compat.logdebug(self.node, "Waiting for result... (Sent %d bytes)" % len(audio.get_raw_data()))
             result = self.recognize(audio)
@@ -425,6 +428,30 @@ class ROSSpeechRecognition(object):
         except:
             ros_compat.logerr(self.node, "Unexpected error: %s" % str(sys.exc_info()))
         self.play_sound("timeout", 0.1)
+
+    def began_while_speaking(self, audio):
+        """Whether the phrase in ``audio`` began before the robot stopped speaking.
+
+        audio_cb is called only once a phrase has ended: after pause_threshold
+        of silence, plus however late the audio topic arrives. By then the
+        robot may have stopped speaking more than tts_tolerance ago, so
+        is_canceling alone lets the robot's own voice through on a busy PC.
+        This dates the phrase back by its length instead.
+
+        Parameters
+        ----------
+        audio : speech_recognition.AudioData
+
+        Returns
+        -------
+        bool
+        """
+        if not self.self_cancellation or self.last_tts is None:
+            return False
+        duration = len(audio.frame_data) / float(
+            audio.sample_rate * audio.sample_width)
+        began = ros_compat.now_sec(self.node) - duration
+        return began < self.last_tts + self.tts_tolerance
 
     def start_speech_recognition(self):
         if self.engine == Config.SpeechRecognition_GoogleCloudStream:
