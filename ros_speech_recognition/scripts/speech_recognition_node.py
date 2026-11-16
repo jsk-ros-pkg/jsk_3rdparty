@@ -217,6 +217,8 @@ class ROSSpeechRecognition(object):
         self.tts_status = {}
         if self.self_cancellation:
             for tts_topic_name in self.tts_topic_names:
+                # the default QoS of jsk_ros1_ros2_compat >= 3.0.6 (BEST_EFFORT and VOLATILE on ROS2)
+                # reads the audio of any publisher, reliable or best-effort
                 ros_compat.create_subscription(node,
                     tts_topic_name, AudioData,
                     lambda msg, a=tts_topic_name: self.tts_status.__setitem__(a, len(msg.data)),
