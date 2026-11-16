@@ -11,7 +11,9 @@ if("$ENV{ROS_DISTRO}" STRGREATER "melodic") # >= noetic
   set(CXXFLAGS_NOETIC "-Wno-error=deprecated-copy")
 endif()
 externalproject_add(downward
-  URL http://cdn.rawgit.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz
+  # cdn.rawgit.com (and jsDelivr, where it redirects to) returns 404
+  URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz
+  URL_MD5 0c882a28d4c0f60266f4baadf09e3ac7
   TIMEOUT 120
   CONFIGURE_COMMAND ""
   BUILD_COMMAND cd src && sed -i "s@^CXXFLAGS =$@CXXFLAGS = ${CXXFLAGS_NOETIC} -Wno-deprecated-copy -Wno-maybe-uninitialized@" search/Makefile && patch -p3 < ${PROJECT_SOURCE_DIR}/fix_std_vector_namespace.patch && ./build_all DOWNWARD_BITWIDTH=native && patch -p3 < ${PROJECT_SOURCE_DIR}/fix_time_clock.patch
