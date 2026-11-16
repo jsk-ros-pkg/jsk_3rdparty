@@ -1,1 +1,6 @@
-hume[stream]
+# All the versions of hume on PyPI are yanked, and pip installs a yanked version only
+# when it is pinned by ==. The scripts use the legacy HumeStreamClient, removed in
+# hume 0.7; 0.6.0 is the version of pyproject.toml / uv.lock of ROS2, which needs
+# python 3.9, and 0.4.2 is the last one for python 3.8 (noetic).
+hume[stream]==0.6.0; python_version >= "3.9"
+hume[stream]==0.4.2; python_version < "3.9"
