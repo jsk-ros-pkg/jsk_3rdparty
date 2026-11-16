@@ -191,6 +191,37 @@ class ROSAudio(SR.AudioSource):
                     self._drop_arrivals(overflow)
 
 
+def flac_problem():
+    """Why the FLAC encoder cannot run, or None when it can.
+
+    The Google engines send FLAC, made by the ``flac`` program.
+    SpeechRecognition falls back to a flac binary bundled in its package
+    when none is on PATH, but CMakeLists.txt removes those binaries (they
+    break the buildfarm) and relies on the apt ``flac`` instead. Without it,
+    every recognition fails with a bare FileNotFoundError.
+    """
+    try:
+        converter = SR.get_flac_converter()
+    except OSError as e:
+        return str(e)
+    if not os.path.isfile(converter):
+        return "%s does not exist" % converter
+    return None
+
+
+FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engine. "
+             "Install it with: sudo apt install flac "
+             "(flac が入っていないため音声を送れません。sudo apt install flac で入れてください。"
+             "共用の PC では TA に頼んでください)")
+
+
+def as_log_text(text):
+    """Recognized text for a log line (str on Python 3, utf-8 bytes on Python 2)."""
+    if sys.version_info[0] >= 3 or isinstance(text, str):
+        return text
+    return text.encode('utf-8')
+
+
 class ROSSpeechRecognition(object):
     def __init__(self, node=None):
         self.node = node
@@ -309,6 +340,11 @@ class ROSSpeechRecognition(object):
         if self.engine != config.engine:
             self.args = {}
             self.engine = config.engine
+            if self.engine in (Config.SpeechRecognition_Google,
+                               Config.SpeechRecognition_GoogleCloud):
+                problem = flac_problem()
+                if problem is not None:
+                    ros_compat.logerr(self.node, "%s [%s]" % (FLAC_HINT, problem))
             # Lazy-build the streaming GCP wrapper when first selected.
             if (self.engine == Config.SpeechRecognition_GoogleCloudStream
                     and self._stream_recognizer is None):
@@ -442,7 +478,7 @@ class ROSSpeechRecognition(object):
                 confidence = result['alternative'][0]['confidence']
                 result = result['alternative'][0]['transcript']
             self.play_sound("recognized", 0.05)
-            ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+            ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
             self.play_sound("success", 0.1)
             msg = SpeechRecognitionCandidates(
                 transcript=[result],
@@ -458,8 +494,10 @@ class ROSSpeechRecognition(object):
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except SR.UnknownValueError as e:
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
-        except:
-            ros_compat.logerr(self.node, "Unexpected error: %s" % str(sys.exc_info()))
+        except Exception as e:
+            ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
+            if isinstance(e, (IOError, OSError)) and flac_problem() is not None:
+                ros_compat.logerr(self.node, FLAC_HINT)
         self.play_sound("timeout", 0.1)
 
     def began_while_speaking(self, audio):
@@ -647,7 +685,7 @@ class ROSSpeechRecognition(object):
                             raise SR.UnknownValueError()
                         confidence = result['alternative'][0].get('confidence', 1.0)
                         result = result['alternative'][0]['transcript']
-                    ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+                    ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
                     res.result = SpeechRecognitionCandidates(
