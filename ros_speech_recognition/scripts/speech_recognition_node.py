@@ -210,9 +210,7 @@ def flac_problem():
 
 
 FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engine. "
-             "Install it with: sudo apt install flac "
-             "(flac が入っていないため音声を送れません。sudo apt install flac で入れてください。"
-             "共用の PC では TA に頼んでください)")
+             "Install it with: sudo apt install flac")
 
 
 def as_log_text(text):
