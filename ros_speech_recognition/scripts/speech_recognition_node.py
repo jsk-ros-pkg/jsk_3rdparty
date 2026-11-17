@@ -9,6 +9,7 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import math
 import os
 import sys
 from collections import deque
@@ -471,7 +472,8 @@ class ROSSpeechRecognition(object):
         This dates the phrase back by its length instead, counting from
         when the last audio of the phrase arrived on the topic rather than
         from now, so a recognizer thread that lags behind the topic does not
-        make the phrase look later than it was.
+        make the phrase look later than it was. The silence that listen()
+        read after the phrase but cut from ``audio`` is subtracted too.
 
         Parameters
         ----------
@@ -492,9 +494,33 @@ class ROSSpeechRecognition(object):
         ended = stream.last_read_stamp if stream is not None else None
         if ended is None:
             ended = ros_compat.now_sec(self.node)
-        duration = len(audio.frame_data) / float(
-            audio.sample_rate * audio.sample_width)
-        return ended - duration < last_tts + self.tts_tolerance
+        bytes_per_sec = float(audio.sample_rate * audio.sample_width)
+        duration = len(audio.frame_data) / bytes_per_sec
+        return (ended - self._cut_silence_bytes() / bytes_per_sec - duration
+                < last_tts + self.tts_tolerance)
+
+    def _cut_silence_bytes(self):
+        """Bytes of silence listen() reads after a phrase but cuts from it.
+
+        Recognizer.listen() ends a phrase after pause_threshold of silence
+        (pause_buffer_count + 1 chunks) and keeps only non_speaking_duration
+        of it. It counts a chunk as CHUNK samples, but ROSAudio.AudioStream
+        returns CHUNK bytes per read, so the count is converted with CHUNK
+        bytes per chunk here. When phrase_time_limit ends the phrase instead,
+        less is cut, so this dates the phrase earlier than it was, which
+        errs towards dropping it.
+
+        Returns
+        -------
+        int
+        """
+        seconds_per_buffer = float(self.audio.CHUNK) / self.audio.SAMPLE_RATE
+        pause_buffer_count = int(math.ceil(
+            self.recognizer.pause_threshold / seconds_per_buffer))
+        non_speaking_buffer_count = int(math.ceil(
+            self.recognizer.non_speaking_duration / seconds_per_buffer))
+        return max(0, pause_buffer_count + 1 - non_speaking_buffer_count) \
+            * self.audio.CHUNK
 
     def start_speech_recognition(self):
         if self.engine == Config.SpeechRecognition_GoogleCloudStream:
