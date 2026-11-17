@@ -294,7 +294,7 @@ class GDriveServerNode(object):
                     mkdir=mkdir)
                 return folder_id
             else:
-                raise ValueError('folder is not found: {}', folder_title)
+                raise ValueError('folder is not found: {}'.format(folder_title))
 
 
 if __name__ == '__main__':
