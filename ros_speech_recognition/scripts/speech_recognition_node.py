@@ -520,8 +520,6 @@ class ROSSpeechRecognition(object):
                 ros_compat.loginfo(self.node, "Updated energy threshold to %f" % self.recognizer.energy_threshold)
         except SR.RequestError as e:
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
-        except SR.UnknownValueError as e:
-            ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except Exception as e:
             ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
             if (self.engine in (Config.SpeechRecognition_Google,
