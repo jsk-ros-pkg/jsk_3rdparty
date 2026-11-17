@@ -1,89 +1,101 @@
 # ros\_speech\_recognition
 
-A ROS package for speech-to-text services.  
-This package uses Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition) as a backend.
+A ROS package for speech-to-text. `speech_recognition_node.py` listens to an audio topic (e.g. from a microphone
+through audio_capture), cuts it into phrases by the audio energy, and recognizes them with one of the engines of the
+Python package [SpeechRecognition](https://pypi.python.org/pypi/SpeechRecognition): the Google Web Speech API, Google
+Cloud Speech-to-Text (also in streaming), the offline [Vosk](https://alphacephei.com/vosk/), and others. The result is
+published on a topic (continuous mode) or returned by a service. The same nodes and launch arguments work on ROS 1 and
+ROS 2.
 
-## Tutorials
+## Requirements
 
-### Normal tutorial
+- A microphone (with `audio_capture`), or any `audio_common_msgs/AudioData` topic.
+- Per engine (`engine:=...`):
+  - `Google` (default): internet access; no key is needed (a public key of SpeechRecognition, which may be blocked;
+    `~google_key` sets an own key).
+  - `GoogleCloud`, `GoogleCloudStream`: a Google Cloud project with the Speech-to-Text API enabled and the JSON key of a
+    service account. Give its path by `google_cloud_credentials_json:=/path/to/key.json`, or set
+    `GOOGLE_APPLICATION_CREDENTIALS`. For JSK users, the key is on
+    [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing).
+  - `Vosk`: offline, no credentials. The small English (`vosk-model-small-en-us-0.15`) and Japanese
+    (`vosk-model-small-ja-0.22`) models are downloaded into `trained_data/` of the package at build time (ROS 1) or
+    install time (ROS 2) with jsk_data (about 40 MB and 48 MB).
+  - `Sphinx`, `Wit`, `Bing`, `Houndify`, `IBM`: see SpeechRecognition; `Bing` needs `~bing_key`.
+- SpeechRecognition, vosk and google-cloud-speech are installed into a virtualenv of the package at build time
+  (ROS 1: catkin_virtualenv with `requirements.txt`; ROS 2: [uv](https://docs.astral.sh/uv/) with
+  `pyproject.toml`/`uv.lock`).
 
-1. Install this package and SpeechReconition
+## Usage
 
-  ```bash
-  sudo apt install ros-${ROS_DISTRO}-ros-speech-recognition
-  ```
-  
-2. Launch speech recognition node
-
-  ```bash
-  roslaunch ros_speech_recognition speech_recognition.launch
-  ```
-  
-3. Echo `/speech_to_text`
-
-  ```bash
-  rostopic echo /speech_to_text
-  # you can get the recognition result
-  ```
-
-### Parrotry tutorial
-
-Parrotry mean オウム返し in Japanese
-
-```bash
-# english
-roslaunch ros_speech_recognition parrotry.launch
-# japanese
-roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
-```
-
-### ROS2
-
-The same nodes run on ROS2 (built with colcon; SpeechRecognition and vosk
-are installed into a venv of this package with uv at build time).
-The dynamic reconfigure parameters (see [Parameters](#parameters)) are ROS2
-parameters, e.g. `ros2 param set /speech_recognition language ja-JP`.
-The vosk models are downloaded into the installed share directory by
-`colcon build` (with jsk_data, as on ROS1).
+### ROS 2
 
 ```bash
 ros2 launch ros_speech_recognition speech_recognition.launch.xml
 ros2 topic echo /speech_to_text
-# parrotry (julius and aques_talk are not available, use engine:=... and sound_play)
+# Japanese
+ros2 launch ros_speech_recognition speech_recognition.launch.xml language:=ja-JP
+# offline with Vosk (language en-US or ja for the bundled models)
+ros2 launch ros_speech_recognition speech_recognition.launch.xml engine:=Vosk language:=ja
+# Google Cloud, streaming
+ros2 launch ros_speech_recognition speech_recognition.launch.xml engine:=GoogleCloudStream language:=ja-JP \
+    google_cloud_credentials_json:=/path/to/key.json
+# change an engine parameter at runtime (instead of dynamic_reconfigure)
+ros2 param set /speech_recognition language ja-JP
+# stop and start the recognition (continuous mode)
+ros2 service call /speech_recognition/stop std_srvs/srv/Empty
+ros2 service call /speech_recognition/start std_srvs/srv/Empty
+```
+
+Service mode (`continuous:=false`):
+
+```bash
+ros2 launch ros_speech_recognition speech_recognition.launch.xml continuous:=false
+ros2 service call /speech_recognition speech_recognition_msgs/srv/SpeechRecognition "{duration: 5.0, quiet: false}"
+```
+
+Parrot (repeats what it hears with sound_play):
+
+```bash
 ros2 launch ros_speech_recognition parrotry.launch.xml
+ros2 launch ros_speech_recognition parrotry.launch.xml engine:=Vosk language:=ja
+```
+
+### ROS 1
+
+```bash
+roslaunch ros_speech_recognition speech_recognition.launch
+rostopic echo /speech_to_text
+rosservice call /speech_recognition/stop
+rosrun rqt_reconfigure rqt_reconfigure   # engine parameters
+# parrot (English: sound_play; ja-JP: aques_talk; use_google:=false: julius_ros)
+roslaunch ros_speech_recognition parrotry.launch
+roslaunch ros_speech_recognition parrotry.launch language:=ja-JP
+```
+
+`ros_speech_recognition.client.SpeechRecognitionClient` (ROS 1 only) wraps the service and dynamic_reconfigure:
+
+```python
+from ros_speech_recognition.client import SpeechRecognitionClient
+client = SpeechRecognitionClient()   # needs continuous:=false
+client.language = 'ja-JP'
+print(client.recognize(duration=5.0).transcript)
 ```
 
 ### Streaming recognition with Google Cloud (`GoogleCloudStream`)
 
-In addition to the request/response `GoogleCloud` engine, a streaming engine
-`GoogleCloudStream` is available. It uses the bidirectional gRPC
-`StreamingRecognize` API and publishes interim hypotheses on
-`~voice_interim_topic` while the user is still speaking, then publishes the
-finalised utterance on `~voice_topic` as usual.
+In addition to the request/response `GoogleCloud` engine, `GoogleCloudStream` uses the bidirectional gRPC
+`StreamingRecognize` API. It publishes interim hypotheses on `~voice_interim_topic` while the user is still speaking,
+then the final utterance on `~voice_topic` as usual.
 
-```bash
-roslaunch ros_speech_recognition speech_recognition.launch \
-    engine:=GoogleCloudStream \
-    language:=ja-JP \
-    google_cloud_credentials_json:=/path/to/credentials.json
+- Endpointing combines Google's own `is_final` flag with a stability timer, `~google_cloud_endpoint_stable_s`
+  (default: 1.0 s).
+- The gRPC session has a 305 s server-side limit; the recognizer reconnects lazily on the next audio chunk.
+- With `~self_cancellation`, the streaming session is closed while a `~tts_action_names` action is active and
+  reopened afterwards, not to recognize the robot's own voice.
+
+`Interim:` shows intermediate results, `Result:` the final result after the speaker finishes speaking:
+
 ```
-
-Notes:
-
-* Endpointing combines Google's own `is_final` flag with a stability timer
-  controlled by `~google_cloud_endpoint_stable_s` (default: 1.0 s).
-* The gRPC session has a 305 s server-side limit; the recognizer reconnects
-  lazily on the next audio chunk, so long-running nodes are safe.
-* When `~self_cancellation` is enabled, the streaming session is torn down
-  while a `~tts_action_names` action is active and reopened automatically
-  afterwards to avoid recognising the robot's own voice.
-
-Example:
-
-The following is an example of speech recognition using `GoogleCloudStream`.
-`Interim:` shows intermediate recognition results, while `Result:` shows the final recognition result after the speaker finishes speaking.
-
-```bash
 [INFO] [1792069200.711352]: Interim: こんにちは。
 [INFO] [1792069201.701424]: Result: こんにちは。
 [INFO] [1792069218.021376]: Interim: 今日？
@@ -110,229 +122,143 @@ The following is an example of speech recognition using `GoogleCloudStream`.
 [INFO] [1792069240.221812]: Result: ぜひ 外で遊びましょう。
 ```
 
-## `speech_recognition_node.py` Interface
+## Launch files
+
+### `speech_recognition.launch` / `speech_recognition.launch.xml`
+
+Launches `sound_play`, `audio_capture` (microphone), `speech_recognition` and `speech_recognition_candidates_to_string`.
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `launch_sound_play` | `true` | Launch sound_play (action `sound_play`) and play sound effects (`~enable_sound_effect`) |
+| `launch_audio_capture` | `true` | Launch audio_capture to publish the microphone on `audio_topic` |
+| `audio_topic` | `/audio` | Audio topic |
+| `voice_topic` | `/speech_to_text` | Topic of the results |
+| `n_channel` | `1` | Channels of the audio |
+| `depth` | `16` | Bit depth of the audio |
+| `sample_rate` | `16000` | Sample rate of the audio |
+| `device` | `""` | Microphone of audio_capture, e.g. `hw:0,0` (see `arecord -l`) |
+| `engine` | `Google` | Engine: `Google`, `GoogleCloud`, `GoogleCloudStream`, `Sphinx`, `Wit`, `Bing`, `Houndify`, `IBM`, `Vosk` |
+| `language` | `en-US` | Language, e.g. `ja-JP` (`ja` for Vosk) |
+| `continuous` | `true` | `true`: publish on `voice_topic`. `false`: serve the `speech_recognition` service |
+| `auto_start` | `true` | Start recognizing at launch (continuous mode) |
+| `energy_threshold` | `300.0` | Minimum audio energy of speech |
+| `dynamic_energy_threshold` | `true` | Adapt `energy_threshold` to the background noise |
+| `self_cancellation` | `true` | Ignore the audio while the robot speaks |
+| `tts_tolerance` | `1.0` | Seconds after speaking during which the audio is still ignored |
+| `tts_action_names` | `['sound_play']` | Actions of text-to-speech for self cancellation |
+| `google_cloud_credentials_json` | `""` | Path of the JSON key of Google Cloud |
+
+### `parrotry.launch` / `parrotry.launch.xml`
+
+`speech_recognition.launch(.xml)` (continuous, `voice_topic:=/speech_to_text`, with the microphone) and `parrot_node`,
+which says the recognized text.
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `language` | `en-US` | Language |
+| `confidence_threshold` | `0.8` | Results with a lower confidence are not said |
+| `use_google` (ROS 1 only) | `true` | `false`: recognize with julius_ros instead |
+| `engine` (ROS 2 only) | `Google` | Engine of `speech_recognition` |
+| `tts_action_name` | `sound_play` | Action to say the text. ROS 1: `robotsound_jp` (aques_talk) for `ja-JP`, `sound_play` otherwise (not an argument). ROS 2: an argument; julius_ros and aques_talk have no ROS 2 port, the voice is sound_play's |
+
+## Interface
+
+### speech_recognition_node.py
+
+Published topics:
+
+- `~voice_topic` (`speech_recognition_msgs/SpeechRecognitionCandidates`): results (continuous mode). Its name is
+  the parameter `~voice_topic`, default `speech_to_text`.
+- `~voice_interim_topic` (`std_msgs/String`): interim results of `GoogleCloudStream` (continuous mode). Its name is
+  the parameter `~voice_interim_topic`, default `speech_to_text/interim`.
+
+Subscribed topics:
+
+- `~audio_topic` (`audio_common_msgs/AudioData`): audio to recognize. Its name is the parameter `~audio_topic`,
+  default `audio`.
+
+Services:
+
+- `speech_recognition` (`speech_recognition_msgs/SpeechRecognition`): recognize one phrase within `duration` seconds
+  (`~duration` if `<= 0`); `quiet` disables the sound effects. Only with `~continuous: false`.
+- `speech_recognition/start`, `speech_recognition/stop` (`std_srvs/Empty`): start/stop recognizing. Only with
+  `~continuous: true`.
+
+Action clients:
+
+- `sound_play` (`sound_play/SoundRequestAction`; ROS 2: `sound_play_msgs/action/SoundRequest`): sound effects, if
+  `~enable_sound_effect` and the server is found within 5 seconds.
+- `~tts_action_names`: only the status of their goals is watched (`<name>/status`; ROS 2:
+  `<name>/_action/status`), for self cancellation.
+
+Parameters of the engine (dynamic_reconfigure on ROS 1, `cfg/SpeechRecognition.cfg`; ROS 2 parameters on ROS 2,
+`cfg/ros2/SpeechRecognitionConfig.py`, changeable at runtime with `ros2 param set`):
+
+| Name | Type | Default | Meaning |
+|---|---|---|---|
+| `~language` | string | `en-US` | Language |
+| `~engine` | string | `Google` | Engine (see the launch argument `engine`) |
+| `~energy_threshold` | double | `300.0` | Threshold of voice activity detection |
+| `~dynamic_energy_threshold` | bool | `true` | Adaptive estimation of `energy_threshold` |
+| `~dynamic_energy_adjustment_damping` | double | `0.15` | Damping of the adaptive estimation |
+| `~dynamic_energy_ratio` | double | `1.5` | Energy ratio of speech to the background noise |
+| `~pause_threshold` | double | `0.8` | Seconds of silence which end a phrase |
+| `~operation_timeout` | double | `0.0` | Timeout [s] of an API request (`0`: none) |
+| `~listen_timeout` | double | `0.0` | Seconds to wait for a phrase to start (`0`: none, service mode) |
+| `~phrase_time_limit` | double | `10.0` | Maximum seconds of a phrase (`0`: none) |
+| `~phrase_threshold` | double | `0.3` | Minimum seconds of speech to be a phrase |
+| `~non_speaking_duration` | double | `0.5` | Seconds of silence kept on both sides of a phrase |
+
+Other parameters (read at start):
+
+| Name | Type | Default | Meaning |
+|---|---|---|---|
+| `~audio_topic` | string | `audio` | Audio topic |
+| `~voice_topic` | string | `speech_to_text` | Topic of the results |
+| `~voice_interim_topic` | string | `speech_to_text/interim` | Topic of the interim results |
+| `~depth` | int | `16` | Bit depth of the audio (8, 16 or 32) |
+| `~n_channel` | int | `1` | Channels of the audio; the first one is recognized |
+| `~sample_rate` | int | `16000` | Sample rate of the audio |
+| `~buffer_size` | int | `10240` | Bytes of audio buffered for recognition |
+| `~duration` | double | `10.0` | Default seconds to wait for speech (service mode) |
+| `~continuous` | bool | `false` | Publish on a topic (`true`) or serve a service (`false`); the launch files set `true` |
+| `~auto_start` | bool | `true` | Start recognizing at start (continuous mode) |
+| `~enable_sound_effect` | bool | `true` | Play sound effects with `sound_play` |
+| `~start_signal` | string | `/usr/share/sounds/freedesktop/stereo/bell.ogg` | Sound at the start of listening |
+| `~recognized_signal` | string | `/usr/share/sounds/freedesktop/stereo/message.ogg` | Sound at the end of a phrase |
+| `~success_signal` | string | `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg` | Sound on a result |
+| `~timeout_signal` | string | `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg` | Sound on a failure |
+| `~self_cancellation` | bool | `true` | Ignore the audio while one of `~tts_action_names` is active |
+| `~tts_action_names` | string list | `['sound_play']` | Actions of text-to-speech |
+| `~tts_tolerance` | double | `1.0` | Seconds after speaking during which the audio is still ignored |
+| `~google_key` | string | none | Key of the Google Web Speech API (`Google`; none: the public key) |
+| `~google_cloud_credentials_json` | string | none | Path of the JSON key (`GoogleCloud`, `GoogleCloudStream`). Empty: the default credentials (`GOOGLE_APPLICATION_CREDENTIALS`). For `GoogleCloudStream`, a set `GOOGLE_APPLICATION_CREDENTIALS` takes precedence |
+| `~google_cloud_preferred_phrases` | string list | none | Phrases to be recognized preferably (`GoogleCloud`) |
+| `~diarizationConfig` | dict | none | `diarizationConfig` of the RecognitionConfig (`GoogleCloud`) |
+| `~google_cloud_model` | string | `""` | Model, e.g. `latest_long` (`GoogleCloudStream`; empty: the API default) |
+| `~google_cloud_endpoint_stable_s` | double | `1.0` | Seconds an unchanged interim result takes to be final (`GoogleCloudStream`) |
+| `~log_interim_results` | bool | `true` | Log the interim results when they change (`GoogleCloudStream`) |
+| `~bing_key` | string | none | Key of Bing (`Bing`) |
+| `~vosk_model_path` | string | none | Model directory of Vosk (`Vosk`). None: the bundled model of `language` `en-US` or `ja`; other models are on the [model list](https://alphacephei.com/vosk/models) |
+
+The sound files of the effects are of the package `sound-theme-freedesktop`; `.oga` is used if `.ogg` is missing.
+
+### speech_recognition_candidates_to_string.py
+
+Subscribes `~input` (`speech_recognition_msgs/SpeechRecognitionCandidates`) and publishes its first transcript on
+`~output` (`std_msgs/String`). On ROS 1 it subscribes only while `~output` is subscribed.
+
+```bash
+ros2 run ros_speech_recognition speech_recognition_candidates_to_string.py --ros-args -r '~/input:=/speech_to_text'
+```
+
+### parrot_node.py
+
+Subscribes `~input` (`speech_recognition_msgs/SpeechRecognitionCandidates`) and says the first transcript with
+sound_play's `SoundClient` (blocking) on the action `~tts_action_name` (string, default `sound_play`), if its
+confidence is at least `~confidence_threshold` (double, default `0.8`).
 
-### Publishing Topics
-
-* `~voice_topic` (`speech_recognition_msgs/SpeechRecognitionCandidates`)
-
-  Speech recognition candidates topic name.
-
-  Topic name is set by parameter  `~voice_topic`, and default value is `speech_to_text`.
-
-* `~voice_interim_topic` (`std_msgs/String`)
-
-  Interim (non-final) transcript published while the user is still speaking.
-  Only valid when `~engine` is `GoogleCloudStream`.
-
-  Topic name is set by parameter `~voice_interim_topic`, and default value is `speech_to_text/interim`.
-
-* `sound_play` (`sound_play/SoundRequestAction`)
-
-  Action client to play sound on events. If the action server is not available or `~enable_sound_effect` is `False`, no sound is played.
-  
-### Subscribing Topics
-
-* `~audio_topic` (`audio_common_msgs/AudioData`)
-
-  Audio stream data to be recognized.
-
-  Topis name is set by parameter  `~audio_topic` and default value is `audio`.
-
-### Advertising Services
-
-* `speech_recognition` (`speech_recognition_msgs/SpeechRecognition`)
-
-  Service for speech recognition
-
-* `speech_recognition/start` (`std_srvs/Empty`)
-
-  Start service for speech recognition
-
-  This service is available when parameter `~contiunous` is `True`.
-
-* `speech_recognition/start` (`std_srvs/Empty`)
-
-  Stop service for speech recognition
-
-  This service is available when parameter `~contiunous` is `True`.
-
-## Parameters
-
-* `~voice_topic` (`String`, default: `speech_to_text`)
-
-  Publishing voice topic name
-
-* `~audio_topic` (`String`, default: `audio`)
-
-  Subscribing audio topic name
-
-* `~enable_sound_effect` (`Bool`, default: `True`)
-
-    Flag to enable or disable sound to play sound on recognition.
-
-* `~language` (`String`, default: `en-US`)
-
-  Language to be recognized
-  
-* `~engine` (`Enum[String]`, default: `Google`)
-
-  Speech-to-text engine (To see full options use `dynamic_reconfigure`)
-  
-* `~energy_threshold` (`Double`, default: `300`)
-
-  Threshold for Voice activity detection
-  
-* `~dynamic_energy_threshold` (`Bool`, default: `True`)
-
-  Adaptive estimation for `energy_threshold`
-
-* `~dynamic_energy_adjustment_damping` (`Double`, default: `0.15`)
-
-  Damping threshold for dynamic VAD
-  
-* `~dynamic_energy_ratio` (`Double`, default: `1.5`)
-
-  Energy ratio for dynamic VAD
-  
-* `~pause_threshold` (`Double`, default: `0.8`)
-
-  Seconds of non-speaking audio before a phrase is considered complete
-  
-* `~operation_timeout` (`Double`, default: `0.0`)
-
-  Seconds after an internal operation (e.g., an API request) starts before it times out
-  
-* `~listen_timeout` (`Double`, default: `0.0`)
-
-  The maximum number of seconds that this will wait for a phrase to start before giving up
-  
-* `~phrase_time_limit` (`Double`, default: `10.0`)
-
-  The maximum number of seconds that this will allow a phrase to continue before stopping and returning the part of the phrase processed before the time limit was reached
-  
-* `~phrase_threshold` (`Double`, default: `0.3`)
-
-  Minimum seconds of speaking audio before we consider the speaking audio a phrase
-  
-* `~non_speaking_duration` (`Double`, default: `0.5`)
-
-  Seconds of non-speaking audio to keep on both sides of the recording
-
-* `~duration` (`Double`, default: `10.0`)
-
-  Seconds of waiting for speech
-
-* `~depth` (`Int`, default: `16`)
-
-  Depth of audio signal
-  
-* `~n_channel` (`Int`, default: `1`)
-
-  Total number of channels in audio data (e.g. 1: mono, 2: stereo)
-  
-* `~sample_rate` (`Int`, default: `16000`)
-
-  Sample rate of audio signal
-  
-* `~buffer_size` (`Int`, default: `10240`)
-
-  Maximum buffer size to store audio data for speech recognition
-  
-* `~start_signal` (`String`, default: `None`)
-
-  Path to sound file for bell on the start of audio caption.
-
-  If this is `None`, `/usr/share/sounds/freedesktop/stereo/bell.ogg` or `/usr/share/sounds/freedesktop/stereo/bell.oga` is used.
-  
-* `~recognized_signal` (`String`, default: `None`)
-
-  Path to sound file for bell on the end of audio caption.
-
-  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message.ogg` or `/usr/share/sounds/freedesktop/stereo/message.oga` is used.
-  
-* `~success_signal` (`String`, default: `None`)
-
-  Path to sound file for bell on getting successful recognition result.
-
-  If this is `None`, `/usr/share/sounds/freedesktop/stereo/message-new-instant.ogg` or `/usr/share/sounds/freedesktop/stereo/message-new-instant.oga` is used.
-  
-* `~timeout_signal` (`String`, default: `None`)
-
-  Path to sound file for bell on timeout for recognition.
-
-  If this is `None`, `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.ogg` or `/usr/share/sounds/freedesktop/stereo/network-connectivity-lost.oga` is used.
-  
-* `~continuous` (`Bool`, default: False)
-
-  Selecting to use topic or service. By default, service is used.
-
-* `~auto_start` (`Bool`, default: True)
-
-  Starting the speech recognition when launching.
-
-* `~self_cancellation` (`Bool`, default: `True`)
-
-  Whether the node recognize the sound heard when `~tts_action_names` is running or not.
-
-  This options is for ignoring self voice sounds from recognition.
-
-* `~tts_action_names` (`List[String]`, default: `['sound_play']`)
-
-  Text-to-speech action name for self cancellation.
-
-  The node ignores the voice heard when these Text-to-speech action is running.
-
-* `~tts_tolerance` (`Float`, default: `1.0`)
-
-   Tolerance seconds for self cancellation.
-
-   The node ignores the voice with this tolerance seconds after `~tts_action_names` finish running.
-
-* `~google_key` (`String`, default: `None`)
-
-  Auth Key for Google API. If `None`, use public key. (No guarantee to be blocked.)  
-  This is valid only if `~engine` is `Google`.
-  
-* `~google_cloud_credentials_json` (`String`, default: `None`)
-
-  Path to credential json file. For JSK users, you can download from [Google Drive](https://drive.google.com/file/d/1VxniytpH9J12ii9jphtBylydY1_k5nXf/view?usp=sharing) link.
-  This is valid if `~engine` is `GoogleCloud` or `GoogleCloudStream`.
-  If the environment variable `GOOGLE_APPLICATION_CREDENTIALS` is already set, this parameter is ignored.
-
-* `~google_cloud_preferred_phrases` (`[String]`, default: `None`)
-
-  Preferred phrases parameters.
-  This is valid only if `~engine` is `GoogleCloud`.
-
-* `~google_cloud_model` (`String`, default: `""`)
-
-  Recognition model name passed to the Google Cloud Speech API (e.g. `latest_long`, `latest_short`, `default`). Leave empty to use the API default.
-  This is valid only if `~engine` is `GoogleCloudStream`.
-
-* `~google_cloud_endpoint_stable_s` (`Double`, default: `1.0`)
-
-  Seconds the interim transcript must remain unchanged before a result is treated as final, in addition to Google's own `is_final` signal. Lower values commit faster but may cut off slow speakers.
-  This is valid only if `~engine` is `GoogleCloudStream`.
-
-* `~log_interim_results` (`Bool`, default: `True`)
-
-  If `True`, the interim transcript is also written to `rospy.loginfo` (deduplicated — only logged when the text actually changes). Set to `False` to silence the interim log line on noisy environments.
-  This is valid only if `~engine` is `GoogleCloudStream`.
-  
-* `~bing_key` (`String`, default: `None`)
-
-  Auth key for Bing API.  
-  This is valid only if `~engine` is `bing`.
-
-* `~vosk_model_path` (`String`, default: `None`)
-
-  Path to trainded model for Vosk API.
-  This is valid only if `~engine` is `Vosk`.
-
-  If `en-US` or `ja` is selected as `~language`, you do not need to specify the path.
-  To load other models, please download them from [Model list](https://alphacephei.com/vosk/models).
-  
 ## Author
 
 Yuki Furuta <<furushchev@jsk.imi.i.u-tokyo.ac.jp>>
