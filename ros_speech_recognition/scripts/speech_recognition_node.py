@@ -11,6 +11,7 @@ import json
 import array
 import os
 import sys
+from collections import deque
 from threading import Lock
 from threading import Thread
 from threading import Event
@@ -116,6 +117,10 @@ class ROSAudio(SR.AudioSource):
             self.buffer_size = buffer_size
             self.lock = Lock()
             self.buffer = bytes()
+            # [n_bytes, arrival time] of each message still in self.buffer
+            self.arrivals = deque()
+            # arrival time of the newest bytes returned by read_once
+            self.last_read_stamp = None
             self.depth = depth
             self.n_channel = n_channel
             self.target_channel = min(self.n_channel - 1, max(0, target_channel))
@@ -125,10 +130,32 @@ class ROSAudio(SR.AudioSource):
             for code in ['b', 'h', 'i', 'l']:
                 self.type_code[array.array(code).itemsize] = code
 
+        def _drop_arrivals(self, size):
+            """Forget ``size`` bytes from the head of self.arrivals.
+
+            Returns
+            -------
+            float or None
+                Arrival time of the last dropped byte.
+            """
+            stamp = None
+            while size > 0 and self.arrivals:
+                head = self.arrivals[0]
+                stamp = head[1]
+                if head[0] > size:
+                    head[0] -= size
+                    break
+                size -= head[0]
+                self.arrivals.popleft()
+            return stamp
+
         def read_once(self, size):
             with self.lock:
                 buf = self.buffer[:size]
                 self.buffer = self.buffer[size:]
+                stamp = self._drop_arrivals(len(buf))
+                if stamp is not None:
+                    self.last_read_stamp = stamp
                 return buf
 
         def read(self, size):
@@ -145,17 +172,22 @@ class ROSAudio(SR.AudioSource):
             except:
                 pass
             self.buffer = bytes()
+            self.arrivals.clear()
 
         def audio_cb(self, msg):
+            stamp = ros_compat.now_sec(self.node)
             with self.lock:
                 dtype = self.type_code[self.depth/8]
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array_to_bytes(array.array(dtype, chan_data))
+                chunk = array_to_bytes(array.array(dtype, chan_data))
+                self.buffer += chunk
+                self.arrivals.append([len(chunk), stamp])
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
+                    self._drop_arrivals(overflow)
 
 
 class ROSSpeechRecognition(object):
@@ -436,7 +468,10 @@ class ROSSpeechRecognition(object):
         of silence, plus however late the audio topic arrives. By then the
         robot may have stopped speaking more than tts_tolerance ago, so
         is_canceling alone lets the robot's own voice through on a busy PC.
-        This dates the phrase back by its length instead.
+        This dates the phrase back by its length instead, counting from
+        when the last audio of the phrase arrived on the topic rather than
+        from now, so a recognizer thread that lags behind the topic does not
+        make the phrase look later than it was.
 
         Parameters
         ----------
@@ -446,12 +481,20 @@ class ROSSpeechRecognition(object):
         -------
         bool
         """
-        if not self.self_cancellation or self.last_tts is None:
+        if not self.self_cancellation:
             return False
+        # tts_timer_cb may reset last_tts to None at any moment, when the
+        # robot starts speaking again
+        last_tts = self.last_tts
+        if last_tts is None:
+            return self.is_canceling
+        stream = self.audio.stream
+        ended = stream.last_read_stamp if stream is not None else None
+        if ended is None:
+            ended = ros_compat.now_sec(self.node)
         duration = len(audio.frame_data) / float(
             audio.sample_rate * audio.sample_width)
-        began = ros_compat.now_sec(self.node) - duration
-        return began < self.last_tts + self.tts_tolerance
+        return ended - duration < last_tts + self.tts_tolerance
 
     def start_speech_recognition(self):
         if self.engine == Config.SpeechRecognition_GoogleCloudStream:
