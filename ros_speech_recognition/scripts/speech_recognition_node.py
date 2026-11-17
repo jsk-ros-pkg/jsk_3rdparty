@@ -362,7 +362,7 @@ class ROSSpeechRecognition(object):
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
                 credentials_path = ros_compat.get_param(self.node, "~google_cloud_credentials_json", None)
-                if credentials_path is not None:
+                if credentials_path:  # "" (the default of the launch files) is not given
                     with open(credentials_path) as j:
                         credentials_json = j.read()
                 else:
