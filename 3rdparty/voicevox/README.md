@@ -1,253 +1,128 @@
 # voicevox
 
-ROS Interface for [VOICEVOX](https://voicevox.hiroshiba.jp/) (AI speech synthesis)
+ROS interface for [VOICEVOX](https://voicevox.hiroshiba.jp/), a free Japanese AI speech synthesis engine.
+The package builds the VOICEVOX engine (CPU) into the package, and launches it together with
+[sound_play](https://github.com/ros-drivers/audio_common) so that Japanese text sent to `robotsound_jp`
+is spoken. It can also publish the speech as raw PCM on an audio topic instead, and can use the official
+VOICEVOX Docker image (CPU or GPU) or an engine running on another machine.
+The same launch arguments and environment variables work on ROS 1 and ROS 2.
 
-This package supports both ROS 1 and ROS 2 with the same launch arguments and environment variables.
-For ROS 2, read `roslaunch voicevox voicevox_texttospeech.launch` as `ros2 launch voicevox voicevox_texttospeech.launch.xml` and `rosrun` as `ros2 run`.
+## Requirements
 
-## Quick Start
+- x86_64 or aarch64 Linux (on other architectures the package builds nothing).
+- Network access at build time. The build downloads:
+  - [voicevox_engine](https://github.com/VOICEVOX/voicevox_engine) (git clone, about 10 MB): `0.23.0` with Python >= 3.12
+    (ROS 2 jazzy and later, ROS One on noble), `0.14.7` with older Pythons (noetic);
+  - [voicevox_core](https://github.com/VOICEVOX/voicevox_core) CPU release zip with the voice models and ONNX Runtime
+    (about 1.3 GB for `0.15.7`, about 0.96 GB for `0.14.6`);
+  - [voicevox_resource](https://github.com/VOICEVOX/voicevox_resource) (shallow git clone of the character information);
+  - the Python packages of the engine, into a virtualenv of the package (ROS 1: catkin_virtualenv with
+    `requirements_python3.*.txt`; ROS 2: [uv](https://docs.astral.sh/uv/) with `pyproject.toml`/`uv.lock`),
+    and, on ROS 2, the Open JTalk dictionary of pyopenjtalk (about 24 MB).
+- No credentials. Check the [terms of use](#terms-of-use) of VOICEVOX and of each character.
+- Optional: Docker, and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+  for `use_gpu:=true`.
 
-Choose the deployment pattern that best fits your needs:
-
-```bash
-# Pattern A: Direct Docker + ROS client (Multi-machine) | 直接Docker + ROSクライアント（マルチマシン）
-# Server machine:
-docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
-# Client machine:
-roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
-
-# Pattern B: ROS-managed Docker + ROS client (Multi-machine) | ROS管理Docker + ROSクライアント（マルチマシン）
-# Server machine:
-roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
-# Client machine:
-roslaunch voicevox voicevox_texttospeech.launch host:=<server_ip> port:=50021
-
-# Pattern C: All-in-one (Docker + ROS on same machine) | オールインワン（同一マシンでDocker+ROS）
-roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
-
-# Pattern D: Local VOICEVOX without Docker (CPU only) | ローカルVOICEVOX（Dockerなし、CPU版）
-# VOICEVOX engine is automatically installed during catkin build
-roslaunch voicevox voicevox_texttospeech.launch
-```
-
-Patterns A-C provide GPU acceleration support through Docker. Pattern D runs locally with CPU only.
-パターンA-CはDockerを通じたGPUによる高速な音声合成をサポート。パターンDはCPUのみでローカル実行。
-
-## TERM
-
-[VOICEVOX](https://voicevox.hiroshiba.jp/) is basically free to use, but please check the terms of use below.
-
-[TERM](https://voicevox.hiroshiba.jp/term)
-
-Each voice synthesis character has its own rules. Please use this package according to those terms.
-
-| Character name  |  term link |
-| ---- | ---- |
-| 四国めたん | https://zunko.jp/con_ongen_kiyaku.html |
-| ずんだもん | https://zunko.jp/con_ongen_kiyaku.html |
-| 春日部つむぎ | https://tsukushinyoki10.wixsite.com/ktsumugiofficial/利用規約 |
-| 波音リツ | http://canon-voice.com/kiyaku.html |
-| 雨晴はう | https://amehau.com/?page_id=225 |
-| 玄野武宏 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
-| 白上虎太郎 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
-| 青山龍星 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
-| 冥鳴ひまり | https://kotoran8zunzun.wixsite.com/my-site/利用規約 |
-| 九州そら | https://zunko.jp/con_ongen_kiyaku.html |
-| もち子さん | https://vtubermochio.wixsite.com/mochizora/利用規約 |
-| 剣崎雌雄 | https://frontier.creatia.cc/fanclubs/413/posts/4507 |
-| WhiteCUL | https://www.whitecul.com/guideline |
-| 後鬼 | https://ついなちゃん.com/voicevox_terms/ |
-| No.7 | https://voiceseven.com/#j0200 |
-| ちび式じい | https://docs.google.com/presentation/d/1AcD8zXkfzKFf2ertHwWRwJuQXjNnijMxhz7AJzEkaI4 |
-| 櫻歌ミコ | https://voicevox35miko.studio.site/rule |
-| 小夜/SAYO | https://316soramegu.wixsite.com/sayo-official/guideline |
-| ナースロボ＿タイプＴ | https://www.krnr.top/rules |
-| †聖騎士 紅桜† | https://commons.nicovideo.jp/material/nc296132 |
-| 雀松朱司 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
-| 麒ヶ島宗麟 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
-| 春歌ナナ | https://nanahira.jp/haruka_nana/guideline.html |
-| 猫使アル | https://nekotukarb.wixsite.com/nekonohako/利用規約 |
-| 猫使ビィ | https://nekotukarb.wixsite.com/nekonohako/利用規約 |
-| 中国うさぎ | https://zunko.jp/con_ongen_kiyaku.html |
-| 栗田まろん | https://aivoice.jp/character/maron/ |
-| あいえるたん | https://www.infiniteloop.co.jp/special/iltan/terms/ |
-| 満別花丸 | https://100hanamaru.wixsite.com/manbetsu-hanamaru/rule |
-| 琴詠ニア | https://commons.nicovideo.jp/works/nc315435 |
-| Voidoll | https://blog.nicovideo.jp/niconews/224589.html |
-| 中部つるぎ | https://zunko.jp/con_ongen_kiyaku.html |
-| ぞん子 | https://zonko.zone-energy.jp/guideline |
-
-## Installation
-
-Build this package.
+## Build
 
 ```bash
-cd /path/to/catkin_workspace
+# ROS 1
 catkin build voicevox
-```
-
-For ROS 2 (Python 3.12 or newer is required; python packages are installed with [uv](https://docs.astral.sh/uv/))
-
-```bash
-cd /path/to/colcon_workspace
+# ROS 2
 colcon build --packages-up-to voicevox
 ```
 
-### Optional (Using Docker with GPU acceleration)
-
-VOICEVOX supports Docker deployment with GPU acceleration, which enables significantly faster speech synthesis compared to CPU-only processing.
-
-#### Prerequisites
-
-First, install the NVIDIA Container Toolkit:
-
-https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
-
-#### Setup
-
-Pull the GPU-enabled VOICEVOX Docker image:
-
-```bash
-docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
-```
-
-Start the Docker container with GPU support:
-
-```bash
-docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
-```
-
-#### Usage with use_docker option
-
-Launch the ROS node with Docker backend using the `use_docker:=true` option:
-
-```bash
-# For local Docker container
-roslaunch voicevox voicevox_texttospeech.launch use_docker:=true
-
-# For remote Docker container
-roslaunch voicevox voicevox_texttospeech.launch use_docker:=true host:=<Docker PC IP>
-```
-
-#### Docker-only mode
-
-If you want to launch only the Docker container without the ROS sound_play node, use the `docker_only:=true` option:
-
-```bash
-# Launch Docker container only (local)
-roslaunch voicevox voicevox_texttospeech.launch docker_only:=true
-
-# Launch Docker container only with custom port
-roslaunch voicevox voicevox_texttospeech.launch docker_only:=true port:=50022
-```
-
-#### GPU / CPU selection
-
-With `use_docker` or `docker_only`, the container uses the CPU image by default. Set `use_gpu:=true` to use the GPU image:
-
-```bash
-roslaunch voicevox voicevox_texttospeech.launch docker_only:=true use_gpu:=true
-```
-
-With `use_gpu:=true`, a short synthesis is sent once in the background after the container starts (warm-up) because the first synthesis can take tens of seconds.
-
-#### Connect to existing Docker container
-
-To connect to an existing Docker container running on a different machine:
-
-```bash
-# Connect to remote Docker container
-roslaunch voicevox voicevox_texttospeech.launch host:=<Docker PC IP> port:=<Docker Port>
-
-# Example: Connect to Docker container at 192.168.1.100:50021
-roslaunch voicevox voicevox_texttospeech.launch host:=192.168.1.100 port:=50021
-```
-
-The `use_docker` and `docker_only` options allow you to:
-- **use_docker**: Run Docker container and ROS node together
-- **docker_only**: Launch only the Docker container (useful for server deployment)
-- Utilize GPU acceleration for faster speech synthesis
-- Run VOICEVOX engine in an isolated container environment
-- Easily deploy on different machines without local installation
-
-
 ## Usage
 
-### Publish the speech on an audio topic instead of playing it with sound_play
+### ROS 2
 
-With `output_type:=audio`, `request_synthesis.py --output-type audio` runs
-instead of sound_play: it subscribes `SoundRequest` on `robotsound_jp` (as
-sound_play does, e.g. from `SoundClient.say()`, see [Say something](#saysomething))
-and text (`std_msgs/String`) on `robotsound_jp/text`, and publishes the
-synthesized speech as raw PCM (mono, S16LE, `sample_rate`) on `audio`
-(`audio_common_msgs/AudioData`), so that it is played by e.g.
-[audio_common](https://github.com/ros-drivers/audio_common)'s
-`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another
-machine. `~speaker` (id or name) can be changed at runtime.
-The `robotsound_jp` action (`SoundClient(blocking=True)`) is only served by sound_play.
+```bash
+# engine (CPU, in this package) + sound_play
+ros2 launch voicevox voicevox_texttospeech.launch.xml
+# speak (from another terminal)
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは。音声テストです。'}"
+ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"
+# list the speakers (needs a running engine)
+ros2 run voicevox list_speakers.py
+```
+
+### ROS 1
+
+```bash
+roslaunch voicevox voicevox_texttospeech.launch
+rostopic pub --once /robotsound_jp/text std_msgs/String "data: 'こんにちは'"
+rostopic pub --once /robotsound_jp sound_play/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"
+rosrun voicevox list_speakers.py
+```
+
+In `SoundRequest`, `sound: -3` is `SAY`, `command: 1` is `PLAY_ONCE` and `arg2` is the voice (a speaker id or the
+beginning of a speaker name, see [Speakers](#speakers)); an empty `arg2` uses `default_speaker`.
+
+### Deployment patterns
+
+```bash
+# A: the engine in this package, CPU only (default)
+ros2 launch voicevox voicevox_texttospeech.launch.xml
+# B: the engine in the official Docker image (CPU, or GPU with use_gpu:=true), started by the launch file
+ros2 launch voicevox voicevox_texttospeech.launch.xml use_docker:=true use_gpu:=true
+# C: an engine on another machine
+#    server: ros2 launch voicevox voicevox_texttospeech.launch.xml docker_only:=true use_gpu:=true
+#        or: docker run --rm --gpus all -p '50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+#    client:
+ros2 launch voicevox voicevox_texttospeech.launch.xml host:=<server_ip> port:=50021
+```
+
+(ROS 1: `roslaunch voicevox voicevox_texttospeech.launch` with the same arguments.)
+The Docker images are `voicevox/voicevox_engine:cpu-ubuntu20.04-latest` and
+`voicevox/voicevox_engine:nvidia-ubuntu20.04-latest`; the launch file pulls them if they are missing.
+With `use_gpu:=true`, a short synthesis is sent once after the container starts (warm-up), because the first
+synthesis can take tens of seconds.
+
+### Publish the speech on an audio topic
+
+With `output_type:=audio`, `request_synthesis.py --output-type audio` (node `voicevox_audio`) runs instead of
+sound_play. It speaks the same `robotsound_jp` (`SoundRequest`) and `robotsound_jp/text` (`std_msgs/String`) topics,
+and publishes the speech as raw PCM (mono, S16LE, `sample_rate`) on `audio`, to be played by e.g. audio_common's
+`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another machine. The `robotsound_jp` action
+(`SoundClient(blocking=True)`) is only served by sound_play.
 
 ```bash
 ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio
 ros2 run audio_play audio_play_node --ros-args -p format:=wave -p sample_rate:=16000
+# ROS 1
+roslaunch voicevox voicevox_texttospeech.launch output_type:=audio volume_scale:=10.0
 ```
 
-Send Japanese text from another terminal:
+`volume_scale` raises the volume, e.g. about `10.0` for Unitree G1, whose default volume is low.
+
+### Write a wav file without ROS topics
+
+`request_synthesis.py` is also the `text2wave` command of sound_play: it reads the first line of a text file and
+writes the speech to a wav file. With an engine running (e.g. the launch file above, or the Docker image):
 
 ```bash
-ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは。音声テストです。'}"
-ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは。音声テストです。', arg2: ''}"
+echo 'こんにちは。音声テストです。' > /tmp/voicevox.txt
+ros2 run voicevox request_synthesis.py -eval 2 -o /tmp/voicevox.wav /tmp/voicevox.txt   # ROS 2
+rosrun voicevox request_synthesis.py -eval 2 -o /tmp/voicevox.wav /tmp/voicevox.txt     # ROS 1
 ```
 
-### Launch sound_play with VOICEVOX Text-to-Speech
+`-eval` is the speaker (id or name). The results are cached in `$ROS_HOME/voicevox/` (default `~/.ros/voicevox/`)
+unless `ROS_VOICEVOX_TEXTTOSPEECH_CACHE_ENABLED` is not `true`.
 
-```bash
-roslaunch voicevox voicevox_texttospeech.launch
-```
-
-<a id="saysomething"></a>
-### Say something
-
-Both `output_type:=wav` (default) and `output_type:=audio` speak
-`SoundRequest` (sound_play's `SoundClient`) on `robotsound_jp`
-and text (`std_msgs/String`) on `robotsound_jp/text`.
-
-#### From the command line
-
-Text (`std_msgs/String`):
-
-```bash
-rostopic pub --once /robotsound_jp/text std_msgs/String "data: 'こんにちは'"  # ROS 1
-ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは'}"  # ROS 2
-```
-
-`SoundRequest` (`sound: -3` is `SAY`, `command: 1` is `PLAY_ONCE`, `arg2` is the voice):
-
-```bash
-rostopic pub --once /robotsound_jp sound_play/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 1
-ros2 topic pub --once /robotsound_jp sound_play_msgs/msg/SoundRequest "{sound: -3, command: 1, volume: 1.0, arg: 'こんにちは', arg2: '四国めたん-あまあま'}"  # ROS 2
-```
-
-With `output_type:=wav`, the voice of the text is `~speaker` of `text_to_sound_request_jp`
-(default: `default_speaker`), e.g. `rosparam set /text_to_sound_request_jp/speaker 四国めたん-あまあま`
-(ROS 2: `ros2 param set /text_to_sound_request_jp speaker 四国めたん-あまあま`).
-With `output_type:=audio`, it is `~speaker` of `voicevox_audio`.
-
-#### For python users
+### Python and roseus
 
 ```python
+# ROS 1
 import rospy
 from sound_play.libsoundplay import SoundClient
 
 rospy.init_node('say_node')
-
 client = SoundClient(sound_action='robotsound_jp', sound_topic='robotsound_jp')
-
 client.say('こんにちは', voice='四国めたん-あまあま')
 ```
 
-For ROS 2
-
 ```python
+# ROS 2
 import time
 
 import rclpy
@@ -255,20 +130,75 @@ from sound_play.libsoundplay import SoundClient
 
 rclpy.init()
 node = rclpy.create_node('say_node')
-
 client = SoundClient(node, sound_action='robotsound_jp', sound_topic='robotsound_jp')
 time.sleep(1)
-
 client.say('こんにちは', voice='四国めたん-あまあま')
 ```
 
-You can change the voice by changing the voice_name.
-You can also specify the speaker id.
-To get available voice name and speaker id, run following command
-```bash
-rosrun voicevox list_speakers.py  # ROS 1
-ros2 run voicevox list_speakers.py  # ROS 2
+```lisp
+;; roseus (ROS 1)
+(load "package://pr2eus/speak.l")
+(ros::roseus "say_node")
+(speak "JSKへようこそ。" :lang "波音リツ" :wait t :topic-name "robotsound_jp")
 ```
+
+## Interface
+
+### Launch arguments (`voicevox_texttospeech.launch` / `voicevox_texttospeech.launch.xml`)
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `host` | `$VOICEVOX_TEXTTOSPEECH_URL` or `localhost` | Host of the engine. Other than `localhost`/`127.0.0.1`, no local engine is started |
+| `port` | `$VOICEVOX_TEXTTOSPEECH_PORT` or `50021` | Port of the engine |
+| `default_speaker` | `$VOICEVOX_DEFAULT_SPEAKER_ID` or `2` | Speaker used when none is given |
+| `cpu_num_threads` | `1` | CPU threads of the engine |
+| `use_docker` | `false` | Run the engine in the official Docker image instead of the one in this package |
+| `docker_only` | `false` | Run only the Docker engine (no sound_play nor ROS nodes), e.g. on a server |
+| `use_gpu` | `false` | Use the GPU (`nvidia-ubuntu20.04-latest`) image with `use_docker`/`docker_only` |
+| `remote_only` | `false` | Do not start a local engine |
+| `output_type` | `wav` | `wav`: play with sound_play. `audio`: publish PCM on `audio` |
+| `sample_rate` | `16000` | Sample rate of `audio` (`output_type:=audio`) |
+| `volume_scale` | `1.0` | Volume of `audio` (`output_type:=audio`) |
+| `launch_sound_play` | `true` | Launch `sound_play_jp` and `text_to_sound_request_jp` (`output_type:=wav`) |
+| `sound_play_respawn` | `true` | Respawn the nodes |
+| `device` | `""` | Audio output device of sound_play |
+
+### Nodes
+
+- `voicevox_server` (`run-voicevox`): the VOICEVOX engine (HTTP server on `0.0.0.0:<port>`).
+- `voicevox_docker_server` (`run-voicevox-docker`): the engine in Docker (container `voicevox-engine-<port>`), or,
+  for a remote `host`, waits for and monitors it.
+- `sound_play_jp` (sound_play's `soundplay_node.py`), `output_type:=wav`: action server and subscriber
+  `robotsound_jp` (`sound_play/SoundRequest`; ROS 2: `sound_play_msgs/msg/SoundRequest`, action
+  `sound_play_msgs/action/SoundRequest`). It synthesizes `SAY` requests with `bin/text2wave` of this package.
+- `text_to_sound_request_jp` (`text_to_sound_request.py`), `output_type:=wav`
+  - Subscribes `robotsound_jp/text` (`std_msgs/String`), publishes `robotsound_jp` (`SoundRequest`, `SAY`).
+  - Parameter `~speaker` (id or name, default `""`: `default_speaker`), read for each message.
+- `voicevox_audio` (`request_synthesis.py --output-type audio`), `output_type:=audio`
+  - Subscribes `robotsound_jp/text` (`std_msgs/String`) and `robotsound_jp` (`SoundRequest`, only `SAY` +
+    `PLAY_ONCE`, `arg2` is the speaker).
+  - Publishes `audio` (`audio_common_msgs/AudioData`, mono S16LE in 0.1 s chunks at playback speed) and
+    `audio_info` (`audio_common_msgs/AudioInfo`, latched).
+  - Parameters: `~speaker` (`default_speaker`, read for each message, can be changed at runtime),
+    `~sample_rate` (int, `16000`), `~volume_scale` (float, `1.0`).
+
+### Environment variables
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `VOICEVOX_TEXTTOSPEECH_URL` | `localhost` | Host of the engine |
+| `VOICEVOX_TEXTTOSPEECH_PORT` | `50021` | Port of the engine |
+| `VOICEVOX_DEFAULT_SPEAKER_ID` | `2` | Default speaker |
+| `VOICEVOX_STARTUP_TIMEOUT` | `300` | Seconds to wait for the engine to start |
+| `ROS_VOICEVOX_TEXTTOSPEECH_CACHE_ENABLED` | `true` | Cache the synthesized wav files in `$ROS_HOME/voicevox/` |
+
+The speaker list of the engine is cached in `$ROS_HOME/voicevox/speakers.json`; remove it after changing the engine.
+
+<a id="speakers"></a>
+## Speakers
+
+A speaker is given by its id or by (the beginning of) its name, `<character>-<style>`.
+`list_speakers.py` prints those of the running engine; the list below may differ with the engine version.
 
 |  speaker_id  |  voice_name  |
 | ---- | ---- |
@@ -360,29 +290,47 @@ ros2 run voicevox list_speakers.py  # ROS 2
 | 85 | 青山龍星-かなしみ |
 | 86 | 青山龍星-囁き |
 
-#### For roseus users
+<a id="terms-of-use"></a>
+## Terms of use
 
-```
-$ roseus
-(load "package://pr2eus/speak.l")
+[VOICEVOX](https://voicevox.hiroshiba.jp/) is basically free to use, but please check the terms of use below.
 
-(ros::roseus "say_node")
+[Terms of use](https://voicevox.hiroshiba.jp/term)
 
-(speak "JSKへようこそ。" :lang "波音リツ" :wait t :topic-name "robotsound_jp")
-```
+Each voice synthesis character has its own rules. Please use this package according to those terms.
 
-### Tips
-
-Normally, the server for speech synthesis starts up at `http://localhost:50021`.
-You can change the url and port by setting values for `VOICEVOX_TEXTTOSPEECH_URL` and `VOICEVOX_TEXTTOSPEECH_PORT`.
-
-You can also set the default character by setting `VOICEVOX_DEFAULT_SPEAKER_ID`.
-Please refer to [here](#saysomething) for the speaker id.
-
-With `output_type:=audio`, you can change the volume by `volume_scale` (default: `1.0`).
-For example, Unitree G1 needs about `volume_scale:=10.0` because its default volume is low.
-
-```bash
-roslaunch voicevox voicevox_texttospeech.launch output_type:=audio volume_scale:=10.0
-ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio volume_scale:=10.0
-```
+| Character name  |  term link |
+| ---- | ---- |
+| 四国めたん | https://zunko.jp/con_ongen_kiyaku.html |
+| ずんだもん | https://zunko.jp/con_ongen_kiyaku.html |
+| 春日部つむぎ | https://tsukushinyoki10.wixsite.com/ktsumugiofficial/利用規約 |
+| 波音リツ | http://canon-voice.com/kiyaku.html |
+| 雨晴はう | https://amehau.com/?page_id=225 |
+| 玄野武宏 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 白上虎太郎 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 青山龍星 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 冥鳴ひまり | https://kotoran8zunzun.wixsite.com/my-site/利用規約 |
+| 九州そら | https://zunko.jp/con_ongen_kiyaku.html |
+| もち子さん | https://vtubermochio.wixsite.com/mochizora/利用規約 |
+| 剣崎雌雄 | https://frontier.creatia.cc/fanclubs/413/posts/4507 |
+| WhiteCUL | https://www.whitecul.com/guideline |
+| 後鬼 | https://ついなちゃん.com/voicevox_terms/ |
+| No.7 | https://voiceseven.com/#j0200 |
+| ちび式じい | https://docs.google.com/presentation/d/1AcD8zXkfzKFf2ertHwWRwJuQXjNnijMxhz7AJzEkaI4 |
+| 櫻歌ミコ | https://voicevox35miko.studio.site/rule |
+| 小夜/SAYO | https://316soramegu.wixsite.com/sayo-official/guideline |
+| ナースロボ＿タイプＴ | https://www.krnr.top/rules |
+| †聖騎士 紅桜† | https://commons.nicovideo.jp/material/nc296132 |
+| 雀松朱司 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 麒ヶ島宗麟 | https://virvoxproject.wixsite.com/official/voicevoxの利用規約 |
+| 春歌ナナ | https://nanahira.jp/haruka_nana/guideline.html |
+| 猫使アル | https://nekotukarb.wixsite.com/nekonohako/利用規約 |
+| 猫使ビィ | https://nekotukarb.wixsite.com/nekonohako/利用規約 |
+| 中国うさぎ | https://zunko.jp/con_ongen_kiyaku.html |
+| 栗田まろん | https://aivoice.jp/character/maron/ |
+| あいえるたん | https://www.infiniteloop.co.jp/special/iltan/terms/ |
+| 満別花丸 | https://100hanamaru.wixsite.com/manbetsu-hanamaru/rule |
+| 琴詠ニア | https://commons.nicovideo.jp/works/nc315435 |
+| Voidoll | https://blog.nicovideo.jp/niconews/224589.html |
+| 中部つるぎ | https://zunko.jp/con_ongen_kiyaku.html |
+| ぞん子 | https://zonko.zone-energy.jp/guideline |
