@@ -95,9 +95,8 @@ class SwitchBotAPIClient(object):
         else:
             raise ValueError('Got unexpected http request method. Please use GET or POST.')
 
-        response_json = response.json()
-
-        # Catch the HTTP 4XX, 5XX error
+        # Catch the HTTP 4XX, 5XX error before parsing the body, which may
+        # not be JSON on such errors
         try:
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
@@ -108,6 +107,7 @@ class SwitchBotAPIClient(object):
             else:
                 raise e
         else:
+            response_json = response.json()
             if response_json['statusCode'] == 100:
                 return response_json
             elif response_json['statusCode'] == 151:
