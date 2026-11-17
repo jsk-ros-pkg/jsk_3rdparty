@@ -1,142 +1,108 @@
 chaplus_ros
 ===========
 
-ROS package for mebo: https://mebo.work/
+A chatbot node: it sends the text received on `request` to a chat API on the web and publishes the reply on
+`response`. Three engines are supported: [mebo](https://mebo.work/) (default), [A3RT Talk API](https://a3rt.recruit.co.jp/product/talkAPI)
+and Chaplus (the Chaplus service ended on August 31, 2022; the code is kept). The same script runs on ROS 1 and ROS 2.
 
-## Tutorials
+## Requirements
 
-1. optional) If you want to get new agent, please reference https://qiita.com/maKunugi/items/14f1b82a2c0b6fa5c202
+An API key of the engine, in a JSON file given by the `~chaplus_apikey_file` parameter:
 
-2. For JSK Users, please download the [apikey.json](https://drive.google.com/file/d/1tAT_WQqCMqvtbM0-CSTomWjwMP4jcOi9/view?usp=sharing)
+```json
+{"apikey_mebo": "<mebo API key>",
+ "agentid_mebo": "<mebo agent ID>",
+ "uid_mebo": "<any user ID of the conversation>",
+ "apikey_a3rt": "<A3RT Talk API key>",
+ "apikey": "<Chaplus API key>"}
+```
 
-3. Please start the sample launch with the following command.
+Only the keys of the engine in use are read.
 
-  ```
-  $ roslaunch chaplus_ros google_example.launch chaplus_apikey_file:=${HOME}/Downloads/apikey.json
-  ```
-  This sample subscribes `/speech_to_text [speech_recognition_msgs/SpeechRecognitionCandidates]` and publishes `/robotsound_jp [sound_play/SoundRequest]`
+- mebo: create an account and an agent at https://mebo.work/ and take the API key and the agent ID from the API
+  settings of the agent (see also https://qiita.com/maKunugi/items/14f1b82a2c0b6fa5c202). `uid_mebo` is a user ID of
+  your choice; mebo keeps the context of the conversation per user ID.
+- A3RT: register at https://a3rt.recruit.co.jp/product/talkAPI/registered/ and the API key is sent by e-mail.
+- JSK members can download a ready `apikey.json` from
+  [Google Drive](https://drive.google.com/file/d/1tAT_WQqCMqvtbM0-CSTomWjwMP4jcOi9/view?usp=sharing).
 
-4. You can try several conversations using `rostopic pub` command. Here is an example of sending "おはよう".
+The node needs access to the internet (the endpoints are fixed in the code).
 
-  ```
-  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
-  - 'おはよう'
-  confidence:
-  - 0"
-  ```
-  The reply from the bot can be checked using `rostopic echo` command.
-  ```
-  $ roopic echo --filter "print(m.arg)" /robotsound_jp
-  or
-  $ rostopic echo /robotsound_jp | ascii2uni -a U -q
-  ```
+## Usage
 
-  Here is an example of conversations.
-  ```
-  # terminal 1
-  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
-  - 'おはよう'
-  confidence:
-  - 0"
+### ROS 2
 
-  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
-  - 'お話しよう'
-  confidence:
-  - 0"
+There is no ROS 2 launch file; run the node:
 
-  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
-  - '何色が好き？'
-  confidence:
-  - 0"
+```bash
+ros2 run chaplus_ros chaplus_ros.py --ros-args \
+  -p chatbot_engine:=Mebo -p chaplus_apikey_file:=$HOME/Downloads/apikey.json -p use_sample:=false
+```
 
-  $ rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript:
-  - '良いですね。私は白が好きです。'
-  confidence:
-  - 0"
-  ```
-  ```
-  # termial 2
-  $ roopic echo --filter "print(m.arg)" /robotsound_jp
-  おはようございます！
-  あー、久しぶりにおしゃべりしたいですね。楽しみにしています。
-  私の好きな色は緑です。気持ちが落ち着きますよね。
-  私も好きです。気持ちが落ち着く気がしますから。
-  ```
+Talk to it:
+
+```bash
+ros2 topic echo /response &
+ros2 topic pub --once /request std_msgs/msg/String "{data: 'おはよう'}"
+```
+
+### ROS 1
+
+```bash
+rosrun chaplus_ros chaplus_ros.py _chatbot_engine:=Mebo _chaplus_apikey_file:=$HOME/Downloads/apikey.json _use_sample:=false
+rostopic echo /response &
+rostopic pub -1 /request std_msgs/String "data: 'おはよう'"
+```
+
+`sample/google_example.launch` (ROS 1 only) connects it to speech recognition and speech synthesis:
+
+```bash
+roslaunch chaplus_ros google_example.launch chaplus_apikey_file:=$HOME/Downloads/apikey.json
+```
+
+| Argument | Default | Description |
+|---|---|---|
+| `chatbot_engine` | `Mebo` | `Mebo`, `A3RT` or `Chaplus` |
+| `use_sample` | `false` | Send `communication_sample.json` with each request (Chaplus only) |
+| `use_respeaker` | `true` | `true`: relay `/speech_to_text` (`speech_recognition_msgs/SpeechRecognitionCandidates`, e.g. of respeaker_ros) to `/request`. `false`: start `aques_talk` and `ros_speech_recognition` (GoogleCloud engine) and relay `/Tablet/voice` to `/request` |
+| `chaplus_apikey_file` | `$(find chaplus_ros)/apikey.json` | The API key file |
+
+The reply on `/response` is relayed to `/robotsound_jp` (`sound_play/SoundRequest`). With `use_respeaker:=false`,
+edit the `/speech_recognition/google_cloud_credentials_json` parameter in the launch file to your Google Cloud key
+(see [ros_speech_recognition](../ros_speech_recognition)).
+
+Try a conversation with `rostopic`:
+
+```bash
+# terminal 1
+rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript: ['おはよう']
+confidence: [0]"
+rostopic pub -1 /speech_to_text speech_recognition_msgs/SpeechRecognitionCandidates "transcript: ['何色が好き？']
+confidence: [0]"
+# terminal 2
+rostopic echo --filter "print(m.arg)" /robotsound_jp
+おはようございます！
+私の好きな色は緑です。気持ちが落ち着きますよね。
+```
 
 ## Interface
 
-### Subscribing Topics
+### chaplus_ros.py
 
-- request (std_msgs/String)
+#### Subscribed topics
 
-  Input text data for chaplus bot system.
+- `request` (`std_msgs/String`): the utterance to the chatbot.
 
-### Publishing Topics
+#### Published topics
 
-- response (std_msgs/String)
+- `response` (`std_msgs/String`): the reply of the chatbot; `ごめんなさい、よくわからないです` when the request fails.
 
-  Response text data from chaplus bot system.
+#### Parameters
 
-### Parameters
-
-- ~chaplus_apikey_file (String: default: `rospack find chaplus_ros`/apikey.json
-
-  Path to json file stores chaplus API key.
-  
-  
-- ~communication_sample_file (String: default: `rospack find chaplus_ros`/communication_sample.json
-
-  Path to json file of decided responses.
-  
-  If you do not want to use this, please set the parameter as `use_sample:=false` when roslaunch.
-  
-
-Sample Code
------------
-
-1) sample/julius_example.launch
-
-Example to listen from your mic and respond from speakers, This demo uses Julius for speech to text engine, which requires vocabulary list. You need to change following line of the `julius_example.launch` to let system recognize your talk. Note that julius needs 20-30 seconds to update it's vocabulary list, so please be patient after you send the list from your command line.
-```
-  <!-- julius needs vocabulary list -->
-  <node pkg="rosservice" type="rosservice" name="update_vocabulary_list"
-        args='call --wait /speech_recognition "{vocabulary: {words: ["こんにちは", "おはよう"]}}"' />
-```
-
-2) sample/google_example.launch
-
-Example with google speech recognition. This demo requires [google_cloud_credentials_json](https://github.com/jsk-ros-pkg/jsk_3rdparty/tree/master/ros_speech_recognition#parameters), and update following line of the `google_example.launch`
-```
-  <param name="/speech_recognition/google_cloud_credentials_json"
-         value="/home/k-okada/Downloads/eternal-byte-236613-4bc6962824d1.json" />
-```
-
-## Use other chat API
-### A3RT
-If you want to use [A3RT](https://a3rt.recruit.co.jp/product/talkAPI)
-1) Get A3RT APIKey
-Please access https://a3rt.recruit.co.jp/product/talkAPI/registered/ and enter your information.
-
-2) Write A3RT API key in json file under `` `rospack find chaplus_ros`/apikey.json ``
-```
-{"apikey": "0123456789",
- "apikey_a3rt": "abcdefgh"}
-```
-
-3) raunch with A3RT option
-```
-roslaunch chaplus_ros google_example.launch chatbot_engine:=A3RT
-```
-
-### Chaplus
-
-Reference: https://www.chaplus.jp/. Note that support ends on August 31, 2022.
-
-1) Obtain API keys for chaplus service, go to https://www.chaplus.jp/api
-
-You can also create account via https://chaplus.work and reqeust [beta program](https://forms.gle/DQWXdXzUH4MnE5wv6)
-
-2) Put API key as json file under `` `rospack find chaplus_ros`/apikey.json ``
-   ```
-   {"apikey": "0123456789"}
-   ```
+- `~chatbot_engine` (string, default: `Mebo`): `Mebo`, `A3RT` or `Chaplus`.
+- `~chaplus_apikey_file` (string, default: `apikey.json` of the package: the source directory on ROS 1, the share
+  directory on ROS 2): the JSON file of the API keys.
+- `~use_sample` (bool, default: `true`): load `~communication_sample_file` and send its `agentState` and `addition`
+  with each request. Only the Chaplus engine uses it, but the file is loaded with any engine when this is `true`.
+- `~communication_sample_file` (string, default: `communication_sample.json` of the package): the character and
+  fixed utterance/response pairs of the bot (Chaplus).
