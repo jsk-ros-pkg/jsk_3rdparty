@@ -560,6 +560,8 @@ class GoogleChatROS(object):
             return img
 
     def _download_content(self, uri=None, drive_id=None, filename=''):
+        # Returned as it is when the download fails before the path is set
+        path = None
         try:
             if drive_id:
                 path = os.path.join(self.download_directory, drive_id)
