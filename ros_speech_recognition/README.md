@@ -53,6 +53,21 @@ ros2 launch ros_speech_recognition speech_recognition.launch.xml continuous:=fal
 ros2 service call /speech_recognition speech_recognition_msgs/srv/SpeechRecognition "{duration: 5.0, quiet: false}"
 ```
 
+Without a microphone, e.g. with the test bag `test/data/konnichiwa.bag` (ROS 1; convert it with
+[rosbags](https://pypi.org/project/rosbags/), `pip install rosbags`). Its audio messages are about 50 KB each, larger
+than the default `~buffer_size`, which is not an argument of the launch file, so run the node:
+
+```bash
+rosbags-convert --src test/data/konnichiwa.bag --dst konnichiwa
+ros2 run ros_speech_recognition speech_recognition_node.py --ros-args -r __node:=speech_recognition \
+    -p engine:=Vosk -p language:=ja -p audio_topic:=/speech_audio -p continuous:=true \
+    -p enable_sound_effect:=false -p buffer_size:=200000
+ros2 topic echo /speech_to_text speech_recognition_msgs/msg/SpeechRecognitionCandidates
+ros2 bag play --loop konnichiwa
+```
+
+![ros_speech_recognition Vosk demo](doc/ros_speech_recognition_vosk_demo.gif)
+
 Parrot (repeats what it hears with sound_play):
 
 ```bash
