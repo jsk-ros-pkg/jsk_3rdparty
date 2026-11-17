@@ -1,72 +1,88 @@
 # sesame_ros
 
-ROS API for Sesame smart lock made by CANDY HOUSE, Inc.
+ROS API for the Sesame smart lock made by CANDY HOUSE, Inc. `sesame_server.py` provides services to get the status
+of a Sesame and to lock, unlock and sync it through the Web API of CANDY HOUSE (`https://api.candyhouse.co/public`).
 
 ![](images/sesame_ros_system.png)
 
+## Requirements
 
-#### API key
+- A Sesame, reachable from the cloud of CANDY HOUSE (e.g. through its Wi-Fi access point), and the internet.
+- An authorization token of the Web API: log in to the CANDY HOUSE Dashboard (https://my.candyhouse.co/) and create
+  it there. You must be the owner of the Sesame to use the Web API; make sure that you can see the list of your
+  Sesames on the dashboard. The token can be given as it is or as the path of a file whose first line is the token.
+- Python package `requests`: on ROS 2 the system `python3-requests`; on ROS 1 it is installed into a virtualenv by
+  `catkin_virtualenv` from `requirements.in.python2` / `requirements.in.python3.12` at build time.
 
-You have to create your authorization token by logging into the CANDY HOUSE Dashboard: https://my.candyhouse.co/
+## Usage
 
-Note that you must be the owner of your Sesame in order to use Web API.
+### ROS 2
 
-Please make sure you can see the list of Sesames on CANDY HOUSE Dashboard.
+```bash
+colcon build --packages-up-to sesame_ros
+source install/setup.bash
+# list your Sesames (prints the JSON of https://api.candyhouse.co/public/sesames)
+ros2 run sesame_ros list_sesames.py YOUR_AUTH_TOKEN   # or the path of a token file
+# start the server
+ros2 run sesame_ros sesame_server.py --ros-args -p auth_token:=YOUR_AUTH_TOKEN -p device_id:=YOUR_SESAMES_UUID
+```
 
+```bash
+ros2 service call /sesame_server/get_status sesame_ros/srv/Status
+ros2 service call /sesame_server/lock sesame_ros/srv/Command
+ros2 service call /sesame_server/unlock sesame_ros/srv/Command
+ros2 service call /sesame_server/force_sync sesame_ros/srv/Command
+```
 
-#### Python Package Requirements
+There is no launch file.
 
-This package supports [catkin_virtualenv](https://github.com/locusrobotics/catkin_virtualenv).
+### ROS 1
 
-So pip dependencies written in `requirements.txt` will be automatically installed into virtualenv during build.
+```bash
+rosrun sesame_ros list_sesames.py YOUR_AUTH_TOKEN
+rosrun sesame_ros sesame_server.py _auth_token:=YOUR_AUTH_TOKEN _device_id:=YOUR_SESAMES_UUID
+```
 
+```bash
+rosservice call /sesame_server/get_status
+rosservice call /sesame_server/lock
+rosservice call /sesame_server/unlock
+rosservice call /sesame_server/force_sync
+```
 
-## Scripts in this package
+## Interface
 
-- ### list_sesames.py
+### list_sesames.py
 
-    A script for listing your Sesames.
+A script (not a node) listing your Sesames. Argument: `auth_token` (required), the token or the path of its file.
 
-    __Arguments__
+### sesame_server.py
 
-    - `auth_token` (__required__): Your authorization token. Path to its file is also supported.
+The node is named `sesame_server`.
 
+Services:
 
-- ### sesame_server.py
+- `~get_status` (`sesame_ros/Status`): the `nickname`, `serial`, `device_id`, `battery`, `locked` and `responsive`
+  of the Sesame.
+- `~lock` (`sesame_ros/Command`): locks the Sesame and waits for the end of the task.
+- `~unlock` (`sesame_ros/Command`): unlocks the Sesame and waits for the end of the task.
+- `~force_sync` (`sesame_ros/Command`): makes the server of CANDY HOUSE update the status of the Sesame.
 
-    A node for controlling your Sesame.
+The response of `sesame_ros/Command` is `status` (`terminated` when the task ended), `successful` and `error`.
 
-    __Parameters__
+Parameters:
 
-    - `~auth_token` (`string`, __required__): Your authorization token. Path to its file is also supported.
+- `~auth_token` (string, required): the authorization token, or the path of a file of it.
+- `~device_id` (string, default: none): the UUID of the Sesame.
+- `~nickname` (string, default: none): the nickname of the Sesame.
+  The Sesame is searched in your list first by `~device_id`, then by `~nickname`; if neither matches or is given,
+  the first Sesame found is used.
+- `~command_timeout` (int or float, default: `60`): the timeout [s] of `lock`, `unlock` and `force_sync`.
 
-    - `~device_id` (`string`, optional): UUID of your Sesame.
-
-    - `~nickname` (`string`, optional): Nickname of your Sesame.
-
-    `~device_id` and `~nickname` are used for searching Sesame from your Sesame list.
-
-    If neither of them matches or is specified, the first found Sesame will be used.
-
-    - `~command_timeout` (`int` or `float`, optional): Timeout for executing commands. Default is 60 [sec].
-
-
-    __Advertising services (See Usage section)__
-
-    - `~get_status` (`sesame_ros/Status`)
-
-    - `~lock` (`sesame_ros/Command`)
-
-    - `~unlock` (`sesame_ros/Command`)
-
-    - `~force_sync` (`sesame_ros/Command`)
-
-
-## Defined service list
-
-- __sesame_ros/Status__
+## Services
 
 ```
+# sesame_ros/Status
 ---
 string nickname
 string serial
@@ -76,51 +92,10 @@ bool locked
 bool responsive
 ```
 
-- __sesame_ros/Command__
-
 ```
+# sesame_ros/Command
 ---
 string status
 bool successful
 string error
 ```
-
-
-## Usage
-
-### To list your Sesames:
-
-Just run below.
-```
-$ rosrun sesame_ros list_sesames.py YOUR_AUTH_TOKEN
-```
-
-### To controll your Sesame:
-
-1. Start service server.
-    ```
-    $ roscore
-    $ rosrun sesame_ros sesame_server.py _auth_token:=YOUR_AUTH_TOKEN _device_id:=YOUR_SESAME's_UUID
-    ```
-
-2. Call service.
-
-    - To get your Sesame status:
-        ```
-        $ rosservice call /sesame_server/get_status
-        ```
-
-    - To lock your Sesame:
-        ```
-        $ rosservice call /sesame_server/lock
-        ```
-
-    - To unlock your Sesame:
-        ```
-        $ rosservice call /sesame_server/unlock
-        ```
-
-    - To force the server to update your Sesame status:
-        ```
-        $ rosservice call /sesame_server/force_sync
-        ```
