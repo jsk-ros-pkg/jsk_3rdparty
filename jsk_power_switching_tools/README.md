@@ -1,9 +1,18 @@
 # jsk_power_switching_tools
 
-ROS tools for power switching tools.  
+ROS drivers of USB power switches, to power on/off or power-cycle a USB device (e.g. a camera or a serial device
+which hangs) by a service call, and a node which power-cycles it automatically when its topic stops.
 Supported tools are:
 - [USB-Serial troubleshooter](#usb-serial-troubleshooter)
 - [USB PPPS hubs](#usb-ppps-hubs)
+
+| Node | ROS 1 | ROS 2 | |
+|---|:---:|:---:|---|
+| [`usb_serial_troubleshooter_driver.py`](#usb_serial_troubleshooter_driverpy) | ✓ | ✓ | Driver of USB-Serial troubleshooter |
+| [`usb_ppps_hub_driver.py`](#usb_ppps_hub_driverpy) | ✓ | ✓ | Driver of USB PPPS hubs (via `uhubctl`) |
+| [`auto_power_cycle.py`](#auto_power_cyclepy) | ✓ | | Power cycle when a monitored topic stops |
+
+The launch files (`launch/*.launch`) are of ROS 1; on ROS 2 run the drivers with `ros2 run`.
 
 ## [USB-Serial troubleshooter](https://www.century.co.jp/products/ct-3usb1hub.html)
 
@@ -13,9 +22,18 @@ Supported tools are:
 
 This is optional, but we recommend this setting because USB-Serial troubleshooter is sometimes suddenly disconnected and its device file changes.
 ```bash
+# ROS 1
 rosrun jsk_power_switching_tools setup_udev_for_usb_serial_troubleshooter <serial_number> <symlink_name>
 # <serial_number> : The serial number of your USB-Serial troubleshooter (e.g., 001A02F2046C). You can check the serial number by "udevadm info --name=/dev/ttyACM* --attribute-walk"
 # <symlink_name> : The name to create as a symbolic link in /dev (e.g., usb_serial_troubleshooter1)
+```
+The script finds the udev rule template by `rospack`, so it does not work on ROS 2. There, write the rule of
+`udev/90-usb-serial-troubleshooter.rules.template` by hand:
+```bash
+sed -e 's/{{SERIAL}}/<serial_number>/' -e 's/{{SYMLINK}}/<symlink_name>/' \
+  $(ros2 pkg prefix --share jsk_power_switching_tools)/udev/90-usb-serial-troubleshooter.rules.template \
+  | sudo tee /etc/udev/rules.d/90-usb-serial-troubleshooter.rules
+sudo udevadm control --reload && sudo udevadm trigger
 ```
 
 #### Connecting USB-Serial troubleshooter
@@ -32,9 +50,20 @@ If you face this phenomenon, try the following:
 
 ### Minimal usage: launching driver only
 
+ROS 2:
+```bash
+ros2 run jsk_power_switching_tools usb_serial_troubleshooter_driver.py --ros-args \
+  -p port:=/dev/<symlink_name> -p serial_timeout:=1.0
+ros2 service call /usb_serial_troubleshooter_driver/power std_srvs/srv/SetBool '{data: false}'
+ros2 service call /usb_serial_troubleshooter_driver/power_cycle std_srvs/srv/Trigger
+```
+
+ROS 1:
 ```bash
 roslaunch jsk_power_switching_tools usb_serial_troubleshooter.launch port:=/dev/<symlink_name>
 # <symlink_name> : The same as above
+rosservice call /usb_serial_troubleshooter_driver/power "data: false"
+rosservice call /usb_serial_troubleshooter_driver/power_cycle
 ```
 
 #### Arguments
@@ -52,17 +81,7 @@ Optional Arguments:
   serial_timeout (default "1"): Timeout [sec] of serial communication with USB-Serial troubleshooter
 ```
 
-#### Services
-
-- `usb_serial_troubleshooter_driver/power` (`std_srvs/SetBool`)
-
-  Power on/off USB.
-
-- `usb_serial_troubleshooter_driver/power_cycle` (`std_srvs/Trigger`)
-
-  Execute power cycle of USB.
-
-### Advanced usage: automated power cycle of USB
+### Advanced usage: automated power cycle of USB (ROS 1)
 
 ```bash
 roslaunch jsk_power_switching_tools auto_power_cycle.launch troubleshooter_port:=/dev/<symlink_name> monitored_topic:=<monitored_topic> monitored_topic_expected_hz:=<monitored_topic_expected_hz> monitored_topic_respawn_delay:=<monitored_topic_respawn_delay>
@@ -73,6 +92,12 @@ roslaunch jsk_power_switching_tools auto_power_cycle.launch troubleshooter_port:
 #
 # In default, this launch firstly executes power cycle once. If you want to change this behavior, set "init_with_power_cycle:=false"
 ```
+
+Other arguments of `auto_power_cycle.launch` (check them by `--ros-args`): `launch_default_driver` (default
+`true`: run `usb_serial_troubleshooter.launch`), `troubleshooter_serial_timeout` (`1`),
+`troubleshooter_power_cycle_interval` (`1.0`), `troubleshooter_init_with_power_set` (`true`),
+`troubleshooter_init_with_power_on` (`true`), `monitored_topic_allowed_delay_cycles` (`2.0`) and
+`init_with_power_cycle` (`true`).
 
 ## USB PPPS hubs
 
@@ -96,7 +121,10 @@ Hubs supporting PPPS (e.g., [VirtualHere USB 3 4-Port Hub](https://modularkvmip.
 
 This is required for running the driver node without `sudo`.
 ```bash
+# ROS 1
 rosrun jsk_power_switching_tools setup_udev_for_usb_ppps_hub
+# ROS 2
+$(ros2 pkg prefix --share jsk_power_switching_tools)/scripts/setup_udev_for_usb_ppps_hub
 # Reboot your PC after this script finishes
 # Note that this script adds your user to dialout group, which means "chmod" becomes unnecessary for accessing some device files (e.g., /dev/ttyACM0)
 ```
@@ -146,12 +174,22 @@ If the found workaround requires supplementary options for `uhubctl`, write them
 
 ### Minimal usage: launching driver only
 
+ROS 2:
+```bash
+ros2 run jsk_power_switching_tools usb_ppps_hub_driver.py --ros-args \
+  -p hub_location:=<hub_location> -p hub_port:=<hub_port>
+# several ports: -p hub_location:="['3-5', '3-5']" -p hub_port:="[1, 2]"
+ros2 service call /usb_ppps_hub_driver/power std_srvs/srv/SetBool '{data: false}'
+ros2 service call /usb_ppps_hub_driver/power_cycle std_srvs/srv/Trigger
+```
+
+ROS 1:
 ```bash
 roslaunch jsk_power_switching_tools usb_ppps_hub.launch hub_location:=<hub_location> hub_port:=<hub_port>
 # <hub_location> : Location of your hub
 # <hub_port> : Port of your hub which you want to power on/off
 ```
-If [the previous checking](#check-if-power-switching-works) tells you to use the latest `uhubctl` and/or add supplementary options to `uhubctl`, use `uhubctl_executable` argument explained below.
+If [the previous checking](#check-if-power-switching-works) tells you to use the latest `uhubctl` and/or add supplementary options to `uhubctl`, use `uhubctl_executable` argument (parameter on ROS 2) explained below.
 
 #### Arguments
 
@@ -169,17 +207,7 @@ Optional Arguments:
   uhubctl_executable (default "uhubctl"): Command to control USB PPPS hub. You can add supplementary options to uhubctl command (e.g., 'uhubctl -r 100'). In addition, you can specify the path to uhubctl command you installed on your own (e.g., '~/uhubctl/uhubctl')
 ```
 
-#### Services
-
-- `usb_ppps_hub_driver/power` (`std_srvs/SetBool`)
-
-  Power on/off the target port.
-
-- `usb_ppps_hub_driver/power_cycle` (`std_srvs/Trigger`)
-
-  Execute power cycle of the target port.
-
-### Advanced usage: automated power cycle of USB hub port
+### Advanced usage: automated power cycle of USB hub port (ROS 1)
 
 ```bash
 roslaunch jsk_power_switching_tools usb_ppps_hub.launch power_cycle_service:=auto_power_cycle/power_cycle hub_location:=<hub_location> hub_port:=<hub_port>
@@ -190,3 +218,62 @@ roslaunch jsk_power_switching_tools auto_power_cycle.launch launch_default_drive
 #
 # In default, this launch firstly executes power cycle once. If you want to change this behavior, set "init_with_power_cycle:=false"
 ```
+
+## Interface
+
+### Common to the drivers
+
+Services:
+
+- `~power` (`std_srvs/SetBool`): power on (`true`) / off (`false`) the USB device
+- `~power_cycle` (`std_srvs/Trigger`): power off, wait `~power_cycle_interval`, power on
+
+Parameters:
+
+| Parameter | Type | Default | |
+|---|---|---|---|
+| `~power_cycle_interval` | double | `1.0` | Interval [s] between off and on of `~power_cycle` |
+| `~init_with_power_set` | bool | `true` | Set the power state at start up |
+| `~init_with_power_on` | bool | `true` | The state set at start up: on (`true`) or off (`false`) |
+
+### `usb_serial_troubleshooter_driver.py`
+
+Parameters:
+
+| Parameter | Type | Default | |
+|---|---|---|---|
+| `~port` | string | `/dev/ttyACM0` | Serial port of the troubleshooter (115200 baud) |
+| `~serial_timeout` | double | none (blocking) | Timeout [s] of serial read/write; the launch file sets `1` |
+
+### `usb_ppps_hub_driver.py`
+
+Parameters:
+
+| Parameter | Type | Default | |
+|---|---|---|---|
+| `~hub_location` | string or list of strings | (required) | Location(s) of the hub, as `uhubctl -l` |
+| `~hub_port` | int or list | (required) | Port(s) of the hub, as `uhubctl -p`; the same length as `~hub_location` |
+| `~uhubctl_executable` | string | `uhubctl` | Command (and options) of `uhubctl`; `~` is expanded |
+
+The node checks the location and the port with `uhubctl` at start up and shuts down when they are invalid.
+
+### `auto_power_cycle.py`
+
+(ROS 1 only) Subscribed topics:
+
+- `~monitored_topic` (any type): when no message comes for
+  `(1 / ~monitored_topic_expected_hz) * (1 + ~monitored_topic_allowed_delay_cycles)` seconds, it calls the power
+  cycle service, then waits `~monitored_topic_respawn_delay` seconds before the next check.
+
+Services called:
+
+- `~power_cycle` (`std_srvs/Trigger`): the power cycle service of a driver (waited for at start up)
+
+Parameters:
+
+| Parameter | Type | Default | |
+|---|---|---|---|
+| `~monitored_topic_expected_hz` | double | `10` | Expected rate [Hz] of the monitored topic |
+| `~monitored_topic_allowed_delay_cycles` | double | `2.0` | Allowed delay, in cycles of the expected rate |
+| `~monitored_topic_respawn_delay` | double | `10.0` | Time [s] to wait after a power cycle |
+| `~init_with_power_cycle` | bool | `true` | Power cycle once at start up |
