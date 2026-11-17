@@ -143,13 +143,23 @@ class Patlite(object):
     def close(self):
         return self.sock.close()
 
+    def _recv(self):
+        # socket.recv() returns str on Python 2 but bytes on Python 3. Decode
+        # the bytes as latin-1 so that they compare with ACK/NAK and feed
+        # PatliteState in the same way as on Python 2 (where the str is used
+        # as it is).
+        ret = self.sock.recv(self.bufsize)
+        if not isinstance(ret, str):
+            ret = ret.decode('latin-1')
+        return ret
+
     def write(self, state=None):
         ret = None
         if state is None:
             state = self.state
         try:
             self.sock.sendall((self.WRITE_HEADER + state.state).encode('latin-1'))
-            ret = self.sock.recv(self.bufsize)
+            ret = self._recv()
         except socket.timeout:
             print("timeout")
         if (ret != self.ACK):
@@ -159,7 +169,7 @@ class Patlite(object):
     def read(self):
         try:
             self.sock.sendall(self.READ.encode('latin-1'))
-            tmp_state = PatliteState(self.sock.recv(self.bufsize))
+            tmp_state = PatliteState(self._recv())
         except socket.timeout:
             print("timeout")
             return None
@@ -169,7 +179,7 @@ class Patlite(object):
         ret = None
         try:
             self.sock.sendall(self.CLEAR.encode('latin-1'))
-            ret = self.sock.recv(self.bufsize)
+            ret = self._recv()
         except socket.timeout:
             print("timeout")
             return False
