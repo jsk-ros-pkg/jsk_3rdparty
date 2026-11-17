@@ -209,6 +209,22 @@ def flac_problem():
     return None
 
 
+def is_flac_error(e):
+    """Whether ``e`` says the FLAC encoder program is missing.
+
+    SpeechRecognition raises FileNotFoundError naming the flac binary when
+    it cannot run it, or OSError "FLAC conversion utility not available"
+    when it has no bundled binary for this platform. Other I/O errors (e.g.
+    a missing credentials file) are not about flac.
+    """
+    if not isinstance(e, (IOError, OSError)):
+        return False
+    filename = getattr(e, 'filename', None)
+    if filename and os.path.basename(str(filename)).startswith('flac'):
+        return True
+    return 'FLAC conversion utility' in str(e)
+
+
 FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engine. "
              "Install it with: sudo apt install flac")
 
@@ -494,7 +510,9 @@ class ROSSpeechRecognition(object):
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except Exception as e:
             ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
-            if isinstance(e, (IOError, OSError)) and flac_problem() is not None:
+            if (self.engine in (Config.SpeechRecognition_Google,
+                                Config.SpeechRecognition_GoogleCloud)
+                    and is_flac_error(e)):
                 ros_compat.logerr(self.node, FLAC_HINT)
         self.play_sound("timeout", 0.1)
 
