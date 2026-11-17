@@ -7,6 +7,14 @@ is spoken. It can also publish the speech as raw PCM on an audio topic instead, 
 VOICEVOX Docker image (CPU or GPU) or an engine running on another machine.
 The same launch arguments and environment variables work on ROS 1 and ROS 2.
 
+![voicevox demo](doc/voicevox_demo.gif)
+
+The engine of this package (ROS 2 jazzy, CPU, offline; `ros2 launch voicevox voicevox_texttospeech.launch.xml
+launch_sound_play:=false`, as sound_play is not needed for a wav file) writes
+「こんにちは。ボイスボックスで音声合成しています。」 to a wav file with `request_synthesis.py` (speaker 3,
+ずんだもん-ノーマル), see [Write a wav file without ROS topics](#write-a-wav-file-without-ros-topics):
+[listen to the sample](doc/voicevox_sample.mp3) (VOICEVOX:ずんだもん).
+
 ## Requirements
 
 - x86_64 or aarch64 Linux (on other architectures the package builds nothing).
