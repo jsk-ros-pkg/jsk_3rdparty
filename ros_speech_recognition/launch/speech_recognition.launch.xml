@@ -57,7 +57,7 @@
     <param name="self_cancellation" value="$(var self_cancellation)" />
     <param name="tts_tolerance" value="$(var tts_tolerance)" />
     <param name="tts_action_names" value="$(var tts_action_names)" />
-    <param name="google_cloud_credentials_json" value="$(var google_cloud_credentials_json)" />
+    <param name="google_cloud_credentials_json" type="str" value="$(var google_cloud_credentials_json)" />
   </node>
 
   <node name="speech_recognition_candidates_to_string"
