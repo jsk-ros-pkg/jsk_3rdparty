@@ -57,6 +57,8 @@ while True:
 "
 ```
 
+![rospatlite demo](doc/rospatlite_demo.gif)
+
 ## Interface
 
 ### `patlite_node.py`
