@@ -2,6 +2,7 @@
 
 import os.path
 from requests import ConnectionError
+from requests import RequestException
 from switchbot_ros.msg import Device
 from switchbot_ros.msg import DeviceArray
 from switchbot_ros.switchbot import SwitchBotAPIClient
@@ -196,7 +197,10 @@ class SwitchBotAction:
                     command_type=command_type,
                     device_name=goal.device_name
                 ))
-        except (DeviceError, SwitchBotAPIError, KeyError) as e:
+        # ValueError: unknown statusCode / non-JSON reply,
+        # RequestException: HTTP error or no connection to the API server
+        except (DeviceError, SwitchBotAPIError, KeyError,
+                ValueError, RequestException) as e:
             ros_compat.logerr(self.node, str(e))
             feedback.status = str(e)
             success = False
@@ -204,7 +208,10 @@ class SwitchBotAction:
             self._as.publish_feedback(feedback)
             r.sleep()
             result.done = success
-            self._as.set_succeeded(result)
+            if success:
+                self._as.set_succeeded(result)
+            else:
+                self._as.set_aborted(result)
 
 
 if __name__ == '__main__':
