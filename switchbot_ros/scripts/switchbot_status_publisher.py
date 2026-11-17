@@ -38,6 +38,9 @@ class SwitchBotStatusPublisher:
     """
     def __init__(self, node=None):
         self.node = node
+        # Set True at the end of __init__; spin() does nothing when __init__
+        # returned early on a configuration error (already logged)
+        self.ready = False
         # SwitchBot configs
         # '~token' can be file path or raw characters
         token = ros_compat.get_param(node, '~token')
@@ -118,6 +121,7 @@ class SwitchBotStatusPublisher:
             self.status_pub = ros_compat.create_publisher(node, topic_name, self.msg_class, queue_size=1, latch=True)
         
         ros_compat.loginfo(self.node, 'Ready: SwitchBot Status Publisher for ' + self.device_name)
+        self.ready = True
 
 
     def get_switchbot_client(self):
@@ -131,6 +135,8 @@ class SwitchBotStatusPublisher:
 
 
     def spin(self):
+        if not self.ready:
+            return
         rate = ros_compat.Rate(self.node, self.rate)
         while not ros_compat.is_shutdown(self.node):
             rate.sleep()
