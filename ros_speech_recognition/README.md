@@ -154,7 +154,7 @@ Launches `sound_play`, `audio_capture` (microphone), `speech_recognition` and `s
 | `sample_rate` | `16000` | Sample rate of the audio |
 | `device` | `""` | Microphone of audio_capture, e.g. `hw:0,0` (see `arecord -l`) |
 | `engine` | `Google` | Engine: `Google`, `GoogleCloud`, `GoogleCloudStream`, `Sphinx`, `Wit`, `Bing`, `Houndify`, `IBM`, `Vosk` |
-| `language` | `en-US` | Language, e.g. `ja-JP` (`ja` for Vosk) |
+| `language` | `en-US` | Language, e.g. `ja-JP` (also for Vosk) |
 | `continuous` | `true` | `true`: publish on `voice_topic`. `false`: serve the `speech_recognition` service |
 | `auto_start` | `true` | Start recognizing at launch (continuous mode) |
 | `energy_threshold` | `300.0` | Minimum audio energy of speech |
@@ -255,7 +255,7 @@ Other parameters (read at start):
 | `~google_cloud_endpoint_stable_s` | double | `1.0` | Seconds an unchanged interim result takes to be final (`GoogleCloudStream`) |
 | `~log_interim_results` | bool | `true` | Log the interim results when they change (`GoogleCloudStream`) |
 | `~bing_key` | string | none | Key of Bing (`Bing`) |
-| `~vosk_model_path` | string | none | Model directory of Vosk (`Vosk`). None: the bundled model of `language` `en-US` or `ja`; other models are on the [model list](https://alphacephei.com/vosk/models) |
+| `~vosk_model_path` | string | none | Model directory of Vosk (`Vosk`). None: the bundled model of `language` `en-US`, `ja` or `ja-JP`; other models are on the [model list](https://alphacephei.com/vosk/models) |
 
 The sound files of the effects are of the package `sound-theme-freedesktop`; `.oga` is used if `.ogg` is missing.
 
