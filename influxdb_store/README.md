@@ -45,6 +45,11 @@ ros2 run influxdb_store joint_states_logger.py --ros-args \
 docker exec influxdb influx -database test -execute 'SELECT * FROM joint_states ORDER BY time DESC LIMIT 6'
 ```
 
+![influxdb_store demo](doc/influxdb_store_demo.gif)
+
+(In the recording, the container is named `influxdb_demo`, the output of `ros2 topic pub` is discarded with
+`> /dev/null`, and `influx -precision rfc3339` prints the time as a date.)
+
 ```bash
 ros2 run influxdb_store network_states_logger.py --ros-args \
   -r '~/input/transmit:=/wlan0/transmit' -r '~/input/receive:=/wlan0/receive' -p database:=test
