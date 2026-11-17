@@ -9,6 +9,7 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import locale
 import math
 import os
 import sys
@@ -230,10 +231,23 @@ FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engi
 
 
 def as_log_text(text):
-    """Recognized text for a log line (str on Python 3, utf-8 bytes on Python 2)."""
-    if sys.version_info[0] >= 3 or isinstance(text, str):
-        return text
-    return text.encode('utf-8')
+    """Recognized text for a log line (str on Python 3, utf-8 bytes on Python 2).
+
+    Python 3.6 (the venv on kinetic/melodic) writes logs in ASCII under the
+    C locale, so logging Japanese raises UnicodeEncodeError there. Text that
+    an output encoding cannot show is escaped (e.g. ``\\u3053``) instead.
+    """
+    if sys.version_info[0] < 3:
+        return text if isinstance(text, str) else text.encode('utf-8')
+    encodings = [getattr(sys.stdout, 'encoding', None),
+                 getattr(sys.stderr, 'encoding', None),
+                 locale.getpreferredencoding(False)]
+    for encoding in encodings:
+        try:
+            text.encode(encoding or 'ascii')
+        except (UnicodeEncodeError, LookupError):
+            return text.encode('ascii', 'backslashreplace').decode('ascii')
+    return text
 
 
 class ROSSpeechRecognition(object):
