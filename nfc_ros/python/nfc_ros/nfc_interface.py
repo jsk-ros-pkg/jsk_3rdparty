@@ -18,7 +18,9 @@ class NFCInterface:
 
     def __del__(self):
 
-        self.clf.close()
+        # self.clf is not set when nfc.ContactlessFrontend() failed
+        if hasattr(self, 'clf'):
+            self.clf.close()
 
     def read_card(
             self,
