@@ -1,0 +1,10 @@
+{
+    "device_name": "SDP Sesami",
+    "wifi_ssid": "",
+    "wifi_password": "",
+    "sesami_device_uuid": "",
+    "sesami_secret_key": "",
+    "sesami_api_key": "",
+    "uwb_id": -1,
+    "comment": "this is configuration for sdp_sesami_host"
+}
