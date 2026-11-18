@@ -20,6 +20,15 @@ roslaunch openni2 openni2.launch
 rosrun image_transport republish zdepth in:=/camera/depth/image_raw raw out:=/camera/depth_decompressed/image_raw raw
 ```
 
+On ROS2, image_transport publishes `<topic>/zdepth` with the plugin, and the republish node decompresses it as
+
+```
+ros2 run image_transport republish --ros-args -p in_transport:=zdepth -p out_transport:=raw \
+  -r in/zdepth:=/camera/depth/image_raw/zdepth -r out:=/camera/depth_decompressed/image_raw
+```
+
+`ros2 run image_transport list_transports` shows `image_transport/zdepth`.
+
 ## Visual Comparison
 
 ### ZDepth (This package)
