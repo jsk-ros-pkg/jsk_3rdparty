@@ -82,4 +82,7 @@ class NFCROSNode:
     def spin(self):
 
         while not ros_compat.is_shutdown(self.node):
-            self.interface.read_card(on_connect=self.publish_tag)
+            # return on shutdown, see __main__ of nfc_ros_node.py for ROS2
+            self.interface.read_card(
+                on_connect=self.publish_tag,
+                terminate=lambda: ros_compat.is_shutdown(self.node))

@@ -9,4 +9,16 @@ if __name__ == '__main__':
 
     node = ros_compat.init_node('nfc_ros')
     nfc_ros_node = NFCROSNode(node)
-    nfc_ros_node.spin()
+    if ros_compat.ROS_VERSION == 1:
+        nfc_ros_node.spin()
+    else:
+        # rclpy's signal handlers shut the context down only out of a
+        # spinning executor (and nfcpy's clf.connect() swallows the
+        # KeyboardInterrupt), so read the cards in a thread, which returns
+        # when ros_compat.spin() is shut down by SIGINT/SIGTERM
+        import threading
+        thread = threading.Thread(target=nfc_ros_node.spin)
+        thread.daemon = True
+        thread.start()
+        ros_compat.spin(node)
+        thread.join(timeout=1.0)
