@@ -117,8 +117,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/jsk_3rdparty
-          key: jsk_3rdparty-downloads-${{ hashFiles('3rdparty/*/CMakeLists.txt') }}
-          restore-keys: jsk_3rdparty-downloads-
+          key: jsk_3rdparty-downloads-${{ github.job }}-${{ hashFiles('3rdparty/*/CMakeLists.txt') }}
+          # the jobs download different packages (e.g. arm skips downward): the key of the job, to save its own
+          # set, restored from the caches of the other jobs too
+          restore-keys: |
+            jsk_3rdparty-downloads-${{ github.job }}-
+            jsk_3rdparty-downloads-
 
       - name: Run jsk_travis
         uses: jsk-ros-pkg/jsk_travis@master
@@ -213,8 +217,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/jsk_3rdparty
-          key: jsk_3rdparty-downloads-${{ hashFiles('**/3rdparty/*/CMakeLists.txt') }}
-          restore-keys: jsk_3rdparty-downloads-
+          key: jsk_3rdparty-downloads-${{ github.job }}-${{ hashFiles('**/3rdparty/*/CMakeLists.txt') }}
+          # the jobs download different packages (e.g. arm skips downward): the key of the job, to save its own
+          # set, restored from the caches of the other jobs too
+          restore-keys: |
+            jsk_3rdparty-downloads-${{ github.job }}-
+            jsk_3rdparty-downloads-
       - name: Run commands
         run: |
           cd ${{ matrix.ROS_DISTRO }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
@@ -348,8 +356,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/jsk_3rdparty
-          key: jsk_3rdparty-downloads-${{ hashFiles('**/3rdparty/*/CMakeLists.txt') }}
-          restore-keys: jsk_3rdparty-downloads-
+          key: jsk_3rdparty-downloads-${{ github.job }}-${{ hashFiles('**/3rdparty/*/CMakeLists.txt') }}
+          # the jobs download different packages (e.g. arm skips downward): the key of the job, to save its own
+          # set, restored from the caches of the other jobs too
+          restore-keys: |
+            jsk_3rdparty-downloads-${{ github.job }}-
+            jsk_3rdparty-downloads-
       - name: Compile Packages
         run: |
           source /opt/ros/one/setup.bash
