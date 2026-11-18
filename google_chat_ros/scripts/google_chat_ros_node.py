@@ -429,14 +429,16 @@ class GoogleChatROS(object):
         elif button_msg.image_button_name:
             ros_compat.loginfo(self.node, "Build image button:{}".format(button_msg.image_button_name))
             image_button = {}
+            image_button['name'] = button_msg.image_button_name
             image_button['onClick'] = self._make_on_click_json(button_msg.image_button_on_click)
             if button_msg.icon:
-                image_icon['icon'] = button_msg.icon
+                image_button['icon'] = button_msg.icon
             elif button_msg.original_icon_url:
-                image_icon['iconUrl'] = button_msg.original_icon_url
+                image_button['iconUrl'] = button_msg.original_icon_url
             elif button_msg.original_icon_filepath:
-                image_icon['iconUrl'] = self._upload_file(
+                image_button['iconUrl'] = self._upload_file(
                     button_msg.original_icon_filepath, timestamp=timestamp)
+            json_body['imageButton'] = image_button
         return json_body
 
     def _get_user_info(self, item):
@@ -558,6 +560,8 @@ class GoogleChatROS(object):
             return img
 
     def _download_content(self, uri=None, drive_id=None, filename=''):
+        # Returned as it is when the download fails before the path is set
+        path = None
         try:
             if drive_id:
                 path = os.path.join(self.download_directory, drive_id)

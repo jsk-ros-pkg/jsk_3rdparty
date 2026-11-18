@@ -32,7 +32,7 @@ def recognize_vosk(self, audio_data, model_path=None, language='en-US'):
                 data_path = osp.join(rp.get_path(PKG), 'trained_data')
             if language == 'en-US':
                 model_path = osp.join(data_path, 'vosk-model-small-en-us-0.15')
-            elif language == 'ja':
+            elif language in ('ja', 'ja-JP'):
                 model_path = osp.join(data_path, 'vosk-model-small-ja-0.22')
             else:
                 ros_compat.logerr(None, "Unsupported language: {0}.\n Please download the model from https://alphacephei.com/vosk/models and specify its path as 'vosk_model_path'.".format(language))

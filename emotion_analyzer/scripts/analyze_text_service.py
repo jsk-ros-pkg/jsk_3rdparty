@@ -27,8 +27,12 @@ class TextServiceNode:
     def __init__(self, node=None):
         self.node = node
         self.api_key = ros_compat.get_param(node, "hume_api_key", None)
-        if self.api_key is None:
-            ros_compat.logerr(node, "API key has not been set")
+        # The launch files pass api_key:="" by default, so treat an empty
+        # key as missing too (as analyze_audio_service.py does)
+        if not self.api_key:
+            ros_compat.logerr(
+                node, "API key has not been set: give your Hume API key "
+                "with api_key:=<key> (parameter hume_api_key)")
             exit(1)
 
         self.client = HumeStreamClient(self.api_key)

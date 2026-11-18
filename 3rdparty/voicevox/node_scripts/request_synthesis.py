@@ -115,7 +115,6 @@ def get_speaker_id_to_name():
 def get_speaker_id(speaker_name):
     """speaker_name: a speaker id, or (the beginning of) a speaker name"""
     speaker_id = VOICEVOX_DEFAULT_SPEAKER_ID
-    print(["speaker_id = ",speaker_id])
     speaker_name = str(speaker_name).lstrip('(').rstrip(')')
     if type(speaker_name) is int or speaker_name.isdigit():
         speaker_id = speaker_name

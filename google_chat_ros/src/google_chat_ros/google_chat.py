@@ -108,6 +108,10 @@ class GoogleChatHTTPSHandler(s.BaseHTTPRequestHandler):
             self._parse_json()
             self._callback(self.json_content)
             self._response()
+        else:
+            # Answer requests from other clients instead of leaving them
+            # without any HTTP response
+            self._bad_request()
 
     def _parse_json(self):
         content_len = int(self.headers.get("content-length"))
@@ -131,7 +135,7 @@ class GoogleChatPubSubClient():
         self._streaming_pull_future = self._sub.subscribe(sub_path, callback=self._pubsub_cb)
 
     def _pubsub_cb(self, message):
-        rospy.logdebug("Recieved {message}")
+        rospy.logdebug("Received {}".format(message))
         rospy.logdebug(message.data)
         try:
             json_content = json.loads(message.data)

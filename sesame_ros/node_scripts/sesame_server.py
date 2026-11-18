@@ -30,7 +30,15 @@ class SesameServer(object):
 
     def __init__(self, node=None):
         self.node = node
-        auth_token = ros_compat.get_param(node, '~auth_token')
+        try:
+            auth_token = ros_compat.get_param(node, '~auth_token')
+        except KeyError:  # rospy.get_param() without default
+            auth_token = None
+        if auth_token is None:
+            ros_compat.logerr(
+                node, '~auth_token is required: set your authorization token '
+                'or the path to its file.')
+            raise KeyError('~auth_token')
         if osp.isfile(osp.expanduser(auth_token)):
             with open(osp.expanduser(auth_token), 'r') as f:
                 self.auth_token = f.readline().rstrip()

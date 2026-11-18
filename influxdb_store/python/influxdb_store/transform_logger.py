@@ -27,7 +27,7 @@ class TransformLogger(object):
             try:
                 if trial_count > 1200:
                     sys.exit(1)
-                self.graph = yaml.load(self.get_frames().frame_yaml)
+                self.graph = yaml.load(self.get_frames().frame_yaml, Loader=yaml.SafeLoader)
             except Exception as e:
                 rospy.logerr_throttle(
                     60.0, 'Failed to get graph: {}'.format(e))
@@ -227,7 +227,7 @@ class TransformLogger(object):
     def _graph_cb(self, event):
         graph = {}
         try:
-            graph = yaml.load(self.get_frames().frame_yaml)
+            graph = yaml.load(self.get_frames().frame_yaml, Loader=yaml.SafeLoader)
         except Exception as e:
             rospy.logerr(e)
 

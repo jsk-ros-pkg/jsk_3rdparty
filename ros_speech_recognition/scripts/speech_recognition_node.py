@@ -264,7 +264,8 @@ class ROSSpeechRecognition(object):
                               node=node)
 
         # initialize sound play client
-        if ros_compat.get_param(node, '~enable_sound_effect', True):
+        enable_sound_effect = ros_compat.get_param(node, '~enable_sound_effect', True)
+        if enable_sound_effect:
             self.act_sound = ros_compat.create_simple_action_client(node,
                 "sound_play", SoundRequestAction)
             if not self.act_sound.wait_for_server(5.0):
@@ -316,8 +317,13 @@ class ROSSpeechRecognition(object):
                         tts_action_name + TTS_STATUS_TOPIC, GoalStatusArray,
                         lambda msg, a=tts_action: self.tts_status.__setitem__(a, msg),
                         queue_size=1, latch=True)
-                else:
+                elif enable_sound_effect:
                     ros_compat.logerr(node,
+                        "action '{}' is not initialized."
+                        .format(tts_action_name))
+                else:
+                    # sound_play is not expected without the sound effect
+                    ros_compat.loginfo(node,
                         "action '{}' is not initialized."
                         .format(tts_action_name))
                 self.tts_timer = ros_compat.create_timer(node, 0.1, self.tts_timer_cb)
@@ -519,8 +525,6 @@ class ROSSpeechRecognition(object):
                 self.recognizer.adjust_for_ambient_noise(self.audio)
                 ros_compat.loginfo(self.node, "Updated energy threshold to %f" % self.recognizer.energy_threshold)
         except SR.RequestError as e:
-            ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
-        except SR.UnknownValueError as e:
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except Exception as e:
             ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
