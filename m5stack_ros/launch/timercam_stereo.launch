@@ -1,0 +1,113 @@
+<launch>
+  <arg name="queue_size" default="100" />
+
+  <node pkg="rosserial_python" type="serial_node.py" name="timercam"
+        ns="left">
+    <rosparam>
+      port: /dev/TimercamLeft
+      baud: 115200
+    </rosparam>
+    <remap from="timer_cam_image/compressed" to="image_raw/compressed" />
+  </node>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="timercam"
+        ns="right">
+    <rosparam>
+      port: /dev/TimercamRight
+      baud: 115200
+    </rosparam>
+    <remap from="timer_cam_image/compressed" to="image_raw/compressed" />
+  </node>
+
+  <group ns="right">
+    <node name="republish"
+          pkg="image_transport" type="republish"
+          args="compressed raw">
+      <remap from="in" to="image_raw" />
+      <remap from="out" to="image_raw" />
+    </node>
+
+    <!-- The stereo camera baseline is assumed to be 3cm -->
+    <node name="camera_info_publisher_with_yaml"
+          pkg="jsk_interactive_marker" type="camera_info_publisher"
+          output="screen">
+      <rosparam subst_value="true">
+        yaml_filename: $(find m5stack_ros)/config/timercam_right_3cm.yaml
+        sync_image: true
+      </rosparam>
+      <remap from="~input" to="image_raw" />
+      <remap from="~camera_info" to="camera_info" />
+    </node>
+
+    <node name="rectify_color"
+          pkg="nodelet" type="nodelet"
+          args="standalone image_proc/rectify">
+      <param name="queue_size" value="$(arg queue_size)" />
+      <remap from="image_mono" to="image_raw" />
+      <remap from="image_rect" to="image_rect_color" />
+    </node>
+  </group>
+
+  <group ns="left">
+    <node name="republish"
+          pkg="image_transport" type="republish"
+          args="compressed raw">
+      <remap from="in" to="image_raw" />
+      <remap from="out" to="image_raw" />
+    </node>
+
+    <!-- The stereo camera baseline is assumed to be 3cm -->
+    <node name="camera_info_publisher_with_yaml"
+          pkg="jsk_interactive_marker" type="camera_info_publisher"
+          output="screen">
+      <rosparam subst_value="true">
+        yaml_filename: $(find m5stack_ros)/config/timercam_left_3cm.yaml
+        sync_image: true
+      </rosparam>
+      <remap from="~input" to="image_raw" />
+      <remap from="~camera_info" to="camera_info" />
+    </node>
+
+    <node name="rectify_color"
+          pkg="nodelet" type="nodelet"
+          args="standalone image_proc/rectify"
+          >
+      <param name="queue_size" value="$(arg queue_size)" />
+      <remap from="image_mono" to="image_raw" />
+      <remap from="image_rect" to="image_rect_color" />
+    </node>
+  </group>
+
+  <node name="disparity"
+        pkg="nodelet" type="nodelet"
+        args="standalone stereo_image_proc/disparity"
+        clear_params="true">
+    <param name="queue_size" value="$(arg queue_size)" />
+    <remap from="left/image_rect" to="left/image_rect_color" />
+    <remap from="left/camera_info" to="left/camera_info" />
+    <remap from="right/image_rect" to="right/image_rect_color" />
+    <remap from="right/camera_info" to="right/camera_info" />
+    <rosparam subst_value="true" >
+      disparity_range: 64
+      queue_size: $(arg queue_size)
+      approximate_sync: true
+      stereo_algorithm: 1 <!-- StereoSGBM -->
+    </rosparam>
+  </node>
+
+  <node name="point_cloud"
+        pkg="nodelet" type="nodelet"
+        args="standalone stereo_image_proc/point_cloud2"
+        clear_params="true">
+    <param name="queue_size" value="$(arg queue_size)" />
+    <remap from="left/image_rect_color" to="left/image_rect_color" />
+    <remap from="left/camera_info" to="left/camera_info" />
+    <remap from="right/camera_info" to="right/camera_info" />
+    <remap from="points2" to="points" />
+    <rosparam subst_value="true" >
+      queue_size: $(arg queue_size)
+      approximate_sync: true
+    </rosparam>
+  </node>
+
+</launch>

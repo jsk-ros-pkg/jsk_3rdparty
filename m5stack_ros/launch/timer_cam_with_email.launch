@@ -1,0 +1,34 @@
+<launch>
+
+  <arg name="port" default="/dev/rfcomm1" />
+  <arg name="baud" default="115200" />
+  <arg name="image" default="/timer_cam_image" />
+  <arg name="gui" default="true" />
+
+  <arg name="rosserial_name" default="fridge_contents_monitor" />
+
+  <!-- Publish image from M5 TimerCam -->
+  <include file="$(find m5stack_ros)/launch/timer_cam.launch">
+    <arg name="port" value="$(arg port)" />
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="image" value="$(arg image)" />
+    <arg name="rosserial_name" value="$(arg rosserial_name)" />
+    <arg name="gui" value="$(arg gui)" />
+  </include>
+
+  <!-- email_fridge_contents.py gets fridge contents images from M5 TimerCam
+       and then publish /email topic for the following email_topic.py -->
+  <node pkg="m5stack_ros" type="email_fridge_contents.py" name="email_fridge_contents"
+        output="screen" respawn="true">
+    <rosparam subst_value="true">
+      rosserial_name: $(arg rosserial_name)
+    </rosparam>
+  </node>
+
+  <!-- email_topic.py subscribes /email topic and send email -->
+  <!-- For detailed usage, please see
+       https://github.com/jsk-ros-pkg/jsk_robot/tree/master/jsk_robot_common/jsk_robot_startup#scriptsemail_topicpy -->
+  <node pkg="jsk_robot_startup" type="email_topic.py" name="email_topic_server"
+        output="screen"/>
+
+</launch>

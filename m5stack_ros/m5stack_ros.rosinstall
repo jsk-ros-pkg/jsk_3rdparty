@@ -1,0 +1,9 @@
+# This is for melodic rosserial
+# Use master branch if the following PR is merged
+# https://github.com/ros-drivers/rosserial/pull/570
+# https://github.com/ros-drivers/rosserial/pull/594
+# https://github.com/ros-drivers/rosserial/pull/596
+- git:
+    local-name: ros-drivers/rosserial
+    uri: https://github.com/708yamaguchi/rosserial.git
+    version: m5stack-ros-melodic

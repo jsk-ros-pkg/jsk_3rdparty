@@ -1,0 +1,12 @@
+# Please change Bluetooth according to your M5 devices
+
+- name: M5Stack for SGP30 gas sensor
+  address: AA:BB:CC:DD:EE:FF
+- name: M5Stack for PDM SPM1423 microphone
+  address: AA:BB:CC:DD:EE:FF
+- name: M5Stack for MLX90640 thermography
+  address: AA:BB:CC:DD:EE:FF
+- name: M5Stack for UnitV
+  address: AA:BB:CC:DD:EE:FF
+- name: M5Stack for ENV III
+  address: AA:BB:CC:DD:EE:FF
