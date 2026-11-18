@@ -1,17 +1,34 @@
 // #include <cv_bridge/cv_bridge.h>
 
+#include "zdepth_image_transport/ros_version.h"
+#if ROS_VERSION_MAJOR == 1
 #include <ros/console.h>
+#else
+#include <rclcpp/logging.hpp>
+#define ROS_ERROR(...) RCLCPP_ERROR(rclcpp::get_logger("zdepth_image_transport"), __VA_ARGS__)
+#endif
 #include "zdepth/zdepth.hpp"
 #include "zdepth_image_transport/zdepth_publisher.h"
 
+#if ROS_VERSION_MAJOR == 1
 #include <sensor_msgs/Image.h>
 #include "zdepth_image_transport/ZDepthImage.h"
+#else
+#include <cmath>
+#include <sensor_msgs/msg/image.hpp>
+#include "zdepth_image_transport/msg/z_depth_image.hpp"
+#endif
 
 namespace zdepth_image_transport
 {
 
+#if ROS_VERSION_MAJOR == 1
   void ZDepthPublisher::publish(const sensor_msgs::Image& img_msg,
                                 const PublishFn& publish_fn) const
+#else
+  void ZDepthPublisher::publish(const sensor_msgs::msg::Image& img_msg,
+                                const PublisherT& publisher) const
+#endif
   {
     if (img_msg.encoding != "16UC1" && img_msg.encoding != "32FC1")
     {
@@ -49,13 +66,21 @@ namespace zdepth_image_transport
     }
 
     // publish
+#if ROS_VERSION_MAJOR == 1
     zdepth_image_transport::ZDepthImage::Ptr compressed_img_msg(new zdepth_image_transport::ZDepthImage());
+#else
+    zdepth_image_transport::msg::ZDepthImage::SharedPtr compressed_img_msg(new zdepth_image_transport::msg::ZDepthImage());
+#endif
     compressed_img_msg->header = img_msg.header;
     compressed_img_msg->data = compressed;
     compressed_img_msg->format = "16UC1; zdepth";
     compressed_img_msg->width = width;
     compressed_img_msg->height = height;
+#if ROS_VERSION_MAJOR == 1
     publish_fn(*compressed_img_msg);
+#else
+    publisher->publish(*compressed_img_msg);
+#endif
   }
 
 } //namespace zdepth_image_transport

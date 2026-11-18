@@ -18,7 +18,9 @@ class NFCInterface:
 
     def __del__(self):
 
-        self.clf.close()
+        # self.clf is not set when nfc.ContactlessFrontend() failed
+        if hasattr(self, 'clf'):
+            self.clf.close()
 
     def read_card(
             self,
@@ -26,7 +28,8 @@ class NFCInterface:
             on_startup=lambda targets: targets,
             on_discover=lambda target: True,
             on_connect=lambda tag: False,
-            on_release=lambda tag: False):
+            on_release=lambda tag: False,
+            terminate=lambda: False):
 
         if targets is None:
             targets = self.targets
@@ -37,6 +40,7 @@ class NFCInterface:
                 'on-discover': on_discover,
                 'on-connect': on_connect,
                 'on-release': on_release,
-            }
+            },
+            terminate=terminate
         )
         return tag

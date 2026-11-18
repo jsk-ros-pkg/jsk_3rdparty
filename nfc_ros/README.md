@@ -82,6 +82,41 @@ identifier: "08f1b023"
 ---
 ```
 
+## ROS2
+
+Build with colcon. nfcpy (`nfcpy==1.0.4`, as `requirements.txt`) is installed into a venv made from `pyproject.toml`/`uv.lock` at build time, which the node runs in.
+
+```bash
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/jsk-ros-pkg/jsk_3rdparty.git
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -y
+colcon build --packages-up-to nfc_ros
+```
+
+Check the NFC device with nfcpy in that venv, as above
+
+```bash
+~/ros2_ws/install/nfc_ros/share/nfc_ros/venv/bin/python3 -m nfc
+```
+
+and run `demo.launch.xml`
+
+```bash
+source ~/ros2_ws/install/setup.bash
+ros2 launch nfc_ros demo.launch.xml
+ros2 topic echo /nfc_ros_node/tag
+```
+
+Without the NFC device (or without the access to it, see the udev rule above), the node exits with
+
+```
+[ERROR] [nfc_ros_node]: Failed to open the NFC reader: [Errno 19] No such device
+```
+
+On ROS2, the constant names of `nfc_ros/msg/Tag` are upper case, as rosidl only allows them (e.g. `NFC_TAG_FELICASTANDARD` for `NFC_TAG_FelicaStandard` of ROS1); their values are the same.
+
 ## Tag editing
 
 Currently nfc_ros does not support tag writing. If you want to customize your NFC Tag, please use other tools (e.g. NFC Tools [for Android](https://play.google.com/store/apps/details?id=com.wakdev.wdnfc&hl=ja&gl=US&pli=1) and [for iPhone](https://apps.apple.com/jp/app/nfc-tools/id1252962749). )

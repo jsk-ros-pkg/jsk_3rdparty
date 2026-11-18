@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="nfc_ros" exec="nfc_ros_node.py" name="nfc_ros_node" output="screen" on_exit="shutdown" />
+</launch>

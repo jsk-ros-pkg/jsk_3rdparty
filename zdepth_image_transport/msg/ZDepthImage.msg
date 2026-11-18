@@ -1,6 +1,6 @@
 # This message contains a compressed image
 
-Header header        # Header timestamp should be acquisition time of image
+std_msgs/Header header # Header timestamp should be acquisition time of image
                      # Header frame_id should be optical frame of camera
                      # origin of frame should be optical center of camera
                      # +x should point to the right in the image
