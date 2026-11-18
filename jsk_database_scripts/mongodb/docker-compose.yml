@@ -1,0 +1,41 @@
+version: '2.3'
+
+x-default-container-settings:
+  &default-settings
+  restart: always
+  stop_signal: SIGINT
+  stop_grace_period: 5m
+  healthcheck:
+    test: ["CMD-SHELL", "$$(mongo --quiet --eval \"db.adminCommand({ping: 1}).ok === 1\")"]
+    interval: 20s
+    timeout: 10s
+    retries: 2
+    start_period: 5m
+
+services:
+  mongo-primary:
+    << : *default-settings
+    image: "mongo:${MONGO_VERSION}"
+    command: "--config /etc/mongod.conf"
+    ports:
+      - "${MONGO_PRIMARY_PORT}:27017"
+    volumes:
+      - "${MONGO_PRIMARY_DB_PATH}:/data/db"
+      - "${MONGO_PRIMARY_CONF_PATH}:/etc/mongod.conf:ro"
+  mongo-secondary:
+    << : *default-settings
+    image: "mongo:${MONGO_VERSION}"
+    command: "--config /etc/mongod.conf"
+    depends_on:
+      - "mongo-primary"
+    ports:
+      - "${MONGO_SECONDARY_PORT}:27017"
+    volumes:
+      - "${MONGO_SECONDARY_DB_PATH}:/data/db"
+      - "${MONGO_SECONDARY_CONF_PATH}:/etc/mongod.conf:ro"
+  mongo-arbiter:
+    << : *default-settings
+    image: "mongo:${MONGO_VERSION}"
+    ports:
+      - "${MONGO_ARBITER_PORT}:27017"
+    command: "mongod --syslog --replSet ${MONGO_REPLSET}"
