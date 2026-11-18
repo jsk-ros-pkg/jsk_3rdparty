@@ -9,8 +9,11 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import locale
+import math
 import os
 import sys
+from collections import deque
 from threading import Lock
 from threading import Thread
 from threading import Event
@@ -116,6 +119,10 @@ class ROSAudio(SR.AudioSource):
             self.buffer_size = buffer_size
             self.lock = Lock()
             self.buffer = bytes()
+            # [n_bytes, arrival time] of each message still in self.buffer
+            self.arrivals = deque()
+            # arrival time of the newest bytes returned by read_once
+            self.last_read_stamp = None
             self.depth = depth
             self.n_channel = n_channel
             self.target_channel = min(self.n_channel - 1, max(0, target_channel))
@@ -125,10 +132,32 @@ class ROSAudio(SR.AudioSource):
             for code in ['b', 'h', 'i', 'l']:
                 self.type_code[array.array(code).itemsize] = code
 
+        def _drop_arrivals(self, size):
+            """Forget ``size`` bytes from the head of self.arrivals.
+
+            Returns
+            -------
+            float or None
+                Arrival time of the last dropped byte.
+            """
+            stamp = None
+            while size > 0 and self.arrivals:
+                head = self.arrivals[0]
+                stamp = head[1]
+                if head[0] > size:
+                    head[0] -= size
+                    break
+                size -= head[0]
+                self.arrivals.popleft()
+            return stamp
+
         def read_once(self, size):
             with self.lock:
                 buf = self.buffer[:size]
                 self.buffer = self.buffer[size:]
+                stamp = self._drop_arrivals(len(buf))
+                if stamp is not None:
+                    self.last_read_stamp = stamp
                 return buf
 
         def read(self, size):
@@ -145,17 +174,80 @@ class ROSAudio(SR.AudioSource):
             except:
                 pass
             self.buffer = bytes()
+            self.arrivals.clear()
 
         def audio_cb(self, msg):
+            stamp = ros_compat.now_sec(self.node)
             with self.lock:
                 dtype = self.type_code[self.depth/8]
                 # take out target_channel channel data from multi channel data
                 data = array.array(dtype, bytes(msg.data)).tolist()
                 chan_data = data[self.target_channel::self.n_channel]
-                self.buffer += array_to_bytes(array.array(dtype, chan_data))
+                chunk = array_to_bytes(array.array(dtype, chan_data))
+                self.buffer += chunk
+                self.arrivals.append([len(chunk), stamp])
                 overflow = len(self.buffer) - self.buffer_size
                 if overflow > 0:
                     self.buffer = self.buffer[overflow:]
+                    self._drop_arrivals(overflow)
+
+
+def flac_problem():
+    """Why the FLAC encoder cannot run, or None when it can.
+
+    The Google engines send FLAC, made by the ``flac`` program.
+    SpeechRecognition falls back to a flac binary bundled in its package
+    when none is on PATH, but CMakeLists.txt removes those binaries (they
+    break the buildfarm) and relies on the apt ``flac`` instead. Without it,
+    every recognition fails with a bare FileNotFoundError.
+    """
+    try:
+        converter = SR.get_flac_converter()
+    except OSError as e:
+        return str(e)
+    if not os.path.isfile(converter):
+        return "%s does not exist" % converter
+    return None
+
+
+def is_flac_error(e):
+    """Whether ``e`` says the FLAC encoder program is missing.
+
+    SpeechRecognition raises FileNotFoundError naming the flac binary when
+    it cannot run it, or OSError "FLAC conversion utility not available"
+    when it has no bundled binary for this platform. Other I/O errors (e.g.
+    a missing credentials file) are not about flac.
+    """
+    if not isinstance(e, (IOError, OSError)):
+        return False
+    filename = getattr(e, 'filename', None)
+    if filename and os.path.basename(str(filename)).startswith('flac'):
+        return True
+    return 'FLAC conversion utility' in str(e)
+
+
+FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engine. "
+             "Install it with: sudo apt install flac")
+
+
+def as_log_text(text):
+    """Recognized text for a log line (str on Python 3, utf-8 bytes on Python 2).
+
+    Python 3.6 (the venv on kinetic/melodic) writes logs in ASCII under the
+    C locale, so logging Japanese raises UnicodeEncodeError there. Text that
+    an output encoding cannot show is escaped (e.g. ``\\u3053``) instead.
+    """
+    if sys.version_info[0] < 3:
+        return text if isinstance(text, str) else text.encode('utf-8')
+    encodings = [getattr(sys.stdout, 'encoding', None),
+                 getattr(sys.stderr, 'encoding', None),
+                 locale.getpreferredencoding(False)]
+    for encoding in encodings:
+        try:
+            text.encode(encoding or 'ascii')
+        except (UnicodeEncodeError, LookupError):
+            return text.encode('ascii', 'backslashreplace').decode('ascii')
+    return text
 
 
 class ROSSpeechRecognition(object):
@@ -276,6 +368,11 @@ class ROSSpeechRecognition(object):
         if self.engine != config.engine:
             self.args = {}
             self.engine = config.engine
+            if self.engine in (Config.SpeechRecognition_Google,
+                               Config.SpeechRecognition_GoogleCloud):
+                problem = flac_problem()
+                if problem is not None:
+                    ros_compat.logerr(self.node, "%s [%s]" % (FLAC_HINT, problem))
             # Lazy-build the streaming GCP wrapper when first selected.
             if (self.engine == Config.SpeechRecognition_GoogleCloudStream
                     and self._stream_recognizer is None):
@@ -362,7 +459,7 @@ class ROSSpeechRecognition(object):
         elif self.engine == Config.SpeechRecognition_GoogleCloud:
             if not self.args:
                 credentials_path = ros_compat.get_param(self.node, "~google_cloud_credentials_json", None)
-                if credentials_path is not None:
+                if credentials_path:  # "" (the default of the launch files) is not given
                     with open(credentials_path) as j:
                         credentials_json = j.read()
                 else:
@@ -409,7 +506,7 @@ class ROSSpeechRecognition(object):
                 confidence = result['alternative'][0]['confidence']
                 result = result['alternative'][0]['transcript']
             self.play_sound("recognized", 0.05)
-            ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+            ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
             self.play_sound("success", 0.1)
             msg = SpeechRecognitionCandidates(
                 transcript=[result],
@@ -425,8 +522,12 @@ class ROSSpeechRecognition(object):
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except SR.UnknownValueError as e:
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
-        except:
-            ros_compat.logerr(self.node, "Unexpected error: %s" % str(sys.exc_info()))
+        except Exception as e:
+            ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
+            if (self.engine in (Config.SpeechRecognition_Google,
+                                Config.SpeechRecognition_GoogleCloud)
+                    and is_flac_error(e)):
+                ros_compat.logerr(self.node, FLAC_HINT)
         self.play_sound("timeout", 0.1)
 
     def began_while_speaking(self, audio):
@@ -436,7 +537,11 @@ class ROSSpeechRecognition(object):
         of silence, plus however late the audio topic arrives. By then the
         robot may have stopped speaking more than tts_tolerance ago, so
         is_canceling alone lets the robot's own voice through on a busy PC.
-        This dates the phrase back by its length instead.
+        This dates the phrase back by its length instead, counting from
+        when the last audio of the phrase arrived on the topic rather than
+        from now, so a recognizer thread that lags behind the topic does not
+        make the phrase look later than it was. The silence that listen()
+        read after the phrase but cut from ``audio`` is subtracted too.
 
         Parameters
         ----------
@@ -446,12 +551,44 @@ class ROSSpeechRecognition(object):
         -------
         bool
         """
-        if not self.self_cancellation or self.last_tts is None:
+        if not self.self_cancellation:
             return False
-        duration = len(audio.frame_data) / float(
-            audio.sample_rate * audio.sample_width)
-        began = ros_compat.now_sec(self.node) - duration
-        return began < self.last_tts + self.tts_tolerance
+        # tts_timer_cb may reset last_tts to None at any moment, when the
+        # robot starts speaking again
+        last_tts = self.last_tts
+        if last_tts is None:
+            return self.is_canceling
+        stream = self.audio.stream
+        ended = stream.last_read_stamp if stream is not None else None
+        if ended is None:
+            ended = ros_compat.now_sec(self.node)
+        bytes_per_sec = float(audio.sample_rate * audio.sample_width)
+        duration = len(audio.frame_data) / bytes_per_sec
+        return (ended - self._cut_silence_bytes() / bytes_per_sec - duration
+                < last_tts + self.tts_tolerance)
+
+    def _cut_silence_bytes(self):
+        """Bytes of silence listen() reads after a phrase but cuts from it.
+
+        Recognizer.listen() ends a phrase after pause_threshold of silence
+        (pause_buffer_count + 1 chunks) and keeps only non_speaking_duration
+        of it. It counts a chunk as CHUNK samples, but ROSAudio.AudioStream
+        returns CHUNK bytes per read, so the count is converted with CHUNK
+        bytes per chunk here. When phrase_time_limit ends the phrase instead,
+        less is cut, so this dates the phrase earlier than it was, which
+        errs towards dropping it.
+
+        Returns
+        -------
+        int
+        """
+        seconds_per_buffer = float(self.audio.CHUNK) / self.audio.SAMPLE_RATE
+        pause_buffer_count = int(math.ceil(
+            self.recognizer.pause_threshold / seconds_per_buffer))
+        non_speaking_buffer_count = int(math.ceil(
+            self.recognizer.non_speaking_duration / seconds_per_buffer))
+        return max(0, pause_buffer_count + 1 - non_speaking_buffer_count) \
+            * self.audio.CHUNK
 
     def start_speech_recognition(self):
         if self.engine == Config.SpeechRecognition_GoogleCloudStream:
@@ -578,7 +715,7 @@ class ROSSpeechRecognition(object):
                             raise SR.UnknownValueError()
                         confidence = result['alternative'][0].get('confidence', 1.0)
                         result = result['alternative'][0]['transcript']
-                    ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+                    ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
                     res.result = SpeechRecognitionCandidates(
