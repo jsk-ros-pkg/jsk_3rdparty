@@ -28,6 +28,11 @@ if("$ENV{ROS_VERSION}" EQUAL 2)
     endif()
   ")
 
+  if(BUILD_TESTING)
+    find_package(launch_testing_ament_cmake REQUIRED)
+    add_launch_test(test/test_rosping_launch.py)
+  endif()
+
   ament_package()
 
 else() # if("$ENV{ROS_VERSION}" EQUAL 2)

@@ -29,6 +29,12 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">rclcpp</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">boost</exec_depend>
+  <test_depend condition="$ROS_VERSION == 2">ament_index_python</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">launch</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">launch_ros</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">launch_testing</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">launch_testing_ament_cmake</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">rclpy</test_depend>
   <!-- <test_depend>roscpp</test_depend> -->
   <!-- <test_depend>std_msgs</test_depend> -->
 
