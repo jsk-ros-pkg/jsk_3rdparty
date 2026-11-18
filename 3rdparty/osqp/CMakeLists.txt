@@ -10,9 +10,15 @@ if("$ENV{ROS_DISTRO}" STRGREATER "indigo")
   if(NOT CMAKE_VERSION VERSION_LESS 3.7)
     set(OSQP_URL ${OSQP_URL} ${OSQP_URL} ${OSQP_URL})
   endif()
+  # with JSK_3RDPARTY_DOWNLOAD_DIR (e.g. a cache of the CI), the file is downloaded there, and is not
+  # downloaded again while its hash matches
+  if(DEFINED ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+    set(OSQP_DOWNLOAD_DIR DOWNLOAD_DIR $ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+  endif()
   ExternalProject_Add(
     osqp
     URL ${OSQP_URL}
+    ${OSQP_DOWNLOAD_DIR}
     URL_HASH MD5=66738e622174eb506e0cee106891397e
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     INSTALL_COMMAND echo "install"

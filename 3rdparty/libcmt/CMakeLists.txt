@@ -17,9 +17,15 @@ set(LIBCMT_URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/lib
 if(NOT CMAKE_VERSION VERSION_LESS 3.7)
   set(LIBCMT_URL ${LIBCMT_URL} ${LIBCMT_URL} https://github.com/delmottea/libCMT/archive/e4d7ea42edafe13b1070ef4d595b2d6062d79d1a.zip)
 endif()
+# with JSK_3RDPARTY_DOWNLOAD_DIR (e.g. a cache of the CI), the file is downloaded there, and is not
+# downloaded again while its hash matches
+if(DEFINED ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+  set(LIBCMT_DOWNLOAD_DIR DOWNLOAD_DIR $ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+endif()
 ExternalProject_Add(
   libcmt
   URL ${LIBCMT_URL}
+  ${LIBCMT_DOWNLOAD_DIR}
   URL_HASH MD5=9113175f01cb9c62e60ba46415c657cb
   PATCH_COMMAND cat ${PROJECT_SOURCE_DIR}/fix_opencv3.patch ${PROJECT_SOURCE_DIR}/fix_cmakelists.patch | patch -p1
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}

@@ -16,9 +16,15 @@ set(DOWNWARD_URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/F
 if(NOT CMAKE_VERSION VERSION_LESS 3.7)
   set(DOWNWARD_URL ${DOWNWARD_URL} ${DOWNWARD_URL} ${DOWNWARD_URL})
 endif()
+# with JSK_3RDPARTY_DOWNLOAD_DIR (e.g. a cache of the CI), the file is downloaded there, and is not
+# downloaded again while its hash matches
+if(DEFINED ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+  set(DOWNWARD_DOWNLOAD_DIR DOWNLOAD_DIR $ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+endif()
 externalproject_add(downward
   # cdn.rawgit.com (and jsDelivr, where it redirects to) returns 404
   URL ${DOWNWARD_URL}
+  ${DOWNWARD_DOWNLOAD_DIR}
   URL_MD5 0c882a28d4c0f60266f4baadf09e3ac7
   TIMEOUT 120
   CONFIGURE_COMMAND ""

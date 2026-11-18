@@ -17,9 +17,15 @@ set(SLIC_URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/SLIC-
 if(NOT CMAKE_VERSION VERSION_LESS 3.7)
   set(SLIC_URL ${SLIC_URL} ${SLIC_URL} https://github.com/garaemon/SLIC-Superpixels/archive/78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c.zip)
 endif()
+# with JSK_3RDPARTY_DOWNLOAD_DIR (e.g. a cache of the CI), the file is downloaded there, and is not
+# downloaded again while its hash matches
+if(DEFINED ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+  set(SLIC_DOWNLOAD_DIR DOWNLOAD_DIR $ENV{JSK_3RDPARTY_DOWNLOAD_DIR})
+endif()
 ExternalProject_Add(
   slic
   URL ${SLIC_URL}
+  ${SLIC_DOWNLOAD_DIR}
   URL_HASH MD5=6555bf6fdc7c1651e3070ff1e2b884f3
   GIT_TAG 78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c
   CMAKE_COMMAND echo "configure"
