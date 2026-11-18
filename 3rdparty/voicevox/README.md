@@ -7,13 +7,48 @@ is spoken. It can also publish the speech as raw PCM on an audio topic instead, 
 VOICEVOX Docker image (CPU or GPU) or an engine running on another machine.
 The same launch arguments and environment variables work on ROS 1 and ROS 2.
 
+## Try it with Docker first
+
+The [official VOICEVOX engine image](https://hub.docker.com/r/voicevox/voicevox_engine) needs no build. Try the voices
+with it (CPU image, about 2.7 GB on disk):
+
+```bash
+docker run --rm -p 50021:50021 voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+# another terminal: synthesize 「こんにちは」 with speaker 3 (ずんだもん-ノーマル), see Speakers
+curl -s -X POST --get --data-urlencode 'text=こんにちは' 'localhost:50021/audio_query?speaker=3' > query.json
+curl -s -X POST -H 'Content-Type: application/json' -d @query.json 'localhost:50021/synthesis?speaker=3' > voice.wav
+```
+
+The nodes of this package can use that engine instead of the one built into the package: `remote_only:=true` starts
+no engine and uses the one at `host`:`port` (default `localhost:50021`), and `use_docker:=true` makes the launch file
+start the container itself (see [Deployment patterns](#deployment-patterns)):
+
+```bash
+ros2 launch voicevox voicevox_texttospeech.launch.xml remote_only:=true   # the container above
+ros2 launch voicevox voicevox_texttospeech.launch.xml use_docker:=true    # or: the launch file runs it
+ros2 topic pub --once /robotsound_jp/text std_msgs/msg/String "{data: 'こんにちは'}"
+```
+
+(ROS 1: `roslaunch voicevox voicevox_texttospeech.launch` with the same arguments.)
+The package itself still has to be built (its nodes and the Python client run in its virtualenv), and the build
+always downloads the engine, the core and the resources described in [Requirements](#requirements); only the engine
+which runs differs.
+
+## Demo
+
 ![voicevox demo](doc/voicevox_demo.gif)
 
 The engine of this package (ROS 2 jazzy, CPU, offline; `ros2 launch voicevox voicevox_texttospeech.launch.xml
 launch_sound_play:=false`, as sound_play is not needed for a wav file) writes
 「こんにちは。ボイスボックスで音声合成しています。」 to a wav file with `request_synthesis.py` (speaker 3,
-ずんだもん-ノーマル), see [Write a wav file without ROS topics](#write-a-wav-file-without-ros-topics):
-[listen to the sample](doc/voicevox_sample.mp3) (VOICEVOX:ずんだもん).
+ずんだもん-ノーマル), see [Write a wav file without ROS topics](#write-a-wav-file-without-ros-topics).
+The speech (VOICEVOX:ずんだもん):
+
+<!-- TODO: replace the next line with the user-attachments URL of doc/voicevox_sample.mp4 (upload it in the browser) -->
+**[VIDEO PLACEHOLDER: https://github.com/user-attachments/assets/... of doc/voicevox_sample.mp4]**
+
+If the video does not play, [listen to the sample](doc/voicevox_sample.mp3) (mp3) or
+[download the video](doc/voicevox_sample.mp4).
 
 ## Requirements
 
