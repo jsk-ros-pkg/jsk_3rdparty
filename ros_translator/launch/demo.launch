@@ -1,0 +1,15 @@
+<launch>
+
+    <node pkg="ros_translator" type="ros_translator_node.py" name="ros_translator" output="screen">
+    </node>
+
+    <node pkg="ros_translator" type="demo_output_node.py" name="demo_output_node" output="screen">
+        <remap from="~text" to="/ros_translator/output_text"/>
+    </node>
+
+    <node pkg="ros_translator" type="demo_input_node.py" name="demo_input_node" output="screen"
+        launch-prefix="xterm -e">
+        <remap from="~text" to="/ros_translator/input_text"/>
+    </node>
+
+</launch>
