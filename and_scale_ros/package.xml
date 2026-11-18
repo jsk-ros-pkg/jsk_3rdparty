@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <name>and_scale_ros</name>
+  <version>2.1.4</version>
+  <description>The and_scale_ros package</description>
+
+  <maintainer email="pazeshun3682@gmail.com">Shun Hasegawa</maintainer>
+  <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
+  <author email="pazeshun3682@gmail.com">Shun Hasegawa</author>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <export>
+  </export>
+</package>
