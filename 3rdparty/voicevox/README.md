@@ -44,8 +44,8 @@ launch_sound_play:=false`, as sound_play is not needed for a wav file) writes
 ずんだもん-ノーマル), see [Write a wav file without ROS topics](#write-a-wav-file-without-ros-topics).
 The speech (VOICEVOX:ずんだもん):
 
-<!-- TODO: replace the next line with the user-attachments URL of doc/voicevox_sample.mp4 (upload it in the browser) -->
-**[VIDEO PLACEHOLDER: https://github.com/user-attachments/assets/... of doc/voicevox_sample.mp4]**
+<!-- doc/voicevox_sample.mp4, uploaded to GitHub to play here -->
+https://github.com/user-attachments/assets/77a9846b-d935-402b-9c2e-71786f53c7d2
 
 If the video does not play, [listen to the sample](doc/voicevox_sample.mp3) (mp3) or
 [download the video](doc/voicevox_sample.mp4).
