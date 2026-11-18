@@ -9,9 +9,15 @@ include(ExternalProject)
 #   git config --global http.sslVerify false)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+set(SLIC_URL https://github.com/garaemon/SLIC-Superpixels/archive/78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c.zip)
+# ExternalProject tries the URLs in turn (CMake 3.7 and later): the same URL again, for a
+# transient error of the network (e.g. of the CI)
+if(NOT CMAKE_VERSION VERSION_LESS 3.7)
+  set(SLIC_URL ${SLIC_URL} ${SLIC_URL} ${SLIC_URL})
+endif()
 ExternalProject_Add(
   slic
-  URL https://github.com/garaemon/SLIC-Superpixels/archive/78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c.zip
+  URL ${SLIC_URL}
   GIT_TAG 78d9a2ba7ae1d3fee8c2ec774a52536c5f08f07c
   CMAKE_COMMAND echo "configure"
   BUILD_COMMAND echo "build"

@@ -4,9 +4,15 @@ project(osqp)
 include(ExternalProject)
 
 if("$ENV{ROS_DISTRO}" STRGREATER "indigo")
+  set(OSQP_URL https://github.com/osqp/osqp/releases/download/v0.6.2/complete_sources.tar.gz)
+  # ExternalProject tries the URLs in turn (CMake 3.7 and later): the same URL again, for a
+  # transient error of the network (e.g. of the CI)
+  if(NOT CMAKE_VERSION VERSION_LESS 3.7)
+    set(OSQP_URL ${OSQP_URL} ${OSQP_URL} ${OSQP_URL})
+  endif()
   ExternalProject_Add(
     osqp
-    URL https://github.com/osqp/osqp/releases/download/v0.6.2/complete_sources.tar.gz
+    URL ${OSQP_URL}
     URL_HASH MD5=66738e622174eb506e0cee106891397e
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     INSTALL_COMMAND echo "install"

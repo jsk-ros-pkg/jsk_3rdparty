@@ -10,9 +10,15 @@ include(ExternalProject)
 if("$ENV{ROS_DISTRO}" STRGREATER "melodic") # >= noetic
   set(CXXFLAGS_NOETIC "-Wno-error=deprecated-copy")
 endif()
+set(DOWNWARD_URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz)
+# ExternalProject tries the URLs in turn (CMake 3.7 and later): the same URL again, for a
+# transient error of the network (e.g. of the CI)
+if(NOT CMAKE_VERSION VERSION_LESS 3.7)
+  set(DOWNWARD_URL ${DOWNWARD_URL} ${DOWNWARD_URL} ${DOWNWARD_URL})
+endif()
 externalproject_add(downward
   # cdn.rawgit.com (and jsDelivr, where it redirects to) returns 404
-  URL https://raw.githubusercontent.com/jsk-ros-pkg/archives/master/Fast-Downward-f33d3b65601f.tar.gz
+  URL ${DOWNWARD_URL}
   URL_MD5 0c882a28d4c0f60266f4baadf09e3ac7
   TIMEOUT 120
   CONFIGURE_COMMAND ""
