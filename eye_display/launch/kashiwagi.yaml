@@ -1,0 +1,102 @@
+names: [normal, blink, surprised, sleepy, angry, sad, happy, troubled, delighted, expecting]
+normal:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/kashiwagi_pupil.png"
+  path_reflex: "/kashiwagi_reflex.png"
+  path_upperlid: "/kashiwagi_upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9]
+blink:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/kashiwagi_pupil.png"
+  path_reflex: "/kashiwagi_reflex.png"
+  path_upperlid: "/kashiwagi_upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9, 9, 130, 130, 9, 9]
+surprised:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris_surprised.jpg"
+  path_pupil: "/kashiwagi_pupil_surprised.png"
+  path_reflex: "/kashiwagi_reflex_surprised.png"
+  path_upperlid: "/kashiwagi_upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9, 9, 9, 9, 130, 130, 9, 9, 9, 9, 130, 9, 9, 130, 9, 9]
+sleepy:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/kashiwagi_pupil.png"
+  path_reflex: "/kashiwagi_reflex.png"
+  path_upperlid: "/kashiwagi_upperlid.jpg"
+  path_pupil: "/normal_kxr_pupil_sleepy.png"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [60, 60, 70, 130, 130, 130, 70, 60, 60, 60]
+angry:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/kashiwagi_pupil.png"
+  path_reflex: "/kashiwagi_reflex.png"
+  path_upperlid: "/kashiwagi_upperlid_ldown.png"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [120]
+sad:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/kashiwagi_pupil.png"
+  path_reflex: "/kashiwagi_reflex.png"
+  path_upperlid: "/kashiwagi_upperlid_rdown.png"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [130]
+happy:
+  path_outline: "/outline.jpg"
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/kashiwagi_happy.jpg"
+  path_upperlid: "/white.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [130]
+troubled:
+  path_outline: "/outline.jpg"
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/kashiwagi_troubled.jpg"
+  path_upperlid: "/white.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [130]
+delighted:
+  path_outline: "/outline.jpg"
+  path_iris: "/white.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/kashiwagi_delighted.jpg"
+  path_upperlid: "/white.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [130]
+expecting:
+  path_outline: "/outline.jpg"
+  path_iris: "/kashiwagi_iris.jpg"
+  path_pupil: "/white.jpg"
+  path_reflex: "/kashiwagi_reflex_expecting.png"
+  path_upperlid: "/kashiwagi_upperlid.jpg"
+  upperlid_default_pos_x: 75
+  upperlid_default_pos_y: 7
+  upperlid_default_theta: 0
+  upperlid_position: [9]
