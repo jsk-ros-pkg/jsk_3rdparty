@@ -1,3 +1,67 @@
+if("$ENV{ROS_VERSION}" EQUAL 2)
+  cmake_minimum_required(VERSION 3.8)
+  project(zdepth_image_transport)
+
+  find_package(ament_cmake REQUIRED)
+  find_package(rosidl_default_generators REQUIRED)
+  find_package(image_transport REQUIRED)
+  find_package(pluginlib REQUIRED)
+  find_package(rclcpp REQUIRED)
+  find_package(sensor_msgs REQUIRED)
+  find_package(std_msgs REQUIRED)
+
+  # libzdepth/libzstd and zdepth/zdepth.hpp of the zdepth package, as ROS1
+  find_library(${PROJECT_NAME}_zdepth_LIB zdepth PATH_SUFFIXES zdepth REQUIRED)
+  find_library(${PROJECT_NAME}_zstd_LIB zstd PATH_SUFFIXES zdepth NO_CMAKE_SYSTEM_PATH REQUIRED)
+  set(${PROJECT_NAME}_zdepth_LIBRARIES ${${PROJECT_NAME}_zdepth_LIB} ${${PROJECT_NAME}_zstd_LIB})
+  find_path(${PROJECT_NAME}_zdepth_INCLUDE_DIRS zdepth/zdepth.hpp REQUIRED)
+
+  # the target ${PROJECT_NAME} is the plugin library (libzdepth_image_transport.so)
+  rosidl_generate_interfaces(${PROJECT_NAME}_msgs
+    msg/ZDepthImage.msg
+    DEPENDENCIES std_msgs
+    LIBRARY_NAME ${PROJECT_NAME}
+  )
+  rosidl_get_typesupport_target(${PROJECT_NAME}_cpp_typesupport ${PROJECT_NAME}_msgs rosidl_typesupport_cpp)
+
+  add_executable(zdepth_test src/test/zdepth_test.cpp)
+  target_include_directories(zdepth_test PRIVATE ${${PROJECT_NAME}_zdepth_INCLUDE_DIRS})
+  target_link_libraries(zdepth_test ${${PROJECT_NAME}_zdepth_LIBRARIES})
+
+  add_library(${PROJECT_NAME} SHARED src/manifest.cpp src/zdepth_publisher.cpp src/zdepth_subscriber.cpp)
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+    ${${PROJECT_NAME}_zdepth_INCLUDE_DIRS}
+  )
+  target_link_libraries(${PROJECT_NAME}
+    ${${PROJECT_NAME}_cpp_typesupport}
+    image_transport::image_transport
+    pluginlib::pluginlib
+    rclcpp::rclcpp
+    ${sensor_msgs_TARGETS}
+    ${${PROJECT_NAME}_zdepth_LIBRARIES}
+  )
+  # the library path of zdepth_plugins.xml (lib/libzdepth_image_transport)
+  # is not found by the pluginlib of ROS2, which takes the library name
+  pluginlib_export_plugin_description_file(image_transport zdepth_plugins_ros2.xml)
+
+  install(TARGETS zdepth_test
+    DESTINATION lib/${PROJECT_NAME}
+  )
+  install(TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+  )
+  install(DIRECTORY include/
+    DESTINATION include/${PROJECT_NAME}
+  )
+
+  ament_export_dependencies(rosidl_default_runtime image_transport pluginlib rclcpp sensor_msgs std_msgs)
+  ament_package()
+
+else() # if("$ENV{ROS_VERSION}" EQUAL 2)
 cmake_minimum_required(VERSION 2.8.3)
 project(zdepth_image_transport)
 
@@ -73,3 +137,5 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES zdepth_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   )
+
+endif() # if("$ENV{ROS_VERSION}" EQUAL 2)
