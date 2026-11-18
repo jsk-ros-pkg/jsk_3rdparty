@@ -15,6 +15,7 @@
 #else
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <unistd.h>
 #endif
 
 int main(int argc, char* argv[])
@@ -74,6 +75,13 @@ int main(int argc, char* argv[])
               }
           }
 #else
+          // the raw socket is open: drop the root privileges of the setuid
+          // install before creating the node, else the shared memory files
+          // of DDS (Fast DDS's /dev/shm/fastrtps_*) are owned by root, and
+          // the nodes of the user do not receive ping/delay through them
+          if (setuid(getuid()) != 0) {
+              throw std::runtime_error("failed to drop the root privileges");
+          }
           auto n = rclcpp::Node::make_shared("ping");
           double rate = n->declare_parameter<double>("rate", 10.0);   // 0.1Hz
           auto pub = n->create_publisher<std_msgs::msg::Float64>("ping/delay", 10);
