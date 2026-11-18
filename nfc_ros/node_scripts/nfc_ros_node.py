@@ -25,8 +25,22 @@ if __name__ == '__main__':
         # KeyboardInterrupt), so read the cards in a thread, which returns
         # when ros_compat.spin() is shut down by SIGINT/SIGTERM
         import threading
-        thread = threading.Thread(target=nfc_ros_node.spin)
+        errors = []
+
+        def read_cards():
+            # an exception of reading the cards would end only this thread,
+            # and leave the node running without reading: shut the node down
+            # and exit with an error, as on ROS1
+            try:
+                nfc_ros_node.spin()
+            except Exception as e:
+                errors.append(e)
+                ros_compat.logerr(node, 'Failed to read the NFC cards: {}'.format(e))
+                ros_compat.signal_shutdown(node, 'failed to read the NFC cards')
+        thread = threading.Thread(target=read_cards)
         thread.daemon = True
         thread.start()
         ros_compat.spin(node)
         thread.join(timeout=1.0)
+        if errors:
+            sys.exit(1)
