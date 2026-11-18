@@ -8,7 +8,7 @@ import nfc.tag.tt3
 import nfc.tag.tt3_sony
 import nfc.tag.tt4
 
-import rospy
+from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
 from nfc_ros.msg import Tag
 from nfc_ros.msg import NDEFRecord
 
@@ -17,15 +17,16 @@ from nfc_ros.nfc_interface import NFCInterface
 
 class NFCROSNode:
 
-    def __init__(self):
+    def __init__(self, node=None):
+        self.node = node
 
         self.interface = NFCInterface()
-        self.pub_tag = rospy.Publisher('~tag', Tag, queue_size=1)
-        rospy.loginfo('Initialized')
+        self.pub_tag = ros_compat.create_publisher(node, '~tag', Tag, queue_size=1)
+        ros_compat.loginfo(node, 'Initialized')
 
     def publish_tag(self, tag):
 
-        rospy.loginfo('tag: {}'.format(tag))
+        ros_compat.loginfo(self.node, 'tag: {}'.format(tag))
         msg = Tag()
 
         if type(tag.identifier) == bytes:
@@ -58,7 +59,7 @@ class NFCROSNode:
         elif type(tag) == nfc.tag.tt4.Type4BTag:
             msg.tag_type = Tag.NFC_TAG_TYPE4BTAG
         else:
-            rospy.logerr('Unknown tag type: {}'.format(type(tag)))
+            ros_compat.logerr(self.node, 'Unknown tag type: {}'.format(type(tag)))
             return True
 
         if tag.ndef is not None:
@@ -74,5 +75,5 @@ class NFCROSNode:
 
     def spin(self):
 
-        while not rospy.is_shutdown():
+        while not ros_compat.is_shutdown(self.node):
             self.interface.read_card(on_connect=self.publish_tag)

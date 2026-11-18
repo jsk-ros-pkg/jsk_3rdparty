@@ -16,6 +16,7 @@
   <build_depend>catkin_virtualenv</build_depend>
   <build_export_depend>message_generation</build_export_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
 
   <test_depend>rostest</test_depend>
 
