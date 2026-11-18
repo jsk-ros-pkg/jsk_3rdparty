@@ -32,14 +32,17 @@ The same scripts run on ROS 1 and ROS 2.
     or build it from source (`catkin build respeaker_ros` on ROS 1, `colcon build --packages-up-to respeaker_ros`
     on ROS 2).
 
-1. Register the udev rule, so that the device can be accessed without root, and re-connect the device
+1. Register the udev rule `config/60-respeaker.rules` (`MODE:="0666"` for the USB device `2886:0018`), so that
+   the device can be accessed without root: copy it, reload the rules and apply them to the connected device (or
+   re-connect the device)
 
     ```bash
     # ROS 1
     sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules
     # ROS 2
     sudo cp -f $(ros2 pkg prefix respeaker_ros)/share/respeaker_ros/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules
-    sudo systemctl restart udev
+    # both
+    sudo udevadm control --reload-rules && sudo udevadm trigger
     ```
 
 1. Update the firmware to the 6 channels version
