@@ -1,0 +1,64 @@
+version = 1
+revision = 3
+requires-python = ">=3.10"
+
+[[package]]
+name = "libusb1"
+version = "3.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/35/f9d2a990d092d647b47540cd229e1d68432c0f51183484ca189612a4824c/libusb1-3.4.0.tar.gz", hash = "sha256:9cf5638506d54f21bf36550d97ea63189111a23c4d8078f630103a2052135f45", size = 91206, upload-time = "2026-05-16T20:59:19.315Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/64/d4b59444e4d3b6979aa5eb58840634465a24b41a9ab03dcf8434c9b89551/libusb1-3.4.0-py3-none-any.whl", hash = "sha256:e83d034e44c3efe1c4599c6281d34bca50a38c12cab3b7b6217d583161a01ffd", size = 67373, upload-time = "2026-05-16T20:59:13.142Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/55/a838a4278fac4ee49bf670ddc59d621999a1cb2a3188fb13a23609ea4f06/libusb1-3.4.0-py3-none-win32.whl", hash = "sha256:0a1aa1416034690eb9dc9a895eda0fef44d853bca1053eb1de50a5906684846d", size = 129704, upload-time = "2026-05-16T20:59:15.243Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/08/02aecf6dad627534a5835244ece14d7f187ef430354d9b8551199934d059/libusb1-3.4.0-py3-none-win_amd64.whl", hash = "sha256:b7dcc1f324a895af6aac708bc5513a17373f97349cc2ab8a277519c788bd18ca", size = 141212, upload-time = "2026-05-16T20:59:17.286Z" },
+]
+
+[[package]]
+name = "ndeflib"
+version = "0.3.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/f8/cd11ec90bd6a6bcf35bb80e4e29fdebe8bf2b05e869a93ca1e41d85518d0/ndeflib-0.3.3.tar.gz", hash = "sha256:1d56828558b9b16f2822a4051824346347b66adf5320ea86070748b6f2454a88", size = 143759, upload-time = "2019-05-27T20:12:35.226Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c9/80/bbc9a4818cd74807f914d225611cd724d8c0e56237b952a9a4aa6d583f5c/ndeflib-0.3.3-py2.py3-none-any.whl", hash = "sha256:c634b1af2ab454754f0fdbe1debd38247ed7bdaf94587359b857726f3ee7decb", size = 56331, upload-time = "2019-05-27T20:12:33.179Z" },
+]
+
+[[package]]
+name = "nfc-ros"
+version = "3.0.1"
+source = { virtual = "." }
+dependencies = [
+    { name = "nfcpy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "nfcpy", specifier = "==1.0.4" }]
+
+[[package]]
+name = "nfcpy"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "libusb1" },
+    { name = "ndeflib" },
+    { name = "pydes" },
+    { name = "pyserial" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/38/a2/cce3ab796e84bea5098c4231ff56e523cb182c58a21280ccff0d75e693e6/nfcpy-1.0.4.tar.gz", hash = "sha256:e5bd08d0119e1d9e95d05215f838b07b44d03b651adddc523cc1a38892b8af6b", size = 451788, upload-time = "2022-03-10T17:02:47.799Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/2e/4fd1d12de425b26e0c5e74bb109cc7f55cdaf275b8f1a72e737ef584cf8a/nfcpy-1.0.4-py3-none-any.whl", hash = "sha256:c1f3ecdd9755f9af46e89a945ed490354d089d5b19422e307159e256ff8c1b3d", size = 186108, upload-time = "2022-03-10T17:02:44.699Z" },
+]
+
+[[package]]
+name = "pydes"
+version = "2.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/5e/0075a35ea5d307a182b0963900298b209ea2f363ccdd5a27e8cb04c58410/pyDes-2.0.1.tar.gz", hash = "sha256:e2ab8e21d2b83e90d90dbfdcb6fb8ac0000b813238b7ecaede04f8435c389012", size = 9878, upload-time = "2016-05-06T22:37:27.59Z" }
+
+[[package]]
+name = "pyserial"
+version = "3.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/7d/ae3f0a63f41e4d2f6cb66a5b57197850f919f59e558159a4dd3a818f5082/pyserial-3.5.tar.gz", hash = "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb", size = 159125, upload-time = "2020-11-23T03:59:15.045Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/bc/587a445451b253b285629263eb51c2d8e9bcea4fc97826266d186f96f558/pyserial-3.5-py2.py3-none-any.whl", hash = "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0", size = 90585, upload-time = "2020-11-23T03:59:13.41Z" },
+]
