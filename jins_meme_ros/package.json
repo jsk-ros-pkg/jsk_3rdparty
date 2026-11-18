@@ -1,0 +1,23 @@
+{
+  "name": "jins_meme_ros",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sktometometo/jins_meme_ros.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sktometometo/jins_meme_ros/issues"
+  },
+  "homepage": "https://github.com/sktometometo/jins_meme_ros#readme",
+  "dependencies": {
+    "rosnodejs": "^3.1.0",
+    "ws": "^8.13.0"
+  }
+}
