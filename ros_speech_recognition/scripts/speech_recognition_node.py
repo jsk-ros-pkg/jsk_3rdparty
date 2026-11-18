@@ -9,6 +9,7 @@ from ros_speech_recognition.recognize_google_cloud import RecognizerEx
 import ros_speech_recognition.recognize_vosk
 import json
 import array
+import locale
 import math
 import os
 import sys
@@ -191,6 +192,64 @@ class ROSAudio(SR.AudioSource):
                     self._drop_arrivals(overflow)
 
 
+def flac_problem():
+    """Why the FLAC encoder cannot run, or None when it can.
+
+    The Google engines send FLAC, made by the ``flac`` program.
+    SpeechRecognition falls back to a flac binary bundled in its package
+    when none is on PATH, but CMakeLists.txt removes those binaries (they
+    break the buildfarm) and relies on the apt ``flac`` instead. Without it,
+    every recognition fails with a bare FileNotFoundError.
+    """
+    try:
+        converter = SR.get_flac_converter()
+    except OSError as e:
+        return str(e)
+    if not os.path.isfile(converter):
+        return "%s does not exist" % converter
+    return None
+
+
+def is_flac_error(e):
+    """Whether ``e`` says the FLAC encoder program is missing.
+
+    SpeechRecognition raises FileNotFoundError naming the flac binary when
+    it cannot run it, or OSError "FLAC conversion utility not available"
+    when it has no bundled binary for this platform. Other I/O errors (e.g.
+    a missing credentials file) are not about flac.
+    """
+    if not isinstance(e, (IOError, OSError)):
+        return False
+    filename = getattr(e, 'filename', None)
+    if filename and os.path.basename(str(filename)).startswith('flac'):
+        return True
+    return 'FLAC conversion utility' in str(e)
+
+
+FLAC_HINT = ("flac is not installed, so speech cannot be sent to the Google engine. "
+             "Install it with: sudo apt install flac")
+
+
+def as_log_text(text):
+    """Recognized text for a log line (str on Python 3, utf-8 bytes on Python 2).
+
+    Python 3.6 (the venv on kinetic/melodic) writes logs in ASCII under the
+    C locale, so logging Japanese raises UnicodeEncodeError there. Text that
+    an output encoding cannot show is escaped (e.g. ``\\u3053``) instead.
+    """
+    if sys.version_info[0] < 3:
+        return text if isinstance(text, str) else text.encode('utf-8')
+    encodings = [getattr(sys.stdout, 'encoding', None),
+                 getattr(sys.stderr, 'encoding', None),
+                 locale.getpreferredencoding(False)]
+    for encoding in encodings:
+        try:
+            text.encode(encoding or 'ascii')
+        except (UnicodeEncodeError, LookupError):
+            return text.encode('ascii', 'backslashreplace').decode('ascii')
+    return text
+
+
 class ROSSpeechRecognition(object):
     def __init__(self, node=None):
         self.node = node
@@ -309,6 +368,11 @@ class ROSSpeechRecognition(object):
         if self.engine != config.engine:
             self.args = {}
             self.engine = config.engine
+            if self.engine in (Config.SpeechRecognition_Google,
+                               Config.SpeechRecognition_GoogleCloud):
+                problem = flac_problem()
+                if problem is not None:
+                    ros_compat.logerr(self.node, "%s [%s]" % (FLAC_HINT, problem))
             # Lazy-build the streaming GCP wrapper when first selected.
             if (self.engine == Config.SpeechRecognition_GoogleCloudStream
                     and self._stream_recognizer is None):
@@ -442,7 +506,7 @@ class ROSSpeechRecognition(object):
                 confidence = result['alternative'][0]['confidence']
                 result = result['alternative'][0]['transcript']
             self.play_sound("recognized", 0.05)
-            ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+            ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
             self.play_sound("success", 0.1)
             msg = SpeechRecognitionCandidates(
                 transcript=[result],
@@ -458,8 +522,12 @@ class ROSSpeechRecognition(object):
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
         except SR.UnknownValueError as e:
             ros_compat.logerr(self.node, "Failed to recognize: %s" % str(e))
-        except:
-            ros_compat.logerr(self.node, "Unexpected error: %s" % str(sys.exc_info()))
+        except Exception as e:
+            ros_compat.logerr(self.node, "Unexpected error: %s: %s" % (type(e).__name__, e))
+            if (self.engine in (Config.SpeechRecognition_Google,
+                                Config.SpeechRecognition_GoogleCloud)
+                    and is_flac_error(e)):
+                ros_compat.logerr(self.node, FLAC_HINT)
         self.play_sound("timeout", 0.1)
 
     def began_while_speaking(self, audio):
@@ -647,7 +715,7 @@ class ROSSpeechRecognition(object):
                             raise SR.UnknownValueError()
                         confidence = result['alternative'][0].get('confidence', 1.0)
                         result = result['alternative'][0]['transcript']
-                    ros_compat.loginfo(self.node, "Result: %s" % result.encode('utf-8'))
+                    ros_compat.loginfo(self.node, "Result: %s" % as_log_text(result))
                     if not req.quiet:
                         self.play_sound("success", 0.1)
                     res.result = SpeechRecognitionCandidates(
