@@ -38,6 +38,10 @@ if("$ENV{ROS_VERSION}" EQUAL 2)
   jsk_ros1_ros2_compat_generate_uv_venv(CHECK_IMPORTS nfc)
   jsk_ros1_ros2_compat_install_python(PROGRAMS node_scripts/nfc_ros_node.py USE_VENV)
 
+  install(DIRECTORY launch
+    DESTINATION share/${PROJECT_NAME}
+  )
+
   ament_export_dependencies(rosidl_default_runtime)
   ament_package()
 
