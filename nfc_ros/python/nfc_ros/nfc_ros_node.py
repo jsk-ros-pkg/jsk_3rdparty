@@ -15,6 +15,12 @@ from nfc_ros.msg import NDEFRecord
 from nfc_ros.nfc_interface import NFCInterface
 
 
+def tag_constant(name):
+    """Tag.<name>, which is upper cased on ROS2 (rosidl only allows upper
+    case constant names, see CMakeLists.txt)"""
+    return getattr(Tag, name, None) or getattr(Tag, name.upper())
+
+
 class NFCROSNode:
 
     def __init__(self, node=None):
@@ -43,15 +49,15 @@ class NFCROSNode:
         elif type(tag) == nfc.tag.tt3.Type3Tag:
             msg.tag_type = Tag.NFC_TAG_TYPE3TAG
         elif type(tag) == nfc.tag.tt3_sony.FelicaStandard:
-            msg.tag_type == Tag.NFC_TAG_FelicaStandard
+            msg.tag_type = tag_constant('NFC_TAG_FelicaStandard')
         elif type(tag) == nfc.tag.tt3_sony.FelicaMobile:
-            msg.tag_type == Tag.NFC_TAG_FelicaMobile
+            msg.tag_type = tag_constant('NFC_TAG_FelicaMobile')
         elif type(tag) == nfc.tag.tt3_sony.FelicaLite:
-            msg.tag_type == Tag.NFC_TAG_FelicaLite
+            msg.tag_type = tag_constant('NFC_TAG_FelicaLite')
         elif type(tag) == nfc.tag.tt3_sony.FelicaLiteS:
-            msg.tag_type == Tag.NFC_TAG_FelicaLiteS
+            msg.tag_type = tag_constant('NFC_TAG_FelicaLiteS')
         elif type(tag) == nfc.tag.tt3_sony.FelicaPlug:
-            msg.tag_type == Tag.NFC_TAG_FelicaPlug
+            msg.tag_type = tag_constant('NFC_TAG_FelicaPlug')
         elif type(tag) == nfc.tag.tt4.Type4Tag:
             msg.tag_type = Tag.NFC_TAG_TYPE4TAG
         elif type(tag) == nfc.tag.tt4.Type4ATag:
