@@ -1,0 +1,16 @@
+<launch>
+
+  <arg name="robot_type" />
+  <arg name="robot_name" />
+  <arg name="video_topic_name" />
+
+  <arg name="timezone" default="Asia/Tokyo" />
+  <arg name="video_path" default="/mnt/hdd1/data/gdrive_recorder/$(arg robot_name)_recorder" />
+
+  <node name="gdrive_recorder" pkg="jsk_tools" type="roscore_regardless.py"
+        args="--respawn --timeout 1 --ping-trials 1 --sigint-timeout 5 --sigterm-timeout 5
+              rosrun gdrive_recorder gdrive_recorder.py
+              _video_path:=$(arg video_path) _video_topic_name:=$(arg video_topic_name)
+              _database:=$(arg robot_name) _timezone:=Asia/Tokyo
+              _robot_type:=$(arg robot_type) _robot_name:=$(arg robot_name)" />
+</launch>

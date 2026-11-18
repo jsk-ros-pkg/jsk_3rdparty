@@ -1,0 +1,12 @@
+[Unit]
+Description=JSK Fetch15 gdrive server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=applications
+Group=applications
+ExecStart=/bin/bash -c "source /home/applications/ros/melodic/devel/setup.bash && rossetip && rossetmaster fetch15 && GOOGLE_DRIVE_SETTINGS_YAML=/var/lib/robot/gdrive/pydrive_settings.yaml rosrun jsk_tools roscore_regardless.py --respawn --timeout 3 --ping-trials 1 --sigint-timeout 5 --sigterm-timeout 5 roslaunch gdrive_ros gdrive_server.launch node_name:=gdrive_record_server"
+
+[Install]
+WantedBy=multi-user.target
