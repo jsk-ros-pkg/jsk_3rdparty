@@ -257,7 +257,7 @@ def run_audio_node():
             status = 'succeeded' if done else 'preempted'
         except Exception as e:
             ros_compat.logerr(node, 'Speech action failed: {}'.format(e))
-            status = 'aborted'
+            status = 'preempted' if canceled() else 'aborted'
         result.playing = False
         return status, result
 
