@@ -159,16 +159,27 @@ def run_audio_node():
     (audio_common_msgs/AudioData), for e.g. audio_common's audio_play with
     format:=wave, instead of writing a wav file for sound_play"""
     import tempfile
+    import threading
     import wave
     from audio_common_msgs.msg import AudioData, AudioInfo
     from std_msgs.msg import String
     from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat
     if ros_compat.ROS_VERSION == 1:
-        from sound_play.msg import SoundRequest
+        import actionlib
+        import rospy
+        from sound_play.msg import (SoundRequest, SoundRequestAction,
+                                    SoundRequestFeedback, SoundRequestResult)
     else:
+        from rclpy.action import ActionServer, CancelResponse, GoalResponse
+        from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
         from sound_play_msgs.msg import SoundRequest
+        from sound_play_msgs.action import SoundRequest as SoundRequestAction
+        from builtin_interfaces.msg import Duration
+        SoundRequestFeedback = SoundRequestAction.Feedback
+        SoundRequestResult = SoundRequestAction.Result
 
-    node = ros_compat.init_node('voicevox_audio')
+    node = ros_compat.init_node('voicevox_audio', multi_threaded=True)
+    speech_lock = threading.Lock()
     sample_rate = ros_compat.get_param(node, '~sample_rate', 16000)
     volume_scale = ros_compat.get_param(node, '~volume_scale', 1.0)
     pub_audio = ros_compat.create_publisher(node, 'audio', AudioData, queue_size=10)
@@ -182,36 +193,122 @@ def run_audio_node():
         coding_format='wave')
     pub_audio_info.publish(audio_info)
 
-    def speak(text, speaker=''):
-        # ~speaker is read for each message, so that it can be changed at runtime
-        speaker_id = get_speaker_id(
-            speaker or ros_compat.get_param(node, '~speaker', VOICEVOX_DEFAULT_SPEAKER_ID))
+    def speak(text, speaker='', canceled=lambda: False, feedback=None, volume=1.0):
+        # Serialize topic and action requests so their PCM chunks never interleave.
+        if not speech_lock.acquire(False):
+            raise RuntimeError('Another speech request is already being processed')
         try:
+            if canceled() or ros_compat.is_shutdown(node):
+                return False
+            speaker_id = get_speaker_id(
+                speaker or ros_compat.get_param(node, '~speaker', VOICEVOX_DEFAULT_SPEAKER_ID))
             with tempfile.NamedTemporaryFile(suffix='.wav') as f:
-                synthesize(text, speaker_id, f.name, sample_rate, volume_scale)
+                synthesize(text, speaker_id, f.name, sample_rate, volume_scale * volume)
                 with wave.open(f.name, 'rb') as w:
                     pcm = w.readframes(w.getnframes())
+            # Publish in 0.1 sec chunks at playback speed.
+            chunk_bytes = max(1, sample_rate // 10) * 2
+            start = time.monotonic()
+            for offset in range(0, len(pcm), chunk_bytes):
+                if canceled() or ros_compat.is_shutdown(node):
+                    return False
+                chunk = pcm[offset:offset + chunk_bytes]
+                pub_audio.publish(AudioData(data=chunk))
+                elapsed = (offset + len(chunk)) / (sample_rate * 2.0)
+                if feedback is not None:
+                    feedback(elapsed)
+                time.sleep(max(0, start + elapsed - time.monotonic()))
+            if canceled() or ros_compat.is_shutdown(node):
+                return False
+            ros_compat.loginfo(node, 'Published {:.2f} sec of speech'.format(len(pcm) / (sample_rate * 2.0)))
+            return True
+        finally:
+            speech_lock.release()
+
+    def topic_speak(text, speaker=''):
+        try:
+            speak(text, speaker)
         except Exception as e:
             ros_compat.logerr(node, 'Failed to synthesize {}: {}'.format(text, e))
-            return
-        # publish in 0.1 sec chunks at the playback speed
-        chunk_bytes = sample_rate // 10 * 2
-        start = time.time()
-        for offset in range(0, len(pcm), chunk_bytes):
-            if ros_compat.is_shutdown(node):
-                return
-            pub_audio.publish(AudioData(data=pcm[offset:offset + chunk_bytes]))
-            time.sleep(max(0, start + (offset + chunk_bytes) / (sample_rate * 2.0) - time.time()))
-        ros_compat.loginfo(node, 'Published {:.2f} sec of speech'.format(len(pcm) / (sample_rate * 2.0)))
+
+    def supported(goal):
+        req = goal.sound_request
+        return req.sound == SoundRequest.SAY and req.command == SoundRequest.PLAY_ONCE
+
+    def execute(goal, canceled, publish_feedback):
+        result = SoundRequestResult()
+
+        def feedback(elapsed):
+            msg = SoundRequestFeedback()
+            msg.playing = True
+            if ros_compat.ROS_VERSION == 1:
+                msg.stamp = rospy.Time.from_sec(elapsed)
+            else:
+                ns = int(elapsed * 1e9)
+                msg.stamp = Duration(sec=ns // 1000000000, nanosec=ns % 1000000000)
+            result.stamp = msg.stamp
+            publish_feedback(msg)
+
+        try:
+            if not supported(goal):
+                raise ValueError('Only SAY with PLAY_ONCE is supported')
+            req = goal.sound_request
+            done = speak(req.arg, req.arg2, canceled, feedback, req.volume)
+            status = 'succeeded' if done else 'preempted'
+        except Exception as e:
+            ros_compat.logerr(node, 'Speech action failed: {}'.format(e))
+            status = 'aborted'
+        result.playing = False
+        return status, result
+
+    if ros_compat.ROS_VERSION == 1:
+        def execute_ros1(goal):
+            status, result = execute(goal, server.is_preempt_requested, server.publish_feedback)
+            getattr(server, 'set_' + status)(result)
+
+        server = actionlib.SimpleActionServer(
+            'robotsound', SoundRequestAction, execute_cb=execute_ros1, auto_start=False)
+        server.start()
+    else:
+        # Accept one action at a time; cancellation must run during execution.
+        action_lock = threading.Lock()
+
+        def accept_goal(goal):
+            if supported(goal) and action_lock.acquire(False):
+                return GoalResponse.ACCEPT
+            return GoalResponse.REJECT
+
+        def execute_ros2(handle):
+            try:
+                status, result = execute(
+                    handle.request, lambda: handle.is_cancel_requested, handle.publish_feedback)
+                if handle.is_cancel_requested:
+                    handle.canceled()
+                elif status == 'succeeded':
+                    handle.succeed()
+                else:
+                    handle.abort()
+                return result
+            finally:
+                action_lock.release()
+
+        server = ActionServer(
+            node, SoundRequestAction, 'robotsound', execute_ros2,
+            goal_callback=accept_goal,
+            cancel_callback=lambda handle: CancelResponse.ACCEPT,
+            callback_group=ReentrantCallbackGroup())
 
     def sound_request_callback(msg):
         # arg2 is the voice of SoundClient.say(text, voice=...)
         if msg.sound == SoundRequest.SAY and msg.command == SoundRequest.PLAY_ONCE:
-            speak(msg.arg, msg.arg2)
+            topic_speak(msg.arg, msg.arg2)
+    topic_group = MutuallyExclusiveCallbackGroup() if ros_compat.ROS_VERSION == 2 else None
     ros_compat.create_subscription(
-        node, 'text', String, lambda msg: speak(msg.data), queue_size=10)
+        node, 'text', String, lambda msg: topic_speak(msg.data), queue_size=10,
+        callback_group=topic_group)
     ros_compat.create_subscription(
-        node, 'robotsound', SoundRequest, sound_request_callback, queue_size=10)
+        node, 'robotsound', SoundRequest, sound_request_callback, queue_size=10,
+        callback_group=topic_group)
     ros_compat.spin(node)
 
 
