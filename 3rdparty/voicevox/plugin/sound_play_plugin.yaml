@@ -1,0 +1,2 @@
+- name: voicevox/voicevox_plugin
+  module: voicevox_plugin.VoicevoxPlugin

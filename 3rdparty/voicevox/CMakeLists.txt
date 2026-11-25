@@ -169,7 +169,7 @@ install(
   PROGRAMS bin/text2wave ${VOICEVOX_TARGET_DIR}/bin/run-voicevox ${VOICEVOX_TARGET_DIR}/bin/run-voicevox-docker
   DESTINATION ${SHARE_DESTINATION}/bin)
 
-install(DIRECTORY launch
+install(DIRECTORY launch plugin
   DESTINATION ${SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
 
