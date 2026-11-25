@@ -126,8 +126,22 @@ synthesis can take tens of seconds.
 With `output_type:=audio`, `request_synthesis.py --output-type audio` (node `voicevox_audio`) runs instead of
 sound_play. It speaks the same `robotsound_jp` (`SoundRequest`) and `robotsound_jp/text` (`std_msgs/String`) topics,
 and publishes the speech as raw PCM (mono, S16LE, `sample_rate`) on `audio`, to be played by e.g. audio_common's
-`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another machine. The `robotsound_jp` action
-(`SoundClient(blocking=True)`) is only served by sound_play.
+`audio_play` (`format:=wave`, the same `sample_rate`), possibly on another machine. It also serves the same `robotsound_jp` action as sound_play
+(ROS 1: `sound_play/SoundRequestAction`; ROS 2: `sound_play_msgs/action/SoundRequest`),
+including `SoundClient(blocking=True)`. Only `SAY` + `PLAY_ONCE` are supported;
+`arg` is text, `arg2` is the speaker, and `volume` multiplies `volume_scale`.
+Success means all PCM has been published at playback speed, not that a remote speaker
+has finished playback. Feedback reports `playing` and elapsed audio duration in `stamp`.
+Cancel stops further PCM publication; synthesis already in progress finishes before
+cancellation is processed, and audio already buffered downstream cannot be recalled.
+ROS 2 rejects additional action goals while one is active; ROS 1 uses normal
+SimpleActionServer preemption. Overlapping topic/action speech is not mixed: a busy
+request is logged (topics) or aborted (actions).
+
+```bash
+ros2 action send_goal /robotsound_jp sound_play_msgs/action/SoundRequest \
+  '{sound_request: {sound: -3, command: 1, volume: 1.0, arg: "こんにちは", arg2: "2"}}' --feedback
+```
 
 ```bash
 ros2 launch voicevox voicevox_texttospeech.launch.xml output_type:=audio
@@ -222,6 +236,7 @@ client.say('こんにちは', voice='四国めたん-あまあま')
 - `voicevox_audio` (`request_synthesis.py --output-type audio`), `output_type:=audio`
   - Subscribes `robotsound_jp/text` (`std_msgs/String`) and `robotsound_jp` (`SoundRequest`, only `SAY` +
     `PLAY_ONCE`, `arg2` is the speaker).
+  - Serves `robotsound_jp` (`SoundRequest` action) for `SAY` + `PLAY_ONCE`.
   - Publishes `audio` (`audio_common_msgs/AudioData`, mono S16LE in 0.1 s chunks at playback speed) and
     `audio_info` (`audio_common_msgs/AudioInfo`, latched).
   - Parameters: `~speaker` (`default_speaker`, read for each message, can be changed at runtime),
