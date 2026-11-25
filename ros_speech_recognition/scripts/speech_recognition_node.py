@@ -298,6 +298,7 @@ class ROSSpeechRecognition(object):
         self.tts_tolerance = ros_compat.get_param(node, "~tts_tolerance", 1.0)  # sec
         tts_action_names = ros_compat.get_param(node,
             '~tts_action_names', ['sound_play'])
+        self.tts_topic_names = ros_compat.get_param(node, '~tts_topic_names', ['audio'])
 
         self.tts_action = None
         self.last_tts = None
@@ -308,6 +309,13 @@ class ROSSpeechRecognition(object):
         # (actionlib's action_client.last_status_msg)
         self.tts_status = {}
         if self.self_cancellation:
+            for tts_topic_name in self.tts_topic_names:
+                # the default QoS of jsk_ros1_ros2_compat >= 3.0.6 (BEST_EFFORT and VOLATILE on ROS2)
+                # reads the audio of any publisher, reliable or best-effort
+                ros_compat.create_subscription(node,
+                    tts_topic_name, AudioData,
+                    lambda msg, a=tts_topic_name: self.tts_status.__setitem__(a, len(msg.data)),
+                    queue_size=1)
             for tts_action_name in tts_action_names:
                 tts_action = ros_compat.create_simple_action_client(node,
                     tts_action_name, SoundRequestAction)
@@ -767,6 +775,12 @@ class ROSSpeechRecognition(object):
     def tts_timer_cb(self, event):
         stamp = ros_compat.now_sec(self.node)
         active = False
+        for tts_topic_name in self.tts_topic_names:
+            status = self.tts_status.get(tts_topic_name)
+            if status:
+                if status > 0:
+                    active = True
+                    self.tts_status.__setitem__(tts_topic_name, None)  # clear the status
         for tts_action in self.tts_actions:
             status = self.tts_status.get(tts_action)
             for st in (status.status_list if status else []):

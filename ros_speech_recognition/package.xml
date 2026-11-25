@@ -41,7 +41,8 @@
   <!-- catkin_virtualenv (requirements.txt) has no ROS2 port -->
   <!-- jsk_ros1_ros2_compat is only released with jsk_common >= 3.0;
        ROS1 falls back to rospy when it is not available -->
-  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</exec_depend>
+  <!-- 3.0.6: create_subscription reads any publisher by default (jsk-ros-pkg/jsk_common#1843) -->
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="3.0.6">jsk_ros1_ros2_compat</exec_depend>
   <!-- jsk_ros1_ros2_compat_install_python()/_generate_uv_venv() in CMakeLists.txt -->
   <buildtool_depend condition="$ROS_VERSION == 2" version_gte="3.0.2">jsk_ros1_ros2_compat</buildtool_depend>
 
