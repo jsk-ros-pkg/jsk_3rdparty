@@ -72,7 +72,9 @@ class VoicevoxPlugin(SoundPlayPlugin):
     def _request_once(self, method, path, body, headers):
         for attempt in (0, 1):
             try:
-                if self._conn is None:
+                # the engine may close the connection (Connection: close),
+                # then reconnect to set the timeout for synthesis again
+                if self._conn is None or self._conn.sock is None:
                     # short timeout for connecting, long one for synthesis
                     self._conn = http.client.HTTPConnection(
                         self._host, self._port, timeout=5)
@@ -96,12 +98,21 @@ class VoicevoxPlugin(SoundPlayPlugin):
                     raise
 
     def _fetch_speakers(self):
+        # share speakers.json with text2wave (request_synthesis.py), so that
+        # a named voice is resolved without the engine after a restart
+        speakers_cache = os.path.join(self._cache_dir, 'speakers.json')
+        if os.path.exists(speakers_cache):
+            with open(speakers_cache, encoding='utf-8') as f:
+                return json.load(f)
         data = self._request('GET', '/speakers')
         speakers = {}
         for speaker in json.loads(data.decode('utf-8')):
             for style in speaker['styles']:
                 speakers[str(style['id'])] = '%s-%s' % (
                     speaker['name'], style['name'])
+        os.makedirs(self._cache_dir, exist_ok=True)
+        with open(speakers_cache, 'w', encoding='utf-8') as f:
+            json.dump(speakers, f, ensure_ascii=False)
         return speakers
 
     def _resolve_speaker(self, voice):
