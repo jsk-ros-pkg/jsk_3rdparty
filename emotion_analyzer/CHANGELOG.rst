@@ -2,6 +2,51 @@
 Changelog for package emotion_analyzer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
+  Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
+* emotion_analyzer: note the license of hume bundled in the venv
+  PyPI says hume 0.6.0 is "Other/Proprietary License", but the LICENSE file of
+  its sdist is the MIT License. The scripts use HumeStreamClient, which was
+  removed in hume 0.7, so keep 0.6.0 and note it in LICENSE.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* emotion_analyzer: treat an empty Hume API key as missing in text service
+  analyze_text_service.py checked `api_key is None`, but emotion_analyzer
+  launch files always set hume_api_key from api_key, whose default is "".
+  So the text service started without a key and only failed later on each
+  request to the Hume API, while analyze_audio_service.py already refused
+  an empty key with `not api_key`.
+  Use the same `not api_key` check and say how to give the key. A node
+  started with a key behaves as before; without a key it now stops at
+  start-up with a clear message, as the audio service already does.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* emotion_analyzer: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge branch 'master' into speech-recognition-drop-phrase-during-tts
+* Merge pull request `#592 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/592>`_ from k-okada/fix-downward-url
+* emotion_analyzer: pin hume of requirements.in (all the versions on PyPI are yanked)
+  All the versions of hume on PyPI are yanked now, and pip installs a yanked version
+  only when it is pinned by ==, so that catkin_virtualenv (pip-compile of
+  requirements.in) fails with "Could not find a version that satisfies the requirement
+  hume[stream]" (e.g. ROS One on the buildfarm of ubi-agni and ROS-O of the CI). Pin
+  0.6.0, the version of pyproject.toml / uv.lock of ROS2 (the legacy HumeStreamClient
+  of the scripts is removed in 0.7; 0.14.1, which the CI resolved before, has no
+  "stream"), for python 3.9 and later, and 0.4.2 for python 3.8 (noetic).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+  (cherry picked from commit 9a6bf6c761a92aa9a9d2e23a70193b3295d7347c)
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

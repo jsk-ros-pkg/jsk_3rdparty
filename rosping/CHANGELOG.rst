@@ -2,6 +2,69 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#603 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/603>`_ from k-okada/license-spdx-ids
+  Use SPDX license identifiers matching the LICENSE files (packages not built on ROS 2)
+* rosping: use the SPDX identifier BSL-1.0
+  <license>Boost Software License, Version 1.0</license> is BSL-1.0 in SPDX.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#597 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/597>`_ from k-okada/ros2-nfc-rosping-zdepth
+  ROS 2: nfc_ros, rosping, zdepth, zdepth_image_transport
+* [rosping] add ROS2 launch test
+  test/test_rosping_launch.py, the ROS2 counterpart of test-rosping.test:
+  rosping pings 127.0.0.1 (instead of 8.8.8.8, which does not reply
+  without the network) every 0.5 s, and a reply (delay >= 0) on
+  /ping/delay is expected. As the ROS1 test, it is skipped when rosping is
+  neither setuid root nor run as root (KeepAliveProc keeps the launch
+  running then, as rosping exits at once).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [rosping] ROS2: drop the root privileges after opening the raw socket
+  Run setuid root, the ROS2 node created the shared memory files of
+  Fast DDS (/dev/shm/fastrtps\_*) as root, and `ros2 topic echo /ping/delay`
+  of the user received nothing (it did through UDPv4 only, with
+  FASTDDS_BUILTIN_TRANSPORTS=UDPv4). The raw socket is opened by pinger,
+  before the node is created, so drop the privileges (setuid(getuid()))
+  then: ping/delay is received with the default transports, the socket
+  still works, and the node no longer runs as root. ROS1 is unchanged.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [rosping] build on ROS2
+  - CMakeLists.txt: the ROS2 build is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (only lines added):
+  - rosping is built with rclcpp and installed to lib/rosping, for
+  `ros2 run rosping rosping <host>`,
+  - as on ROS1, it is made setuid root at install time when sudo works
+  without a password (else the commands to do so are shown), since it
+  sends ICMP ECHO_REQUEST with a raw socket,
+  - the dynamic loader ignores LD_LIBRARY_PATH for setuid programs, so
+  the directories of the libraries are put in its RPATH
+  (CMAKE_INSTALL_RPATH_USE_LINK_PATH, and -Wl,--disable-new-dtags as on
+  ROS1, as RUNPATH is not used for the dependencies of the libraries).
+  - package.xml: format 3, with $ROS_VERSION conditions on the ROS1/ROS2
+  dependencies and build_type; boost for ROS2 (rosboost_cfg of ROS1).
+  - AMENT_IGNORE is removed.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [rosping] rosping.cpp: roscpp or rclcpp
+  rosping.cpp runs on ROS1 and ROS2 with #if blocks, the ROS1 lines being
+  unchanged: ROS1 when <ros/ros.h> is available (which defines
+  ROS_VERSION_MAJOR to 1, the detection of jsk_ros1_ros2_compat's
+  ros_version.h, without depending on it), else ROS2:
+  - rclcpp::init(), and the arguments without the --ros-args
+  (rclcpp::remove_ros_arguments()), as ros::init() removes the remappings
+  from argv, so that `rosping <host>` is checked as before,
+  - the "ping" node with the "rate" parameter (the publishing period in
+  seconds, 10.0 by default as ROS1's ~rate) and the ping/delay
+  (std_msgs/Float64) publisher, published in the same loop.
+  ping.cpp (boost::asio raw ICMP socket) is unchanged.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 

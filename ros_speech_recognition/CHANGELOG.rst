@@ -2,6 +2,135 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
+  Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
+* ros_speech_recognition: declare Apache-2.0 for the installed Vosk models
+  On ROS 2, install_trained_data.py installs vosk-model-small-ja-0.22 and
+  vosk-model-small-en-us-0.15 (Apache License 2.0) into
+  share/ros_speech_recognition/trained_data, so add it to package.xml and
+  LICENSE.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* ros_speech_recognition: no error for a missing tts action without sound effect
+  With ~enable_sound_effect false, sound_play is usually not launched, but
+  the default ~tts_action_names (['sound_play']) still logged "action
+  'sound_play' is not initialized." as an error. Log it as info in that
+  case; it stays an error when the sound effect is enabled.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* ros_speech_recognition: load the Vosk Japanese model for ja-JP too
+  recognize_vosk() picks the bundled Japanese model only when ~language
+  is exactly 'ja'. The rest of the package (launch files, README, the
+  other engines) uses 'ja-JP' for Japanese, so running the Vosk engine
+  with language:=ja-JP logged "Unsupported language" and exited the node.
+  Accept 'ja-JP' as well as 'ja'. 'en-US', 'ja' and an explicit
+  ~vosk_model_path behave exactly as before; only a setting that used to
+  exit the node now works.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* ros_speech_recognition: drop unreachable duplicate except clause
+  audio_cb() had two `except SR.UnknownValueError` clauses. The second
+  one, which logged "Failed to recognize", could never run because the
+  first one (adjusting the energy threshold) always catches the
+  exception first. Remove the dead clause; the reachable handlers are
+  unchanged, so recognition behaves exactly as before.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* Merge pull request `#598 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/598>`_ from k-okada/speech-recognition-flac-and-result-log
+  [ros_speech_recognition] Say when flac is missing; log results as text
+* [ros_speech_recognition] Escape result text the log output cannot encode
+  Address review on `#591 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/591>`_: on kinetic/melodic the node runs on Python 3.6,
+  which writes logs in ASCII under the C locale of the CI, so logging a
+  Japanese result raised UnicodeEncodeError and audio_cb dropped the
+  result before publishing it. Escape the text (\uXXXX) when stdout,
+  stderr or the locale encoding cannot encode it.
+* [ros_speech_recognition] Give the flac hint only for errors about flac
+  Address review on `#591 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/591>`_: the hint was printed for any I/O error (e.g. a
+  missing credentials JSON) whenever flac was absent, and for non-Google
+  engines too. Give it only for the Google engines and only when the
+  exception names the flac binary or says no FLAC converter is available.
+* [ros_speech_recognition] Keep the flac hint to the install command
+* [ros_speech_recognition] Say when flac is missing; log results as text
+  CMakeLists.txt removes the flac binaries bundled with SpeechRecognition and
+  relies on the apt flac. Without it every Google recognition failed with a bare
+  'Unexpected error: (<class FileNotFoundError>, ...)'. Check for a usable flac
+  when a Google engine is selected and say how to install it; log unexpected
+  errors as 'Type: message'.
+  'Result: %s' % text.encode('utf-8') printed b'\xe3...' on Python 3; log the
+  text itself there (still utf-8 bytes on Python 2).
+* ros_speech_recognition: add a demo GIF of Vosk to README.md
+  A terminal recording of the offline recognition with Vosk on ROS 2
+  jazzy: the test bag konnichiwa.bag, converted to ROS 2 with rosbags,
+  played on /speech_audio and recognized as "今日 は". Also give the
+  commands: the audio messages of the bag are larger than the default
+  ~buffer_size, which the launch file does not expose, so run the node.
+  The output on the screen is not filtered; it was recorded with the log
+  fixes of speech_recognition_node.py (fix-error-handling, `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* ros_speech_recognition: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#590 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/590>`_ from iory/speech-recognition-drop-phrase-during-tts
+  [ros_speech_recognition] Drop a phrase that began while the robot was speaking
+* [ros_speech_recognition] Also subtract the silence listen() cut from the phrase
+  Address review on `#590 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/590>`_: listen() reads pause_threshold of silence to
+  end a phrase but keeps only non_speaking_duration of it, so the phrase
+  started that much earlier than 'end - duration'. Subtract the cut part,
+  counted in the CHUNK-byte reads ROSAudio.AudioStream returns.
+* [ros_speech_recognition] Date a phrase from when its audio arrived, not from the callback
+  Address review on `#590 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/590>`_: the recognizer thread can lag behind the audio
+  topic, so 'now' at the callback overstates when the phrase ended. Record
+  the arrival time of each audio message and use the arrival time of the
+  last bytes listen() read. Also snapshot last_tts, which tts_timer_cb may
+  reset to None concurrently.
+* Merge branch 'master' into speech-recognition-drop-phrase-during-tts
+* Merge pull request `#585 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/585>`_ from uamea/fix/speech_recognition_add_google_param
+  fix: speech recognition add param 'google_cloud_credentials_json'
+* ros_speech_recognition: google_cloud_credentials_json as a string in the ROS2 launch
+  Without a type, ROS2 launch read the value of the parameter as YAML, so that a path
+  such as "/tmp/key `#1 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/1>`_.json" was cut at "#" ("/tmp/key") and "1234" was an integer; give
+  type="str". The default "" is still an empty string, which the node takes as not given.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* ros_speech_recognition: google_cloud_credentials_json "" as not given
+  The empty default of google_cloud_credentials_json in the <rosparam> of
+  speech_recognition.launch is null in YAML, which roslaunch of ROS1 cannot set
+  ("TypeError: cannot marshal None unless allow_none is enabled", the error of
+  test_sample_ros_speech_recognition on indigo, kinetic and melodic); quote it, so that
+  it is "". The node uses the credentials only when the path is not empty, as the
+  streaming recognizer does, instead of opening "".
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [ros_speech_recognition] Drop a phrase that began while the robot was speaking
+  audio_cb runs only once a phrase has ended (pause_threshold of silence plus
+  however late the audio topic arrives), and checked only is_canceling, which
+  clears tts_tolerance after the robot stops. A phrase that started with the
+  robot's own voice therefore often reached the recogniser, and a program that
+  answers what it hears kept answering itself. Date the phrase back by its
+  length and drop it if it began before the robot stopped (plus tts_tolerance).
+* Merge pull request `#587 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/587>`_ from iory/speech-recognition-energy-threshold-args
+  [ros_speech_recognition] Add energy_threshold and dynamic_energy_threshold launch args
+* [ros_speech_recognition] Add energy_threshold and dynamic_energy_threshold launch args
+  The node already reads both parameters, but speech_recognition.launch(.xml)
+  did not expose them, so the threshold could only be changed after start-up.
+  With dynamic_energy_threshold on, the threshold is calibrated against the
+  background noise when the node starts and keeps following it; in a noisy
+  room it can end up above normal speech, and nothing is recognized.
+  Both args default to the node's existing defaults (300.0 and true), so
+  launching without them behaves as before. Added to the ROS 2 launch
+  (speech_recognition.launch.xml) and the ROS 1 launch alike.
+* fix: speech recognition add param 'google_cloud_credentials_json'
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Iori Yanokura, Kei Okada, uamea
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

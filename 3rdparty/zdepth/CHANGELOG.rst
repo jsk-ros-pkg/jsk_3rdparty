@@ -2,6 +2,23 @@
 Changelog for package zdepth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#597 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/597>`_ from k-okada/ros2-nfc-rosping-zdepth
+  ROS 2: nfc_ros, rosping, zdepth, zdepth_image_transport
+* [zdepth] build on ROS2
+  zdepth is a plain CMake package (build_type cmake), which builds Zdepth
+  with ExternalProject_Add() and installs libzdepth.so, libzstd.so and
+  zdepth/zdepth.hpp, independently of the ROS version, so CMakeLists.txt is
+  unchanged:
+  - package.xml: format 3, catkin as the buildtool of ROS1 only, cmake for
+  ROS2,
+  - AMENT_IGNORE is removed.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

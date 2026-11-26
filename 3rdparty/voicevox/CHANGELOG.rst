@@ -2,6 +2,68 @@
 Changelog for package voicevox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#601 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/601>`_ from nakane11/voicevox-plugin
+  [voicevox] Add a sound_play plugin to synthesize speech without runni…
+* Merge branch 'master' into voicevox-plugin
+* [voicevox] plugin: keep the synthesis timeout after Connection: close, and share speakers.json with text2wave
+  - After a response with Connection: close, HTTPConnection reconnects by
+  itself with the 5 s connect timeout; recreate the connection instead so
+  that the synthesis timeout is set again.
+  - Read $ROS_HOME/voicevox/speakers.json, as text2wave does, before asking
+  the engine for /speakers, and write it after a fetch, so that a named
+  voice is resolved after a restart even if the engine is unavailable.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [voicevox] Add a sound_play plugin to synthesize speech without running text2wave for each utterance
+* Merge pull request `#600 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/600>`_ from jsk-ros-pkg/voicevox-audio-action
+  [voicevox] Support SoundRequest actions for PCM audio output
+* Update status handling in request_synthesis.py
+  Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.github.com>
+* Add SoundRequest actions to VOICEVOX audio output
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* voicevox: remove a debug print of the default speaker id
+  get_speaker_id() printed ['speaker_id = ', 2] (the default speaker, not
+  the one used) on each request; the speaker is already printed with the
+  text ("speak ... with (<id>)").
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* voicevox: README.md plays the speech sample (doc/voicevox_sample.mp4 uploaded to GitHub)
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* voicevox: show the Docker engine first and a playable sample in README.md
+  Begin with the official VOICEVOX engine image (CPU, port 50021): trying
+  the voices with curl, and the nodes of the package using it with
+  remote_only:=true (or use_docker:=true), before the build, which still
+  downloads the engine, the core and the resources. Checked on ROS 2
+  jazzy: the curl synthesis, and request_synthesis.py and the sound_play
+  text2wave path with remote_only:=true against the container.
+  Add doc/voicevox_sample.mp4 (the 4.1 s speech over a still image of the
+  sentence and the credit "VOICEVOX:ずんだもん", h264 + aac, 56 KB), to be
+  uploaded as a user attachment, which GitHub plays inline; a marked
+  placeholder line is left for its URL. The mp3 stays as a fallback.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* voicevox: add a demo GIF and a speech sample to README.md
+  A terminal recording of the engine of the package (ROS 2 jazzy, CPU,
+  offline, launch_sound_play:=false) writing a Japanese sentence to a wav
+  file with request_synthesis.py, and the speech as mp3 (speaker 3, with
+  the credit "VOICEVOX:ずんだもん" required by its terms). The output on
+  the screen is not filtered; it was recorded with the removal of the
+  debug print of request_synthesis.py (fix-error-handling, `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* voicevox: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Aoi Nakane, Kei Okada, Yoshiki Obinata
+
 3.0.1 (2026-11-10)
 ------------------
 

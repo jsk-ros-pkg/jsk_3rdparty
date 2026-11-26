@@ -2,6 +2,109 @@
 Changelog for package nfc_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#597 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/597>`_ from k-okada/ros2-nfc-rosping-zdepth
+  ROS 2: nfc_ros, rosping, zdepth, zdepth_image_transport
+* [nfc_ros] shut the node down when reading the cards fails on ROS2
+  On ROS2 the cards are read in a thread, and an exception there (e.g. a binary NDEF record,
+  which record.data.decode() fails on) ended only the thread, and left the node running without
+  reading the cards. The thread logs the error and shuts the node down, and the node exits with 1,
+  as the exception ends the node on ROS1, so that on_exit of the launch file runs. Checked with a
+  reader which fails on b'\xff'.decode(): the node logs the error and exits with 1. Pointed out by
+  the review of Copilot.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] README: ROS2
+  How to build and run on ROS2 (the venv of nfcpy, demo.launch.xml), the
+  error without the NFC device, and the upper case constant names of Tag.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] add ROS2 launch file
+  launch/demo.launch.xml: the ROS2 counterpart of demo.launch (on_exit=
+  "shutdown" for required="true"), installed with the launch directory.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] fail with an error message without the NFC reader
+  Without a reader (or without the access to it), nfc.ContactlessFrontend()
+  raises IOError(ENODEV), which ended the node with a traceback and an
+  AttributeError in NFCInterface.__del_\_() (self.clf is not set then).
+  Log "Failed to open the NFC reader: [Errno 19] No such device" and exit
+  with 1 instead, on ROS1 and ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] exit on SIGINT/SIGTERM on ROS2
+  nfcpy's clf.connect() blocks until a tag is read, and returns False on
+  a KeyboardInterrupt. On ROS1, rospy's signal handler shuts rospy down
+  before raising it, so the loop of NFCROSNode.spin() ends; rclpy's signal
+  handlers shut the context down only out of a spinning executor, so the
+  node never exited on ROS2 (SIGTERM neither).
+  - NFCInterface.read_card() takes nfcpy's `terminate` function, and
+  NFCROSNode.spin() returns read_card() on shutdown with it,
+  - on ROS2, __main_\_ reads the cards in a thread and spins the node with
+  ros_compat.spin(), which returns on SIGINT/SIGTERM and shuts rclpy
+  down, so that the thread returns; ROS1 is unchanged.
+  Checked with nfcpy's 'udp' driver in place of the USB reader: the node
+  exits with 0 on SIGINT and SIGTERM (it was killed with SIGKILL before).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] Felica tag types: set tag_type with the ROS2 constant names
+  The FeliCa tags were never given their tag_type (`msg.tag_type ==
+  Tag.NFC_TAG_Felica...` compared instead of assigning, so 0 was
+  published), and those comparisons fail on ROS2 with an AttributeError, as
+  the constants are upper cased there (NFC_TAG_FELICASTANDARD, ..., see
+  CMakeLists.txt). Assign them, looking the constant up with
+  tag_constant(), which falls back to the upper cased name on ROS2.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] build on ROS2
+  - CMakeLists.txt: the ROS2 build is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (only lines added):
+  - the messages are generated with rosidl; rosidl only allows upper case
+  constant names, so Tag.msg is generated from msg/Tag.msg with the
+  constant names upper cased into the build directory
+  (NFC_TAG_FelicaStandard -> NFC_TAG_FELICASTANDARD, ...), the other
+  constants are already upper case,
+  - rosidl_generate_interfaces() already installs the nfc_ros python
+  package, so the modules of python/nfc_ros are installed into it,
+  - nfcpy is not available from apt, and catkin_virtualenv has no ROS2
+  port, so nfc_ros_node.py runs in a uv venv made from
+  pyproject.toml/uv.lock (nfcpy==1.0.4, as requirements.txt) with
+  jsk_ros1_ros2_compat_generate_uv_venv(), installed to share/ (so it is
+  shipped in the deb); the script is installed with
+  jsk_ros1_ros2_compat_install_python(USE_VENV).
+  - package.xml: format 3, with $ROS_VERSION conditions on the ROS1/ROS2
+  dependencies and build_type.
+  - AMENT_IGNORE is removed.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [nfc_ros] rospy -> jsk_ros1_ros2_compat
+  Use jsk_ros1_ros2_compat's rospy_rclpy_compat as `ros_compat` instead of
+  rospy, so that the node runs on ROS1 and ROS2. `node` is None on ROS1.
+  1. Mechanical part, generated without manual edits by
+  cd nfc_ros
+  FILES=$(grep -l '^import rospy$' node_scripts/*.py python/nfc_ros/*.py)
+  sed -i '/^import rospy$/a from jsk_ros1_ros2_compat import rospy_rclpy_compat as ros_compat' $FILES
+  python3 rospy_to_ros_compat.py $FILES
+  rospy_to_ros_compat.py is the script of the ros_speech_recognition port
+  (4c1d6ebc, "[ros_speech_recognition] rospy/actionlib/dynamic_reconfigure
+  -> jsk_ros1_ros2_compat"): it converts the rospy calls whose ros_compat
+  functions take the same arguments (log*, is_shutdown,
+  Publisher -> create_publisher, init_node), adding the node argument
+  (`node` in __main_\_ and in __init_\_ of NFCROSNode, which gets a
+  `node=None` argument, `self.node` in its other methods), and removes
+  `import rospy` when no rospy.xxx is left.
+  2. By hand:
+  - node_scripts/nfc_ros_node.py: NFCROSNode is given the node of
+  ros_compat.init_node(), and is no longer assigned to `node`,
+  - package.xml: exec_depend on jsk_ros1_ros2_compat (>= 3.0.2, the
+  released jsk_common), on ROS1 too, as there is no fallback to rospy.
+  The ROS1-only test/test_rospy_node.py keeps rospy.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

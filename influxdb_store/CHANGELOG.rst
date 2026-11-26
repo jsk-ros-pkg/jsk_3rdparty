@@ -2,6 +2,37 @@
 Changelog for package influxdb_store
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* influxdb_store: pass a Loader to yaml.load in transform_logger
+  transform_logger calls yaml.load() without Loader on the tf2
+  allFramesAsYAML() string. PyYAML 6 made Loader mandatory, so every call
+  raised TypeError: _graph_cb() logged it and stored no frames, and
+  __init_\_ retried until it gave up with sys.exit(1).
+  Use yaml.SafeLoader. The data is a plain mapping of frame names to
+  str/float fields, which SafeLoader parses identically to the old
+  default Loader (PyYAML < 5.1, ROS 1 Python 2) and FullLoader (5.1 to
+  5.4, ROS 1 noetic); SafeLoader also exists in all those versions.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* influxdb_store: add a demo GIF to README.md
+  A terminal recording on ROS 2 jazzy: InfluxDB 1.8 in Docker,
+  /joint_states published, joint_states_logger.py storing them, and the
+  stored points queried with influx. Note the differences of the recorded
+  commands from the README (container name, > /dev/null, -precision).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* influxdb_store: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

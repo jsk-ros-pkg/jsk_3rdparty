@@ -2,6 +2,60 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* switchbot_ros: exit cleanly when status publisher is misconfigured
+  SwitchBotStatusPublisher.__init_\_() logs an error and returns early when
+  ~device_name is empty, unknown, or of a device type without a status
+  message, but __main_\_ still calls spin(), which then crashed with
+  AttributeError (no device_type / msg_class) or KeyError from
+  device_status(), hiding the real error message under a traceback.
+  Mark the publisher ready only at the end of __init_\_ and make spin()
+  return immediately otherwise, so the node logs the configuration error
+  and exits. A correctly configured publisher runs exactly as before
+  (the Remote case already returned from spin()).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* switchbot_ros: check HTTP status before parsing the response JSON
+  SwitchBotAPIClient.request() called response.json() before
+  response.raise_for_status(). When the API answers 4XX/5XX with a
+  non-JSON body (an HTML error page, a plain "Too Many Requests"), a
+  JSONDecodeError was raised and the dedicated InvalidRequestError (422)
+  / ExceededRequestError (429) / HTTPError handling was never reached.
+  Parse the body only after the status check succeeded; response_json is
+  used only in that branch. Successful responses and 4XX/5XX responses
+  with a JSON body behave exactly as before (checked with mocked
+  requests: 200, statusCode 152, 401 JSON are unchanged; 422/429/500 with
+  a non-JSON body now raise InvalidRequestError/ExceededRequestError/
+  HTTPError instead of JSONDecodeError).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* switchbot_ros: abort the action goal when the command fails
+  execute_cb() always called set_succeeded() from its finally block, so a
+  failed command (unknown device, offline device, API error, ...) was
+  reported to action clients as SUCCEEDED with result.done == False.
+  Errors not in the except list (HTTP errors / no connection from
+  requests, ValueError for an unknown statusCode or a non-JSON reply)
+  were even reported as SUCCEEDED with done == True before the exception
+  escaped the callback.
+  Catch those too, and call set_aborted() when the command failed. The
+  feedback, the logged error and result.done are the same as before, and
+  successful commands are still SUCCEEDED, so clients that only read
+  result.done (SwitchBotROSClient.control_device()) see no change; only
+  the goal state now tells the truth on failure.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* switchbot_ros: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

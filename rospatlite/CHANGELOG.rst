@@ -2,6 +2,39 @@
 Changelog for package rospatlite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* rospatlite: decode socket reply so ACK check works on Python 3
+  Patlite.write()/clear() compare the reply of socket.recv() with the str
+  ACK '\x06'. On Python 3 recv() returns bytes, so b'\x06' != '\x06' and
+  every command was reported as a failure; read() likewise built a
+  PatliteState from bytes, which then broke code2int() and __repr_\_().
+  Receive through a small _recv() helper that decodes bytes as latin-1
+  (the same codec already used for sendall()). On Python 2 recv() returns
+  str, which is passed through unchanged, so the ROS 1 / Python 2
+  behavior is exactly as before.
+  Checked with a dummy TCP server on 127.0.0.1: write()/clear() now
+  return True and read() returns the right state on Python 3; Python 2
+  results are identical before and after.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* rospatlite: add a demo GIF to README.md
+  A terminal recording on ROS 2 jazzy without a PATLITE: the dummy TCP
+  server of the README prints the bytes which patlite_node.py sends for
+  the messages on /patlite/set/{red,yellow,buzzer}.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* rospatlite: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

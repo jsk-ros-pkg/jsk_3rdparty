@@ -2,6 +2,74 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* google_chat_ros: answer 400 to HTTPS requests with unknown user agent
+  GoogleChatHTTPSHandler.do_POST() only handled requests whose
+  User-Agent matches (Google-Dynamite) and returned without sending any
+  HTTP response otherwise, so such clients got the connection closed
+  with no status line (or hung until their timeout).
+  Send 400 Bad Request with the existing, so far unused, _bad_request()
+  helper in that case. Requests from Google Chat are processed and
+  answered 200 exactly as before, and the callback is still not called
+  for other user agents.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* google_chat_ros: format the received Pub/Sub message in debug log
+  GoogleChatPubSubClient._pubsub_cb() logged the literal text
+  "Recieved {message}" because the string had no f-prefix. Format the
+  message into it with str.format() (also fixing the typo), which keeps
+  the file compilable on Python 2 like the rest of the module. Debug-level
+  log text only; no behavior change.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* google_chat_ros: avoid UnboundLocalError in _download_content
+  _download_content() returns `path` from a `finally:` block, but `path`
+  is only bound inside the try block. When the download fails before it
+  is set (e.g. os.path.join() fails) the logged warning was followed by
+  an UnboundLocalError, raised from the message callback.
+  Initialise `path = None` before the try. Successful downloads and the
+  warn/error logs on failure are unchanged; only the crash goes away.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* google_chat_ros: fix undefined image_icon in image button json
+  _make_button_json() filled the icon of an image button into
+  `image_icon`, which is never defined, so sending a card with an image
+  button that has icon / original_icon_url / original_icon_filepath raised
+  NameError; and the built `image_button` was never put into json_body, so
+  an image button without icon was silently dropped.
+  Fill the fields into `image_button` and add it as `imageButton` (with
+  its `name`), the same way the text button branch adds `textButton`.
+  Text buttons and every other card element are unchanged; image buttons
+  never worked before, so no existing ROS 1 behavior depends on this.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* google_chat_ros: restructure README.md for a first-time user
+  Begin with what the package does and a table of the modes (Pub/Sub,
+  HTTPS, sending only, Dialogflow) with what each needs, then a
+  step-by-step quick start of the Pub/Sub mode on ROS 2, sending and
+  receiving, the details of each mode, ROS 1, the interface and
+  troubleshooting; the notes on the Python dependencies go to the end.
+  Facts checked against the code: receiving_mode:=dialogflow only creates
+  the topics, as its subscriber was removed (e4adc5ae), so answering with
+  Dialogflow is the helper's to_dialogflow_client (ROS 1 only); host
+  defaults to localhost; without a valid key there is no send action.
+  The send examples are given for ROS 2 (ros2 action send_goal); their
+  goals were parsed into google_chat_ros/action/SendMessage goals. The
+  subscription expiry is described without a number of days.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* google_chat_ros: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

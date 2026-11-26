@@ -2,6 +2,41 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
+  Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
+* respeaker_ros: declare GPL-2.0-only for pixel-ring bundled in the venv
+  On ROS 2, pixel-ring 0.1.0 (GNU General Public License v2) is installed into
+  share/respeaker_ros/venv, so add it to package.xml and LICENSE.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
+* respeaker_ros: add missing ROS 2 exec_depend on tf2_ros
+  sample_respeaker.launch.xml (ROS 2) runs tf2_ros
+  static_transform_publisher, but package.xml declared tf2_ros nowhere,
+  so rosdep did not install it with the package. Add it with
+  condition="$ROS_VERSION == 2"; ROS 1 keeps using tf (already declared)
+  from sample_respeaker.launch, so ROS 1 dependencies are unchanged.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
+  Update the READMEs for ROS 1 / ROS 2, with badges and demos
+* respeaker_ros: reload the udev rules with udevadm in README.md
+  After copying config/60-respeaker.rules, reload the rules and apply them
+  to the connected device with "udevadm control --reload-rules" and
+  "udevadm trigger", instead of "systemctl restart udev", which does not
+  apply the new rule to a device already connected.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* respeaker_ros: update README.md for ROS 1 / ROS 2
+  Describe how to run it on ROS 2 and ROS 1, its interface (topics,
+  services, actions, parameters) as in the source, and its requirements.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review

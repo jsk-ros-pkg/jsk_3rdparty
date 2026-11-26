@@ -2,6 +2,73 @@
 Changelog for package zdepth_image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#597 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/597>`_ from k-okada/ros2-nfc-rosping-zdepth
+  ROS 2: nfc_ros, rosping, zdepth, zdepth_image_transport
+* [zdepth_image_transport] README: ROS2
+  How to decompress /camera/depth/image_raw/zdepth with the republish node
+  of ROS2 (its in/zdepth remapping), checked with a 16UC1 640x480 image
+  published on /depth, republished raw -> zdepth -> raw: 614400 bytes ->
+  1513 bytes, the same size/encoding/header back, the 0 (invalid) pixels
+  kept, the others within 3 mm (zdepth quantizes the depth).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [zdepth_image_transport] build on ROS2
+  - CMakeLists.txt: the ROS2 build is prepended and the ROS1 original is
+  wrapped in else()/endif() unchanged (only lines added):
+  - libzdepth/libzstd and zdepth/zdepth.hpp of the zdepth package are
+  found as on ROS1 (without the system libzstd),
+  - ZDepthImage.msg is generated with rosidl, by the target
+  zdepth_image_transport_msgs (with LIBRARY_NAME zdepth_image_transport),
+  as the target zdepth_image_transport is the plugin library
+  (libzdepth_image_transport.so, as on ROS1),
+  - the plugin library, zdepth_test and the headers (to
+  include/zdepth_image_transport, as ROS2 packages do) are installed,
+  - the plugins are exported to image_transport with
+  pluginlib_export_plugin_description_file(), with
+  zdepth_plugins_ros2.xml: the same as zdepth_plugins.xml, except for the
+  library path "zdepth_image_transport", as the pluginlib of ROS2 takes
+  the library name, and does not find lib/libzdepth_image_transport
+  ("image_transport/zdepth (*): Not available" in
+  `ros2 run image_transport list_transports`).
+  - package.xml: format 3, with $ROS_VERSION conditions on the ROS1/ROS2
+  dependencies and build_type, member of rosidl_interface_packages on
+  ROS2.
+  - AMENT_IGNORE is removed.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [zdepth_image_transport] plugins: image_transport of ROS1 or ROS2
+  The publisher/subscriber plugins build on ROS1 and ROS2 with #if blocks,
+  the ROS1 lines being unchanged:
+  - include/zdepth_image_transport/ros_version.h: ROS1 when <ros/ros.h> is
+  available (which defines ROS_VERSION_MAJOR to 1), else ROS2, the
+  detection of jsk_ros1_ros2_compat's ros_version.h, without depending
+  on it,
+  - the .hpp headers of image_transport/pluginlib and the
+  zdepth_image_transport/msg/z_depth_image.hpp message of ROS2,
+  - ZDepthPublisher overrides publish(const Image&, const PublisherT&) on
+  ROS2, as publish(const Image&, const PublishFn&) is deprecated on jazzy
+  and removed on rolling (where advertiseImpl() takes node interfaces
+  instead of rclcpp::Node*, which the plugins do not override, so the same
+  source builds on both),
+  - ZDepthSubscriber::internalCallback() takes ZDepthImage::ConstSharedPtr,
+  - SharedPtr instead of Ptr for the messages, publisher->publish() for
+  publish_fn(),
+  - ROS_ERROR() is RCLCPP_ERROR() with the "zdepth_image_transport" logger
+  in the .cpp files on ROS2.
+  The compression/decompression code is unchanged.
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* [zdepth_image_transport] ZDepthImage.msg: std_msgs/Header
+  rosidl (ROS2) does not resolve `Header` to std_msgs/Header as genmsg
+  (ROS1) does. The md5sum of ROS1 is unchanged
+  (b567eabe13717816ed52eecedd17fb24, computed with genmsg before and after).
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/session_01Xo6jRt2Rcht9sQS6ms6A4p
+* Merge pull request `#584 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/584>`_ from k-okada/release-3.0.1
+* Contributors: Kei Okada
+
 3.0.1 (2026-11-10)
 ------------------
 * Merge pull request #583 from k-okada/rosdistro-55247-review
