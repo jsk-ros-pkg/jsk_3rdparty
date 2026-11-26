@@ -7,6 +7,8 @@
 
   <maintainer email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</maintainer>
   <license>BSD-3-Clause</license>
+  <!-- the Vosk models installed on ROS 2, see LICENSE -->
+  <license>Apache-2.0</license>
   <author email="furushchev@jsk.imi.i.u-tokyo.ac.jp">Yuki Furuta</author>
 
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>

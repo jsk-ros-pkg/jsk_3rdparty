@@ -199,3 +199,13 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+--------------------------------------------------------------------------------
+
+Bundled Python packages
+
+On ROS 2, the Python packages of uv.lock are installed from PyPI into
+share/respeaker_ros/venv, under their own licenses. pixel-ring 0.1.0
+(https://github.com/respeaker/pixel_ring), used to control the LED ring of
+ReSpeaker, is under the GNU General Public License v2
+(https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).

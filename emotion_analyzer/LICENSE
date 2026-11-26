@@ -27,3 +27,12 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+Bundled Python packages
+
+On ROS 2, the Python packages of uv.lock are installed from PyPI into
+share/emotion_analyzer/venv, under their own licenses. hume 0.6.0 is under the
+MIT License (Copyright (c) 2022 Hume AI, Inc.), as the LICENSE file of its
+sdist says, although its PyPI metadata says "Proprietary".
