@@ -4,7 +4,7 @@
   <description>fast downward: PDDL Planner (http://www.fast-downward.org)</description>
   <maintainer email="youhei@jsk.t.u-tokyo.ac.jp">Yohei Kakiuchi</maintainer>
 
-  <license>GPL</license>
+  <license>GPL-3.0-or-later</license>
 
   <url type="website">http://ros.org/wiki/downward</url>
   <!-- <url type="bugtracker"></url> -->
