@@ -2,8 +2,8 @@
 Changelog for package sesame_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
 * sesame_ros: log a clear error when ~auth_token is not set
   ~auth_token is required and has no default. With plain rospy the node

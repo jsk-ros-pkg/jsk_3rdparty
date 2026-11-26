@@ -2,8 +2,8 @@
 Changelog for package emotion_analyzer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
   Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
 * emotion_analyzer: note the license of hume bundled in the venv

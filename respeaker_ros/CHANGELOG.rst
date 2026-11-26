@@ -2,8 +2,8 @@
 Changelog for package respeaker_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
   Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
 * respeaker_ros: declare GPL-2.0-only for pixel-ring bundled in the venv

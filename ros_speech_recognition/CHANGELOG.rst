@@ -2,8 +2,8 @@
 Changelog for package ros_speech_recognition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#602 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/602>`_ from k-okada/license-bundled-components
   Declare the licenses of bundled components (hume, pixel-ring, Vosk models)
 * ros_speech_recognition: declare Apache-2.0 for the installed Vosk models

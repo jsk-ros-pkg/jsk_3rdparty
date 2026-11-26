@@ -2,8 +2,8 @@
 Changelog for package rospatlite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
 * rospatlite: decode socket reply so ACK check works on Python 3
   Patlite.write()/clear() compare the reply of socket.recv() with the str

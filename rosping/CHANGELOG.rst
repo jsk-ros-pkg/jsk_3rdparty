@@ -2,8 +2,8 @@
 Changelog for package rosping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#603 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/603>`_ from k-okada/license-spdx-ids
   Use SPDX license identifiers matching the LICENSE files (packages not built on ROS 2)
 * rosping: use the SPDX identifier BSL-1.0

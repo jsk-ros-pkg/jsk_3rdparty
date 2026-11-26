@@ -2,8 +2,8 @@
 Changelog for package chaplus_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#595 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/595>`_ from k-okada/readme-update
   Update the READMEs for ROS 1 / ROS 2, with badges and demos
 * chaplus_ros: update README.md for ROS 1 / ROS 2

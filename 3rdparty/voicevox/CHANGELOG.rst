@@ -2,8 +2,8 @@
 Changelog for package voicevox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#601 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/601>`_ from nakane11/voicevox-plugin
   [voicevox] Add a sound_play plugin to synthesize speech without runni…
 * Merge branch 'master' into voicevox-plugin

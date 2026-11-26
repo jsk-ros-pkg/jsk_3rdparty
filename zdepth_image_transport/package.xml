@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>zdepth_image_transport</name>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
   <description>The zdepth_image_transport package</description>
 
   <maintainer email="shingogo.5511@gmail.com">Shingo Kitagawa</maintainer>

@@ -2,8 +2,8 @@
 Changelog for package nfc_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#597 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/597>`_ from k-okada/ros2-nfc-rosping-zdepth
   ROS 2: nfc_ros, rosping, zdepth, zdepth_image_transport
 * [nfc_ros] shut the node down when reading the cards fails on ROS2

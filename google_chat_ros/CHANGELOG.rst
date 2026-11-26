@@ -2,8 +2,8 @@
 Changelog for package google_chat_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
 * google_chat_ros: answer 400 to HTTPS requests with unknown user agent
   GoogleChatHTTPSHandler.do_POST() only handled requests whose

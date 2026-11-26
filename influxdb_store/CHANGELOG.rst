@@ -2,8 +2,8 @@
 Changelog for package influxdb_store
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
 * influxdb_store: pass a Loader to yaml.load in transform_logger
   transform_logger calls yaml.load() without Loader on the tf2

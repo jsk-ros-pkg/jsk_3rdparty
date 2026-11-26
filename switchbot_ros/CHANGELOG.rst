@@ -2,8 +2,8 @@
 Changelog for package switchbot_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2026-11-26)
+------------------
 * Merge pull request `#594 <https://github.com/jsk-ros-pkg/jsk_3rdparty/issues/594>`_ from k-okada/fix-error-handling
 * switchbot_ros: exit cleanly when status publisher is misconfigured
   SwitchBotStatusPublisher.__init_\_() logs an error and returns early when
