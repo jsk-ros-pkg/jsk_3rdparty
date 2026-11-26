@@ -4,7 +4,7 @@
   <description>ffha: PDDL Planner (http://ipc.informatik.uni-freiburg.de)</description>
   <maintainer email="youhei@jsk.t.u-tokyo.ac.jp">Yohei Kakiuchi</maintainer>
 
-  <license>GPL</license>
+  <license>GPL-3.0-or-later</license>
 
   <url type="website">http://ros.org/wiki/ffha</url>
   <!-- <url type="bugtracker"></url> -->

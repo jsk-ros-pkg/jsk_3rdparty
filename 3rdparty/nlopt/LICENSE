@@ -21,3 +21,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+
+--------------------------------------------------------------------------------
+
+build/nlopt-2.3.tar.gz (NLopt 2.3) is built and installed by this package. As
+its COPYING says, the compiled NLopt library is governed by the GNU Lesser
+General Public License, version 2.1 or later, of the code in its "luksan"
+directory, and the other portions are under the MIT License above.

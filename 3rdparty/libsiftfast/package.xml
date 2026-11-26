@@ -4,7 +4,7 @@
   <description>
     Library to compute SIFT features
   </description>
-  <license>LGPL</license>
+  <license>LGPL-3.0-or-later</license>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
   <author>zerofrog</author>
 

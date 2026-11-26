@@ -6,7 +6,7 @@
   </description>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
 
-  <license>Boost Software License, Version 1.0</license>
+  <license>BSL-1.0</license>
 
   <url type="website">http://ros.org/wiki/rosping</url>
 
