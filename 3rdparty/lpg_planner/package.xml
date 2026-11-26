@@ -4,7 +4,7 @@
   <description>lpg_planner: LPGL Planner (http://zeus.ing.unibs.it/lpg/)</description>
   <maintainer email="h-kamada@jsk.imi.i.u-tokyo.ac.jp">Hitoshi Kamada</maintainer>
 
-  <license>GPL</license>
+  <license>LPG: for research and experimental purposes only</license>
 
   <url type="website">http://ros.org/wiki/lpg_planner</url>
 
