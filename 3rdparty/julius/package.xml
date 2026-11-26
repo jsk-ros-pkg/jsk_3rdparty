@@ -4,7 +4,7 @@
   <description>julius: Open-Source Large Vocabulary CSR Engine (http://julius.sourceforge.jp/index.php)</description>
   <maintainer email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</maintainer>
 
-  <license>GPL</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/julius</url>
   <!-- <url type="bugtracker"></url> -->
